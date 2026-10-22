@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html lang="tr"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Saha Değerlendirme Aracı</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -222,7 +222,7 @@ input[aria-invalid=true]{border:2px solid var(--no)}
 @media print{
   header,.pipeline{background:none;color:#000}
   aside,.viewbar,.unit-actions,#toast,.no-print,button.ghost{display:none!important}
-  .shell{display:block}main{max-width:none;padding:0}
+  body{display:block}.shell{display:block}main{max-width:none;padding:0}
   .box{break-inside:avoid}
 }
 /* ===== Modern tema: slate + amber, Inter, kart mimarisi ===== */
@@ -268,19 +268,48 @@ header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-wi
 .mk strong{display:block;margin-top:4px;font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .mk strong small{font-size:14px;font-weight:400;color:var(--muted);margin-left:4px;letter-spacing:0}
 
-/* Sol panel */
-aside{padding:20px 16px;gap:12px}
-.searchwrap{position:relative;flex:1}
-.searchwrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
-.searchwrap input{padding-left:36px;height:40px;font-size:14px;border-radius:8px}
-#addSite{width:100%;height:40px}
-.site-item{border-radius:10px;border:1px solid var(--line);border-left:4px solid var(--line)}
-.site-item:hover{background:var(--soft)}
-.site-item.active{background:var(--accent-soft);border-color:#fcd34d;border-left-color:#d97706}
-.aside-foot{padding-top:16px;gap:8px;align-items:center}
-.aside-foot button{height:32px;padding:0 12px;font-size:12px;border-radius:6px;background:transparent}
-.aside-foot button:hover{background:var(--soft)}
-.aside-foot p{flex-basis:100%;color:var(--muted)}
+/* Sol panel: koyu navigasyon */
+@media (min-width:701px){
+  body{display:grid;grid-template-columns:256px minmax(0,1fr);grid-template-rows:auto auto 1fr;min-height:100vh}
+  .shell{display:contents}
+  aside{grid-column:1;grid-row:1/span 3}
+  body>header,.pipeline,main{grid-column:2}
+  main{max-width:none}
+}
+aside{background:#111827;color:#cbd5e1;border-right:1px solid #1e293b;padding:0;gap:0;position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#334155 transparent}
+.brand{display:flex;align-items:center;gap:12px;padding:16px;background:#0d121d;border-bottom:1px solid #1e293b}
+.brand .logo{display:grid;place-items:center;width:36px;height:36px;border-radius:8px;background:#f59e0b;color:#020617;flex:none}
+.brand .logo svg{width:20px;height:20px}
+.brand strong{display:block;font-size:16px;font-weight:700;letter-spacing:.025em;color:#fff;line-height:1.2}
+.brand small{display:block;font-size:12px;color:#94a3b8;margin-top:2px}
+.nav{padding:4px 0 8px}
+.nav-head{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-radius:0;background:transparent;padding:16px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b}
+.nav-head:hover{background:transparent;color:#94a3b8}
+.nav-head .chev{width:12px;height:12px;transition:transform .2s}
+.nav-group.collapsed .chev{transform:rotate(-90deg)}
+.nav-group.collapsed .nav-body{display:none}
+.nav-item{display:flex;align-items:center;gap:12px;width:calc(100% - 16px);margin:2px 8px 0;padding:10px 16px;border:0;border-radius:6px;background:transparent;color:#94a3b8;font-size:12px;font-weight:500;text-align:left;transition:background .15s,color .15s}
+.nav-item:hover{background:rgba(30,41,59,.6);color:#fff;border-color:transparent}
+.nav-item .ni{width:16px;height:16px;flex:none}
+.nav-item.active{background:#f59e0b;color:#020617;font-weight:600;box-shadow:0 4px 6px -1px rgba(0,0,0,.3)}
+.nav-item.active:hover{background:#f59e0b;color:#020617}
+.nav-item:focus-visible,.nav-head:focus-visible{outline:2px solid #f59e0b;outline-offset:-2px}
+.listpanel{margin:4px 8px 6px;padding:8px;border:1px solid #1e293b;border-radius:8px;background:#0d121d;display:flex;flex-direction:column;gap:8px}
+.listpanel[hidden]{display:none}
+.searchwrap{position:relative}
+.searchwrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#64748b;pointer-events:none}
+.searchwrap input{padding-left:32px;height:36px;min-height:36px;font-size:12px;background:#111827;border-color:#334155;color:#e2e8f0}
+.searchwrap input::placeholder{color:#64748b}
+.listpanel .filter-note{color:#94a3b8}
+.listpanel .filter-note button{background:transparent;border-color:#334155;color:#cbd5e1}
+#siteList{max-height:340px;gap:6px}
+.site-item{background:transparent;border:1px solid #1e293b;border-left:4px solid #334155;border-radius:8px;color:#cbd5e1;padding:8px 10px}
+.site-item:hover{background:rgba(30,41,59,.6);border-color:#334155;border-left-color:#475569}
+.site-item.active{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);border-left-color:#f59e0b}
+.site-item .name{color:#fff;font-size:13px}
+.site-item .meta{color:#94a3b8;font-size:11.5px;flex-wrap:wrap}
+.aside .score.hi,aside .score.hi{color:#4ade80}aside .score.mid{color:#fbbf24}aside .score.lo{color:#f87171}
+.nav-note{margin:auto 0 0;padding:12px 16px 16px;font-size:11px;line-height:1.5;color:#64748b;border-top:1px solid #1e293b}
 
 /* Sekmeler */
 main{padding:24px 28px}
@@ -320,6 +349,8 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 @media (max-width:700px){
   header{padding:18px 14px 16px}.pipeline{padding:16px 14px 4px}.pipe-legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .mk{padding:12px}.mk strong{font-size:17px}main{padding:14px}.emptystate{padding:36px 16px}
+  aside{position:static;height:auto;overflow:visible}
+  #siteList{flex-direction:row;max-height:none}.site-item{min-width:200px}.nav-note{display:none}
 }
 </style>
 <header>
@@ -336,20 +367,37 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 
 <div class="shell">
   <aside>
-    <div class="aside-top">
-      <div class="searchwrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search" type="search" placeholder="Lokasyon, ilçe veya proje ara" aria-label="Lokasyon ara"></div>
+    <div class="brand">
+      <span class="logo"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span>
+      <div><strong>MKT Motors</strong><small>Saha Değerlendirme · EV CPO</small></div>
     </div>
-    <button class="primary" id="addSite"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button>
-    <div class="filter-note" id="filterNote" hidden></div>
-    <div id="siteList"></div>
-    <div class="aside-foot">
-      <button id="exportJson">Yedek indir</button>
-      <button id="importBtn">Yedek yükle</button>
-      <button id="demoClear">Demo veriyi sil</button>
-      <button id="exportCsv">CSV indir</button>
-      <input type="file" id="importFile" accept=".json,application/json" hidden>
-      <p>Kayıtlar her değişiklikte buluta kaydedilir; telefondan, başka bilgisayardan ve sayfayı paylaştığınız kişilerden aynı veriler görünür. JSON yedeği arşiv içindir.</p>
-    </div>
+    <nav class="nav" aria-label="Ana gezinme">
+      <section class="nav-group" data-group="main">
+        <button type="button" class="nav-head" aria-expanded="true">Ana menü<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Genel Bakış / Anasayfa</span></button></div>
+      </section>
+      <section class="nav-group" data-group="site">
+        <button type="button" class="nav-head" aria-expanded="true">Saha &amp; Lokasyon Yönetimi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="port"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>Portföy Özeti</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Lokasyon Listesi</span></button><div class="listpanel" id="listPanel">
+          <div class="searchwrap"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search" type="search" placeholder="Lokasyon ara…" aria-label="Lokasyon, ilçe veya proje ara"></div>
+          <div class="filter-note" id="filterNote" hidden></div>
+          <div id="siteList"></div>
+        </div><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Lokasyon Ekle</span></button></div>
+      </section>
+      <section class="nav-group" data-group="tech">
+        <button type="button" class="nav-head" aria-expanded="true">Şarj Üniteleri &amp; Teknik<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="units"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg><span>Şarj Üniteleri (AC/DC)</span></button><button type="button" class="nav-item" data-nav="infra"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/></svg><span>Altyapı &amp; Güç Kapasitesi</span></button></div>
+      </section>
+      <section class="nav-group" data-group="fin">
+        <button type="button" class="nav-head" aria-expanded="true">Finansman &amp; Uygunluk<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="credit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg><span>Kredilendirme &amp; Takip</span></button><button type="button" class="nav-item" data-nav="check"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>Kontrol Listesi (Checklist)</span></button></div>
+      </section>
+      <section class="nav-group" data-group="data">
+        <button type="button" class="nav-head" aria-expanded="true">Veri ve Araçlar<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="nav-body"><button type="button" class="nav-item" id="exportJson" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Yedek indir (JSON)</span></button><button type="button" class="nav-item" id="importBtn" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Yedek yükle</span></button><button type="button" class="nav-item" id="exportCsv" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg><span>CSV indir</span></button><button type="button" class="nav-item" id="demoClear" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg><span>Demo veriyi sil</span></button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+      </section>
+    </nav>
+    <p class="nav-note">Kayıtlar her değişiklikte buluta kaydedilir; telefondan, başka bilgisayardan ve sayfayı paylaştığınız kişilerden aynı veriler görünür. JSON yedeği arşiv içindir.</p>
   </aside>
   <main>
     <div class="viewbar no-print">
@@ -693,7 +741,7 @@ function renderList(){
     </button>`;}).join(''):'<p style="font-size:13px;color:var(--muted)">Aramaya uyan lokasyon yok.</p>';
 }
 function render(){
-  renderPipe();renderList();
+  renderPipe();renderList();paintNav();
   $('vPortfolio').setAttribute('aria-pressed',view==='portfolio');
   $('vSite').setAttribute('aria-pressed',view==='site');
   $('vSite').disabled=!db.sites.length;
@@ -1078,6 +1126,36 @@ function demoSites(){
       fin:{share:20,entShare:0,starShare:40,ekoShare:40},tr:[]})
   ];
 }
+/* ---------- sol navigasyon ---------- */
+let navKey='ovw';
+const NAV_SECTIONS={units:'Şarj üniteleri',infra:'Saha keşfi',credit:'Finansman yapısı',check:'Skorlama ve yeterlilik'};
+function paintNav(){
+  if(view==='portfolio'&&navKey!=='ovw'&&navKey!=='port')navKey='ovw';
+  if(view==='site'&&(navKey==='ovw'||navKey==='port'))navKey='list';
+  document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===navKey;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+}
+function jump(title){
+  const h=[...document.querySelectorAll('#view section.box > h3, #view .box > h3')].find(x=>x.textContent.trim().startsWith(title));
+  if(h)h.scrollIntoView({behavior:'smooth',block:'start'});else window.scrollTo({top:0,behavior:'smooth'});
+}
+function goSite(key){
+  if(!db.sites.length){toast('Önce bir lokasyon ekleyin.');return;}
+  if(!db.sites.find(x=>x.id===activeId))activeId=(visibleSites()[0]||db.sites[0]).id;
+  navKey=key;view='site';render();jump(NAV_SECTIONS[key]);
+}
+document.querySelector('aside').addEventListener('click',e=>{
+  const head=e.target.closest('.nav-head');
+  if(head){const g=head.parentElement,c=g.classList.toggle('collapsed');head.setAttribute('aria-expanded',String(!c));
+    try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');st[g.dataset.group]=c;localStorage.setItem('saha-nav',JSON.stringify(st));}catch(x){}return;}
+  const b=e.target.closest('.nav-item[data-nav]');if(!b)return;
+  const k=b.dataset.nav;
+  if(k==='ovw'){navKey='ovw';view='portfolio';render();window.scrollTo({top:0,behavior:'smooth'});}
+  else if(k==='port'){navKey='port';view='portfolio';render();jump('Lokasyonlar');}
+  else if(k==='list'){const p=$('listPanel');p.hidden=!p.hidden;if(!p.hidden)$('search').focus();if(view==='site'){navKey='list';paintNav();}}
+  else if(NAV_SECTIONS[k])goSite(k);
+});
+try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');for(const g in st)if(st[g]){const el=document.querySelector(`.nav-group[data-group="${g}"]`);if(el){el.classList.add('collapsed');el.querySelector('.nav-head').setAttribute('aria-expanded','false');}}}catch(x){}
+
 function seedDemo(){
   const K=KEY+':seeded';
   try{if(localStorage.getItem(K))return;}catch(e){}
