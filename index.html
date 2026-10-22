@@ -1,5 +1,8 @@
 <!doctype html><html lang="tr"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Saha Değerlendirme Aracı</title>
+<meta name="robots" content="noindex,nofollow">
+<style>html.pending body{visibility:hidden}</style>
+<script>document.documentElement.classList.add("pending")</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
@@ -286,7 +289,10 @@ header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-wi
   .sb-collapsed .nav-group.collapsed .nav-body{display:block}
   .sb-collapsed .nav-group+.nav-group{border-top:1px solid rgba(30,41,59,.6);margin-top:6px;padding-top:6px}
   .sb-collapsed .nav-item{justify-content:center;gap:0;padding:12px 0;margin:2px 8px 0;width:calc(100% - 16px);position:relative}
-  .sb-collapsed .nav-item span{display:none}
+  .sb-collapsed .nav-item span,.sb-collapsed .logout span,.sb-collapsed .whoami{display:none}
+  .sb-collapsed .logout{justify-content:center;gap:0;padding:12px 0;position:relative}
+  .sb-collapsed .logout::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);white-space:nowrap;padding:6px 10px;border-radius:6px;background:#020617;color:#f1f5f9;font-size:12px;font-weight:500;border:1px solid #334155;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .15s}
+  .sb-collapsed .logout:hover::after,.sb-collapsed .logout:focus-visible::after{opacity:1}
   .sb-collapsed .nav-item::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);white-space:nowrap;padding:6px 10px;border-radius:6px;background:#020617;color:#f1f5f9;font-size:12px;font-weight:500;border:1px solid #334155;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .15s}
   .sb-collapsed .nav-item:hover::after,.sb-collapsed .nav-item:focus-visible::after{opacity:1}
 }
@@ -302,7 +308,7 @@ aside{background:#111827;color:#cbd5e1;border-right:1px solid #1e293b;padding:0;
 .sb-toggle svg{width:16px;height:16px}
 .sb-toggle .tg-right{display:none}
 .nav{padding:4px 0 8px}
-.nav-head{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-bottom:1px solid rgba(30,41,59,.4);border-radius:0;background:transparent;padding:20px 16px 8px;margin-bottom:4px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#cbd5e1}
+.nav-head{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-bottom:1px solid rgba(30,41,59,.4);border-radius:0;background:transparent;padding:20px 16px 8px;margin-bottom:4px;text-align:left;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#cbd5e1}
 .nav-head:hover{background:transparent;color:#fff}
 .nav-head .chev{width:12px;height:12px;transition:transform .2s}
 .nav-group.collapsed .chev{transform:rotate(-90deg)}
@@ -329,6 +335,13 @@ main{padding:24px 28px}
 .total{box-shadow:var(--shadow)}
 .site-head h2{font-weight:700;letter-spacing:-.02em}
 
+/* Oturum: kullanıcı ve çıkış */
+.sb-user{margin-top:auto;padding:12px 8px 16px;border-top:1px solid rgba(30,41,59,.8);position:sticky;bottom:0;background:#111827}
+.whoami{display:block;padding:0 8px 8px;font-size:12px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout{display:flex;align-items:center;gap:12px;width:100%;padding:10px 16px;border:1px solid rgba(136,19,55,.3);border-radius:8px;background:transparent;color:#fb7185;font-size:12px;font-weight:600;text-align:left}
+.logout:hover{background:rgba(76,5,25,.3);color:#fda4af;border-color:rgba(136,19,55,.5)}
+.logout:focus-visible{outline:2px solid #fb7185;outline-offset:2px}
+.logout svg{width:16px;height:16px;flex:none}
 /* Sekmeli görünümler: yalnız seçili bölüm gösterilir */
 @media screen{
   #view[data-sub="ovw"] [data-tab]:not([data-tab="ovw"]),
@@ -427,6 +440,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
         <div class="nav-body"><button type="button" class="nav-item" id="exportJson" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Yedek indir (JSON)</span></button><button type="button" class="nav-item" id="importBtn" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Yedek yükle</span></button><button type="button" class="nav-item" id="exportCsv" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg><span>CSV indir</span></button><button type="button" class="nav-item" id="demoClear" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg><span>Demo veriyi sil</span></button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
       </section>
     </nav>
+    <div class="sb-user"><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
   </aside>
   <main>
     <div class="viewbar no-print">
@@ -661,7 +675,8 @@ function migrateSite(s){s.fin={...FIN_DEFAULT,...(s.fin||{})};s.units=Array.isAr
 const byCreated=(a,b)=>String(a.createdAt).localeCompare(String(b.createdAt));
 const clock=()=>new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
 async function api(path,opts){
-  const r=await fetch(API+path,{headers:{'content-type':'application/json'},...opts});
+  const r=await fetch(API+path,{credentials:'same-origin',headers:{'content-type':'application/json'},...opts});
+  if(r.status===401){location.replace('/login.html');}
   if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}
   return r.status===204?null:r.json();
 }
@@ -1208,6 +1223,22 @@ $('demoClear').onclick=async()=>{
   if(!d.length){toast('Silinecek demo veri yok.');return;}
   if(!await ask(d.length+' demo lokasyon silinsin mi? Kendi eklediklerinize dokunulmaz.','Demoyu sil'))return;
   d.forEach(removeSite);activeId=null;view='portfolio';render();toast('Demo veri silindi.');
+};
+
+/* ---------- oturum ---------- */
+(async()=>{
+  try{
+    const r=await fetch('/api/auth/me',{credentials:'same-origin'});
+    if(r.status===401||r.status===503){location.replace('/login.html');return;}
+    if(r.ok){const d=await r.json();if(d.email){$('whoami').textContent=d.email;$('whoami').title=d.email;$('whoami').hidden=false;}}
+  }catch(e){/* çevrimdışı: yerel kayıtla devam */}
+  document.documentElement.classList.remove('pending');
+})();
+$('logoutBtn').onclick=async()=>{
+  const b=$('logoutBtn');b.disabled=true;
+  try{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'}});}catch(e){}
+  toast('Çıkış yapıldı.');
+  setTimeout(()=>location.replace('/login.html'),500);
 };
 
 render();load();

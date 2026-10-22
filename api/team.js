@@ -1,8 +1,10 @@
 // /api/team — PUT (ekip üyesi listesi upsert)
 import { sql, ensureSchema, readJson } from '../lib/db.js';
+import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   try {
+    if (!requireAuth(req, res)) return;
     await ensureSchema();
     const s = sql();
 
