@@ -250,11 +250,17 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#d97706;box-shado
 .units td input,.units td select{min-height:34px}
 
 /* Başlık */
-header{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);padding:24px 28px 20px;align-items:flex-start}
+header{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);padding:20px 28px;align-items:center}
 header h1{font-size:24px;font-weight:700;letter-spacing:-.025em;color:var(--ink)}
 header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-width:62ch}
-#saveStatus{color:var(--muted);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500}
-#saveStatus.err{color:#b45309;background:#fffbeb;border-color:#fde68a}
+#saveStatus{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;line-height:1.4;box-shadow:0 1px 2px rgba(15,23,42,.05);color:#047857;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25)}
+#saveStatus::before{content:"";width:8px;height:8px;border-radius:50%;background:#10b981;flex:none}
+#saveStatus.err{color:#d97706;background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.25)}
+#saveStatus.err::before{background:#f59e0b;animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}
+@keyframes pulse{50%{opacity:.4}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #saveStatus{color:#34d399}:root:not([data-theme="light"]) #saveStatus.err{color:#fbbf24}}
+:root[data-theme="dark"] #saveStatus{color:#34d399}:root[data-theme="dark"] #saveStatus.err{color:#fbbf24}
+@media (prefers-reduced-motion:reduce){#saveStatus.err::before{animation:none}}
 
 /* KPI kartları + durum çubuğu */
 .pipeline{background:var(--bg);color:var(--ink);padding:20px 28px 4px;display:flex;flex-direction:column}
@@ -296,10 +302,6 @@ aside{background:#111827;color:#cbd5e1;border-right:1px solid #1e293b;padding:0;
 .nav-item:focus-visible,.nav-head:focus-visible{outline:2px solid #f59e0b;outline-offset:-2px}
 .listpanel{margin:4px 8px 6px;padding:8px;border:1px solid #1e293b;border-radius:8px;background:#0d121d;display:flex;flex-direction:column;gap:8px}
 .listpanel[hidden]{display:none}
-.searchwrap{position:relative}
-.searchwrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:#64748b;pointer-events:none}
-.searchwrap input{padding-left:32px;height:36px;min-height:36px;font-size:12px;background:#111827;border-color:#334155;color:#e2e8f0}
-.searchwrap input::placeholder{color:#64748b}
 .listpanel .filter-note{color:#94a3b8}
 .listpanel .filter-note button{background:transparent;border-color:#334155;color:#cbd5e1}
 #siteList{max-height:340px;gap:6px}
@@ -309,7 +311,6 @@ aside{background:#111827;color:#cbd5e1;border-right:1px solid #1e293b;padding:0;
 .site-item .name{color:#fff;font-size:13px}
 .site-item .meta{color:#94a3b8;font-size:11.5px;flex-wrap:wrap}
 .aside .score.hi,aside .score.hi{color:#4ade80}aside .score.mid{color:#fbbf24}aside .score.lo{color:#f87171}
-.nav-note{margin:auto 0 0;padding:12px 16px 16px;font-size:11px;line-height:1.5;color:#64748b;border-top:1px solid #1e293b}
 
 /* Sekmeler */
 main{padding:24px 28px}
@@ -350,13 +351,12 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   header{padding:18px 14px 16px}.pipeline{padding:16px 14px 4px}.pipe-legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .mk{padding:12px}.mk strong{font-size:17px}main{padding:14px}.emptystate{padding:36px 16px}
   aside{position:static;height:auto;overflow:visible}
-  #siteList{flex-direction:row;max-height:none}.site-item{min-width:200px}.nav-note{display:none}
+  #siteList{flex-direction:row;max-height:none}.site-item{min-width:200px}
 }
 </style>
 <header>
   <div>
     <h1>Saha değerlendirme</h1>
-    <p>Gelen lokasyonları kaydedin, şarj ünitelerini girin, finansmana uygunluğu kontrol listesiyle takip edin.</p>
   </div>
   <div id="saveStatus" role="status">Yükleniyor…</div>
 </header>
@@ -379,7 +379,6 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
       <section class="nav-group" data-group="site">
         <button type="button" class="nav-head" aria-expanded="true">Saha &amp; Lokasyon Yönetimi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div class="nav-body"><button type="button" class="nav-item" data-nav="port"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>Portföy Özeti</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Lokasyon Listesi</span></button><div class="listpanel" id="listPanel">
-          <div class="searchwrap"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search" type="search" placeholder="Lokasyon ara…" aria-label="Lokasyon, ilçe veya proje ara"></div>
           <div class="filter-note" id="filterNote" hidden></div>
           <div id="siteList"></div>
         </div><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Lokasyon Ekle</span></button></div>
@@ -397,7 +396,6 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
         <div class="nav-body"><button type="button" class="nav-item" id="exportJson" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Yedek indir (JSON)</span></button><button type="button" class="nav-item" id="importBtn" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Yedek yükle</span></button><button type="button" class="nav-item" id="exportCsv" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg><span>CSV indir</span></button><button type="button" class="nav-item" id="demoClear" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg><span>Demo veriyi sil</span></button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
       </section>
     </nav>
-    <p class="nav-note">Kayıtlar her değişiklikte buluta kaydedilir; telefondan, başka bilgisayardan ve sayfayı paylaştığınız kişilerden aynı veriler görünür. JSON yedeği arşiv içindir.</p>
   </aside>
   <main>
     <div class="viewbar no-print">
@@ -716,8 +714,7 @@ const capRef=s=>{const a=+s.survey?.availKw||0;return a>0?{v:a,u:'kW kullanılab
 
 /* ---------- rendering ---------- */
 function visibleSites(){
-  const q=$('search').value.trim().toLocaleLowerCase('tr');
-  return db.sites.filter(s=>(!filter||s.status===filter)&&(!q||[s.name,s.district,s.city,s.project,s.host,s.survey?.lead].join(' ').toLocaleLowerCase('tr').includes(q)));
+  return db.sites.filter(s=>(!filter||s.status===filter)&&true);
 }
 function renderPipe(){
   const counts=STATUSES.map(st=>({...st,n:db.sites.filter(s=>s.status===st.k).length}));
@@ -996,7 +993,6 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();const name=$('dlgName').value.trim(
   const s=blankSite(name,$('dlgProject').value.trim());const src=db.sites.find(x=>x.id===$('dlgCopy').value);
   if(src)s.units=src.units.map(u=>({...u,id:uid()}));
   db.sites.push(s);$('dlg').close();touched(s);openSite(s.id);toast(name+' eklendi.');};
-$('search').oninput=()=>{renderList();if(view==='portfolio')renderPortfolio();};
 $('vPortfolio').onclick=()=>{view='portfolio';render();};
 $('vSite').onclick=()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';render();};
 $('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';render();};
@@ -1151,7 +1147,7 @@ document.querySelector('aside').addEventListener('click',e=>{
   const k=b.dataset.nav;
   if(k==='ovw'){navKey='ovw';view='portfolio';render();window.scrollTo({top:0,behavior:'smooth'});}
   else if(k==='port'){navKey='port';view='portfolio';render();jump('Lokasyonlar');}
-  else if(k==='list'){const p=$('listPanel');p.hidden=!p.hidden;if(!p.hidden)$('search').focus();if(view==='site'){navKey='list';paintNav();}}
+  else if(k==='list'){const p=$('listPanel');p.hidden=!p.hidden;if(view==='site'){navKey='list';paintNav();}}
   else if(NAV_SECTIONS[k])goSite(k);
 });
 try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');for(const g in st)if(st[g]){const el=document.querySelector(`.nav-group[data-group="${g}"]`);if(el){el.classList.add('collapsed');el.querySelector('.nav-head').setAttribute('aria-expanded','false');}}}catch(x){}
