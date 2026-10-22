@@ -290,7 +290,7 @@ header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-wi
   .sb-collapsed .nav-item::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);white-space:nowrap;padding:6px 10px;border-radius:6px;background:#020617;color:#f1f5f9;font-size:12px;font-weight:500;border:1px solid #334155;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .15s}
   .sb-collapsed .nav-item:hover::after,.sb-collapsed .nav-item:focus-visible::after{opacity:1}
 }
-@media (max-width:700px){.sb-toggle{display:none}}
+@media (max-width:700px){.brand .sb-toggle{display:none}}
 @media (prefers-reduced-motion:reduce){body,aside{transition:none}}
 aside{background:#111827;color:#cbd5e1;border-right:1px solid #1e293b;padding:0;gap:0;position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#334155 transparent}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;background:#0d121d;border-bottom:1px solid rgba(30,41,59,.8)}
@@ -342,12 +342,26 @@ main{padding:24px 28px}
 .subtabs{max-width:100%;overflow-x:auto;margin-bottom:16px}
 .subtabs button{white-space:nowrap}
 /* Lokasyon listesi görünümü */
-.locgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.loc-card{text-align:left;width:100%;padding:16px;display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.loc-card:hover{border-color:var(--accent);background:var(--surface)}
-.loc-card.active{border-color:var(--accent);background:var(--accent-soft)}
-.loc-card .name{font-size:15px;font-weight:600;color:var(--ink)}
-.loc-card .meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.loclist{display:flex;flex-direction:column;gap:8px;width:100%}
+.loc-head,.loc-row{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.3fr) minmax(0,1.4fr) minmax(0,1fr) 20px;align-items:center;gap:16px}
+.loc-head{padding:0 16px 4px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.loc-row{width:100%;text-align:left;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.loc-row:hover{background:var(--surface);border-color:var(--muted);box-shadow:0 1px 3px rgba(15,23,42,.08)}
+.loc-row.active{border-color:var(--accent);background:var(--accent-soft)}
+.loc-name{display:flex;flex-direction:column;min-width:0}
+.loc-name strong{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.loc-name small{font-size:12px;color:var(--muted);margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ink);font-size:12px;font-weight:500;white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.loc-units{font-size:12px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.amg{display:inline-block;padding:4px 8px;border-radius:6px;font-size:12px;font-weight:700;background:var(--soft);color:var(--muted);font-variant-numeric:tabular-nums}
+.amg.hi{background:var(--ok-soft);color:var(--ok)}.amg.mid{background:var(--risk-soft);color:var(--risk)}.amg.lo{background:var(--no-soft);color:var(--no)}
+.loc-go{width:16px;height:16px;color:var(--muted);justify-self:end}
+@media (max-width:900px){
+  .loc-head{display:none}
+  .loc-row{grid-template-columns:minmax(0,1fr) auto 16px;grid-template-areas:"name status go" "units score go";row-gap:10px}
+  .loc-name{grid-area:name}.loc-status{grid-area:status;justify-self:end}.loc-units{grid-area:units}.loc-score{grid-area:score;justify-self:end}.loc-go{grid-area:go}
+}
 .filter-note{margin-bottom:12px;padding:8px 12px;background:var(--soft);border:1px solid var(--line);border-radius:8px}
 /* Boş durum */
 .emptystate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;border:2px dashed var(--line);border-radius:16px;background:var(--soft);box-shadow:none}
@@ -748,12 +762,15 @@ function renderLocations(){
   const list=visibleSites();
   const note=filter?`<div class="filter-note"><span>Filtre: ${esc(statusOf(filter).t)}</span><button id="clearFilter">Filtreyi kaldır</button></div>`:'';
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
-  $('view').innerHTML=`<section class="box"><h3>Lokasyon listesi<small>${list.length} lokasyon · Karta tıklayarak detayı açın</small></h3>${note}<div class="locgrid">`+
-    (list.length?list.map(s=>{const t=totals(s),st=statusOf(s.status),d=amgScore(s);
-      return `<button class="loc-card ${s.id===activeId?'active':''}" data-id="${s.id}">
-        <span class="name">${esc(s.name)}</span>
-        <span class="meta"><span class="chip" style="--c:${st.c}">${esc(st.t)}</span><span class="score ${d.cls}">${d.done?'AMG '+d.label:'Skor yok'}</span></span>
-        <span class="meta"><span>${esc([s.district,s.city].filter(Boolean).join(', '))}</span><span>${t.dcUnits} DC · ${t.acUnits} AC · ${nf.format(t.kw)} kW</span></span>
+  const chev='<svg class="loc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+  $('view').innerHTML=`<section class="box"><h3>Lokasyon listesi<small>${list.length} lokasyon · Satıra tıklayarak detayı açın</small></h3>${note}
+    <div class="loclist" role="list">`+(list.length?`<div class="loc-head" aria-hidden="true"><span>Lokasyon</span><span>Durum</span><span>Ünite ve güç</span><span>AMG skoru</span><span></span></div>`+list.map(s=>{const t=totals(s),st=statusOf(s.status),d=amgScore(s);
+      return `<button type="button" role="listitem" class="loc-row ${s.id===activeId?'active':''}" data-id="${s.id}">
+        <span class="loc-name"><strong>${esc(s.name)}</strong><small>${esc([s.district,s.city].filter(Boolean).join(', ')||s.project||'')}</small></span>
+        <span class="loc-status"><span class="pill" style="--c:${st.c}">${esc(st.t)}</span></span>
+        <span class="loc-units">${t.dcUnits} DC · ${t.acUnits} AC · ${nf.format(t.kw)} kW</span>
+        <span class="loc-score"><span class="amg ${d.cls}">${d.done?'AMG '+d.label:'Skor yok'}</span></span>
+        ${chev}
       </button>`;}).join(''):'<p class="note">Bu filtreye uyan lokasyon yok.</p>')+`</div></section>`;
 }
 function render(){
@@ -1019,7 +1036,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();const name=$('dlgName').value.trim(
 $('vPortfolio').onclick=()=>{view='portfolio';sub='ovw';render();window.scrollTo(0,0);};
 $('vSite').onclick=()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';sub='info';render();window.scrollTo(0,0);};
 $('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();};
-$('view').addEventListener('click',e=>{const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-card[data-id]');if(b)openSite(b.dataset.id);});
+$('view').addEventListener('click',e=>{const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
   const s=cur();if(!s||view!=='site')return;
