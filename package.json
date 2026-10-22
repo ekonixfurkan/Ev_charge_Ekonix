@@ -1,0 +1,17 @@
+{
+  "name": "saha-degerlendirme-araci",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "EV şarj sahası değerlendirme, AMG skorlama ve finansman modelleme aracı",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,933 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Saha Değerlendirme Aracı</title>
+<style>
+:root{
+  --p-owner:#d77e09;--p-ent:#24677d;--p-star:#7a4fb0;--p-eko:#5f8a2a;--p-fon:#8a6340;
+  --nav:#1d3342;--nav-ink:#ffffff;--nav-muted:#b9c8d2;
+  --ink:#22343f;--muted:#64757f;--line:#d9e2e8;--bg:#f2f5f7;--surface:#ffffff;--soft:#f7f9fa;
+  --accent:#d77e09;--accent-soft:#fff4e3;
+  --dc:#24677d;--ac:#7a9a3a;
+  --ok:#2f7d4f;--ok-soft:#e5f3ea;--risk:#b7790c;--risk-soft:#fcf1dc;--no:#b03a2e;--no-soft:#f9e3e0;
+  --s-aday:#8a99a3;--s-inceleme:#3f86a8;--s-sunuldu:#d77e09;--s-onay:#2f7d4f;--s-red:#b03a2e;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --p-owner:#f0a03a;--p-ent:#5fb3cc;--p-star:#b392e6;--p-eko:#a7c76a;--p-fon:#d2a679;
+    --nav:#14232d;--nav-ink:#eef3f6;--nav-muted:#8fa3b0;
+    --ink:#e3eaee;--muted:#93a4ae;--line:#2c3d48;--bg:#0f1a21;--surface:#16242d;--soft:#1b2b35;
+    --accent:#f0a03a;--accent-soft:#3a2a12;
+    --dc:#5fb3cc;--ac:#a7c76a;
+    --ok:#5cc187;--ok-soft:#173326;--risk:#e8b04a;--risk-soft:#3a2d12;--no:#ec7a6c;--no-soft:#3a1b18;
+    --s-aday:#7d8e98;--s-inceleme:#5fb3cc;--s-sunuldu:#f0a03a;--s-onay:#5cc187;--s-red:#ec7a6c;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+    --p-owner:#f0a03a;--p-ent:#5fb3cc;--p-star:#b392e6;--p-eko:#a7c76a;--p-fon:#d2a679;
+    --nav:#14232d;--nav-ink:#eef3f6;--nav-muted:#8fa3b0;
+    --ink:#e3eaee;--muted:#93a4ae;--line:#2c3d48;--bg:#0f1a21;--surface:#16242d;--soft:#1b2b35;
+    --accent:#f0a03a;--accent-soft:#3a2a12;
+    --dc:#5fb3cc;--ac:#a7c76a;
+    --ok:#5cc187;--ok-soft:#173326;--risk:#e8b04a;--risk-soft:#3a2d12;--no:#ec7a6c;--no-soft:#3a1b18;
+    --s-aday:#7d8e98;--s-inceleme:#5fb3cc;--s-sunuldu:#f0a03a;--s-onay:#5cc187;--s-red:#ec7a6c;
+    color-scheme:dark;
+  }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;padding:8px 13px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#1b1205;font-weight:600}
+button.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+button.ghost:hover{color:var(--no);border-color:transparent}
+:focus-visible{outline:3px solid var(--dc);outline-offset:2px}
+input,select,textarea{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:5px;background:var(--surface);min-width:0}
+textarea{resize:vertical;min-height:64px}
+label{display:block;font-size:12.5px;color:var(--muted);font-weight:600}
+label > input,label > select,label > textarea{margin-top:4px;font-weight:400}
+h1,h2,h3{margin:0;line-height:1.25}
+p{margin:6px 0}
+
+header{background:var(--nav);color:var(--nav-ink);padding:18px 26px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+header h1{font-size:22px;font-weight:600}
+header p{color:var(--nav-muted);font-size:13px;margin:2px 0 0}
+#saveStatus{font-size:12px;color:var(--nav-muted)}
+#saveStatus.err{color:#ffc27a}
+
+/* Pipeline strip: the one bold element */
+.pipeline{background:var(--nav);padding:0 26px 20px;color:var(--nav-ink)}
+.pipe{display:flex;height:42px;border-radius:6px;overflow:hidden;background:#ffffff14}
+.pipe button{border:0;border-radius:0;padding:0 12px;display:flex;align-items:center;gap:8px;color:#fff;font-size:13px;white-space:nowrap;overflow:hidden;min-width:0;transition:flex-grow .35s ease}
+.pipe button b{font-size:18px}
+.pipe button[aria-pressed=true]{box-shadow:inset 0 -4px 0 #fff}
+.pipe .empty{color:var(--nav-muted);padding:0 12px;display:flex;align-items:center;font-size:13px}
+.pipe-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--nav-muted)}
+.pipe-legend strong{color:var(--nav-ink);font-weight:600}
+
+.shell{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:calc(100vh - 170px)}
+aside{background:var(--surface);border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:10px}
+.aside-top{display:flex;gap:8px}
+.aside-top input{flex:1}
+.filter-note{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.filter-note button{padding:2px 8px;font-size:12px}
+#siteList{display:flex;flex-direction:column;gap:6px;overflow:auto}
+.site-item{text-align:left;width:100%;padding:10px 11px;border-left:4px solid var(--line);display:grid;gap:3px}
+.site-item.active{background:var(--accent-soft);border-color:var(--accent);border-left-color:var(--accent)}
+.site-item .name{font-weight:600;font-size:14px}
+.site-item .meta{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.aside-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.aside-foot button{font-size:13px;padding:6px 10px}
+.aside-foot p{font-size:11.5px;color:var(--muted);margin:4px 0 0;line-height:1.5}
+
+main{padding:22px 26px;max-width:1300px;width:100%}
+.viewbar{display:flex;gap:6px;margin-bottom:16px}
+.viewbar button[aria-pressed=true]{background:var(--nav);color:var(--nav-ink);border-color:var(--nav)}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
+.box h3{font-size:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.box h3 small{font-weight:400;font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.span2{grid-column:span 2}.span4{grid-column:1/-1}
+
+.site-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.site-head h2{font-size:24px;font-weight:600}
+.site-head p{color:var(--muted);font-size:13px}
+.verdict{display:flex;gap:10px;align-items:stretch}
+.vcell{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 14px;min-width:120px}
+.vcell span{display:block;font-size:12px;color:var(--muted)}
+.vcell strong{font-size:22px;font-variant-numeric:tabular-nums}
+.vcell select{margin-top:2px;font-weight:600}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+.chip::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+
+/* Units */
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13.5px}
+th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+thead th{font-size:12px;color:var(--muted);font-weight:600;background:var(--soft)}
+td.num,th.num{text-align:right}
+tfoot td{font-weight:600;border-bottom:0}
+.units td input,.units td select{padding:6px 7px}
+.units td.w-kind{width:92px}.units td.w-n{width:90px}
+.kind-dc{border-left:4px solid var(--dc)}.kind-ac{border-left:4px solid var(--ac)}
+.scroll{overflow-x:auto}
+.unit-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+.capacity{margin-top:14px}
+.capbar{height:14px;border-radius:7px;background:var(--soft);border:1px solid var(--line);overflow:hidden;display:flex}
+.capbar i{display:block;height:100%}
+.capnote{font-size:12.5px;color:var(--muted);margin-top:6px}
+.capnote.bad{color:var(--no);font-weight:600}
+
+/* Due diligence */
+.dd-row{display:grid;grid-template-columns:minmax(0,1.3fr) auto minmax(0,1fr);gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.dd-row:last-child{border-bottom:0}
+.dd-row .q{font-size:14px}
+.dd-row .q small{display:block;color:var(--muted);font-size:12px}
+.dd-row .q .crit{color:var(--no);font-size:11.5px;font-weight:600;margin-left:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 10px;font-size:12.5px;background:var(--surface);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true][data-v=ok]{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.seg button[aria-pressed=true][data-v=risk]{background:var(--risk-soft);color:var(--risk);font-weight:600}
+.seg button[aria-pressed=true][data-v=no]{background:var(--no-soft);color:var(--no);font-weight:600}
+.dd-row input{font-size:13px}
+.alert{padding:10px 14px;border-left:4px solid var(--no);background:var(--no-soft);font-size:13px;margin-bottom:12px;border-radius:0 6px 6px 0}
+.alert.warn{border-color:var(--risk);background:var(--risk-soft)}
+
+/* Portfolio */
+.totals{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.total{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.total span{display:block;font-size:12px;color:var(--muted)}
+.total strong{font-size:22px;font-variant-numeric:tabular-nums}
+.portfolio tbody tr{cursor:pointer}
+.portfolio tbody tr:hover{background:var(--soft)}
+.score{font-weight:600}
+.score.lo{color:var(--no)}.score.mid{color:var(--risk)}.score.hi{color:var(--ok)}
+.emptystate{text-align:center;padding:50px 20px;color:var(--muted)}
+.emptystate h2{color:var(--ink);font-size:20px;margin-bottom:8px}
+
+#toast{position:fixed;bottom:18px;right:18px;background:var(--nav);color:var(--nav-ink);padding:11px 16px;border-radius:7px;z-index:20;max-width:85vw}
+dialog{border:1px solid var(--line);border-radius:10px;padding:22px;width:min(440px,92vw);background:var(--surface);color:var(--ink)}
+dialog::backdrop{background:#0d1a2366}
+dialog .row{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+dialog label{margin-top:10px}
+
+/* Survey & AMG scoring */
+.leadcell{display:flex;flex-direction:column;gap:6px;min-width:0}
+.newlead{display:flex;gap:6px}.newlead input{flex:1;min-width:0}.newlead button{padding:6px 10px}
+fieldset.chks{border:1px solid var(--line);border-radius:6px;padding:8px 10px 10px;margin:0;display:flex;flex-wrap:wrap;gap:6px 14px;min-width:0}
+fieldset.chks.span2{grid-column:span 2}fieldset.chks.span4{grid-column:1/-1}
+fieldset.chks legend{font-size:12.5px;color:var(--muted);font-weight:600;padding:0 4px}
+fieldset.chks label{display:flex;align-items:center;gap:6px;font-weight:400;color:var(--ink);font-size:13.5px}
+fieldset.chks input{width:auto;margin:0}
+.scoretotal{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.scoretotal strong{font-size:30px;font-variant-numeric:tabular-nums}
+.scoretotal span{color:var(--muted);font-size:14px}
+.guide{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;margin-bottom:8px}
+.amg-row{display:grid;grid-template-columns:minmax(0,1.4fr) 170px minmax(0,1fr);gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.amg-row .q{font-size:14px;font-weight:600}
+.amg-row .q small{display:block;color:var(--muted);font-size:12px;font-weight:400}
+.amg-row .q small.en{font-style:italic}
+.pts{display:grid;grid-template-columns:64px auto;gap:4px 8px;align-items:center;font-size:13px;color:var(--muted)}
+.pts input{padding:6px 7px;font-weight:600}
+.meter{grid-column:1/-1;height:6px;border-radius:3px;background:var(--soft);border:1px solid var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+@media (max-width:700px){.amg-row{grid-template-columns:1fr}fieldset.chks.span2{grid-column:1/-1}}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+/* Revenue model */
+.subh{font-size:14px;margin:20px 0 6px}
+.units td input:disabled,.units td select:disabled{opacity:.35}
+.tranches td select{min-width:140px}.tranches td input[data-tf=term],.tranches td input[data-tf=rate]{min-width:64px}.tranches td input[data-tf=item]{min-width:170px}.tranches td input[data-tf=amount]{min-width:120px}
+.grid.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:1000px){.grid.g5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.presets{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.subgrid{margin-top:14px}
+.shareinfo{font-size:13px;font-weight:600;margin-top:8px}
+.shareinfo.bad{color:var(--no)}
+.inline{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:13px}
+.inline label{display:flex;align-items:center;gap:5px;font-weight:400;color:var(--ink)}
+.inline input{width:auto;margin:0}
+.box details{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.box summary{cursor:pointer;font-weight:600;font-size:14px}
+.note{font-size:12.5px;color:var(--muted);max-width:80ch}
+input[aria-invalid=true]{border:2px solid var(--no)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:16px 0}
+.kpi{border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--soft)}
+.kpi span{display:block;font-size:12px;color:var(--muted)}
+.kpi strong{display:block;font-size:19px;font-variant-numeric:tabular-nums;margin-top:2px}
+.kpi small{font-size:11.5px;color:var(--muted)}
+.chart{width:100%;height:auto;display:block;margin:6px 0 10px}
+.chart text{font-size:12px;fill:var(--muted);font-family:inherit}
+.yearly td,.yearly th{white-space:nowrap;font-size:12.5px}
+.yearly td{text-align:right}
+@media (max-width:1000px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.totals{grid-template-columns:repeat(3,minmax(0,1fr))}.shell{grid-template-columns:240px minmax(0,1fr)}}
+@media (max-width:700px){
+  header,.pipeline{padding-left:14px;padding-right:14px}
+  .shell{display:block}
+  aside{border-right:0;border-bottom:1px solid var(--line)}
+  #siteList{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+  .site-item{min-width:200px}
+  .aside-foot p{display:none}
+  main{padding:14px}
+  .totals{grid-template-columns:1fr 1fr}
+  .dd-row{grid-template-columns:1fr}
+  .verdict{width:100%}.vcell{flex:1;min-width:0}
+  .pipe button span{display:none}
+}
+@media (prefers-reduced-motion:reduce){.pipe button{transition:none}}
+@media print{
+  header,.pipeline{background:none;color:#000}
+  aside,.viewbar,.unit-actions,#toast,.no-print,button.ghost{display:none!important}
+  .shell{display:block}main{max-width:none;padding:0}
+  .box{break-inside:avoid}
+}
+</style>
+<header>
+  <div>
+    <h1>Saha değerlendirme</h1>
+    <p>Gelen lokasyonları kaydedin, şarj ünitelerini girin, finansmana uygunluğu kontrol listesiyle takip edin.</p>
+  </div>
+  <div id="saveStatus" role="status">Yükleniyor…</div>
+</header>
+<section class="pipeline" aria-label="Lokasyonların durum dağılımı">
+  <div class="pipe" id="pipe"></div>
+  <div class="pipe-legend" id="pipeLegend"></div>
+</section>
+
+<div class="shell">
+  <aside>
+    <div class="aside-top">
+      <input id="search" type="search" placeholder="Lokasyon, ilçe veya proje ara" aria-label="Lokasyon ara">
+    </div>
+    <button class="primary" id="addSite">+ Lokasyon ekle</button>
+    <div class="filter-note" id="filterNote" hidden></div>
+    <div id="siteList"></div>
+    <div class="aside-foot">
+      <button id="exportJson">Yedek indir</button>
+      <button id="importBtn">Yedek yükle</button>
+      <button id="exportCsv">CSV indir</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <p>Kayıtlar her değişiklikte buluta kaydedilir; telefondan, başka bilgisayardan ve sayfayı paylaştığınız kişilerden aynı veriler görünür. JSON yedeği arşiv içindir.</p>
+    </div>
+  </aside>
+  <main>
+    <div class="viewbar no-print">
+      <button id="vPortfolio" aria-pressed="true">Portföy özeti</button>
+      <button id="vSite" aria-pressed="false">Lokasyon detayı</button>
+    </div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div id="toast" role="status" hidden></div>
+<dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:15px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
+<dialog id="dlg">
+  <form id="dlgForm">
+    <h2 style="font-size:19px">Yeni lokasyon</h2>
+    <label>Lokasyon adı<input id="dlgName" required maxlength="120" autocomplete="off"></label>
+    <label>Proje / bölge<input id="dlgProject" maxlength="120" list="projectList" autocomplete="off"></label>
+    <datalist id="projectList"></datalist>
+    <label>Kopyalanacak ünite yapısı
+      <select id="dlgCopy"><option value="">Boş başla</option></select>
+    </label>
+    <div class="row">
+      <button type="button" id="dlgCancel">Vazgeç</button>
+      <button type="submit" class="primary">Lokasyonu ekle</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+'use strict';
+const KEY='saha-dd-araci:v1';
+const STATUSES=[
+  {k:'aday',t:'Aday',c:'var(--s-aday)'},
+  {k:'inceleme',t:'İnceleniyor',c:'var(--s-inceleme)'},
+  {k:'sunuldu',t:'Finansöre sunuldu',c:'var(--s-sunuldu)'},
+  {k:'onay',t:'Kredilendirilebilir',c:'var(--s-onay)'},
+  {k:'red',t:'Uygun değil',c:'var(--s-red)'}
+];
+const TYPES=['İş merkezi','Sanayi sitesi','AVM','Akaryakıt istasyonu','Otel','Otopark','Konut sitesi','Otoyol / dinlenme tesisi','Diğer'];
+/* AMG / StarCharge site survey & qualification form */
+const AMG=[
+  {k:'loc',w:15,t:'Konum, trafik ve talep',en:'Location, traffic & demand',h:'Ana yol erişimi, görünürlük, giriş güzergâhı, müşteri bekleme süresi ve tekrar eden talep senaryosu.'},
+  {k:'comp',w:10,t:'Rekabet ve fiyat alanı',en:'Competition & price room',h:'Yakındaki şarj yoğunluğu, güç seviyesi, park ücreti, hizmet ücreti ve fiyat rekabeti.'},
+  {k:'prop',w:12,t:'Mülkiyet / yetki',en:'Property / authorization',h:'Net malik veya hak sahibi, saha sınırı, kira ya da yetkilendirme yapılabilirliği.'},
+  {k:'comm',w:12,t:'Ticari koşullar',en:'Commercial terms',h:'Gelir paylaşımı, sabit kira, kirasız dönem, işbirliği süresi ve işletme sorumluluğu.'},
+  {k:'power',w:14,t:'Güç uygunluğu',en:'Power availability',h:'Mevcut trafo kapasitesi, AG bağlantı noktası, kesici, sayaç ve yükseltme yükü.'},
+  {k:'cons',w:12,t:'İnşaat yapılabilirliği',en:'Construction feasibility',h:'Mesafe, kablo güzergâhı, zemin onarımı, temel, çalışma saati kısıtları ve güvenlik.'},
+  {k:'pv',w:10,t:'PV/BESS ölçeklenebilirliği',en:'PV/BESS scalability',h:'PV alanı, BESS yeri, şebekeye verme / öz tüketim mantığı ve faz genişlemesi.'},
+  {k:'ops',w:15,t:'İşletme kontrolü',en:'Operation control',h:'Benzinli araç işgalinin önlenmesi, bariyer/kilit, aydınlatma, CCTV, olanaklar ve saha yönetimi.'}
+];
+const EXTRA=[
+  {k:'izin',t:'İzinler',h:'Belediye, bina yönetimi ve imar açısından engel yok'},
+  {k:'epdk',t:'EPDK uygunluğu',h:'Şarj hizmeti lisansı ve ağ kaydı açısından uygun'}
+];
+const ATTACH=[
+  {k:'photos',t:'Saha ve park yeri fotoğrafları'},{k:'trafo',t:'Trafo / AG pano fotoğrafları'},{k:'route',t:'Kablo güzergâhı / zemin fotoğrafları'},
+  {k:'comp',t:'Rakip araştırması ekran görüntüleri veya notları'},{k:'bills',t:'Elektrik faturaları / tarife belgeleri'},
+  {k:'lease',t:'Mülkiyet / kira / yetki belgeleri'},{k:'pvdocs',t:'PV/BESS yapısal, yangın veya şebeke belgeleri'}
+];
+const SIGN=[{k:'eng',t:'Keşif mühendisi'},{k:'biz',t:'İşletme sahibi'},{k:'partner',t:'Yerel ortak'},{k:'owner',t:'Saha sahibi'}];
+const CHK={
+  scope:[['ev','EV şarj'],['pv','PV'],['bess','BESS'],['pvbessev','PV-BESS-EV'],['other','Diğer']],
+  access:[['road','Ana yoldan görünür'],['turn','Kolay giriş'],['restricted','Kısıtlı giriş']],
+  pave:[['concrete','Beton'],['asphalt','Asfalt'],['pavers','Kilitli taş'],['soil','Toprak / yeşil alan'],['roof','Çatı / kanopi']],
+  lay:[['trench','Kanal (hendek)'],['tray','Kablo tavası'],['duct','Boru'],['wall','Duvar'],['road','Yol geçişi']],
+  pvpot:[['carport','Otopark kanopisi'],['roof','Çatı'],['retrofit','Mevcut yapıya ek'],['na','Uygun değil']],
+  exist:[['light','Aydınlatma'],['cctv','CCTV'],['fire','Yangın ekipmanı'],['sec','Güvenlik personeli']]
+};
+const TEAM_DEFAULT=['Alaattin Ersivri','Hilmi Doğan','S. Furkan Keçe'];
+let team=[...TEAM_DEFAULT];
+const DECISIONS=[{min:80,t:'İlerlet',en:'Advance',cls:'hi'},{min:60,t:'Eksikleri gider',en:'Resolve gaps',cls:'mid'},{min:0,t:'Öncelik dışı',en:'Deprioritize',cls:'lo'}];
+const VAL={ok:{t:'Uygun',s:1},risk:{t:'Riskli',s:.5},no:{t:'Uygun değil',s:0}};
+
+const $=id=>document.getElementById(id);
+const nf=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:0});
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>(crypto.randomUUID?crypto.randomUUID():'id'+Date.now().toString(36)+Math.random().toString(36).slice(2));
+const now=()=>new Date().toISOString();
+const statusOf=k=>STATUSES.find(s=>s.k===k)||STATUSES[0];
+
+/* ---------- revenue & financing model ---------- */
+const YEARS=7;
+const FIN_DEFAULT={initial:15,growth:2,sale:14.49,cost:5.454,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:0,ekoShare:0,fundShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
+const FIN_LIMITS={initial:[0,100],growth:[-20,20],sale:[0,1000],cost:[0,1000],saleGrowth:[-100,200],costGrowth:[-100,200],share:[0,100],entShare:[0,100],starShare:[0,100],ekoShare:[0,100],fundShare:[0,100],commission:[0,100],opex:[0,1e10],opexGrowth:[0,200]};
+const PARTIES=[
+  {k:'owner',t:'Yer sağlayıcı',sh:'Yer sağlayıcı',c:'var(--p-owner)',share:'share'},
+  {k:'ent',t:'Co-CPO (Entegre)',sh:'Co-CPO',c:'var(--p-ent)',share:'entShare'},
+  {k:'star',t:'StarCharge (AMG)',sh:'StarCharge',c:'var(--p-star)',share:'starShare'},
+  {k:'eko',t:'EKONİX',sh:'EKONİX',c:'var(--p-eko)',share:'ekoShare'},
+  {k:'fon',t:'Diğer fon',sh:'Diğer fon',c:'var(--p-fon)',share:'fundShare'}
+];
+const ITEMS=['Donanım','Saha işleri (EPC)','Şebeke bağlantısı','Diğer'];
+const party=k=>PARTIES.find(p=>p.k===k)||PARTIES[0];
+const pName=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).t;
+const pShort=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).sh;
+const money=v=>nf.format(v)+' TL';
+const df=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:1});
+const df2=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtD=v=>v==null?'—':v>=99?'>99':df2.format(v);
+const dscrClass=v=>v==null?'':v<1?'lo':v<1.2?'mid':'hi';
+const shareTotal=v=>v.share+v.entShare+v.starShare+v.ekoShare+(v.fundShare||0);
+function tranche(item,fin='star',mode='share'){return {id:uid(),item,amount:0,fin,mode,term:5,rate:0,payer:'ent'};}
+const defaultTranches=()=>[tranche('Donanım'),tranche('Saha işleri (EPC)')];
+const totalFin=s=>(s.tranches||[]).reduce((a,t)=>a+(+t.amount||0),0);
+const annuity=t=>{const a=+t.amount||0,n=Math.max(1,Math.round(+t.term||1)),r=(+t.rate||0)/100;return t.mode!=='loan'||!a?0:r?a*r/(1-(1+r)**-n):a/n;};
+
+function calculate(s){
+  const v=s.fin,kw=totals(s).kw;
+  return Array.from({length:YEARS},(_,i)=>{
+    const u=Math.min(100,Math.max(0,v.initial+i*v.growth)),energy=kw*8760*u/100,
+      sale=v.sale*(1+v.saleGrowth/100)**i,cost=v.cost*(1+v.costGrowth/100)**i,
+      revenue=energy*sale,margin=energy*(sale-cost),p=x=>margin*(x||0)/100,
+      owner=p(v.share),ent=p(v.entShare),star=p(v.starShare),eko=p(v.ekoShare),fon=p(v.fundShare),
+      fee=revenue*v.commission/100,opex=v.opex*(1+v.opexGrowth/100)**i;
+    return {year:i+1,u,energy,revenue,margin,owner,ent,star,eko,fon,fee,opex,entCash:ent-fee-opex,remaining:margin*(100-shareTotal(v))/100};
+  });
+}
+const SUMKEYS=['energy','revenue','margin','owner','ent','star','eko','fon','fee','opex','entCash','remaining'];
+function aggregate(sites){
+  const all=sites.map(calculate);
+  return Array.from({length:YEARS},(_,i)=>{const r={year:i+1,u:all.length?all.reduce((t,a)=>t+a[i].u,0)/all.length:0};for(const k of SUMKEYS)r[k]=all.reduce((t,a)=>t+a[i][k],0);return r;});
+}
+function minDscr(pre,ds){let m=null;ds.forEach((d,i)=>{if(d>0.5){const v=pre[i]/d;m=m==null?v:Math.min(m,v);}});return m;}
+function finance(s,rows=calculate(s)){
+  const P={};
+  for(const p of PARTIES)P[p.k]={invest:0,pre:rows.map(r=>p.k==='ent'?r.entCash:r[p.k]),ds:Array(YEARS).fill(0),recv:Array(YEARS).fill(0)};
+  const loans=[];
+  for(const t of s.tranches||[]){
+    const a=+t.amount||0;if(a<=0)continue;P[t.fin].invest+=a;
+    if(t.mode==='loan'){
+      const n=Math.max(1,Math.round(+t.term||1)),r=(+t.rate||0)/100,pay=annuity(t);let bal=a;const sched=[];
+      for(let i=0;i<YEARS;i++){let p=0;if(i<n){p=pay;bal=Math.max(0,bal*(1+r)-pay);if(bal<1)bal=0;}sched.push(p);P[t.payer].ds[i]+=p;P[t.fin].recv[i]+=p;}
+      loans.push({t,site:s,pay,sched,balance:bal,n});
+    }
+  }
+  for(const k in P){const x=P[k];x.flows=[-x.invest,...x.pre.map((v,i)=>v-x.ds[i]+x.recv[i])];x.dscr=minDscr(x.pre,x.ds);}
+  loans.forEach(l=>l.dscr=P[l.t.payer].dscr);
+  return {P,loans,ds:Array.from({length:YEARS},(_,i)=>loans.reduce((a,l)=>a+l.sched[i],0))};
+}
+function aggFinance(sites){
+  const P={},loans=[],ds=Array(YEARS).fill(0);
+  PARTIES.forEach(p=>P[p.k]={invest:0,pre:Array(YEARS).fill(0),ds:Array(YEARS).fill(0),recv:Array(YEARS).fill(0),flows:Array(YEARS+1).fill(0),dscr:null});
+  for(const s of sites){const f=finance(s);loans.push(...f.loans);f.ds.forEach((v,i)=>ds[i]+=v);
+    for(const k in P){const a=P[k],b=f.P[k];a.invest+=b.invest;for(let i=0;i<YEARS;i++){a.pre[i]+=b.pre[i];a.ds[i]+=b.ds[i];a.recv[i]+=b.recv[i];}
+      b.flows.forEach((v,i)=>a.flows[i]+=v);if(b.dscr!=null)a.dscr=a.dscr==null?b.dscr:Math.min(a.dscr,b.dscr);}}
+  return {P,loans,ds};
+}
+function irr(f){
+  if(!(f[0]<0)||!f.slice(1).some(v=>v>0))return null;
+  const npv=r=>f.reduce((a,c,t)=>a+c/(1+r)**t,0);let lo=-0.99,hi=10;
+  if(npv(lo)*npv(hi)>0)return null;
+  for(let i=0;i<120;i++){const m=(lo+hi)/2;if(npv(lo)*npv(m)<=0)hi=m;else lo=m;}
+  return (lo+hi)/2;
+}
+function paybackOf(f){
+  if(!(f[0]<0))return '—';let c=f[0];
+  for(let i=1;i<f.length;i++){const p=c;c+=f[i];if(p<0&&c>=0&&f[i]>0)return df.format(i-1+(-p)/f[i])+' yıl';}
+  return YEARS+' yılda dönmüyor';
+}
+const involved=x=>x.invest>0||x.pre.some(v=>Math.abs(v)>0.5)||x.ds.some(v=>v>0)||x.recv.some(v=>v>0);
+const minAll=P=>{let m=null;for(const k in P)if(P[k].dscr!=null)m=m==null?P[k].dscr:Math.min(m,P[k].dscr);return m;};
+function structureLabel(s){
+  const ts=(s.tranches||[]);if(!ts.length)return 'Finansman tanımsız';
+  const fins=[...new Set(ts.map(t=>t.fin))];
+  if(fins.length===1)return 'Tamamı '+pShort(fins[0],s)+(ts.some(t=>t.mode==='loan')?' (kredi)':'');
+  return ts.map(t=>t.item.replace(' (EPC)','')+' '+pShort(t.fin,s)+(t.mode==='loan'?' kredisi':'')).join(', ');
+}
+function finWarnings(s,f){
+  const w=[],ts=s.tranches||[];
+  if(totals(s).kw&&!ts.some(t=>+t.amount>0))w.push(['warn','Finansman tutarları girilmedi; taraf getirileri hesaplanamıyor.']);
+  for(const t of ts){if(!(+t.amount>0))continue;
+    if(t.mode==='share'&&!(s.fin[party(t.fin).share]>0))w.push(['err',`${t.item}: ${pName(t.fin,s)} finanse ediyor ama gelir payı %0; yatırımını geri alamaz.`]);
+    if(t.mode==='loan'&&t.payer===t.fin)w.push(['warn',`${t.item}: finansör ile geri ödeyen aynı taraf.`]);}
+  for(const l of f.loans){
+    if(l.n>YEARS)w.push(['warn',`${l.t.item}: vade ${l.n} yıl; ${YEARS}. yıl sonunda ${money(l.balance)} anapara kalıyor.`]);
+    if(l.dscr!=null&&l.dscr<1)w.push(['err',`${l.t.item}: ${pName(l.t.payer,s)} kredi taksitlerini kendi nakdiyle karşılayamıyor (en düşük DSCR ${fmtD(l.dscr)}).`]);
+    else if(l.dscr!=null&&l.dscr<1.2)w.push(['warn',`${l.t.item}: en düşük DSCR ${fmtD(l.dscr)}; finansörler genellikle 1,20 üzerini arar.`]);
+  }
+  return w;
+}
+function chartSvg(P,s){
+  const ser=PARTIES.filter(p=>involved(P[p.k])).map(p=>{let c=0;return {name:pShort(p.k,s),color:p.c,v:P[p.k].flows.map(x=>c+=x)};});
+  if(!ser.length)return '';
+  const all=ser.flatMap(x=>x.v),lo=Math.min(0,...all),hi=Math.max(1,...all),y=v=>40+(hi-v)/((hi-lo)||1)*150,x=i=>100+i*(860/YEARS);
+  let o=`<svg class="chart" viewBox="0 0 1000 232" role="img" aria-label="Taraflara göre kümülatif nakit">`;
+  ser.forEach((q,j)=>o+=`<rect x="${100+j*170}" y="6" width="16" height="4" style="fill:${q.color}"/><text x="${122+j*170}" y="13">${esc(q.name)}</text>`);
+  for(let j=0;j<4;j++){const v=lo+(hi-lo)*j/3,yy=y(v);o+=`<line x1="90" x2="980" y1="${yy}" y2="${yy}" style="stroke:var(--line)"/><text x="82" y="${yy+4}" text-anchor="end">${df.format(v/1e6)} mn</text>`;}
+  if(lo<0)o+=`<line x1="90" x2="980" y1="${y(0)}" y2="${y(0)}" style="stroke:var(--muted)" stroke-dasharray="4 4"/>`;
+  ser.forEach(q=>{o+=`<polyline fill="none" style="stroke:${q.color}" stroke-width="2.5" stroke-linejoin="round" points="${q.v.map((v,i)=>x(i)+','+y(v)).join(' ')}"/>`;
+    q.v.forEach((v,i)=>o+=`<circle cx="${x(i)}" cy="${y(v)}" r="4" style="fill:${q.color}"><title>${esc(q.name)}, ${i?i+'. yıl':'başlangıç'}: ${money(v)}</title></circle>`);});
+  for(let i=0;i<=YEARS;i++)o+=`<text x="${x(i)}" y="222" text-anchor="middle">${i?i+'. yıl':'Başlangıç'}</text>`;
+  return o+'</svg>';
+}
+function partyTable(P,s){
+  const ps=PARTIES.filter(p=>involved(P[p.k]));if(!ps.length)return '<p class="note">Henüz pay veya finansman girilmedi.</p>';
+  return `<div class="scroll"><table class="yearly"><thead><tr><th>Taraf</th><th class="num">Yatırım</th><th class="num">${YEARS} yıl nakit girişi</th><th class="num">${YEARS} yıl net</th><th class="num">Geri dönüş</th><th class="num">İç verim (${YEARS} yıl)</th><th class="num">En düşük DSCR</th></tr></thead><tbody>${ps.map(p=>{const x=P[p.k],inflow=x.flows.slice(1).reduce((a,b)=>a+b,0),r=irr(x.flows);
+    return `<tr><th><span class="chip" style="--c:${p.c}">${esc(pName(p.k,s))}</span></th><td>${x.invest?nf.format(x.invest):'—'}</td><td>${nf.format(inflow)}</td><td>${nf.format(inflow-x.invest)}</td><td>${paybackOf(x.flows)}</td><td>${r==null?'—':'%'+df.format(r*100)}</td><td><span class="score ${dscrClass(x.dscr)}">${fmtD(x.dscr)}</span></td></tr>`;}).join('')}</tbody></table></div>
+  <p class="note">Nakit girişi: gelir payı + alınan kredi taksitleri − ödenen kredi taksitleri (Co-CPO için komisyon ve işletme gideri düşülmüş). İç verim yalnız ${YEARS} yıllık nakde dayanır; ekipmanın kalan değeri ve sözleşme sonrası gelir dahil değildir. DSCR: geri ödeyen tarafın kredi öncesi nakdi / yıllık taksit.</p>`;
+}
+function loanTable(loans,withSite){
+  return `<div class="scroll"><table class="yearly"><thead><tr>${withSite?'<th>Lokasyon</th>':''}<th>Kalem</th><th>Finansör</th><th>Geri ödeyen</th><th class="num">Tutar</th><th class="num">Vade / faiz</th><th class="num">Yıllık taksit</th><th class="num">${YEARS}. yıl sonu kalan</th><th class="num">En düşük DSCR</th></tr></thead><tbody>${loans.map(l=>`<tr>${withSite?`<th>${esc(l.site.name)}</th>`:''}<th>${esc(l.t.item)}</th><td style="text-align:left">${esc(pName(l.t.fin,l.site))}</td><td style="text-align:left">${esc(pName(l.t.payer,l.site))}</td><td>${nf.format(l.t.amount)}</td><td>${l.n} yıl, %${df.format(+l.t.rate||0)}</td><td>${nf.format(l.pay)}</td><td>${l.balance?nf.format(l.balance):'—'}</td><td><span class="score ${dscrClass(l.dscr)}">${fmtD(l.dscr)}</span></td></tr>`).join('')}</tbody></table></div>`;
+}
+function yearlyTable(rows,ds){
+  const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),hasDs=ds.some(v=>v>0),R=rows.map((r,i)=>({...r,ds:ds[i]}));
+  const cols=[['energy','Enerji kWh'],['revenue','Hasılat'],['margin','Elektrik sonrası'],['owner','Yer sağlayıcı'],['ent','Co-CPO payı'],['star','StarCharge'],['eko','EKONİX'],...(hasFon?[['fon','Diğer fon']]:[]),['remaining','Dağıtılmayan'],['fee','Komisyon'],['opex','İşletme gideri'],...(hasDs?[['ds','Kredi taksitleri']]:[])];
+  const sum=k=>R.reduce((t,r)=>t+r[k],0);
+  return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar TL. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
+}
+function resultsHtml(rows,f,s,tf){
+  const k=(l,val,sub)=>`<div class="kpi"><span>${l}</span><strong>${val}</strong><small>${sub}</small></div>`,dmin=minAll(f.P);
+  return `<div class="kpis">${k('İlk yıl enerji',nf.format(rows[0].energy)+' kWh','%'+df.format(rows[0].u)+' kullanım')}${k('İlk yıl hasılat',money(rows[0].revenue),'Elektrik sonrası '+money(rows[0].margin))}${k('Toplam finansman',money(tf),tf?'StarCharge %'+df.format(f.P.star.invest/tf*100):'Tutar girilmedi')}${k('En düşük DSCR',`<span class="score ${dscrClass(dmin)}">${fmtD(dmin)}</span>`,dmin==null?'Kredi kalemi yok':'Kredi taksidi karşılama')}${k(YEARS+' yıl yer sağlayıcı',money(rows.reduce((a,r)=>a+r.owner,0)),'Elektrik sonrası taban')}</div>
+  <h4 class="subh">Taraflara göre getiri</h4>${partyTable(f.P,s)}
+  <h4 class="subh">Kümülatif nakit</h4>${chartSvg(f.P,s)}
+  ${f.loans.length?'<h4 class="subh">Kredi kalemleri</h4>'+loanTable(f.loans,!s):''}
+  <h4 class="subh">Yıllık sonuçlar</h4>${yearlyTable(rows,f.ds)}`;
+}
+
+function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
+function blankSite(name,project=''){
+  return {id:uid(),name,project,city:'İstanbul',district:'',address:'',type:'İş merkezi',host:'',contact:'',
+    status:'aday',gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
+}
+/* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
+let db={version:1,sites:[]},activeId=null,view='portfolio',filter=null,loaded=false,mode='none',canWrite=true;
+const API='/api';
+const pending=new Map();let ver=0,flushTimer=null,flushing=false,pollTimer=null;
+function status(t,err=false){$('saveStatus').textContent=t;$('saveStatus').classList.toggle('err',err);}
+function migrateSite(s){s.fin={...FIN_DEFAULT,...(s.fin||{})};s.units=Array.isArray(s.units)?s.units:[];s.dd=s.dd||{};
+  if(!Array.isArray(s.tranches)){s.tranches=defaultTranches();if(s.fin.investment>0){s.tranches[1].fin='ent';s.tranches[1].amount=s.fin.investment;}}
+  s.createdAt=s.createdAt||s.updatedAt||now();s.survey=s.survey||{};s.amg=s.amg||{scores:{},notes:{}};s.amg.scores=s.amg.scores||{};s.amg.notes=s.amg.notes||{};s.att=s.att||{};s.sign=s.sign||{};return s;}
+const byCreated=(a,b)=>String(a.createdAt).localeCompare(String(b.createdAt));
+const clock=()=>new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+async function api(path,opts){
+  const r=await fetch(API+path,{headers:{'content-type':'application/json'},...opts});
+  if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}
+  return r.status===204?null:r.json();
+}
+async function load(){
+  try{
+    const data=await api('/sites');
+    if(Array.isArray(data.sites))db.sites=data.sites.map(migrateSite);
+    if(Array.isArray(data.team)&&data.team.length)team=data.team;
+    db.sites.sort(byCreated);mode='cloud';loaded=true;
+    status('Sunucuda kayıtlı · '+clock());render();startPoll();return;
+  }catch(e){/* API/DB yok → bu tarayıcıya kaydet */}
+  try{const v=localStorage.getItem(KEY);if(v){const d=JSON.parse(v);if(Array.isArray(d.sites))db.sites=d.sites.map(migrateSite);if(Array.isArray(d.team)&&d.team.length)team=d.team;}db.sites.sort(byCreated);mode='local';
+    status('Sunucuya bağlanılamadı · bu tarayıcıya kaydediliyor',true);}
+  catch(e){mode='none';status('Kayıt yapılamıyor · yedek indirin',true);}
+  loaded=true;render();
+}
+function editingNow(){const a=document.activeElement;return a&&$('view').contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName);}
+function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(poll,4000);}
+async function poll(){
+  if(mode!=='cloud'||pending.size||flushing||document.hidden)return;
+  let data;try{data=await api('/sites');}catch(e){return;}
+  let activeChanged=false;const ids=new Set();
+  if(Array.isArray(data.team)&&JSON.stringify(data.team)!==JSON.stringify(team)){team=[...data.team];if(view==='site'&&!editingNow())renderSite();}
+  for(const raw of data.sites||[]){ids.add(raw.id);if(pending.has(raw.id))continue;
+    const body=migrateSite(JSON.parse(JSON.stringify(raw))),k=db.sites.findIndex(x=>x.id===raw.id);
+    if(k<0)db.sites.push(body);
+    else if(JSON.stringify(db.sites[k])!==JSON.stringify(body)){db.sites[k]=body;if(raw.id===activeId)activeChanged=true;}}
+  db.sites=db.sites.filter(x=>ids.has(x.id)||pending.has(x.id));
+  if(activeId&&!db.sites.some(x=>x.id===activeId)){activeId=null;view='portfolio';activeChanged=true;}
+  db.sites.sort(byCreated);
+  if(!pending.size)status('Sunucuda kayıtlı · '+clock());
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else{renderPipe();renderList();}}else render();
+}
+function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
+async function flush(){
+  clearTimeout(flushTimer);
+  if(mode==='local'){try{localStorage.setItem(KEY,JSON.stringify({...db,team}));pending.clear();status('Bu tarayıcıya kaydedildi · '+clock());}catch(e){status('Kayıt başarısız · yedek indirin',true);}return;}
+  if(mode!=='cloud'){status('Kayıt yapılamıyor · yedek indirin',true);return;}
+  if(flushing){flushTimer=setTimeout(flush,400);return;}
+  flushing=true;let failed=null;
+  for(const [id,p] of [...pending]){
+    const site=db.sites.find(x=>x.id===id);
+    try{if(p.op==='delete'||!site)await api('/sites?id='+encodeURIComponent(id),{method:'DELETE'});
+      else await api('/sites',{method:'PUT',body:JSON.stringify(site)});
+      if(pending.get(id)?.v===p.v)pending.delete(id);}
+    catch(e){failed=e;break;}
+  }
+  flushing=false;
+  if(failed){
+    if(failed.status===401||failed.status===403){canWrite=false;status('Bu sayfada değişiklik kaydetme yetkiniz yok',true);return;}
+    status('Kayıt bekliyor · tekrar deneniyor',true);flushTimer=setTimeout(flush,4000);return;
+  }
+  if(pending.size)flushTimer=setTimeout(flush,200);else status('Sunucuda kayıtlı · '+clock());
+}
+function touched(s){s.updatedAt=now();queue(s.id,'save');}
+function removeSite(s){db.sites=db.sites.filter(x=>x.id!==s.id);queue(s.id,'delete');}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&pending.size)flush();});
+window.addEventListener('beforeunload',e=>{if(pending.size){flush();e.preventDefault();e.returnValue='';}});
+function ask(msg,okLabel='Tamam'){return new Promise(res=>{const d=$('ask');$('askMsg').textContent=msg;$('askYes').textContent=okLabel;
+  d.onclose=()=>res(d.returnValue==='yes');d.returnValue='';d.showModal();$('askNo').focus();});}
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3500);}
+
+/* ---------- derived ---------- */
+function totals(s){
+  let dcKw=0,acKw=0,dcSock=0,acSock=0,dcUnits=0,acUnits=0;
+  for(const u of s.units){const q=+u.qty||0;
+    if(u.kind==='DC'){dcKw+=q*(+u.kw||0);dcSock+=q*(+u.sockets||0);dcUnits+=q;}
+    else{acKw+=q*(+u.kw||0);acSock+=q*(+u.sockets||0);acUnits+=q;}}
+  return {dcKw,acKw,dcSock,acSock,dcUnits,acUnits,kw:dcKw+acKw,sockets:dcSock+acSock};
+}
+function amgScore(s){
+  const sc=s.amg?.scores||{};let total=0,done=0,max=0;
+  for(const c of AMG){const v=sc[c.k];if(v===''||v==null||!Number.isFinite(+v))continue;done++;total+=+v;max+=c.w;}
+  const complete=done===AMG.length,dec=complete?DECISIONS.find(d=>total>=d.min):null;
+  const blockers=EXTRA.filter(c=>s.dd?.[c.k]?.v==='no').map(c=>c.t);
+  return {total,done,max,complete,dec,cls:dec?dec.cls:'',blockers,
+    label:done?(complete?`${total}/100`:`${total}/${max}`):'—',
+    decLabel:dec?dec.t:done?`${done}/${AMG.length} kriter puanlandı`:'Puanlanmadı'};
+}
+const capRef=s=>{const a=+s.survey?.availKw||0;return a>0?{v:a,u:'kW kullanılabilir'}:(+s.gridKva>0?{v:+s.gridKva,u:'kVA trafo'}:null);};
+
+/* ---------- rendering ---------- */
+function visibleSites(){
+  const q=$('search').value.trim().toLocaleLowerCase('tr');
+  return db.sites.filter(s=>(!filter||s.status===filter)&&(!q||[s.name,s.district,s.city,s.project,s.host,s.survey?.lead].join(' ').toLocaleLowerCase('tr').includes(q)));
+}
+function renderPipe(){
+  const counts=STATUSES.map(st=>({...st,n:db.sites.filter(s=>s.status===st.k).length}));
+  const total=db.sites.length;
+  $('pipe').innerHTML=total?counts.filter(c=>c.n).map(c=>`<button style="flex-grow:${c.n};background:${c.c}" data-status="${c.k}" aria-pressed="${filter===c.k}" title="${esc(c.t)}: ${c.n}"><b>${c.n}</b><span>${esc(c.t)}</span></button>`).join(''):'<div class="empty">Henüz lokasyon yok</div>';
+  let kw=0,dc=0;db.sites.forEach(s=>{const t=totals(s);kw+=t.kw;dc+=t.dcKw;});
+  const need=db.sites.reduce((a,s)=>a+totalFin(s),0);
+  const ok=db.sites.filter(s=>s.status==='onay');let okKw=0;ok.forEach(s=>okKw+=totals(s).kw);
+  $('pipeLegend').innerHTML=`<span><strong>${total}</strong> lokasyon</span><span><strong>${nf.format(kw)} kW</strong> toplam kurulu güç, ${nf.format(dc)} kW DC</span><span><strong>${nf.format(okKw)} kW</strong> kredilendirilebilir</span><span><strong>${money(need)}</strong> toplam finansman ihtiyacı</span>`;
+}
+function renderList(){
+  const list=visibleSites();
+  $('filterNote').hidden=!filter;
+  if(filter)$('filterNote').innerHTML=`<span>Filtre: ${esc(statusOf(filter).t)}</span><button id="clearFilter">Filtreyi kaldır</button>`;
+  $('siteList').innerHTML=list.length?list.map(s=>{const t=totals(s),st=statusOf(s.status),d=amgScore(s);
+    return `<button class="site-item ${s.id===activeId&&view==='site'?'active':''}" data-id="${s.id}">
+      <span class="name">${esc(s.name)}</span>
+      <span class="meta"><span class="chip" style="--c:${st.c}">${esc(st.t)}</span><span class="score ${d.cls}">${d.done?'AMG '+d.label:'Skor yok'}</span></span>
+      <span class="meta"><span>${esc(s.district||s.city||'')}</span><span>${t.dcUnits} DC · ${t.acUnits} AC · ${nf.format(t.kw)} kW</span></span>
+    </button>`;}).join(''):'<p style="font-size:13px;color:var(--muted)">Aramaya uyan lokasyon yok.</p>';
+}
+function render(){
+  renderPipe();renderList();
+  $('vPortfolio').setAttribute('aria-pressed',view==='portfolio');
+  $('vSite').setAttribute('aria-pressed',view==='site');
+  $('vSite').disabled=!db.sites.length;
+  if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';$('vPortfolio').setAttribute('aria-pressed','true');$('vSite').setAttribute('aria-pressed','false');renderPortfolio();}
+}
+
+function renderPortfolio(){
+  const list=visibleSites();
+  if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Lokasyonlar yükleniyor</h2><p>Kayıtlı lokasyonlar buluttan getiriliyor.</p></div>';return;}
+  if(!db.sites.length){$('view').innerHTML=`<div class="box emptystate"><h2>İlk lokasyonu ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()">+ Lokasyon ekle</button></div>`;return;}
+  let T={dcU:0,acU:0,dcKw:0,acKw:0,sock:0};
+  list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
+  const tot=(l,v)=>`<div class="total"><span>${l}</span><strong>${v}</strong></div>`;
+  const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
+  let h=`<div class="totals">${tot('Lokasyon',list.length)}${tot('DC ünite',T.dcU)}${tot('AC ünite',T.acU)}${tot('Toplam güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj noktası',T.sock)}</div>`;
+  h+=`<section class="box"><h3>Lokasyonlar<small>${filter?esc(statusOf(filter).t)+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
+    <th>Lokasyon</th><th>Proje / bölge</th><th>Durum</th><th class="num">DC ünite</th><th class="num">AC ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / kullanılabilir</th><th class="num">İlk yıl hasılat TL</th><th>Finansman</th><th class="num">AMG skoru</th><th>Karar</th></tr></thead><tbody>`+
+    list.map(s=>{const t=totals(s),d=amgScore(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v;
+      return `<tr data-open="${s.id}" tabindex="0"><td><b>${esc(s.name)}</b><br><small style="color:var(--muted)">${esc([s.district,s.city].filter(Boolean).join(', '))}</small></td><td>${esc(s.project)}${s.survey.lead?`<br><small style="color:var(--muted)">Sorumlu: ${esc(s.survey.lead)}</small>`:''}</td><td><span class="chip" style="--c:${st.c}">${esc(st.t)}</span></td>
+      <td class="num">${t.dcUnits}</td><td class="num">${t.acUnits}</td><td class="num">${nf.format(t.dcKw)}</td><td class="num">${nf.format(t.acKw)}</td><td class="num">${t.sockets}</td>
+      <td class="num" ${over?'style="color:var(--no);font-weight:600" title="Kurulu güç kullanılabilir gücü aşıyor"':''}>${s.gridKva?nf.format(s.gridKva)+' kVA':'—'}<br><small style="color:var(--muted)">${+s.survey.availKw?nf.format(s.survey.availKw)+' kW':''}</small></td>
+      <td class="num">${nf.format(calculate(s)[0].revenue)}</td><td style="min-width:170px">${esc(structureLabel(s))}<br><small style="color:var(--muted)">${money(totalFin(s))}</small></td>
+      <td class="num"><span class="score ${d.cls}">${d.label}</span></td>
+      <td><span class="score ${d.cls}">${esc(d.decLabel)}</span>${d.blockers.length?`<br><small style="color:var(--no);font-weight:600">Engel: ${esc(d.blockers.join(', '))}</small>`:''}</td></tr>`;}).join('')+
+    `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(T.dcKw)}</td><td class="num">${nf.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td class="num">${nf.format(rows[0].revenue)}</td><td>${money(list.reduce((a,s)=>a+totalFin(s),0))}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
+  if(list.length){
+    const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
+    h+=`<section class="box"><h3>Gelir ve finansman, portföy toplamı<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>
+    ${invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:''}
+    ${valid.length?resultsHtml(vrows,f,null,tf):''}</section>`;
+  }
+  h+=`<details class="box"><summary style="cursor:pointer;font-weight:600">Hesaplama esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
+  h+=`<details class="box"><summary style="cursor:pointer;font-weight:600">Skor nasıl hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
+  $('view').innerHTML=h;
+}
+
+function field(key,label,type='text',extra=''){
+  const s=cur();return `<label${extra}>${label}<input data-f="${key}" type="${type}" value="${esc(s[key])}" ${type==='number'?'min="0" step="any" inputmode="decimal"':''}></label>`;
+}
+const cur=()=>db.sites.find(s=>s.id===activeId);
+function leadField(){
+  const v=cur().survey.lead||'',names=[...team];if(v&&!names.includes(v))names.push(v);
+  return `<div class="leadcell"><label>Proje sorumlusu<select data-lead aria-label="Proje sorumlusu"><option value="">Seçin</option>${names.map((n,i)=>`<option value="${esc(n)}" ${n===v?'selected':''}>${i<team.length?(i+1)+'. ':''}${esc(n)}</option>`).join('')}<option value="__new">+ Yeni kişi ekle</option></select></label>
+  <div class="newlead" id="newLeadRow" hidden><input id="newLead" maxlength="60" placeholder="Ad soyad" aria-label="Yeni proje sorumlusu"><button id="addLead" class="primary">Ekle</button><button id="cancelLead" class="ghost">Vazgeç</button></div></div>`;
+}
+async function addTeamMember(name){
+  if(team.includes(name))return;team=[...team,name];
+  if(mode==='cloud'){try{await api('/team',{method:'PUT',body:JSON.stringify({names:team})});}catch(e){toast('Kişi listesi kaydedilemedi; bu sahaya yine de yazıldı.');}}
+  else if(mode==='local'){try{localStorage.setItem(KEY,JSON.stringify({...db,team}));}catch(e){}}
+}
+function sv(k,label,type='text',extra=''){const s=cur(),v=s.survey[k]??'';return `<label${extra}>${label}<input data-sv="${k}" type="${type}" value="${esc(v)}" ${type==='number'?'min="0" step="any" inputmode="decimal"':''}></label>`;}
+function sel(k,label,opts){const v=cur().survey[k]||'';return `<label>${label}<select data-sv="${k}"><option value="">Seçin</option>${opts.map(([o,t])=>`<option value="${o}" ${o===v?'selected':''}>${t}</option>`).join('')}</select></label>`;}
+function chk(k,label,extra=' class="span2"'){const on=cur().survey[k]||[],span=(extra.match(/span\d/)||['span2'])[0];return `<fieldset class="chks ${span}"><legend>${label}</legend>${CHK[k].map(([o,t])=>`<label><input type="checkbox" data-svc="${k}" value="${o}" ${on.includes(o)?'checked':''}>${t}</label>`).join('')}</fieldset>`;}
+function finField(k,label,unitTxt){const [lo,hi]=FIN_LIMITS[k];return `<label>${label}${unitTxt?' ('+unitTxt+')':''}<input data-fin="${k}" type="number" min="${lo}" max="${hi}" step="any" inputmode="decimal" value="${cur().fin[k]}"></label>`;}
+function trRow(t){
+  const opt=sel=>PARTIES.map(p=>`<option value="${p.k}" ${p.k===sel?'selected':''}>${esc(p.t)}</option>`).join(''),loan=t.mode==='loan';
+  return `<tr data-t="${t.id}"><td><input data-tf="item" list="itemList" value="${esc(t.item)}" aria-label="Kalem"></td>
+  <td style="min-width:120px"><input data-tf="amount" type="number" min="0" step="any" inputmode="decimal" value="${t.amount}" aria-label="Tutar TL"></td>
+  <td><select data-tf="fin" aria-label="Finansör">${opt(t.fin)}</select></td>
+  <td><select data-tf="mode" aria-label="Geri dönüş"><option value="share" ${loan?'':'selected'}>Gelir payı ile</option><option value="loan" ${loan?'selected':''}>Kredi</option></select></td>
+  <td class="w-n"><input data-tf="term" type="number" min="1" max="30" step="1" value="${t.term}" ${loan?'':'disabled'} aria-label="Vade yıl"></td>
+  <td class="w-n"><input data-tf="rate" type="number" min="0" max="200" step="any" value="${t.rate}" ${loan?'':'disabled'} aria-label="Faiz yüzde"></td>
+  <td><select data-tf="payer" ${loan?'':'disabled'} aria-label="Geri ödeyen">${opt(t.payer)}</select></td>
+  <td class="num" data-tpay>—</td><td><button class="ghost" data-deltr="${t.id}" aria-label="Kalemi sil">Sil</button></td></tr>`;
+}
+function renderTranches(){const s=cur();$('trBody').innerHTML=s.tranches.map(trRow).join('')||'<tr><td colspan="9" style="color:var(--muted);padding:14px 6px">Finansman kalemi yok. Hazır yapılardan birini seçin veya kalem ekleyin.</td></tr>';}
+function applyPreset(s,p){
+  const get=item=>{let t=s.tranches.find(x=>x.item===item);if(!t){t=tranche(item);s.tranches.push(t);}return t;};
+  const hw=get('Donanım'),epc=get('Saha işleri (EPC)');
+  if(p==='star')s.tranches.forEach(t=>Object.assign(t,{fin:'star',mode:'share'}));
+  if(p==='split'){Object.assign(hw,{fin:'star',mode:'share'});Object.assign(epc,{fin:'ent',mode:'share'});}
+  if(p==='loan'){Object.assign(hw,{fin:'star',mode:'share'});Object.assign(epc,{fin:'fon',mode:'loan',payer:'ent'});}
+}
+function renderFin(){
+  const s=cur(),v=s.fin,t=shareTotal(v),bad=t>100,el=$('shareStatus');
+  el.textContent='Pay toplamı %'+df.format(t)+(bad?': %100 aşılıyor, sonuçlar geçersiz':t<100?': dağıtılmayan %'+df.format(100-t):': dağılım tamam');
+  el.className='shareinfo'+(bad?' bad':'');
+  const rows=calculate(s),f=finance(s,rows),tf=totalFin(s);
+  document.querySelectorAll('#trBody [data-t]').forEach(tr=>{const x=s.tranches.find(q=>q.id===tr.dataset.t);tr.querySelector('[data-tpay]').textContent=x&&x.mode==='loan'&&+x.amount?nf.format(annuity(x)):'—';});
+  $('finSummary').textContent=structureLabel(s)+', toplam '+money(tf);
+  $('finAlerts').innerHTML=finWarnings(s,f).map(([l,x])=>`<div class="alert${l==='warn'?' warn':''}">${esc(x)}</div>`).join('');
+  if(bad){$('finResults').innerHTML='<div class="alert">Pay toplamı %100\'ü aştığı için sonuçlar hesaplanmıyor.</div>';return;}
+  if(!totals(s).kw){$('finResults').innerHTML='<p class="note">Ünite girilince sonuçlar burada görünür.</p>';return;}
+  $('finResults').innerHTML=resultsHtml(rows,f,s,tf);
+}
+
+function renderSite(){
+  const s=cur();
+  const projects=[...new Set(db.sites.map(x=>x.project).filter(Boolean))];
+  let h=`<div class="site-head"><div><h2 id="siteTitle">${esc(s.name)}</h2><p id="siteSub">${esc([s.project,s.district,s.city].filter(Boolean).join(', '))}</p></div>
+  <div class="verdict">
+    <div class="vcell"><span>Durum</span><select data-f="status" aria-label="Durum">${STATUSES.map(st=>`<option value="${st.k}" ${st.k===s.status?'selected':''}>${esc(st.t)}</option>`).join('')}</select></div>
+    <div class="vcell"><span>AMG skoru</span><strong id="vScore"></strong><small id="vDec" style="display:block;font-size:12px"></small></div>
+    <div class="vcell"><span>Toplam güç</span><strong id="vKw"></strong></div>
+  </div></div>
+  <div id="ddAlerts"></div>
+
+  <section class="box"><h3>Lokasyon bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button><button class="ghost" id="delSite">Lokasyonu sil</button></span></h3>
+  <div class="grid">
+    ${field('name','Lokasyon adı','text',' class="span2"')}
+    <label class="span2">Proje / bölge<input data-f="project" list="projList" value="${esc(s.project)}"><datalist id="projList">${projects.map(p=>`<option value="${esc(p)}">`).join('')}</datalist></label>
+    ${field('city','İl')}${field('district','İlçe')}
+    <label>Saha tipi<select data-f="type">${TYPES.map(t=>`<option ${t===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
+    ${field('contractYears','Sözleşme süresi (yıl)','number')}
+    ${field('address','Adres','text',' class="span4"')}
+    ${field('host','Yer sağlayıcı','text',' class="span2"')}
+    ${field('contact','İletişim kişisi / telefon','text',' class="span2"')}
+  </div></section>
+
+  <section class="box"><h3>Saha keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
+  <details open><summary>Proje bilgileri</summary><div class="grid subgrid">
+    ${leadField()}${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}${sv('partner','Yerel ortak')}
+    ${sv('gps','GPS / harita bağlantısı','text',' class="span2"')}${sv('phase','Hedef aşama / COD','text',' class="span2"')}
+    ${chk('scope','Ana kapsam',' class="span4"')}
+  </div><p class="note">Saha sahibi / mal sahibi, lokasyon bilgilerindeki “Yer sağlayıcı” alanıdır.</p></details>
+  <details open><summary>Saha koşulları ve teknik yapılabilirlik</summary><div class="grid subgrid">
+    ${sv('area','Kullanılabilir alan (ör. 20 × 15 m)')}${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}
+    ${chk('access','Erişim ve yol durumu')}${sv('heightLimit','Yükseklik / genişlik sınırı','text',' class="span2"')}
+    ${chk('pave','Zemin / inşaat işleri')}${sv('restore','Zemin onarım notları','text',' class="span2"')}
+    ${field('gridKva','Trafo gücü (kVA)','number')}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}${sv('freq','Frekans (Hz)','number')}
+    ${sel('breaker','Yedek kesici',[['y','Var'],['n','Yok']])}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${chk('lay','Kablo döşeme')}
+    ${sv('meter','Sayaç noktası')}${sv('tariff','Elektrik tarifesi (TL/kWh)','number')}${sv('serviceFee','Hizmet bedeli')}${sv('parkFee','Park ücreti kuralı')}
+    ${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}${chk('pvpot','PV potansiyeli')}
+    ${sv('export','Şebekeye verme / öz tüketim','text',' class="span2"')}${sel('net','4G iletişim',[['good','İyi'],['weak','Zayıf'],['none','Yok']])}<span></span>
+    ${chk('exist','Mevcut güvenlik',' class="span4"')}
+    ${sv('compSites','3 km içindeki hızlı şarj sahası','number')}${sv('compConn','Rakip konnektör sayısı','number')}${sv('compNotes','Rakip fiyat / hizmet / kullanım notları','text',' class="span2"')}
+    <label class="span4">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label>
+  </div><p class="note" id="evPotential"></p></details>
+  </section>
+
+  <section class="box"><h3>Şarj üniteleri<small id="unitSummary"></small></h3>
+  <div class="scroll"><table class="units"><thead><tr><th>Tip</th><th class="num">Ünite gücü kW</th><th class="num">Ünite başına soket</th><th class="num">Adet</th><th>Marka / model</th><th class="num">Toplam kW</th><th></th></tr></thead>
+  <tbody id="unitBody">${s.units.map(u=>unitRow(u)).join('')||`<tr><td colspan="7" style="color:var(--muted);padding:14px 6px">Henüz ünite yok. Aşağıdan DC veya AC ünite ekleyin.</td></tr>`}</tbody>
+  <tfoot id="unitFoot"></tfoot></table></div>
+  <div class="unit-actions"><button id="addDC">+ DC ünite</button><button id="addAC">+ AC ünite</button></div>
+  <div class="capacity">
+    <div class="grid">${field('gridNote','Şebeke notu (trafo, dağıtım şirketi)','text',' class="span4"')}</div>
+    <div class="capbar" id="capbar" style="margin-top:12px" role="img" aria-label="Kurulu gücün şebeke kapasitesine oranı"></div>
+    <div class="capnote" id="capnote"></div>
+  </div></section>
+
+  <section class="box"><h3>Gelir modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
+  <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO (Entegre) payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
+  <div class="shareinfo" id="shareStatus"></div>
+  <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','TL/kWh')}${finField('cost','Elektrik maliyeti','TL/kWh')}</div>
+  <details><summary>Fiyat artışları ve işletme gideri</summary>
+    <div class="grid subgrid">${finField('saleGrowth','Satış fiyatı yıllık artışı','%')}${finField('costGrowth','Elektrik maliyeti yıllık artışı','%')}${finField('commission','Co-CPO ödeme komisyonu','hasılatın %')}${finField('opex','İlk yıl işletme gideri','TL')}${finField('opexGrowth','İşletme gideri yıllık artışı','%')}</div>
+    <p class="note">Komisyon ve işletme gideri Co-CPO payından düşülür. Varsayılan fiyatlar örnektir, tarife teklifi değildir.</p>
+  </details></section>
+
+  <section class="box"><h3>Finansman yapısı<small id="finSummary"></small></h3>
+  <div class="presets no-print"><span class="note">Hazır yapı:</span><button data-preset="star">Tamamı StarCharge (AMG)</button><button data-preset="split">Donanım StarCharge, saha işleri Co-CPO</button><button data-preset="loan">Saha işleri dış fon kredisi</button></div>
+  <div class="scroll"><table class="units tranches"><thead><tr><th>Kalem</th><th class="num">Tutar TL</th><th>Finansör</th><th>Geri dönüş</th><th class="num">Vade yıl</th><th class="num">Faiz %</th><th>Geri ödeyen</th><th class="num">Yıllık taksit</th><th></th></tr></thead><tbody id="trBody"></tbody></table></div>
+  <datalist id="itemList">${ITEMS.map(i=>`<option value="${esc(i)}">`).join('')}</datalist>
+  <div class="unit-actions"><button id="addTr">+ Finansman kalemi</button></div>
+  <div class="grid subgrid"><label class="span2">Diğer fonun adı<input data-fin-text="fundName" value="${esc(s.fin.fundName)}" placeholder="ör. yerli banka, yatırım fonu" maxlength="60"></label></div>
+  <div id="finAlerts" style="margin-top:12px"></div>
+  <p class="note">Gelir payı ile: finansör yatırımını kendi gelir payından geri alır. Kredi: geri ödeyen taraf eşit yıllık taksit öder; taksit onun nakdinden düşülür ve finansöre gider.</p>
+  <div class="inline no-print"><span class="note">${s.project?'Aynı projedeki':'Tüm'} lokasyonlara aktar:</span>
+    <label><input type="checkbox" id="apShare" checked>Paylaşım</label><label><input type="checkbox" id="apPrice">Fiyatlar</label><label><input type="checkbox" id="apUsage">Kullanım</label><label><input type="checkbox" id="apFin">Finansman yapısı</label>
+    <button id="applyAll">Uygula</button></div>
+  </section>
+
+  <section class="box"><h3>Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
+
+  <section class="box"><h3>Skorlama ve yeterlilik<small id="ddProgress"></small></h3>
+  <div class="scoretotal"><strong id="amgTotal"></strong><span id="amgDec"></span></div>
+  <div class="guide"><span class="score lo">60 altı: öncelik dışı</span><span class="score mid">60–79: eksikleri gider</span><span class="score hi">80 ve üzeri: ilerlet</span></div>
+  ${AMG.map(c=>`<div class="amg-row" data-a="${c.k}">
+    <div class="q">${esc(c.t)}<small class="en">${esc(c.en)} · ağırlık ${c.w}</small><small>${esc(c.h)}</small></div>
+    <div class="pts"><input data-amg="${c.k}" type="number" min="0" max="${c.w}" step="1" inputmode="numeric" value="${s.amg.scores[c.k]??''}" aria-label="${esc(c.t)} puanı, en fazla ${c.w}"><span>/ ${c.w}</span>
+      <div class="meter" aria-hidden="true"><i data-meter="${c.k}"></i></div></div>
+    <input data-amgnote="${c.k}" value="${esc(s.amg.notes[c.k])}" placeholder="Değerlendirme notu" aria-label="${esc(c.t)} notu">
+  </div>`).join('')}
+  <h4 class="subh">Ek kontroller</h4>
+  ${EXTRA.map(c=>{const v=s.dd[c.k]||{};return `<div class="dd-row" data-c="${c.k}">
+    <div class="q">${esc(c.t)}<small>${esc(c.h)}</small></div>
+    <div class="seg" role="group" aria-label="${esc(c.t)}">${Object.entries(VAL).map(([k,o])=>`<button data-v="${k}" aria-pressed="${v.v===k}">${o.t}</button>`).join('')}</div>
+    <input data-note="${c.k}" value="${esc(v.note)}" placeholder="Not / kanıt" aria-label="${esc(c.t)} notu">
+  </div>`;}).join('')}
+  </section>
+
+  <section class="box"><h3>Ekler ve onay<small id="attProgress"></small></h3>
+  <div class="scroll"><table class="yearly"><thead><tr><th>Ek türü</th><th>Durum</th></tr></thead><tbody>${ATTACH.map(a=>`<tr><th>${esc(a.t)}</th><td style="text-align:left;min-width:170px"><select data-att="${a.k}" aria-label="${esc(a.t)} durumu"><option value="">Seçin</option>${[['var','Mevcut, ekte'],['yok','Mevcut değil'],['na','Uygulanamaz']].map(([v,t])=>`<option value="${v}" ${s.att[a.k]===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
+  <details><summary>İmza ve katılımcılar</summary><div class="grid subgrid">${SIGN.map(r=>`<label>${esc(r.t)}, ad<input data-sign="${r.k}Name" value="${esc(s.sign[r.k+'Name'])}"></label><label>Tarih<input data-sign="${r.k}Date" type="date" value="${esc(s.sign[r.k+'Date'])}"></label>`).join('')}
+    <label class="span4">Diğer katılımcılar<input data-sign="others" value="${esc(s.sign.others)}"></label></div></details>
+  </section>
+
+  <section class="box"><h3>Genel notlar</h3><textarea data-f="notes" rows="4" aria-label="Genel notlar" placeholder="Saha ziyareti, finansör geri bildirimi, açık sorular">${esc(s.notes)}</textarea>
+  <p style="font-size:12px;color:var(--muted)">Son güncelleme: <span id="upd"></span></p></section>`;
+  $('view').innerHTML=h;
+  renderTranches();
+  updateDerived();
+}
+function unitRow(u){
+  return `<tr data-u="${u.id}" class="${u.kind==='DC'?'kind-dc':'kind-ac'}">
+    <td class="w-kind"><select data-uf="kind" aria-label="Tip"><option ${u.kind==='DC'?'selected':''}>DC</option><option ${u.kind==='AC'?'selected':''}>AC</option></select></td>
+    <td class="w-n"><input data-uf="kw" type="number" min="0" step="any" inputmode="decimal" value="${u.kw}" aria-label="Ünite gücü kW"></td>
+    <td class="w-n"><input data-uf="sockets" type="number" min="1" step="1" inputmode="numeric" value="${u.sockets}" aria-label="Soket"></td>
+    <td class="w-n"><input data-uf="qty" type="number" min="1" step="1" inputmode="numeric" value="${u.qty}" aria-label="Adet"></td>
+    <td><input data-uf="model" value="${esc(u.model)}" placeholder="ör. StarCharge" aria-label="Marka / model"></td>
+    <td class="num" data-utotal>${nf.format((+u.kw||0)*(+u.qty||0))}</td>
+    <td><button class="ghost" data-del="${u.id}" aria-label="Üniteyi sil">Sil</button></td></tr>`;
+}
+function updateDerived(){
+  const s=cur();if(!s)return;const t=totals(s),d=amgScore(s);
+  $('vScore').textContent=d.label;$('vScore').className='score '+d.cls;$('vDec').textContent=d.decLabel;$('vDec').className='score '+d.cls;
+  $('amgTotal').textContent=d.done?d.label:'Puanlanmadı';$('amgTotal').className='score '+d.cls;
+  $('amgDec').textContent=d.complete?'Karar: '+d.dec.t+' ('+d.dec.en+')':d.done?`${AMG.length-d.done} kriter daha puanlanınca karar gösterilir`:'Her kriteri 0 ile ağırlığı arasında puanlayın';
+  AMG.forEach(c=>{const m=document.querySelector(`[data-meter="${c.k}"]`),raw=s.amg.scores[c.k],v=+raw;if(m)m.style.width=(raw!==''&&raw!=null&&Number.isFinite(v)?v/c.w*100:0)+'%';});
+  const attDone=ATTACH.filter(a=>s.att[a.k]).length;$('attProgress').textContent=`${attDone}/${ATTACH.length} ek işaretlendi`;
+  $('evPotential').textContent=t.kw?`Şarj potansiyeli ünite tablosundan alınır: ${s.units.map(u=>`${u.kind} ${nf.format(u.kw)} kW × ${u.qty}`).join(', ')}.`:'Şarj potansiyeli ünite tablosundan alınır.';
+  $('vKw').textContent=nf.format(t.kw)+' kW';
+  $('unitSummary').textContent=`${t.dcUnits} DC (${t.dcSock} soket) · ${t.acUnits} AC (${t.acSock} soket)`;
+  $('unitFoot').innerHTML=s.units.length?`<tr><td colspan="5">DC ${nf.format(t.dcKw)} kW + AC ${nf.format(t.acKw)} kW</td><td class="num">${nf.format(t.kw)}</td><td></td></tr>`:'';
+  const cr=capRef(s),g=cr?cr.v:0,bar=$('capbar'),note=$('capnote');
+  if(g>0){const scale=Math.max(g,t.kw);
+    bar.innerHTML=`<i style="width:${t.dcKw/scale*100}%;background:var(--dc)"></i><i style="width:${t.acKw/scale*100}%;background:var(--ac)"></i>`;
+    const pct=Math.round(t.kw/g*100);
+    note.textContent=t.kw>g?`Kurulu güç ${nf.format(t.kw)} kW, ${nf.format(g)} ${cr.u}: %${pct}. Ek bağlantı, yük yönetimi veya daha az ünite gerekir.`:`Kurulu güç, ${nf.format(g)} ${cr.u} gücün %${pct}'ini kullanıyor (güç faktörü 1 varsayımıyla kaba kontrol).`;
+    note.className='capnote'+(t.kw>g?' bad':'');
+  }else{bar.innerHTML=`<i style="width:${t.kw?t.dcKw/t.kw*100:0}%;background:var(--dc)"></i><i style="width:${t.kw?t.acKw/t.kw*100:0}%;background:var(--ac)"></i>`;note.textContent='Saha keşfinde trafo veya kullanılabilir güç girilmedi; kapasite kontrolü yapılamıyor.';note.className='capnote';}
+  $('ddProgress').textContent=`${d.done}/${AMG.length} kriter puanlandı`;
+  let a='';
+  if(d.blockers.length)a+=`<div class="alert">Engel: ${esc(d.blockers.join(', '))} uygun değil.</div>`;
+  if(d.complete&&d.total<60)a+=`<div class="alert">AMG skoru ${d.total}/100; form kılavuzuna göre öncelik dışı.</div>`;
+  if(s.status==='sunuldu'||s.status==='onay'){
+    const miss=AMG.filter(c=>{const v=s.amg.scores[c.k];return v===''||v==null;}).map(c=>c.t);
+    if(miss.length)a+=`<div class="alert warn">Durum "${esc(statusOf(s.status).t)}" ama puanlanmamış AMG kriterleri var: ${esc(miss.join(', '))}.</div>`;
+  }
+  if(!s.units.length)a+=`<div class="alert warn">Ünite girilmedi.</div>`;
+  if(shareTotal(s.fin)>100)a+=`<div class="alert">Gelir paylaşımı toplamı %100'ü aşıyor.</div>`;
+  renderFin();
+  $('ddAlerts').innerHTML=a;
+  $('siteTitle').textContent=s.name||'Adsız lokasyon';
+  $('siteSub').textContent=[s.project,s.district,s.city].filter(Boolean).join(', ');
+  $('upd').textContent=new Date(s.updatedAt).toLocaleString('tr-TR');
+  renderPipe();renderList();
+}
+
+/* ---------- events ---------- */
+function openSite(id){activeId=id;view='site';render();window.scrollTo({top:0});}
+function openAdd(){
+  $('dlgName').value='';$('dlgProject').value=cur()?.project||'';
+  $('projectList').innerHTML=[...new Set(db.sites.map(s=>s.project).filter(Boolean))].map(p=>`<option value="${esc(p)}">`).join('');
+  $('dlgCopy').innerHTML='<option value="">Boş başla</option>'+db.sites.filter(s=>s.units.length).map(s=>`<option value="${s.id}">${esc(s.name)} ünitelerini kopyala</option>`).join('');
+  $('dlg').showModal();$('dlgName').focus();
+}
+$('addSite').onclick=openAdd;
+$('dlgCancel').onclick=()=>$('dlg').close();
+$('dlgForm').onsubmit=e=>{e.preventDefault();const name=$('dlgName').value.trim();if(!name)return;
+  const s=blankSite(name,$('dlgProject').value.trim());const src=db.sites.find(x=>x.id===$('dlgCopy').value);
+  if(src)s.units=src.units.map(u=>({...u,id:uid()}));
+  db.sites.push(s);$('dlg').close();touched(s);openSite(s.id);toast(name+' eklendi.');};
+$('search').oninput=()=>{renderList();if(view==='portfolio')renderPortfolio();};
+$('vPortfolio').onclick=()=>{view='portfolio';render();};
+$('vSite').onclick=()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';render();};
+$('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';render();};
+$('filterNote').onclick=e=>{if(e.target.id==='clearFilter'){filter=null;render();}};
+$('siteList').onclick=e=>{const b=e.target.closest('[data-id]');if(b)openSite(b.dataset.id);};
+$('view').addEventListener('click',e=>{
+  const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
+  const s=cur();if(!s||view!=='site')return;
+  const pre=e.target.closest('[data-preset]');if(pre){applyPreset(s,pre.dataset.preset);touched(s);renderTranches();updateDerived();toast('Finansman yapısı uygulandı; tutarları kontrol edin.');return;}
+  if(e.target.id==='addTr'){s.tranches.push(tranche('Şebeke bağlantısı'));touched(s);renderTranches();updateDerived();return;}
+  if(e.target.id==='addLead'){const name=$('newLead').value.trim().replace(/\s+/g,' ');if(!name){$('newLead').focus();return;}
+    addTeamMember(name);s.survey.lead=name;touched(s);renderSite();toast(name+' sorumlu listesine eklendi.');return;}
+  if(e.target.id==='cancelLead'){renderSite();return;}
+  const dtr=e.target.closest('[data-deltr]');if(dtr){s.tranches=s.tranches.filter(t=>t.id!==dtr.dataset.deltr);touched(s);renderTranches();updateDerived();return;}
+  if(e.target.id==='applyAll'){const keys=[],fin=$('apFin').checked;if($('apShare').checked)keys.push('share','entShare','starShare','ekoShare','fundShare');if($('apPrice').checked)keys.push('sale','cost','saleGrowth','costGrowth');if($('apUsage').checked)keys.push('initial','growth');
+    if(!keys.length&&!fin){toast('En az bir grup seçin.');return;}
+    const targets=db.sites.filter(x=>x.id!==s.id&&(!s.project||x.project===s.project));
+    targets.forEach(x=>{keys.forEach(k=>x.fin[k]=s.fin[k]);if(fin){x.fin.fundName=s.fin.fundName;const old=x.tranches||[];x.tranches=s.tranches.map(t=>({...t,id:uid(),amount:(old.find(o=>o.item===t.item)||{}).amount??t.amount}));}touched(x);});touched(s);updateDerived();toast(targets.length+' lokasyona uygulandı.');return;}
+  const seg=e.target.closest('.seg button');
+  if(seg){const k=seg.closest('.dd-row').dataset.c,v=seg.dataset.v;s.dd[k]=s.dd[k]||{};s.dd[k].v=s.dd[k].v===v?'':v;
+    seg.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===s.dd[k].v));touched(s);updateDerived();return;}
+  if(e.target.id==='addDC'||e.target.id==='addAC'){const dc=e.target.id==='addDC';s.units.push(dc?unit('DC',120,2,1,'StarCharge DC'):unit('AC',22,1,1,''));touched(s);renderSite();
+    const rows=document.querySelectorAll('#unitBody tr');rows[rows.length-1]?.querySelector('[data-uf=kw]')?.focus();return;}
+  const del=e.target.closest('[data-del]');if(del){s.units=s.units.filter(u=>u.id!==del.dataset.del);touched(s);renderSite();return;}
+  if(e.target.id==='delSite'){ask(s.name+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Lokasyonu sil').then(ok=>{if(!ok)return;
+    removeSite(s);activeId=null;view='portfolio';render();toast('Lokasyon silindi.');});return;}
+  if(e.target.id==='dupSite'){const c=JSON.parse(JSON.stringify(s));c.id=uid();c.name=s.name+' (kopya)';c.units.forEach(u=>u.id=uid());c.status='aday';c.dd={};c.amg={scores:{},notes:{}};c.att={};c.sign={};c.createdAt=now();
+    db.sites.push(c);touched(c);openSite(c.id);toast('Lokasyon kopyalandı; kontrol listesi boş başlatıldı.');}
+});
+$('view').addEventListener('keydown',e=>{if(e.target.id==='newLead'&&e.key==='Enter'){e.preventDefault();$('addLead').click();return;}const row=e.target.closest('[data-open]');if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSite(row.dataset.open);}});
+$('view').addEventListener('input',e=>{
+  const s=cur();if(!s||view!=='site')return;const el=e.target;
+  if(el.dataset.f){let v=el.value;if(el.type==='number')v=Math.max(0,+v||0);s[el.dataset.f]=v;touched(s);updateDerived();return;}
+  if(el.dataset.fin){const k=el.dataset.fin,[lo,hi]=FIN_LIMITS[k],v=el.value.trim()===''?NaN:+el.value;
+    if(!Number.isFinite(v)||v<lo||v>hi){el.setAttribute('aria-invalid','true');status('Hatalı giriş: '+lo+' ile '+nf.format(hi)+' arasında değer girin',true);return;}
+    el.removeAttribute('aria-invalid');s.fin[k]=v;touched(s);updateDerived();return;}
+  if(el.dataset.tf){const tr=el.closest('[data-t]'),t=s.tranches.find(x=>x.id===tr.dataset.t),k=el.dataset.tf;let v=el.value;
+    if(el.type==='number'){v=Math.max(k==='term'?1:0,+v||0);if(k==='term')v=Math.round(v);}
+    t[k]=v;touched(s);if(k==='mode')renderTranches();updateDerived();return;}
+  if(el.dataset.finText){s.fin[el.dataset.finText]=el.value;touched(s);updateDerived();return;}
+  if('lead' in el.dataset){if(el.value==='__new'){$('newLeadRow').hidden=false;$('newLead').focus();return;}
+    $('newLeadRow').hidden=true;s.survey.lead=el.value;touched(s);updateDerived();return;}
+  if(el.dataset.sv){const k=el.dataset.sv;s.survey[k]=el.type==='number'?(el.value===''?'':Math.max(0,+el.value||0)):el.value;touched(s);updateDerived();return;}
+  if(el.dataset.svc){const k=el.dataset.svc;s.survey[k]=[...document.querySelectorAll(`[data-svc="${k}"]:checked`)].map(x=>x.value);touched(s);return;}
+  if(el.dataset.amg){const c=AMG.find(x=>x.k===el.dataset.amg),raw=el.value.trim();
+    if(raw===''){s.amg.scores[c.k]='';el.removeAttribute('aria-invalid');touched(s);updateDerived();return;}
+    const v=+raw;if(!Number.isFinite(v)||v<0||v>c.w){el.setAttribute('aria-invalid','true');status(c.t+': 0 ile '+c.w+' arasında puan girin',true);return;}
+    el.removeAttribute('aria-invalid');s.amg.scores[c.k]=v;touched(s);updateDerived();return;}
+  if(el.dataset.amgnote){s.amg.notes[el.dataset.amgnote]=el.value;touched(s);return;}
+  if(el.dataset.att){s.att[el.dataset.att]=el.value;touched(s);updateDerived();return;}
+  if(el.dataset.sign){s.sign[el.dataset.sign]=el.value;touched(s);return;}
+  if(el.dataset.note){const k=el.dataset.note;s.dd[k]=s.dd[k]||{};s.dd[k].note=el.value;touched(s);return;}
+  if(el.dataset.uf){const tr=el.closest('[data-u]'),u=s.units.find(x=>x.id===tr.dataset.u);let v=el.value;
+    if(el.type==='number')v=Math.max(0,+v||0);u[el.dataset.uf]=v;
+    if(el.dataset.uf==='kind')tr.className=v==='DC'?'kind-dc':'kind-ac';
+    tr.querySelector('[data-utotal]').textContent=nf.format((+u.kw||0)*(+u.qty||0));touched(s);updateDerived();}
+});
+$('view').addEventListener('change',e=>{if(e.target.dataset.f==='status'){const s=cur();s.status=e.target.value;touched(s);updateDerived();}});
+
+/* ---------- backup ---------- */
+async function download(text,type,name){
+  const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);toast(name+' indirildi.');}
+const stamp=()=>new Date().toISOString().slice(0,10);
+$('exportJson').onclick=()=>{download(JSON.stringify({...db,exportedAt:now()},null,2),'application/json','Saha_Degerlendirme_Yedek_'+stamp()+'.json');};
+$('exportCsv').onclick=()=>{
+  const head=['Lokasyon','Proje','Proje sorumlusu','İl','İlçe','Saha tipi','Durum','DC ünite','DC kW','DC soket','AC ünite','AC kW','AC soket','Trafo kVA','Kullanılabilir kW','Park yeri','Kablo mesafesi m','Sözleşme yıl','AMG skoru','Puanlanan kriter','Karar','Engel','Kullanım %','Satış TL/kWh','Elektrik TL/kWh','Yer sağlayıcı %','Co-CPO %','StarCharge %','EKONİX %','Diğer fon %','İlk yıl enerji kWh','İlk yıl hasılat TL',YEARS+' yıl yer sağlayıcı TL','Finansman yapısı','Toplam finansman TL','StarCharge finansmanı TL','Co-CPO finansmanı TL','Diğer fon finansmanı TL','En düşük DSCR',...AMG.map(c=>c.t+' (/'+c.w+')')];
+  const rows=db.sites.map(s=>{const t=totals(s),d=amgScore(s);return [s.name,s.project,s.survey.lead||'',s.city,s.district,s.type,statusOf(s.status).t,t.dcUnits,t.dcKw,t.dcSock,t.acUnits,t.acKw,t.acSock,s.gridKva,s.survey.availKw??'',s.survey.parkTotal??'',s.survey.cableM??'',s.contractYears,d.done?d.total:'',d.done+'/'+AMG.length,d.dec?d.dec.t:'',d.blockers.join(', '),...(()=>{const f=s.fin,r=calculate(s);const F=finance(s,r),dm=minAll(F.P);return [f.initial,f.sale,f.cost,f.share,f.entShare,f.starShare,f.ekoShare,f.fundShare,Math.round(r[0].energy),Math.round(r[0].revenue),Math.round(r.reduce((a,x)=>a+x.owner,0)),structureLabel(s),totalFin(s),F.P.star.invest,F.P.ent.invest,F.P.fon.invest,dm==null?'':fmtD(dm)];})(),...AMG.map(c=>s.amg.scores[c.k]??'')];});
+  const csv=[head,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  download('\ufeff'+csv,'text/csv','Saha_Degerlendirme_'+stamp()+'.csv');
+};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const inc=JSON.parse(await f.text());if(!Array.isArray(inc.sites))throw Error('Dosyada lokasyon listesi bulunamadı.');
+    if(!await ask(inc.sites.length+' lokasyon bulundu. Mevcut listeye eklensin mi?','Listeye ekle'))return;
+    for(const s of inc.sites){const c={...blankSite(s.name||'Adsız'),...s,id:uid(),createdAt:now()};c.units=(c.units||[]).map(u=>({...u,id:uid()}));c.dd=c.dd||{};migrateSite(c);c.fin={...FIN_DEFAULT,...(s.fin||{})};c.tranches=(Array.isArray(s.tranches)?s.tranches:defaultTranches()).map(t=>({...t,id:uid()}));db.sites.push(c);touched(c);}
+    view='portfolio';render();toast(inc.sites.length+' lokasyon eklendi.');}
+  catch(err){toast('Yedek yüklenemedi: '+err.message);}
+};
+
+render();load();
+</script>
+
+</body></html>
