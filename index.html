@@ -283,11 +283,9 @@ header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-wi
   main{max-width:none}
 }
 aside{background:#111827;color:#cbd5e1;border-right:1px solid #1e293b;padding:0;gap:0;position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#334155 transparent}
-.brand{display:flex;align-items:center;gap:12px;padding:16px;background:#0d121d;border-bottom:1px solid #1e293b}
-.brand .logo{display:grid;place-items:center;width:36px;height:36px;border-radius:8px;background:#f59e0b;color:#020617;flex:none}
-.brand .logo svg{width:20px;height:20px}
-.brand strong{display:block;font-size:16px;font-weight:700;letter-spacing:.025em;color:#fff;line-height:1.2}
-.brand small{display:block;font-size:12px;color:#94a3b8;margin-top:2px}
+.brand{display:flex;align-items:center;justify-content:flex-start;padding:16px;background:#0d121d;border-bottom:1px solid rgba(30,41,59,.8)}
+.logobox{display:inline-flex;align-items:center;padding:6px 10px;background:#fff;border-radius:8px}
+.logobox img{display:block;height:32px;width:auto;object-fit:contain}
 .nav{padding:4px 0 8px}
 .nav-head{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-radius:0;background:transparent;padding:16px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b}
 .nav-head:hover{background:transparent;color:#94a3b8}
@@ -367,10 +365,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 
 <div class="shell">
   <aside>
-    <div class="brand">
-      <span class="logo"><svg class="" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span>
-      <div><strong>MKT Motors</strong><small>Saha Değerlendirme · EV CPO</small></div>
-    </div>
+    <div class="brand"><span class="logobox"><img src="/ekore-logo.jpg" alt="Ekore Logo" width="738" height="210"></span></div>
     <nav class="nav" aria-label="Ana gezinme">
       <section class="nav-group" data-group="main">
         <button type="button" class="nav-head" aria-expanded="true">Ana menü<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
