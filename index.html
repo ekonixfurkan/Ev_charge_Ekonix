@@ -1,5 +1,7 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Saha Değerlendirme Aracı</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 :root{
   --p-owner:#d77e09;--p-ent:#24677d;--p-star:#7a4fb0;--p-eko:#5f8a2a;--p-fon:#8a6340;
@@ -223,6 +225,102 @@ input[aria-invalid=true]{border:2px solid var(--no)}
   .shell{display:block}main{max-width:none;padding:0}
   .box{break-inside:avoid}
 }
+/* ===== Modern tema: slate + amber, Inter, kart mimarisi ===== */
+:root{
+  --ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--bg:#f8fafc;--surface:#ffffff;--soft:#f1f5f9;
+  --accent:#d97706;--accent-soft:#fffbeb;--nav:#0f172a;
+  --radius:12px;--shadow:0 1px 2px rgba(15,23,42,.05);
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--ink:#f1f5f9;--muted:#94a3b8;--line:#1e293b;--bg:#0b1220;--surface:#111a2b;--soft:#172033;--accent:#f59e0b;--accent-soft:#3a2a12;--nav:#0b1220;--shadow:0 1px 2px rgba(0,0,0,.4);}
+}
+:root[data-theme="dark"]{--ink:#f1f5f9;--muted:#94a3b8;--line:#1e293b;--bg:#0b1220;--surface:#111a2b;--soft:#172033;--accent:#f59e0b;--accent-soft:#3a2a12;--nav:#0b1220;--shadow:0 1px 2px rgba(0,0,0,.4);}
+body{font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+button{border-radius:8px;font-weight:500;transition:background .15s,border-color .15s,box-shadow .15s}
+button:hover{border-color:var(--muted);background:var(--soft)}
+button.primary{background:#d97706;border-color:#d97706;color:#fff;font-weight:500;box-shadow:var(--shadow);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+button.primary:hover{background:#b45309;border-color:#b45309}
+button.ghost:hover{background:var(--soft);color:var(--ink)}
+input,select,textarea{border-radius:8px;border-color:var(--line);min-height:40px;font-size:14px}
+textarea{min-height:64px}
+input:focus,select:focus,textarea:focus{outline:0;border-color:#d97706;box-shadow:0 0 0 3px rgba(217,119,6,.2)}
+:focus-visible{outline:2px solid #d97706;outline-offset:2px}
+.units td input,.units td select{min-height:34px}
+
+/* Başlık */
+header{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);padding:24px 28px 20px;align-items:flex-start}
+header h1{font-size:24px;font-weight:700;letter-spacing:-.025em;color:var(--ink)}
+header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-width:62ch}
+#saveStatus{color:var(--muted);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:500}
+#saveStatus.err{color:#b45309;background:#fffbeb;border-color:#fde68a}
+
+/* KPI kartları + durum çubuğu */
+.pipeline{background:var(--bg);color:var(--ink);padding:20px 28px 4px;display:flex;flex-direction:column}
+.pipe-legend{order:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;margin:0 0 16px;color:var(--ink)}
+.pipe{order:2;height:44px;border-radius:var(--radius);background:var(--soft);border:1px solid var(--line)}
+.pipe button{font-weight:500}
+.pipe button[aria-pressed=true]{box-shadow:inset 0 -4px 0 rgba(255,255,255,.85)}
+.pipe .empty{color:var(--muted)}
+.mk{background:var(--soft);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.mk span{display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.mk strong{display:block;margin-top:4px;font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.mk strong small{font-size:14px;font-weight:400;color:var(--muted);margin-left:4px;letter-spacing:0}
+
+/* Sol panel */
+aside{padding:20px 16px;gap:12px}
+.searchwrap{position:relative;flex:1}
+.searchwrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none}
+.searchwrap input{padding-left:36px;height:40px;font-size:14px;border-radius:8px}
+#addSite{width:100%;height:40px}
+.site-item{border-radius:10px;border:1px solid var(--line);border-left:4px solid var(--line)}
+.site-item:hover{background:var(--soft)}
+.site-item.active{background:var(--accent-soft);border-color:#fcd34d;border-left-color:#d97706}
+.aside-foot{padding-top:16px;gap:8px;align-items:center}
+.aside-foot button{height:32px;padding:0 12px;font-size:12px;border-radius:6px;background:transparent}
+.aside-foot button:hover{background:var(--soft)}
+.aside-foot p{flex-basis:100%;color:var(--muted)}
+
+/* Sekmeler */
+main{padding:24px 28px}
+.viewbar{display:inline-flex;gap:4px;padding:4px;background:var(--soft);border:1px solid var(--line);border-radius:10px;margin-bottom:20px}
+.viewbar button{border:0;background:transparent;color:var(--muted);border-radius:8px;padding:6px 16px;font-weight:500}
+.viewbar button:hover{background:transparent;color:var(--ink)}
+.viewbar button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.viewbar button:disabled{opacity:.5;cursor:default}
+
+/* Kartlar */
+.box,.total,.vcell,.kpi{border-radius:var(--radius);border-color:var(--line)}
+.box{box-shadow:var(--shadow);padding:20px}
+.total{box-shadow:var(--shadow)}
+.site-head h2{font-weight:700;letter-spacing:-.02em}
+
+/* Boş durum */
+.emptystate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;border:2px dashed var(--line);border-radius:16px;background:var(--soft);box-shadow:none}
+.emptystate .eicon{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:#fffbeb;color:#d97706;margin-bottom:16px}
+.emptystate .eicon svg{width:26px;height:26px}
+.emptystate h2{font-size:18px;font-weight:600;color:var(--ink);margin:0 0 4px}
+.emptystate p{font-size:14px;color:var(--muted);max-width:24rem;margin:0 0 24px}
+
+/* Diyalog */
+dialog{max-width:28rem;width:min(448px,92vw);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 25px 50px -12px rgba(15,23,42,.35);font-family:var(--font)}
+dialog::backdrop{background:rgba(15,23,42,.45);backdrop-filter:blur(2px)}
+dialog h2{font-size:18px;font-weight:600;letter-spacing:-.01em}
+dialog .dsub{font-size:14px;color:var(--muted);margin:4px 0 8px}
+dialog label{margin-top:16px;font-size:12px;font-weight:600;color:var(--ink);text-transform:uppercase;letter-spacing:.05em}
+dialog label > input,dialog label > select{margin-top:6px;height:40px;text-transform:none;letter-spacing:0;font-size:14px;font-weight:400}
+dialog .row{gap:12px;margin-top:24px}
+dialog .row button{height:40px;padding:0 16px}
+dialog .row button:not(.primary){background:transparent;border-color:transparent;color:var(--muted)}
+dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
+#ask p{text-transform:none}
+
+@media (max-width:1000px){.pipe-legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){
+  header{padding:18px 14px 16px}.pipeline{padding:16px 14px 4px}.pipe-legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .mk{padding:12px}.mk strong{font-size:17px}main{padding:14px}.emptystate{padding:36px 16px}
+}
 </style>
 <header>
   <div>
@@ -239,9 +337,9 @@ input[aria-invalid=true]{border:2px solid var(--no)}
 <div class="shell">
   <aside>
     <div class="aside-top">
-      <input id="search" type="search" placeholder="Lokasyon, ilçe veya proje ara" aria-label="Lokasyon ara">
+      <div class="searchwrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search" type="search" placeholder="Lokasyon, ilçe veya proje ara" aria-label="Lokasyon ara"></div>
     </div>
-    <button class="primary" id="addSite">+ Lokasyon ekle</button>
+    <button class="primary" id="addSite"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button>
     <div class="filter-note" id="filterNote" hidden></div>
     <div id="siteList"></div>
     <div class="aside-foot">
@@ -266,7 +364,8 @@ input[aria-invalid=true]{border:2px solid var(--no)}
 <dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:15px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
 <dialog id="dlg">
   <form id="dlgForm">
-    <h2 style="font-size:19px">Yeni lokasyon</h2>
+    <h2>Yeni lokasyon</h2>
+    <p class="dsub">Lokasyonu kaydedin, üniteleri ve kontrol listesini sonra doldurun.</p>
     <label>Lokasyon adı<input id="dlgName" required maxlength="120" autocomplete="off"></label>
     <label>Proje / bölge<input id="dlgProject" maxlength="120" list="projectList" autocomplete="off"></label>
     <datalist id="projectList"></datalist>
@@ -579,7 +678,8 @@ function renderPipe(){
   let kw=0,dc=0;db.sites.forEach(s=>{const t=totals(s);kw+=t.kw;dc+=t.dcKw;});
   const need=db.sites.reduce((a,s)=>a+totalFin(s),0);
   const ok=db.sites.filter(s=>s.status==='onay');let okKw=0;ok.forEach(s=>okKw+=totals(s).kw);
-  $('pipeLegend').innerHTML=`<span><strong>${total}</strong> lokasyon</span><span><strong>${nf.format(kw)} kW</strong> toplam kurulu güç, ${nf.format(dc)} kW DC</span><span><strong>${nf.format(okKw)} kW</strong> kredilendirilebilir</span><span><strong>${money(need)}</strong> toplam finansman ihtiyacı</span>`;
+  const mk=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
+  $('pipeLegend').innerHTML=mk('Lokasyon',total,'')+mk('Toplam kurulu güç',nf.format(kw),'kW')+mk('DC güç',nf.format(dc),'kW')+mk('Kredilendirilebilir',nf.format(okKw),'kW')+mk('Toplam finansman',nf.format(need),'TL');
 }
 function renderList(){
   const list=visibleSites();
@@ -603,7 +703,7 @@ function render(){
 function renderPortfolio(){
   const list=visibleSites();
   if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Lokasyonlar yükleniyor</h2><p>Kayıtlı lokasyonlar buluttan getiriliyor.</p></div>';return;}
-  if(!db.sites.length){$('view').innerHTML=`<div class="box emptystate"><h2>İlk lokasyonu ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()">+ Lokasyon ekle</button></div>`;return;}
+  if(!db.sites.length){$('view').innerHTML=`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk lokasyonu ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;return;}
   let T={dcU:0,acU:0,dcKw:0,acKw:0,sock:0};
   list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
   const tot=(l,v)=>`<div class="total"><span>${l}</span><strong>${v}</strong></div>`;
