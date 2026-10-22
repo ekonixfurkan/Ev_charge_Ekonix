@@ -329,6 +329,18 @@ main{padding:24px 28px}
 .total{box-shadow:var(--shadow)}
 .site-head h2{font-weight:700;letter-spacing:-.02em}
 
+/* Sekmeli görünümler: yalnız seçili bölüm gösterilir */
+@media screen{
+  #view[data-sub="ovw"] [data-tab]:not([data-tab="ovw"]),
+  #view[data-sub="port"] [data-tab]:not([data-tab="port"]),
+  #view[data-sub="info"] [data-tab]:not([data-tab="info"]),
+  #view[data-sub="units"] [data-tab]:not([data-tab="units"]),
+  #view[data-sub="infra"] [data-tab]:not([data-tab="infra"]),
+  #view[data-sub="credit"] [data-tab]:not([data-tab="credit"]),
+  #view[data-sub="check"] [data-tab]:not([data-tab="check"]){display:none}
+}
+.subtabs{max-width:100%;overflow-x:auto;margin-bottom:16px}
+.subtabs button{white-space:nowrap}
 /* Lokasyon listesi görünümü */
 .locgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
 .loc-card{text-align:left;width:100%;padding:16px;display:grid;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -745,6 +757,9 @@ function renderLocations(){
       </button>`;}).join(''):'<p class="note">Bu filtreye uyan lokasyon yok.</p>')+`</div></section>`;
 }
 function render(){
+  if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
+  if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
+  $('view').dataset.sub=view==='locations'?'':sub;
   renderPipe();paintNav();
   $('vPortfolio').setAttribute('aria-pressed',view==='portfolio');
   $('vSite').setAttribute('aria-pressed',view==='site');
@@ -760,8 +775,8 @@ function renderPortfolio(){
   list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
   const tot=(l,v)=>`<div class="total"><span>${l}</span><strong>${v}</strong></div>`;
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
-  let h=`<div class="totals">${tot('Lokasyon',list.length)}${tot('DC ünite',T.dcU)}${tot('AC ünite',T.acU)}${tot('Toplam güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj noktası',T.sock)}</div>`;
-  h+=`<section class="box"><h3>Lokasyonlar<small>${filter?esc(statusOf(filter).t)+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
+  let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC ünite',T.dcU)}${tot('AC ünite',T.acU)}${tot('Toplam güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj noktası',T.sock)}</div>`;
+  h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${filter?esc(statusOf(filter).t)+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
     <th>Lokasyon</th><th>Proje / bölge</th><th>Durum</th><th class="num">DC ünite</th><th class="num">AC ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / kullanılabilir</th><th class="num">İlk yıl hasılat TL</th><th>Finansman</th><th class="num">AMG skoru</th><th>Karar</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=amgScore(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v;
       return `<tr data-open="${s.id}" tabindex="0"><td><b>${esc(s.name)}</b><br><small style="color:var(--muted)">${esc([s.district,s.city].filter(Boolean).join(', '))}</small></td><td>${esc(s.project)}${s.survey.lead?`<br><small style="color:var(--muted)">Sorumlu: ${esc(s.survey.lead)}</small>`:''}</td><td><span class="chip" style="--c:${st.c}">${esc(st.t)}</span></td>
@@ -773,12 +788,12 @@ function renderPortfolio(){
     `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(T.dcKw)}</td><td class="num">${nf.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td class="num">${nf.format(rows[0].revenue)}</td><td>${money(list.reduce((a,s)=>a+totalFin(s),0))}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
-    h+=`<section class="box"><h3>Gelir ve finansman, portföy toplamı<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>
+    h+=`<section class="box" data-tab="port"><h3>Gelir ve finansman, portföy toplamı<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>
     ${invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:''}
     ${valid.length?resultsHtml(vrows,f,null,tf):''}</section>`;
   }
-  h+=`<details class="box"><summary style="cursor:pointer;font-weight:600">Hesaplama esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
-  h+=`<details class="box"><summary style="cursor:pointer;font-weight:600">Skor nasıl hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
+  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Hesaplama esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
+  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Skor nasıl hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
   $('view').innerHTML=h;
 }
 
@@ -843,7 +858,8 @@ function renderSite(){
   </div></div>
   <div id="ddAlerts"></div>
 
-  <section class="box"><h3>Lokasyon bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button><button class="ghost" id="delSite">Lokasyonu sil</button></span></h3>
+  <div class="viewbar subtabs no-print" role="tablist" aria-label="Lokasyon bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" data-sub="${k}" aria-pressed="${sub===k}">${t}</button>`).join('')}</div>
+   <section class="box" data-tab="info"><h3>Lokasyon bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button><button class="ghost" id="delSite">Lokasyonu sil</button></span></h3>
   <div class="grid">
     ${field('name','Lokasyon adı','text',' class="span2"')}
     <label class="span2">Proje / bölge<input data-f="project" list="projList" value="${esc(s.project)}"><datalist id="projList">${projects.map(p=>`<option value="${esc(p)}">`).join('')}</datalist></label>
@@ -855,7 +871,7 @@ function renderSite(){
     ${field('contact','İletişim kişisi / telefon','text',' class="span2"')}
   </div></section>
 
-  <section class="box"><h3>Saha keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
+  <section class="box" data-tab="infra"><h3>Saha keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
   <details open><summary>Proje bilgileri</summary><div class="grid subgrid">
     ${leadField()}${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}${sv('partner','Yerel ortak')}
     ${sv('gps','GPS / harita bağlantısı','text',' class="span2"')}${sv('phase','Hedef aşama / COD','text',' class="span2"')}
@@ -876,7 +892,7 @@ function renderSite(){
   </div><p class="note" id="evPotential"></p></details>
   </section>
 
-  <section class="box"><h3>Şarj üniteleri<small id="unitSummary"></small></h3>
+  <section class="box" data-tab="units"><h3>Şarj üniteleri<small id="unitSummary"></small></h3>
   <div class="scroll"><table class="units"><thead><tr><th>Tip</th><th class="num">Ünite gücü kW</th><th class="num">Ünite başına soket</th><th class="num">Adet</th><th>Marka / model</th><th class="num">Toplam kW</th><th></th></tr></thead>
   <tbody id="unitBody">${s.units.map(u=>unitRow(u)).join('')||`<tr><td colspan="7" style="color:var(--muted);padding:14px 6px">Henüz ünite yok. Aşağıdan DC veya AC ünite ekleyin.</td></tr>`}</tbody>
   <tfoot id="unitFoot"></tfoot></table></div>
@@ -887,7 +903,7 @@ function renderSite(){
     <div class="capnote" id="capnote"></div>
   </div></section>
 
-  <section class="box"><h3>Gelir modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
+  <section class="box" data-tab="credit"><h3>Gelir modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
   <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO (Entegre) payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
   <div class="shareinfo" id="shareStatus"></div>
   <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','TL/kWh')}${finField('cost','Elektrik maliyeti','TL/kWh')}</div>
@@ -896,7 +912,7 @@ function renderSite(){
     <p class="note">Komisyon ve işletme gideri Co-CPO payından düşülür. Varsayılan fiyatlar örnektir, tarife teklifi değildir.</p>
   </details></section>
 
-  <section class="box"><h3>Finansman yapısı<small id="finSummary"></small></h3>
+  <section class="box" data-tab="credit"><h3>Finansman yapısı<small id="finSummary"></small></h3>
   <div class="presets no-print"><span class="note">Hazır yapı:</span><button data-preset="star">Tamamı StarCharge (AMG)</button><button data-preset="split">Donanım StarCharge, saha işleri Co-CPO</button><button data-preset="loan">Saha işleri dış fon kredisi</button></div>
   <div class="scroll"><table class="units tranches"><thead><tr><th>Kalem</th><th class="num">Tutar TL</th><th>Finansör</th><th>Geri dönüş</th><th class="num">Vade yıl</th><th class="num">Faiz %</th><th>Geri ödeyen</th><th class="num">Yıllık taksit</th><th></th></tr></thead><tbody id="trBody"></tbody></table></div>
   <datalist id="itemList">${ITEMS.map(i=>`<option value="${esc(i)}">`).join('')}</datalist>
@@ -909,9 +925,9 @@ function renderSite(){
     <button id="applyAll">Uygula</button></div>
   </section>
 
-  <section class="box"><h3>Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
+  <section class="box" data-tab="credit"><h3>Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
 
-  <section class="box"><h3>Skorlama ve yeterlilik<small id="ddProgress"></small></h3>
+  <section class="box" data-tab="check"><h3>Skorlama ve yeterlilik<small id="ddProgress"></small></h3>
   <div class="scoretotal"><strong id="amgTotal"></strong><span id="amgDec"></span></div>
   <div class="guide"><span class="score lo">60 altı: öncelik dışı</span><span class="score mid">60–79: eksikleri gider</span><span class="score hi">80 ve üzeri: ilerlet</span></div>
   ${AMG.map(c=>`<div class="amg-row" data-a="${c.k}">
@@ -928,13 +944,13 @@ function renderSite(){
   </div>`;}).join('')}
   </section>
 
-  <section class="box"><h3>Ekler ve onay<small id="attProgress"></small></h3>
+  <section class="box" data-tab="check"><h3>Ekler ve onay<small id="attProgress"></small></h3>
   <div class="scroll"><table class="yearly"><thead><tr><th>Ek türü</th><th>Durum</th></tr></thead><tbody>${ATTACH.map(a=>`<tr><th>${esc(a.t)}</th><td style="text-align:left;min-width:170px"><select data-att="${a.k}" aria-label="${esc(a.t)} durumu"><option value="">Seçin</option>${[['var','Mevcut, ekte'],['yok','Mevcut değil'],['na','Uygulanamaz']].map(([v,t])=>`<option value="${v}" ${s.att[a.k]===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
   <details><summary>İmza ve katılımcılar</summary><div class="grid subgrid">${SIGN.map(r=>`<label>${esc(r.t)}, ad<input data-sign="${r.k}Name" value="${esc(s.sign[r.k+'Name'])}"></label><label>Tarih<input data-sign="${r.k}Date" type="date" value="${esc(s.sign[r.k+'Date'])}"></label>`).join('')}
     <label class="span4">Diğer katılımcılar<input data-sign="others" value="${esc(s.sign.others)}"></label></div></details>
   </section>
 
-  <section class="box"><h3>Genel notlar</h3><textarea data-f="notes" rows="4" aria-label="Genel notlar" placeholder="Saha ziyareti, finansör geri bildirimi, açık sorular">${esc(s.notes)}</textarea>
+  <section class="box" data-tab="info"><h3>Genel notlar</h3><textarea data-f="notes" rows="4" aria-label="Genel notlar" placeholder="Saha ziyareti, finansör geri bildirimi, açık sorular">${esc(s.notes)}</textarea>
   <p style="font-size:12px;color:var(--muted)">Son güncelleme: <span id="upd"></span></p></section>`;
   $('view').innerHTML=h;
   renderTranches();
@@ -987,7 +1003,7 @@ function updateDerived(){
 }
 
 /* ---------- events ---------- */
-function openSite(id){activeId=id;view='site';render();window.scrollTo({top:0});}
+function openSite(id){activeId=id;view='site';sub='info';render();window.scrollTo({top:0});}
 function openAdd(){
   $('dlgName').value='';$('dlgProject').value=cur()?.project||'';
   $('projectList').innerHTML=[...new Set(db.sites.map(s=>s.project).filter(Boolean))].map(p=>`<option value="${esc(p)}">`).join('');
@@ -1000,10 +1016,10 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();const name=$('dlgName').value.trim(
   const s=blankSite(name,$('dlgProject').value.trim());const src=db.sites.find(x=>x.id===$('dlgCopy').value);
   if(src)s.units=src.units.map(u=>({...u,id:uid()}));
   db.sites.push(s);$('dlg').close();touched(s);openSite(s.id);toast(name+' eklendi.');};
-$('vPortfolio').onclick=()=>{view='portfolio';render();};
-$('vSite').onclick=()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';render();};
-$('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';render();};
-$('view').addEventListener('click',e=>{if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-card[data-id]');if(b)openSite(b.dataset.id);});
+$('vPortfolio').onclick=()=>{view='portfolio';sub='ovw';render();window.scrollTo(0,0);};
+$('vSite').onclick=()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';sub='info';render();window.scrollTo(0,0);};
+$('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();};
+$('view').addEventListener('click',e=>{const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-card[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
   const s=cur();if(!s||view!=='site')return;
@@ -1129,22 +1145,17 @@ function demoSites(){
   ];
 }
 /* ---------- sol navigasyon ---------- */
-let navKey='ovw';
-const NAV_SECTIONS={units:'Şarj üniteleri',infra:'Saha keşfi',credit:'Finansman yapısı',check:'Skorlama ve yeterlilik'};
+let sub='ovw';
+const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
+const SITE_TABS=[['info','Genel'],['units','Şarj üniteleri'],['infra','Altyapı & güç'],['credit','Finansman'],['check','Kontrol listesi']];
 function paintNav(){
-  if(view==='locations')navKey='list';
-  if(view==='portfolio'&&navKey!=='ovw'&&navKey!=='port')navKey='ovw';
-  if(view==='site'&&(navKey==='ovw'||navKey==='port'))navKey='list';
-  document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===navKey;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
-}
-function jump(title){
-  const h=[...document.querySelectorAll('#view section.box > h3, #view .box > h3')].find(x=>x.textContent.trim().startsWith(title));
-  if(h)h.scrollIntoView({behavior:'smooth',block:'start'});else window.scrollTo({top:0,behavior:'smooth'});
+  const key=view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
   if(!db.sites.length){toast('Önce bir lokasyon ekleyin.');return;}
   if(!db.sites.find(x=>x.id===activeId))activeId=(visibleSites()[0]||db.sites[0]).id;
-  navKey=key;view='site';render();jump(NAV_SECTIONS[key]);
+  view='site';sub=key;render();window.scrollTo(0,0);
 }
 document.querySelector('aside').addEventListener('click',e=>{
   const head=e.target.closest('.nav-head');
@@ -1152,10 +1163,9 @@ document.querySelector('aside').addEventListener('click',e=>{
     try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');st[g.dataset.group]=c;localStorage.setItem('saha-nav',JSON.stringify(st));}catch(x){}return;}
   const b=e.target.closest('.nav-item[data-nav]');if(!b)return;
   const k=b.dataset.nav;
-  if(k==='ovw'){navKey='ovw';view='portfolio';render();window.scrollTo({top:0,behavior:'smooth'});}
-  else if(k==='port'){navKey='port';view='portfolio';render();jump('Lokasyonlar');}
-  else if(k==='list'){navKey='list';view='locations';render();window.scrollTo({top:0,behavior:'smooth'});}
-  else if(NAV_SECTIONS[k])goSite(k);
+  if(PORT_SUBS.includes(k)){view='portfolio';sub=k;render();window.scrollTo(0,0);}
+  else if(k==='list'){view='locations';render();window.scrollTo(0,0);}
+  else if(SITE_SUBS.includes(k))goSite(k);
 });
 /* daraltılabilir sol panel */
 document.querySelectorAll('.nav-item').forEach(b=>{const t=b.textContent.trim();b.dataset.tip=t;b.setAttribute('aria-label',t);});
