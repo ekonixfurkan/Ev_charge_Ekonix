@@ -274,14 +274,36 @@ header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-wi
   aside{grid-column:1;grid-row:1/span 3}
   body>header,.pipeline,main{grid-column:2}
   main{max-width:none}
+  body,aside{transition:grid-template-columns .3s ease-in-out}
+  body.sb-collapsed{grid-template-columns:64px minmax(0,1fr)}
+  .sb-collapsed aside{overflow:visible;z-index:30}
+  .sb-collapsed .brand{flex-direction:column;justify-content:flex-start;padding:12px 8px;gap:10px}
+  .sb-collapsed .logobox{padding:4px}
+  .sb-collapsed .logoimg{width:28px}
+  .sb-collapsed .sb-toggle .tg-left{display:none}
+  .sb-collapsed .sb-toggle .tg-right{display:block}
+  .sb-collapsed .nav-head{display:none}
+  .sb-collapsed .nav-group.collapsed .nav-body{display:block}
+  .sb-collapsed .nav-group+.nav-group{border-top:1px solid rgba(30,41,59,.6);margin-top:6px;padding-top:6px}
+  .sb-collapsed .nav-item{justify-content:center;gap:0;padding:12px 0;margin:2px 8px 0;width:calc(100% - 16px);position:relative}
+  .sb-collapsed .nav-item span{display:none}
+  .sb-collapsed .nav-item::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);white-space:nowrap;padding:6px 10px;border-radius:6px;background:#020617;color:#f1f5f9;font-size:12px;font-weight:500;border:1px solid #334155;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .15s}
+  .sb-collapsed .nav-item:hover::after,.sb-collapsed .nav-item:focus-visible::after{opacity:1}
 }
+@media (max-width:700px){.sb-toggle{display:none}}
+@media (prefers-reduced-motion:reduce){body,aside{transition:none}}
 aside{background:#111827;color:#cbd5e1;border-right:1px solid #1e293b;padding:0;gap:0;position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#334155 transparent}
-.brand{display:flex;align-items:center;justify-content:flex-start;padding:16px;background:#0d121d;border-bottom:1px solid rgba(30,41,59,.8)}
-.logobox{display:inline-flex;align-items:center;padding:6px 10px;background:#fff;border-radius:8px}
-.logobox img{display:block;height:32px;width:auto;object-fit:contain}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;background:#0d121d;border-bottom:1px solid rgba(30,41,59,.8)}
+.logobox{display:inline-flex;align-items:center;padding:6px 10px;background:#fff;border-radius:8px;min-width:0}
+.logoimg{display:block;overflow:hidden}
+.logobox img{display:block;height:32px;width:auto;max-width:none;object-fit:contain}
+.sb-toggle{display:grid;place-items:center;flex:none;padding:6px;min-height:0;border-radius:8px;background:rgba(30,41,59,.8);border:1px solid rgba(51,65,85,.6);color:#cbd5e1}
+.sb-toggle:hover{background:#334155;border-color:rgba(51,65,85,.6);color:#fff}
+.sb-toggle svg{width:16px;height:16px}
+.sb-toggle .tg-right{display:none}
 .nav{padding:4px 0 8px}
-.nav-head{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-radius:0;background:transparent;padding:16px 16px 4px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#64748b}
-.nav-head:hover{background:transparent;color:#94a3b8}
+.nav-head{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;border-bottom:1px solid rgba(30,41,59,.4);border-radius:0;background:transparent;padding:20px 16px 8px;margin-bottom:4px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#cbd5e1}
+.nav-head:hover{background:transparent;color:#fff}
 .nav-head .chev{width:12px;height:12px;transition:transform .2s}
 .nav-group.collapsed .chev{transform:rotate(-90deg)}
 .nav-group.collapsed .nav-body{display:none}
@@ -356,7 +378,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 
 <div class="shell">
   <aside>
-    <div class="brand"><span class="logobox"><img src="/ekore-logo.jpg" alt="Ekore Logo" width="738" height="210"></span></div>
+    <div class="brand"><span class="logobox"><span class="logoimg"><img src="/ekore-logo.jpg" alt="Ekore Logo" width="738" height="210"></span></span><button type="button" id="sbToggle" class="sb-toggle" aria-label="Menüyü daralt" aria-expanded="true"><svg class="tg-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg><svg class="tg-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg></button></div>
     <nav class="nav" aria-label="Ana gezinme">
       <section class="nav-group" data-group="main">
         <button type="button" class="nav-head" aria-expanded="true">Ana menü<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1135,6 +1157,15 @@ document.querySelector('aside').addEventListener('click',e=>{
   else if(k==='list'){navKey='list';view='locations';render();window.scrollTo({top:0,behavior:'smooth'});}
   else if(NAV_SECTIONS[k])goSite(k);
 });
+/* daraltılabilir sol panel */
+document.querySelectorAll('.nav-item').forEach(b=>{const t=b.textContent.trim();b.dataset.tip=t;b.setAttribute('aria-label',t);});
+function setSidebar(c){
+  document.body.classList.toggle('sb-collapsed',c);
+  const t=$('sbToggle');t.setAttribute('aria-expanded',String(!c));t.setAttribute('aria-label',c?'Menüyü genişlet':'Menüyü daralt');
+  try{localStorage.setItem('saha-sidebar',c?'1':'0');}catch(x){}
+}
+$('sbToggle').onclick=()=>setSidebar(!document.body.classList.contains('sb-collapsed'));
+try{if(localStorage.getItem('saha-sidebar')==='1')setSidebar(true);}catch(x){}
 try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');for(const g in st)if(st[g]){const el=document.querySelector(`.nav-group[data-group="${g}"]`);if(el){el.classList.add('collapsed');el.querySelector('.nav-head').setAttribute('aria-expanded','false');}}}catch(x){}
 
 function seedDemo(){
