@@ -247,6 +247,8 @@ input[aria-invalid=true]{border:2px solid var(--no)}
     <div class="aside-foot">
       <button id="exportJson">Yedek indir</button>
       <button id="importBtn">Yedek yükle</button>
+      <button id="demoLoad">Demo veri yükle</button>
+      <button id="demoClear">Demo veriyi sil</button>
       <button id="exportCsv">CSV indir</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
       <p>Kayıtlar her değişiklikte buluta kaydedilir; telefondan, başka bilgisayardan ve sayfayı paylaştığınız kişilerden aynı veriler görünür. JSON yedeği arşiv içindir.</p>
@@ -925,6 +927,68 @@ $('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';i
     for(const s of inc.sites){const c={...blankSite(s.name||'Adsız'),...s,id:uid(),createdAt:now()};c.units=(c.units||[]).map(u=>({...u,id:uid()}));c.dd=c.dd||{};migrateSite(c);c.fin={...FIN_DEFAULT,...(s.fin||{})};c.tranches=(Array.isArray(s.tranches)?s.tranches:defaultTranches()).map(t=>({...t,id:uid()}));db.sites.push(c);touched(c);}
     view='portfolio';render();toast(inc.sites.length+' lokasyon eklendi.');}
   catch(err){toast('Yedek yüklenemedi: '+err.message);}
+};
+
+/* ---------- demo data ---------- */
+function demoSites(){
+  const mk=(name,project,o)=>{
+    const s=blankSite(name,project);Object.assign(s,o.base);s.demo=true;
+    s.units=o.units.map(u=>unit(...u));
+    s.amg.scores=Object.fromEntries(AMG.map((c,i)=>[c.k,o.amg[i]]));
+    s.amg.notes=o.amgNotes||{};
+    s.dd=o.dd||{};s.survey={...o.survey};
+    s.fin={...FIN_DEFAULT,...o.fin};
+    s.tranches=o.tr.map(([item,amount,fin,mode,term,rate,payer])=>({...tranche(item,fin,mode),amount,term,rate,payer}));
+    return s;
+  };
+  const ok={v:'ok'},risk={v:'risk'};
+  return [
+    mk('Maslak Plaza Otopark','Demo · İstanbul Avrupa',{
+      base:{city:'İstanbul',district:'Sarıyer',address:'Büyükdere Cd. No:120',type:'İş merkezi',host:'Maslak Plaza Yönetimi',contact:'0212 555 01 01',status:'onay',gridKva:1000,contractYears:10,notes:'Demo veri. Katlı otopark, 7/24 erişim.'},
+      units:[['DC',120,2,4,'StarCharge Lightning 120'],['AC',22,2,6,'AC Duvar Tipi 22']],
+      amg:[14,8,12,11,13,11,7,13],dd:{izin:ok,epdk:ok},
+      survey:{lead:'Alaattin Ersivri',availKw:700,parkTotal:420,cableM:35,date:'2026-09-12',tariff:'Ticarethane',serviceFee:'4,5',scope:['ev','pv'],access:['road','turn'],pave:['concrete'],lay:['tray'],pvpot:['carport'],exist:['light','cctv','fire','sec']},
+      fin:{share:20,entShare:30,starShare:30,ekoShare:20},
+      tr:[['Donanım',9600000,'star','share',5,0,'ent'],['Saha işleri (EPC)',1800000,'eko','loan',5,28,'ent']]}),
+    mk('Gebze OSB Lojistik','Demo · Kocaeli',{
+      base:{city:'Kocaeli',district:'Gebze',address:'OSB 3. Cadde',type:'Sanayi sitesi',host:'Anadolu Lojistik A.Ş.',contact:'0262 555 02 02',status:'sunuldu',gridKva:1600,contractYears:8,notes:'Demo veri. Tır park alanı, gece yoğun kullanım.'},
+      units:[['DC',180,2,3,'StarCharge Lightning 180'],['DC',60,2,4,'DC 60 kW']],
+      amg:[12,6,12,10,12,9,5,12],dd:{izin:ok,epdk:risk},
+      survey:{lead:'Hilmi Doğan',availKw:900,parkTotal:150,cableM:80,date:'2026-09-20',tariff:'Sanayi',serviceFee:'4,0',scope:['ev'],access:['road'],pave:['asphalt'],lay:['trench'],pvpot:['roof'],exist:['light','cctv']},
+      fin:{share:15,entShare:35,starShare:30,ekoShare:20},
+      tr:[['Donanım',11500000,'star','share',5,0,'ent'],['Şebeke bağlantısı',2200000,'ent','loan',6,30,'owner']]}),
+    mk('Bodrum Marina Otel','Demo · Muğla',{
+      base:{city:'Muğla',district:'Bodrum',address:'Marina Cd. No:8',type:'Otel',host:'Marina Otel İşletmeleri',contact:'0252 555 03 03',status:'inceleme',gridKva:400,contractYears:7,notes:'Demo veri. Yaz sezonu yoğun, kış düşük kullanım.'},
+      units:[['DC',60,2,2,'DC 60 kW'],['AC',22,2,8,'AC Duvar Tipi 22']],
+      amg:[11,7,9,8,8,8,6,10],dd:{izin:risk,epdk:ok},
+      survey:{lead:'S. Furkan Keçe',availKw:180,parkTotal:90,cableM:50,date:'2026-10-02',scope:['ev','pvbessev'],access:['turn'],pave:['pavers'],lay:['duct'],pvpot:['carport'],exist:['light','sec']},
+      fin:{share:25,entShare:25,starShare:25,ekoShare:25},
+      tr:[['Donanım',4800000,'star','share',5,0,'ent']]}),
+    mk('Ankara Çayyolu AVM','Demo · Ankara',{
+      base:{city:'Ankara',district:'Çankaya',address:'Çayyolu Mah. 2. Sk.',type:'AVM',host:'Çayyolu AVM Yönetimi',contact:'0312 555 04 04',status:'aday',gridKva:800,contractYears:5,notes:'Demo veri. Kira şartları görüşülüyor.'},
+      units:[['DC',120,2,2,'StarCharge Lightning 120'],['AC',22,2,4,'AC Duvar Tipi 22']],
+      amg:[13,5,8,6,9,7,4,9],dd:{izin:risk,epdk:ok},
+      survey:{lead:'Alaattin Ersivri',availKw:300,parkTotal:600,cableM:60,date:'2026-10-10',scope:['ev'],access:['road','turn'],pave:['concrete'],lay:['tray','wall'],pvpot:['na'],exist:['light','cctv','sec']},
+      fin:{share:30,entShare:20,starShare:30,ekoShare:20},tr:[]}),
+    mk('Konya Yol Üstü İstasyon','Demo · İç Anadolu',{
+      base:{city:'Konya',district:'Selçuklu',address:'Ankara Yolu 12. km',type:'Akaryakıt istasyonu',host:'Yol Petrol',contact:'0332 555 05 05',status:'red',gridKva:250,contractYears:5,notes:'Demo veri. Trafo yetersiz, yükseltme maliyeti yüksek.'},
+      units:[['DC',60,2,1,'DC 60 kW']],
+      amg:[8,3,6,5,3,4,2,6],dd:{izin:ok,epdk:{v:'no'}},
+      survey:{lead:'Hilmi Doğan',availKw:60,parkTotal:20,cableM:140,date:'2026-10-15',scope:['ev'],access:['road'],pave:['asphalt'],lay:['trench'],pvpot:['na'],exist:['light']},
+      fin:{share:20,entShare:0,starShare:40,ekoShare:40},tr:[]})
+  ];
+}
+$('demoLoad').onclick=async()=>{
+  if(db.sites.some(s=>s.demo)){toast('Demo veri zaten yüklü.');return;}
+  if(!await ask('5 örnek lokasyon (farklı durum ve skorlarla) listeye eklensin mi?','Demo ekle'))return;
+  const list=demoSites();list.forEach(s=>{db.sites.push(s);touched(s);});
+  view='portfolio';render();toast(list.length+' demo lokasyon eklendi.');
+};
+$('demoClear').onclick=async()=>{
+  const d=db.sites.filter(s=>s.demo);
+  if(!d.length){toast('Silinecek demo veri yok.');return;}
+  if(!await ask(d.length+' demo lokasyon silinsin mi? Kendi eklediklerinize dokunulmaz.','Demoyu sil'))return;
+  d.forEach(removeSite);activeId=null;view='portfolio';render();toast('Demo veri silindi.');
 };
 
 render();load();
