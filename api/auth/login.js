@@ -28,12 +28,11 @@ export default async function handler(req, res) {
       return res.status(429).json({ error: 'Çok fazla deneme. 15 dakika sonra tekrar deneyin.' });
     }
 
-    if (!(await checkLogin(email, password))) {
-      return res.status(401).json({ error: 'E-posta veya şifre hatalı' });
-    }
+    const user = await checkLogin(email, password);
+    if (!user) return res.status(401).json({ error: 'E-posta veya şifre hatalı' });
     await clearAttempts(emKey);
     setSession(req, res, email);
-    return res.status(200).json({ ok: true, email });
+    return res.status(200).json({ ok: true, email, role: user.role });
   } catch (e) {
     if (e instanceof ConfigError) return res.status(503).json({ error: 'Kimlik doğrulama yapılandırılmamış' });
     return res.status(500).json({ error: 'Giriş yapılamadı' });

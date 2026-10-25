@@ -404,6 +404,20 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   aside{position:static;height:auto;overflow:visible}
 
 }
+.nav-group[hidden],.pipeline[hidden]{display:none}
+.u-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end;margin-bottom:6px}
+.u-form label{display:grid;gap:4px;font-size:12.5px;color:var(--muted)}
+.u-form .pw{display:flex;gap:6px}
+.u-tbl td,.u-tbl th{padding:9px 8px;text-align:left;vertical-align:middle}
+.u-tbl th{font-size:12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line)}
+.u-tbl td{border-bottom:1px solid var(--line)}
+.u-tbl .acts{display:flex;gap:6px;flex-wrap:wrap}
+.u-tbl .acts button{padding:5px 9px;font-size:12.5px;min-height:0}
+.u-tbl tr.off td{opacity:.55}
+.u-wrap{overflow-x:auto}
+button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,transparent)}
+.u-msg{font-size:13px;margin:8px 0 0;min-height:18px}
+.u-msg.err{color:var(--no)}
 </style>
 <header>
   <div>
@@ -439,6 +453,10 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
       <section class="nav-group" data-group="data">
         <button type="button" class="nav-head" aria-expanded="true">Veri ve Araçlar<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div class="nav-body"><button type="button" class="nav-item" id="exportJson" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Yedek indir (JSON)</span></button><button type="button" class="nav-item" id="importBtn" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Yedek yükle</span></button><button type="button" class="nav-item" id="exportCsv" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg><span>CSV indir</span></button><button type="button" class="nav-item" id="demoClear" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg><span>Demo veriyi sil</span></button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+      </section>
+      <section class="nav-group" data-group="admin" id="adminGroup" hidden>
+        <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button></div>
       </section>
     </nav>
     <div class="sb-user"><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
@@ -706,10 +724,10 @@ async function poll(){
     if(k<0)db.sites.push(body);
     else if(JSON.stringify(db.sites[k])!==JSON.stringify(body)){db.sites[k]=body;if(raw.id===activeId)activeChanged=true;}}
   db.sites=db.sites.filter(x=>ids.has(x.id)||pending.has(x.id));
-  if(activeId&&!db.sites.some(x=>x.id===activeId)){activeId=null;view='portfolio';activeChanged=true;}
+  if(activeId&&!db.sites.some(x=>x.id===activeId)){activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -792,12 +810,14 @@ function renderLocations(){
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=view==='locations'?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users')?'':sub;
   renderPipe();paintNav();
   $('vPortfolio').setAttribute('aria-pressed',view==='portfolio');
   $('vSite').setAttribute('aria-pressed',view==='site');
   $('vSite').disabled=!db.sites.length;
-  if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';$('vPortfolio').setAttribute('aria-pressed','true');$('vSite').setAttribute('aria-pressed','false');renderPortfolio();}
+  document.querySelector('.pipeline').hidden=view==='users';
+  if(view==='users'){$('vPortfolio').setAttribute('aria-pressed','false');$('vSite').setAttribute('aria-pressed','false');renderUsers();}
+  else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';$('vPortfolio').setAttribute('aria-pressed','true');$('vSite').setAttribute('aria-pressed','false');renderPortfolio();}
 }
 
 function renderPortfolio(){
@@ -1182,7 +1202,7 @@ let sub='ovw';
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj üniteleri'],['infra','Altyapı & güç'],['credit','Finansman'],['check','Kontrol listesi']];
 function paintNav(){
-  const key=view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -1198,6 +1218,7 @@ document.querySelector('aside').addEventListener('click',e=>{
   const k=b.dataset.nav;
   if(PORT_SUBS.includes(k)){view='portfolio';sub=k;render();window.scrollTo(0,0);}
   else if(k==='list'){view='locations';render();window.scrollTo(0,0);}
+  else if(k==='users'){view='users';render();window.scrollTo(0,0);}
   else if(SITE_SUBS.includes(k))goSite(k);
 });
 /* daraltılabilir sol panel */
@@ -1226,12 +1247,80 @@ $('demoClear').onclick=async()=>{
   d.forEach(removeSite);activeId=null;view='portfolio';render();toast('Demo veri silindi.');
 };
 
+/* ---------- kullanıcı yönetimi (yalnızca yönetici) ---------- */
+let usersCache=null,usersMe='';
+const fmtDt=v=>v?new Date(v).toLocaleString('tr-TR',{dateStyle:'short',timeStyle:'short'}):'—';
+function genPass(){const a='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',b=new Uint32Array(14);crypto.getRandomValues(b);return Array.from(b,x=>a[x%a.length]).join('');}
+async function userApi(method,body,qs=''){
+  const r=await fetch('/api/users'+qs,{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
+  return d;
+}
+function userMsg(t,err){const m=$('uMsg');if(!m)return;m.textContent=t||'';m.className='u-msg'+(err?' err':'');}
+async function renderUsers(){
+  $('view').innerHTML='<section class="box"><h3>Kullanıcı yönetimi<small>Yükleniyor…</small></h3></section>';
+  let d;
+  try{d=await userApi('GET');}catch(e){if(view!=='users')return;$('view').innerHTML='<section class="box"><h3>Kullanıcı yönetimi</h3><p class="note">'+esc(e.message)+'</p></section>';return;}
+  if(view!=='users')return;
+  usersCache=d.users;usersMe=d.me;
+  const rows=d.users.map(u=>{const self=u.email===d.me;
+    return `<tr class="${u.active?'':'off'}"><td><strong>${esc(u.name||u.email.split('@')[0])}</strong><br><small style="color:var(--muted)">${esc(u.email)}${self?' · (siz)':''}</small></td>
+      <td>${u.role==='admin'?'Yönetici':'Kullanıcı'}</td>
+      <td><span class="pill" style="--c:${u.active?'#7cb52b':'#94a3b8'}">${u.active?'Aktif':'Pasif'}</span></td>
+      <td>${fmtDt(u.lastLogin)}</td>
+      <td><div class="acts" data-email="${esc(u.email)}">
+        <button type="button" data-act="pw">Şifre belirle</button>
+        <button type="button" data-act="role" ${self?'disabled':''}>${u.role==='admin'?'Kullanıcı yap':'Yönetici yap'}</button>
+        <button type="button" data-act="active" ${self?'disabled':''}>${u.active?'Pasifleştir':'Aktifleştir'}</button>
+        <button type="button" data-act="del" class="danger" ${self?'disabled':''}>Sil</button>
+      </div></td></tr>`;}).join('');
+  $('view').innerHTML=`<section class="box"><h3>Yeni kullanıcı ekle<small>Hesabı yönetici açar; kendi kendine kayıt yok</small></h3>
+    <form id="uForm" class="u-form" autocomplete="off">
+      <label>Ad soyad<input id="uName" maxlength="120"></label>
+      <label>E-posta<input id="uEmail" type="email" required maxlength="254"></label>
+      <label>Şifre (en az 8)<span class="pw"><input id="uPass" type="text" required minlength="8" maxlength="200" autocomplete="new-password"><button type="button" id="uGen">Üret</button></span></label>
+      <label>Rol<select id="uRole"><option value="user">Kullanıcı</option><option value="admin">Yönetici</option></select></label>
+      <button type="submit" class="primary">Kullanıcıyı ekle</button>
+    </form><p class="u-msg" id="uMsg" role="status"></p>
+    <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
+    <section class="box"><h3>Kayıtlı kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Rol</th><th>Durum</th><th>Son giriş</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+  $('uGen').onclick=()=>{$('uPass').value=genPass();};
+  $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
+    const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
+    try{await userApi('POST',body);toast('Kullanıcı eklendi: '+body.email.trim().toLowerCase());renderUsers();}catch(x){userMsg(x.message,true);}};
+}
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('.u-tbl .acts button[data-act]');if(!b||b.disabled)return;
+  const email=b.parentElement.dataset.email,u=(usersCache||[]).find(x=>x.email===email);if(!u)return;
+  b.disabled=true;
+  try{
+    if(b.dataset.act==='pw'){
+      const p=prompt('Yeni şifre (en az 8 karakter). Boş bırakırsanız rastgele üretilir:',''); 
+      if(p===null){b.disabled=false;return;}
+      const pw=p.trim()||genPass();
+      await userApi('PATCH',{email,password:pw});
+      await ask('Yeni şifre ('+email+'): '+pw+'\n\nBu şifre bir daha gösterilmez; kopyalayın.','Kapat');
+    }else if(b.dataset.act==='role'){
+      await userApi('PATCH',{email,role:u.role==='admin'?'user':'admin'});toast('Rol güncellendi.');
+    }else if(b.dataset.act==='active'){
+      await userApi('PATCH',{email,active:!u.active});toast(u.active?'Hesap pasifleştirildi.':'Hesap aktifleştirildi.');
+    }else if(b.dataset.act==='del'){
+      if(!await ask(email+' hesabı silinsin mi? Bu geri alınamaz.','Sil')){b.disabled=false;return;}
+      await userApi('DELETE',null,'?email='+encodeURIComponent(email));toast('Hesap silindi.');
+    }
+    renderUsers();
+  }catch(x){toast(x.message);b.disabled=false;}
+});
+
 /* ---------- oturum ---------- */
 (async()=>{
   try{
     const r=await fetch('/api/auth/me',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
-    if(r.ok){const d=await r.json();if(d.email){$('whoami').textContent=d.email;$('whoami').title=d.email;$('whoami').hidden=false;}}
+    if(r.ok){const d=await r.json();if(d.email){$('whoami').textContent=d.email;$('whoami').title=d.email;$('whoami').hidden=false;}
+      if(d.role==='admin')$('adminGroup').hidden=false;}
   }catch(e){/* çevrimdışı: yerel kayıtla devam */}
   document.documentElement.classList.remove('pending');
 })();

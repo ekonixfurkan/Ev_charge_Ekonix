@@ -4,7 +4,7 @@ import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   try {
-    if (!requireAuth(req, res)) return;
+    if (!(await requireAuth(req, res))) return;
     await ensureSchema();
     const s = sql();
 

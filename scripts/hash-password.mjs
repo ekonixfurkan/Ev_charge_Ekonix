@@ -1,5 +1,5 @@
 // Kullanım: node scripts/hash-password.mjs ad@firma.com [şifre]
-// Çıktıyı Vercel'de AUTH_USERS değişkenine ekleyin (birden fazla kullanıcı ";" ile ayrılır).
+// İlk kurulumda çıktıyı Vercel AUTH_USERS değişkenine ekleyin; sonrası için uygulamadaki Kullanıcı Yönetimi sayfasını kullanın.
 import { createInterface } from 'node:readline';
 import { hashPassword } from '../lib/password.js';
 
