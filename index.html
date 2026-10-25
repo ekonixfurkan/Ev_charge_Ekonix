@@ -411,7 +411,8 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 .u-tbl td,.u-tbl th{padding:9px 8px;text-align:left;vertical-align:middle}
 .u-tbl th{font-size:12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line)}
 .u-tbl td{border-bottom:1px solid var(--line)}
-.u-tbl .acts{display:flex;gap:6px;flex-wrap:wrap}
+.u-tbl .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.u-tbl .role-sel{width:auto;min-height:0;padding:5px 8px;font-size:12.5px}
 .u-tbl .acts button{padding:5px 9px;font-size:12.5px;min-height:0}
 .u-tbl tr.off td{opacity:.55}
 .u-wrap{overflow-x:auto}
@@ -1267,12 +1268,11 @@ async function renderUsers(){
   usersCache=d.users;usersMe=d.me;
   const rows=d.users.map(u=>{const self=u.email===d.me;
     return `<tr class="${u.active?'':'off'}"><td><strong>${esc(u.name||u.email.split('@')[0])}</strong><br><small style="color:var(--muted)">${esc(u.email)}${self?' · (siz)':''}</small></td>
-      <td>${u.role==='admin'?'Yönetici':'Kullanıcı'}</td>
       <td><span class="pill" style="--c:${u.active?'#7cb52b':'#94a3b8'}">${u.active?'Aktif':'Pasif'}</span></td>
       <td>${fmtDt(u.lastLogin)}</td>
       <td><div class="acts" data-email="${esc(u.email)}">
         <button type="button" data-act="pw">Şifre belirle</button>
-        <button type="button" data-act="role" ${self?'disabled':''}>${u.role==='admin'?'Kullanıcı yap':'Yönetici yap'}</button>
+        <select class="role-sel" data-act="role" aria-label="Rol" ${self?'disabled title="Kendi rolünüzü değiştiremezsiniz"':''}><option value="user" ${u.role==='user'?'selected':''}>Kullanıcı</option><option value="admin" ${u.role==='admin'?'selected':''}>Yönetici</option></select>
         <button type="button" data-act="active" ${self?'disabled':''}>${u.active?'Pasifleştir':'Aktifleştir'}</button>
         <button type="button" data-act="del" class="danger" ${self?'disabled':''}>Sil</button>
       </div></td></tr>`;}).join('');
@@ -1285,12 +1285,18 @@ async function renderUsers(){
       <button type="submit" class="primary">Kullanıcıyı ekle</button>
     </form><p class="u-msg" id="uMsg" role="status"></p>
     <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
-    <section class="box"><h3>Kayıtlı kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Rol</th><th>Durum</th><th>Son giriş</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="box"><h3>Kayıtlı kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son giriş</th><th style="text-align:right">Rol ve işlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
     const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
     try{await userApi('POST',body);toast('Kullanıcı eklendi: '+body.email.trim().toLowerCase());renderUsers();}catch(x){userMsg(x.message,true);}};
 }
+document.addEventListener('change',async e=>{
+  const sel=e.target.closest('.u-tbl .role-sel');if(!sel)return;
+  const email=sel.parentElement.dataset.email;sel.disabled=true;
+  try{await userApi('PATCH',{email,role:sel.value});toast('Rol güncellendi.');renderUsers();}
+  catch(x){toast(x.message);renderUsers();}
+});
 document.addEventListener('click',async e=>{
   const b=e.target.closest('.u-tbl .acts button[data-act]');if(!b||b.disabled)return;
   const email=b.parentElement.dataset.email,u=(usersCache||[]).find(x=>x.email===email);if(!u)return;
@@ -1302,8 +1308,6 @@ document.addEventListener('click',async e=>{
       const pw=p.trim()||genPass();
       await userApi('PATCH',{email,password:pw});
       await ask('Yeni şifre ('+email+'): '+pw+'\n\nBu şifre bir daha gösterilmez; kopyalayın.','Kapat');
-    }else if(b.dataset.act==='role'){
-      await userApi('PATCH',{email,role:u.role==='admin'?'user':'admin'});toast('Rol güncellendi.');
     }else if(b.dataset.act==='active'){
       await userApi('PATCH',{email,active:!u.active});toast(u.active?'Hesap pasifleştirildi.':'Hesap aktifleştirildi.');
     }else if(b.dataset.act==='del'){
