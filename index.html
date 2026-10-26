@@ -489,10 +489,6 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
     <div class="sb-user"><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
   </aside>
   <main>
-    <div class="viewbar no-print">
-      <button id="vPortfolio" aria-pressed="true">Portföy Özeti</button>
-      <button id="vSite" aria-pressed="false">Lokasyon Detayı</button>
-    </div>
     <div id="view"></div>
   </main>
 </div>
@@ -859,12 +855,9 @@ function render(){
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
   $('view').dataset.sub=(view==='locations'||view==='users')?'':sub;
   renderPipe();paintNav();
-  $('vPortfolio').setAttribute('aria-pressed',view==='portfolio');
-  $('vSite').setAttribute('aria-pressed',view==='site');
-  $('vSite').disabled=!db.sites.length;
   document.querySelector('.pipeline').hidden=view==='users';
-  if(view==='users'){$('vPortfolio').setAttribute('aria-pressed','false');$('vSite').setAttribute('aria-pressed','false');renderUsers();}
-  else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';$('vPortfolio').setAttribute('aria-pressed','true');$('vSite').setAttribute('aria-pressed','false');renderPortfolio();}
+  if(view==='users')renderUsers();
+  else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
 }
 
 function renderPortfolio(){
@@ -955,7 +948,7 @@ const ICON_X='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke
 function editBarHtml(){
   return siteEdit
     ?`<span class="eb-note">Düzenleme modu: değişiklikler Kaydet'e basana kadar sunucuya gönderilmez.</span><button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
-    :`<span class="eb-note">Salt okunur görünüm. Değiştirmek için Düzenle'ye basın.</span><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
+    :`<button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
 }
 const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,[data-del],#addLead,#cancelLead';
 function applyEditState(){
@@ -1175,8 +1168,6 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
     address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
-$('vPortfolio').onclick=()=>guard(()=>{view='portfolio';sub='ovw';render();window.scrollTo(0,0);});
-$('vSite').onclick=()=>{if(view==='site')return;guard(()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';sub='info';render();window.scrollTo(0,0);});};
 $('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;guard(()=>{filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();});};
 $('view').addEventListener('click',e=>{const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
