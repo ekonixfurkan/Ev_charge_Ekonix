@@ -1135,7 +1135,12 @@ function updateDerived(){
     const miss=AMG.filter(c=>{const v=s.amg.scores[c.k];return v===''||v==null;}).map(c=>c.t);
     if(miss.length)a+=`<div class="alert warn">Durum "${esc(statusOf(s.status).t)}" ama puanlanmamış AMG kriterleri var: ${esc(miss.join(', '))}.</div>`;
   }
-  if(!s.units.length)a+=`<div class="alert warn">Ünite girilmedi.</div>`;
+  const todo=[];
+  if(!s.units.length)todo.push('Şarj Üniteleri');
+  if(!(+s.gridKva)&&!(+s.survey.availKw))todo.push('Altyapı & Güç');
+  if(!totalFin(s))todo.push('Finansman');
+  if(!d.done&&!Object.values(s.dd||{}).some(x=>x&&(x.v||x.note)))todo.push('Kontrol Listesi');
+  if(todo.length)a+=`<div class="alert warn">Girilmesi gereken bölümler: ${todo.map(esc).join(', ')}. Lütfen giriniz.</div>`;
   if(shareTotal(s.fin)>100)a+=`<div class="alert">Gelir paylaşımı toplamı %100'ü aşıyor.</div>`;
   renderFin();
   $('ddAlerts').innerHTML=a;
