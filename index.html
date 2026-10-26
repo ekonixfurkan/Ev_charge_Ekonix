@@ -420,7 +420,7 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
 </style>
 <header>
   <div>
-    <h1>Saha değerlendirme</h1>
+    <h1>Saha Değerlendirme</h1>
   </div>
   <div id="saveStatus" role="status">Yükleniyor…</div>
 </header>
@@ -435,7 +435,7 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
     <nav class="nav" aria-label="Ana gezinme">
       <section class="nav-group" data-group="main">
         <button type="button" class="nav-head" aria-expanded="true">Ana menü<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Genel Bakış / Anasayfa</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Genel Bakış / Ana Sayfa</span></button></div>
       </section>
       <section class="nav-group" data-group="site">
         <button type="button" class="nav-head" aria-expanded="true">Saha &amp; Lokasyon Yönetimi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -458,8 +458,8 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
   </aside>
   <main>
     <div class="viewbar no-print">
-      <button id="vPortfolio" aria-pressed="true">Portföy özeti</button>
-      <button id="vSite" aria-pressed="false">Lokasyon detayı</button>
+      <button id="vPortfolio" aria-pressed="true">Portföy Özeti</button>
+      <button id="vSite" aria-pressed="false">Lokasyon Detayı</button>
     </div>
     <div id="view"></div>
   </main>
@@ -469,7 +469,7 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
 <dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:15px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
 <dialog id="dlg">
   <form id="dlgForm">
-    <h2>Yeni lokasyon</h2>
+    <h2>Yeni Lokasyon</h2>
     <p class="dsub">Lokasyonu kaydedin, üniteleri ve kontrol listesini sonra doldurun.</p>
     <label>Lokasyon adı<input id="dlgName" required maxlength="120" autocomplete="off"></label>
     <label>Proje / bölge<input id="dlgProject" maxlength="120" list="projectList" autocomplete="off"></label>
@@ -651,26 +651,26 @@ function chartSvg(P,s){
 }
 function partyTable(P,s){
   const ps=PARTIES.filter(p=>involved(P[p.k]));if(!ps.length)return '<p class="note">Henüz pay veya finansman girilmedi.</p>';
-  return `<div class="scroll"><table class="yearly"><thead><tr><th>Taraf</th><th class="num">Yatırım</th><th class="num">${YEARS} yıl nakit girişi</th><th class="num">${YEARS} yıl net</th><th class="num">Geri dönüş</th><th class="num">İç verim (${YEARS} yıl)</th><th class="num">En düşük DSCR</th></tr></thead><tbody>${ps.map(p=>{const x=P[p.k],inflow=x.flows.slice(1).reduce((a,b)=>a+b,0),r=irr(x.flows);
+  return `<div class="scroll"><table class="yearly"><thead><tr><th>Taraf</th><th class="num">Yatırım</th><th class="num">${YEARS} Yıl Nakit Girişi</th><th class="num">${YEARS} Yıl Net</th><th class="num">Geri Dönüş</th><th class="num">İç Verim (${YEARS} Yıl)</th><th class="num">En Düşük DSCR</th></tr></thead><tbody>${ps.map(p=>{const x=P[p.k],inflow=x.flows.slice(1).reduce((a,b)=>a+b,0),r=irr(x.flows);
     return `<tr><th><span class="chip" style="--c:${p.c}">${esc(pName(p.k,s))}</span></th><td>${x.invest?nf.format(x.invest):'—'}</td><td>${nf.format(inflow)}</td><td>${nf.format(inflow-x.invest)}</td><td>${paybackOf(x.flows)}</td><td>${r==null?'—':'%'+df.format(r*100)}</td><td><span class="score ${dscrClass(x.dscr)}">${fmtD(x.dscr)}</span></td></tr>`;}).join('')}</tbody></table></div>
   <p class="note">Nakit girişi: gelir payı + alınan kredi taksitleri − ödenen kredi taksitleri (Co-CPO için komisyon ve işletme gideri düşülmüş). İç verim yalnız ${YEARS} yıllık nakde dayanır; ekipmanın kalan değeri ve sözleşme sonrası gelir dahil değildir. DSCR: geri ödeyen tarafın kredi öncesi nakdi / yıllık taksit.</p>`;
 }
 function loanTable(loans,withSite){
-  return `<div class="scroll"><table class="yearly"><thead><tr>${withSite?'<th>Lokasyon</th>':''}<th>Kalem</th><th>Finansör</th><th>Geri ödeyen</th><th class="num">Tutar</th><th class="num">Vade / faiz</th><th class="num">Yıllık taksit</th><th class="num">${YEARS}. yıl sonu kalan</th><th class="num">En düşük DSCR</th></tr></thead><tbody>${loans.map(l=>`<tr>${withSite?`<th>${esc(l.site.name)}</th>`:''}<th>${esc(l.t.item)}</th><td style="text-align:left">${esc(pName(l.t.fin,l.site))}</td><td style="text-align:left">${esc(pName(l.t.payer,l.site))}</td><td>${nf.format(l.t.amount)}</td><td>${l.n} yıl, %${df.format(+l.t.rate||0)}</td><td>${nf.format(l.pay)}</td><td>${l.balance?nf.format(l.balance):'—'}</td><td><span class="score ${dscrClass(l.dscr)}">${fmtD(l.dscr)}</span></td></tr>`).join('')}</tbody></table></div>`;
+  return `<div class="scroll"><table class="yearly"><thead><tr>${withSite?'<th>Lokasyon</th>':''}<th>Kalem</th><th>Finansör</th><th>Geri Ödeyen</th><th class="num">Tutar</th><th class="num">Vade / Faiz</th><th class="num">Yıllık Taksit</th><th class="num">${YEARS}. Yıl Sonu Kalan</th><th class="num">En Düşük DSCR</th></tr></thead><tbody>${loans.map(l=>`<tr>${withSite?`<th>${esc(l.site.name)}</th>`:''}<th>${esc(l.t.item)}</th><td style="text-align:left">${esc(pName(l.t.fin,l.site))}</td><td style="text-align:left">${esc(pName(l.t.payer,l.site))}</td><td>${nf.format(l.t.amount)}</td><td>${l.n} yıl, %${df.format(+l.t.rate||0)}</td><td>${nf.format(l.pay)}</td><td>${l.balance?nf.format(l.balance):'—'}</td><td><span class="score ${dscrClass(l.dscr)}">${fmtD(l.dscr)}</span></td></tr>`).join('')}</tbody></table></div>`;
 }
 function yearlyTable(rows,ds){
   const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),hasDs=ds.some(v=>v>0),R=rows.map((r,i)=>({...r,ds:ds[i]}));
   const cols=[['energy','Enerji kWh'],['revenue','Hasılat'],['margin','Elektrik sonrası'],['owner','Yer sağlayıcı'],['ent','Co-CPO payı'],['star','StarCharge'],['eko','EKONİX'],...(hasFon?[['fon','Diğer fon']]:[]),['remaining','Dağıtılmayan'],['fee','Komisyon'],['opex','İşletme gideri'],...(hasDs?[['ds','Kredi taksitleri']]:[])];
   const sum=k=>R.reduce((t,r)=>t+r[k],0);
-  return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar TL. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
+  return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar TL. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
 }
 function resultsHtml(rows,f,s,tf){
   const k=(l,val,sub)=>`<div class="kpi"><span>${l}</span><strong>${val}</strong><small>${sub}</small></div>`,dmin=minAll(f.P);
   return `<div class="kpis">${k('İlk yıl enerji',nf.format(rows[0].energy)+' kWh','%'+df.format(rows[0].u)+' kullanım')}${k('İlk yıl hasılat',money(rows[0].revenue),'Elektrik sonrası '+money(rows[0].margin))}${k('Toplam finansman',money(tf),tf?'StarCharge %'+df.format(f.P.star.invest/tf*100):'Tutar girilmedi')}${k('En düşük DSCR',`<span class="score ${dscrClass(dmin)}">${fmtD(dmin)}</span>`,dmin==null?'Kredi kalemi yok':'Kredi taksidi karşılama')}${k(YEARS+' yıl yer sağlayıcı',money(rows.reduce((a,r)=>a+r.owner,0)),'Elektrik sonrası taban')}</div>
-  <h4 class="subh">Taraflara göre getiri</h4>${partyTable(f.P,s)}
-  <h4 class="subh">Kümülatif nakit</h4>${chartSvg(f.P,s)}
-  ${f.loans.length?'<h4 class="subh">Kredi kalemleri</h4>'+loanTable(f.loans,!s):''}
-  <h4 class="subh">Yıllık sonuçlar</h4>${yearlyTable(rows,f.ds)}`;
+  <h4 class="subh">Taraflara Göre Getiri</h4>${partyTable(f.P,s)}
+  <h4 class="subh">Kümülatif Nakit</h4>${chartSvg(f.P,s)}
+  ${f.loans.length?'<h4 class="subh">Kredi Kalemleri</h4>'+loanTable(f.loans,!s):''}
+  <h4 class="subh">Yıllık Sonuçlar</h4>${yearlyTable(rows,f.ds)}`;
 }
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
@@ -704,7 +704,7 @@ async function load(){
   }catch(e){/* API/DB yok → bu tarayıcıya kaydet */}
   try{const v=localStorage.getItem(KEY);if(v){const d=JSON.parse(v);if(Array.isArray(d.sites))db.sites=d.sites.map(migrateSite);if(Array.isArray(d.team)&&d.team.length)team=d.team;}db.sites.sort(byCreated);mode='local';
     status('Sunucuya bağlanılamadı · bu tarayıcıya kaydediliyor',true);}
-  catch(e){mode='none';status('Kayıt yapılamıyor · yedek indirin',true);}
+  catch(e){mode='none';status('Kayıt yapılamıyor',true);}
   loaded=true;render();if(mode!=='none')seedDemo();
 }
 function editingNow(){const a=document.activeElement;return a&&$('view').contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName);}
@@ -727,8 +727,8 @@ async function poll(){
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
   clearTimeout(flushTimer);
-  if(mode==='local'){try{localStorage.setItem(KEY,JSON.stringify({...db,team}));pending.clear();status('Bu tarayıcıya kaydedildi · '+clock());}catch(e){status('Kayıt başarısız · yedek indirin',true);}return;}
-  if(mode!=='cloud'){status('Kayıt yapılamıyor · yedek indirin',true);return;}
+  if(mode==='local'){try{localStorage.setItem(KEY,JSON.stringify({...db,team}));pending.clear();status('Bu tarayıcıya kaydedildi · '+clock());}catch(e){status('Kayıt başarısız',true);}return;}
+  if(mode!=='cloud'){status('Kayıt yapılamıyor',true);return;}
   if(flushing){flushTimer=setTimeout(flush,400);return;}
   flushing=true;let failed=null;
   for(const [id,p] of [...pending]){
@@ -779,20 +779,20 @@ function visibleSites(){
 function renderPipe(){
   const counts=STATUSES.map(st=>({...st,n:db.sites.filter(s=>s.status===st.k).length}));
   const total=db.sites.length;
-  $('pipe').innerHTML=total?counts.filter(c=>c.n).map(c=>`<button style="flex-grow:${c.n};background:${c.c}" data-status="${c.k}" aria-pressed="${filter===c.k}" title="${esc(c.t)}: ${c.n}"><b>${c.n}</b><span>${esc(c.t)}</span></button>`).join(''):'<div class="empty">Henüz lokasyon yok</div>';
+  $('pipe').innerHTML=total?counts.filter(c=>c.n).map(c=>`<button style="flex-grow:${c.n};background:${c.c}" data-status="${c.k}" aria-pressed="${filter===c.k}" title="${esc(c.t)}: ${c.n}"><b>${c.n}</b><span>${esc(c.t)}</span></button>`).join(''):'<div class="empty">Henüz Lokasyon Yok</div>';
   let kw=0,dc=0;db.sites.forEach(s=>{const t=totals(s);kw+=t.kw;dc+=t.dcKw;});
   const need=db.sites.reduce((a,s)=>a+totalFin(s),0);
   const ok=db.sites.filter(s=>s.status==='onay');let okKw=0;ok.forEach(s=>okKw+=totals(s).kw);
   const mk=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
   $('pipeLegend').innerHTML=mk('Lokasyon',total,'')+mk('Toplam kurulu güç',nf.format(kw),'kW')+mk('DC güç',nf.format(dc),'kW')+mk('Kredilendirilebilir',nf.format(okKw),'kW')+mk('Toplam finansman',nf.format(need),'TL');
 }
-const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk lokasyonu ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
+const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
 function renderLocations(){
   const list=visibleSites();
   const note=filter?`<div class="filter-note"><span>Filtre: ${esc(statusOf(filter).t)}</span><button id="clearFilter">Filtreyi kaldır</button></div>`:'';
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
   const chev='<svg class="loc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
-  $('view').innerHTML=`<section class="box"><h3>Lokasyon listesi<small>${list.length} lokasyon · Satıra tıklayarak detayı açın</small></h3>${note}
+  $('view').innerHTML=`<section class="box"><h3>Lokasyon Listesi<small>${list.length} lokasyon · Satıra tıklayarak detayı açın</small></h3>${note}
     <div class="loclist" role="list">`+(list.length?`<div class="loc-head" aria-hidden="true"><span>Lokasyon</span><span>Durum</span><span>Ünite ve güç</span><span>AMG skoru</span><span></span></div>`+list.map(s=>{const t=totals(s),st=statusOf(s.status),d=amgScore(s);
       return `<button type="button" role="listitem" class="loc-row ${s.id===activeId?'active':''}" data-id="${s.id}">
         <span class="loc-name"><strong>${esc(s.name)}</strong><small>${esc([s.district,s.city].filter(Boolean).join(', ')||s.project||'')}</small></span>
@@ -817,7 +817,7 @@ function render(){
 
 function renderPortfolio(){
   const list=visibleSites();
-  if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Lokasyonlar yükleniyor</h2><p>Kayıtlı lokasyonlar buluttan getiriliyor.</p></div>';return;}
+  if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Lokasyonlar Yükleniyor</h2><p>Kayıtlı lokasyonlar buluttan getiriliyor.</p></div>';return;}
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
   let T={dcU:0,acU:0,dcKw:0,acKw:0,sock:0};
   list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
@@ -825,7 +825,7 @@ function renderPortfolio(){
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
   let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC ünite',T.dcU)}${tot('AC ünite',T.acU)}${tot('Toplam güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj noktası',T.sock)}</div>`;
   h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${filter?esc(statusOf(filter).t)+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
-    <th>Lokasyon</th><th>Proje / bölge</th><th>Durum</th><th class="num">DC ünite</th><th class="num">AC ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / kullanılabilir</th><th class="num">İlk yıl hasılat TL</th><th>Finansman</th><th class="num">AMG skoru</th><th>Karar</th></tr></thead><tbody>`+
+    <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / Kullanılabilir</th><th class="num">İlk Yıl Hasılat TL</th><th>Finansman</th><th class="num">AMG Skoru</th><th>Karar</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=amgScore(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v;
       return `<tr data-open="${s.id}" tabindex="0"><td><b>${esc(s.name)}</b><br><small style="color:var(--muted)">${esc([s.district,s.city].filter(Boolean).join(', '))}</small></td><td>${esc(s.project)}${s.survey.lead?`<br><small style="color:var(--muted)">Sorumlu: ${esc(s.survey.lead)}</small>`:''}</td><td><span class="chip" style="--c:${st.c}">${esc(st.t)}</span></td>
       <td class="num">${t.dcUnits}</td><td class="num">${t.acUnits}</td><td class="num">${nf.format(t.dcKw)}</td><td class="num">${nf.format(t.acKw)}</td><td class="num">${t.sockets}</td>
@@ -836,12 +836,12 @@ function renderPortfolio(){
     `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(T.dcKw)}</td><td class="num">${nf.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td class="num">${nf.format(rows[0].revenue)}</td><td>${money(list.reduce((a,s)=>a+totalFin(s),0))}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
-    h+=`<section class="box" data-tab="port"><h3>Gelir ve finansman, portföy toplamı<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>
+    h+=`<section class="box" data-tab="port"><h3>Gelir ve Finansman, Portföy Toplamı<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>
     ${invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:''}
     ${valid.length?resultsHtml(vrows,f,null,tf):''}</section>`;
   }
-  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Hesaplama esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
-  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Skor nasıl hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
+  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Hesaplama Esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
+  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Skor Nasıl Hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
   $('view').innerHTML=h;
 }
 
@@ -907,7 +907,7 @@ function renderSite(){
   <div id="ddAlerts"></div>
 
   <div class="viewbar subtabs no-print" role="tablist" aria-label="Lokasyon bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" data-sub="${k}" aria-pressed="${sub===k}">${t}</button>`).join('')}</div>
-   <section class="box" data-tab="info"><h3>Lokasyon bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button><button class="ghost" id="delSite">Lokasyonu sil</button></span></h3>
+   <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button><button class="ghost" id="delSite">Lokasyonu sil</button></span></h3>
   <div class="grid">
     ${field('name','Lokasyon adı','text',' class="span2"')}
     <label class="span2">Proje / bölge<input data-f="project" list="projList" value="${esc(s.project)}"><datalist id="projList">${projects.map(p=>`<option value="${esc(p)}">`).join('')}</datalist></label>
@@ -919,13 +919,13 @@ function renderSite(){
     ${field('contact','İletişim kişisi / telefon','text',' class="span2"')}
   </div></section>
 
-  <section class="box" data-tab="infra"><h3>Saha keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
-  <details open><summary>Proje bilgileri</summary><div class="grid subgrid">
+  <section class="box" data-tab="infra"><h3>Saha Keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
+  <details open><summary>Proje Bilgileri</summary><div class="grid subgrid">
     ${leadField()}${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}${sv('partner','Yerel ortak')}
     ${sv('gps','GPS / harita bağlantısı','text',' class="span2"')}${sv('phase','Hedef aşama / COD','text',' class="span2"')}
     ${chk('scope','Ana kapsam',' class="span4"')}
   </div><p class="note">Saha sahibi / mal sahibi, lokasyon bilgilerindeki “Yer sağlayıcı” alanıdır.</p></details>
-  <details open><summary>Saha koşulları ve teknik yapılabilirlik</summary><div class="grid subgrid">
+  <details open><summary>Saha Koşulları ve Teknik Yapılabilirlik</summary><div class="grid subgrid">
     ${sv('area','Kullanılabilir alan (ör. 20 × 15 m)')}${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}
     ${chk('access','Erişim ve yol durumu')}${sv('heightLimit','Yükseklik / genişlik sınırı','text',' class="span2"')}
     ${chk('pave','Zemin / inşaat işleri')}${sv('restore','Zemin onarım notları','text',' class="span2"')}
@@ -940,8 +940,8 @@ function renderSite(){
   </div><p class="note" id="evPotential"></p></details>
   </section>
 
-  <section class="box" data-tab="units"><h3>Şarj üniteleri<small id="unitSummary"></small></h3>
-  <div class="scroll"><table class="units"><thead><tr><th>Tip</th><th class="num">Ünite gücü kW</th><th class="num">Ünite başına soket</th><th class="num">Adet</th><th>Marka / model</th><th class="num">Toplam kW</th><th></th></tr></thead>
+  <section class="box" data-tab="units"><h3>Şarj Üniteleri<small id="unitSummary"></small></h3>
+  <div class="scroll"><table class="units"><thead><tr><th>Tip</th><th class="num">Ünite Gücü kW</th><th class="num">Ünite Başına Soket</th><th class="num">Adet</th><th>Marka / Model</th><th class="num">Toplam kW</th><th></th></tr></thead>
   <tbody id="unitBody">${s.units.map(u=>unitRow(u)).join('')||`<tr><td colspan="7" style="color:var(--muted);padding:14px 6px">Henüz ünite yok. Aşağıdan DC veya AC ünite ekleyin.</td></tr>`}</tbody>
   <tfoot id="unitFoot"></tfoot></table></div>
   <div class="unit-actions"><button id="addDC">+ DC ünite</button><button id="addAC">+ AC ünite</button></div>
@@ -951,18 +951,18 @@ function renderSite(){
     <div class="capnote" id="capnote"></div>
   </div></section>
 
-  <section class="box" data-tab="credit"><h3>Gelir modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
+  <section class="box" data-tab="credit"><h3>Gelir Modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
   <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO (Entegre) payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
   <div class="shareinfo" id="shareStatus"></div>
   <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','TL/kWh')}${finField('cost','Elektrik maliyeti','TL/kWh')}</div>
-  <details><summary>Fiyat artışları ve işletme gideri</summary>
+  <details><summary>Fiyat Artışları ve İşletme Gideri</summary>
     <div class="grid subgrid">${finField('saleGrowth','Satış fiyatı yıllık artışı','%')}${finField('costGrowth','Elektrik maliyeti yıllık artışı','%')}${finField('commission','Co-CPO ödeme komisyonu','hasılatın %')}${finField('opex','İlk yıl işletme gideri','TL')}${finField('opexGrowth','İşletme gideri yıllık artışı','%')}</div>
     <p class="note">Komisyon ve işletme gideri Co-CPO payından düşülür. Varsayılan fiyatlar örnektir, tarife teklifi değildir.</p>
   </details></section>
 
-  <section class="box" data-tab="credit"><h3>Finansman yapısı<small id="finSummary"></small></h3>
+  <section class="box" data-tab="credit"><h3>Finansman Yapısı<small id="finSummary"></small></h3>
   <div class="presets no-print"><span class="note">Hazır yapı:</span><button data-preset="star">Tamamı StarCharge (AMG)</button><button data-preset="split">Donanım StarCharge, saha işleri Co-CPO</button><button data-preset="loan">Saha işleri dış fon kredisi</button></div>
-  <div class="scroll"><table class="units tranches"><thead><tr><th>Kalem</th><th class="num">Tutar TL</th><th>Finansör</th><th>Geri dönüş</th><th class="num">Vade yıl</th><th class="num">Faiz %</th><th>Geri ödeyen</th><th class="num">Yıllık taksit</th><th></th></tr></thead><tbody id="trBody"></tbody></table></div>
+  <div class="scroll"><table class="units tranches"><thead><tr><th>Kalem</th><th class="num">Tutar TL</th><th>Finansör</th><th>Geri Dönüş</th><th class="num">Vade Yıl</th><th class="num">Faiz %</th><th>Geri Ödeyen</th><th class="num">Yıllık Taksit</th><th></th></tr></thead><tbody id="trBody"></tbody></table></div>
   <datalist id="itemList">${ITEMS.map(i=>`<option value="${esc(i)}">`).join('')}</datalist>
   <div class="unit-actions"><button id="addTr">+ Finansman kalemi</button></div>
   <div class="grid subgrid"><label class="span2">Diğer fonun adı<input data-fin-text="fundName" value="${esc(s.fin.fundName)}" placeholder="ör. yerli banka, yatırım fonu" maxlength="60"></label></div>
@@ -975,7 +975,7 @@ function renderSite(){
 
   <section class="box" data-tab="credit"><h3>Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
 
-  <section class="box" data-tab="check"><h3>Skorlama ve yeterlilik<small id="ddProgress"></small></h3>
+  <section class="box" data-tab="check"><h3>Skorlama ve Yeterlilik<small id="ddProgress"></small></h3>
   <div class="scoretotal"><strong id="amgTotal"></strong><span id="amgDec"></span></div>
   <div class="guide"><span class="score lo">60 altı: öncelik dışı</span><span class="score mid">60–79: eksikleri gider</span><span class="score hi">80 ve üzeri: ilerlet</span></div>
   ${AMG.map(c=>`<div class="amg-row" data-a="${c.k}">
@@ -984,7 +984,7 @@ function renderSite(){
       <div class="meter" aria-hidden="true"><i data-meter="${c.k}"></i></div></div>
     <input data-amgnote="${c.k}" value="${esc(s.amg.notes[c.k])}" placeholder="Değerlendirme notu" aria-label="${esc(c.t)} notu">
   </div>`).join('')}
-  <h4 class="subh">Ek kontroller</h4>
+  <h4 class="subh">Ek Kontroller</h4>
   ${EXTRA.map(c=>{const v=s.dd[c.k]||{};return `<div class="dd-row" data-c="${c.k}">
     <div class="q">${esc(c.t)}<small>${esc(c.h)}</small></div>
     <div class="seg" role="group" aria-label="${esc(c.t)}">${Object.entries(VAL).map(([k,o])=>`<button data-v="${k}" aria-pressed="${v.v===k}">${o.t}</button>`).join('')}</div>
@@ -992,13 +992,13 @@ function renderSite(){
   </div>`;}).join('')}
   </section>
 
-  <section class="box" data-tab="check"><h3>Ekler ve onay<small id="attProgress"></small></h3>
-  <div class="scroll"><table class="yearly"><thead><tr><th>Ek türü</th><th>Durum</th></tr></thead><tbody>${ATTACH.map(a=>`<tr><th>${esc(a.t)}</th><td style="text-align:left;min-width:170px"><select data-att="${a.k}" aria-label="${esc(a.t)} durumu"><option value="">Seçin</option>${[['var','Mevcut, ekte'],['yok','Mevcut değil'],['na','Uygulanamaz']].map(([v,t])=>`<option value="${v}" ${s.att[a.k]===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
-  <details><summary>İmza ve katılımcılar</summary><div class="grid subgrid">${SIGN.map(r=>`<label>${esc(r.t)}, ad<input data-sign="${r.k}Name" value="${esc(s.sign[r.k+'Name'])}"></label><label>Tarih<input data-sign="${r.k}Date" type="date" value="${esc(s.sign[r.k+'Date'])}"></label>`).join('')}
+  <section class="box" data-tab="check"><h3>Ekler ve Onay<small id="attProgress"></small></h3>
+  <div class="scroll"><table class="yearly"><thead><tr><th>Ek Türü</th><th>Durum</th></tr></thead><tbody>${ATTACH.map(a=>`<tr><th>${esc(a.t)}</th><td style="text-align:left;min-width:170px"><select data-att="${a.k}" aria-label="${esc(a.t)} durumu"><option value="">Seçin</option>${[['var','Mevcut, ekte'],['yok','Mevcut değil'],['na','Uygulanamaz']].map(([v,t])=>`<option value="${v}" ${s.att[a.k]===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
+  <details><summary>İmza ve Katılımcılar</summary><div class="grid subgrid">${SIGN.map(r=>`<label>${esc(r.t)}, ad<input data-sign="${r.k}Name" value="${esc(s.sign[r.k+'Name'])}"></label><label>Tarih<input data-sign="${r.k}Date" type="date" value="${esc(s.sign[r.k+'Date'])}"></label>`).join('')}
     <label class="span4">Diğer katılımcılar<input data-sign="others" value="${esc(s.sign.others)}"></label></div></details>
   </section>
 
-  <section class="box" data-tab="info"><h3>Genel notlar</h3><textarea data-f="notes" rows="4" aria-label="Genel notlar" placeholder="Saha ziyareti, finansör geri bildirimi, açık sorular">${esc(s.notes)}</textarea>
+  <section class="box" data-tab="info"><h3>Genel Notlar</h3><textarea data-f="notes" rows="4" aria-label="Genel notlar" placeholder="Saha ziyareti, finansör geri bildirimi, açık sorular">${esc(s.notes)}</textarea>
   <p style="font-size:12px;color:var(--muted)">Son güncelleme: <span id="upd"></span></p></section>`;
   $('view').innerHTML=h;
   renderTranches();
@@ -1175,7 +1175,7 @@ function demoSites(){
 /* ---------- sol navigasyon ---------- */
 let sub='ovw';
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
-const SITE_TABS=[['info','Genel'],['units','Şarj üniteleri'],['infra','Altyapı & güç'],['credit','Finansman'],['check','Kontrol listesi']];
+const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Kontrol Listesi']];
 function paintNav(){
   const key=view==='users'?'users':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
@@ -1229,9 +1229,9 @@ async function userApi(method,body,qs=''){
 }
 function userMsg(t,err){const m=$('uMsg');if(!m)return;m.textContent=t||'';m.className='u-msg'+(err?' err':'');}
 async function renderUsers(){
-  $('view').innerHTML='<section class="box"><h3>Kullanıcı yönetimi<small>Yükleniyor…</small></h3></section>';
+  $('view').innerHTML='<section class="box"><h3>Kullanıcı Yönetimi<small>Yükleniyor…</small></h3></section>';
   let d;
-  try{d=await userApi('GET');}catch(e){if(view!=='users')return;$('view').innerHTML='<section class="box"><h3>Kullanıcı yönetimi</h3><p class="note">'+esc(e.message)+'</p></section>';return;}
+  try{d=await userApi('GET');}catch(e){if(view!=='users')return;$('view').innerHTML='<section class="box"><h3>Kullanıcı Yönetimi</h3><p class="note">'+esc(e.message)+'</p></section>';return;}
   if(view!=='users')return;
   usersCache=d.users;usersMe=d.me;
   const rows=d.users.map(u=>{const self=u.email===d.me;
@@ -1244,7 +1244,7 @@ async function renderUsers(){
         <button type="button" data-act="active" ${self?'disabled':''}>${u.active?'Pasifleştir':'Aktifleştir'}</button>
         <button type="button" data-act="del" class="danger" ${self?'disabled':''}>Sil</button>
       </div></td></tr>`;}).join('');
-  $('view').innerHTML=`<section class="box"><h3>Yeni kullanıcı ekle<small>Hesabı yönetici açar; kendi kendine kayıt yok</small></h3>
+  $('view').innerHTML=`<section class="box"><h3>Yeni Kullanıcı Ekle<small>Hesabı yönetici açar; kendi kendine kayıt yok</small></h3>
     <form id="uForm" class="u-form" autocomplete="off">
       <label>Ad soyad<input id="uName" maxlength="120"></label>
       <label>E-posta<input id="uEmail" type="email" required maxlength="254"></label>
@@ -1253,7 +1253,7 @@ async function renderUsers(){
       <button type="submit" class="primary">Kullanıcıyı ekle</button>
     </form><p class="u-msg" id="uMsg" role="status"></p>
     <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
-    <section class="box"><h3>Kayıtlı kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son giriş</th><th style="text-align:right">Rol ve işlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="box"><h3>Kayıtlı Kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son Giriş</th><th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
     const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
