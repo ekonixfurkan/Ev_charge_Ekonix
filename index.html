@@ -393,6 +393,11 @@ dialog .row{gap:12px;margin-top:24px}
 dialog .row button{height:40px;padding:0 16px}
 dialog .row button:not(.primary){background:transparent;border-color:transparent;color:var(--muted)}
 dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
+#dlg{width:min(720px,94vw);max-width:none;max-height:92vh;overflow:auto}
+#dlg .dgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+#dlg .dgrid .span2{grid-column:1/-1}
+#dlg textarea{margin-top:6px;font-size:14px;font-weight:400;text-transform:none;letter-spacing:0;resize:vertical}
+@media (max-width:600px){#dlg .dgrid{grid-template-columns:1fr}}
 #ask p{text-transform:none}
 
 @media (max-width:1000px){.pipe-legend{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -497,13 +502,21 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
 <dialog id="dlg">
   <form id="dlgForm">
     <h2>Yeni Lokasyon</h2>
-    <p class="dsub">Lokasyonu kaydedin, üniteleri ve kontrol listesini sonra doldurun.</p>
-    <label>Lokasyon adı<input id="dlgName" required maxlength="120" autocomplete="off"></label>
-    <label>Proje / bölge<input id="dlgProject" maxlength="120" list="projectList" autocomplete="off"></label>
-    <datalist id="projectList"></datalist>
-    <label>Kopyalanacak ünite yapısı
-      <select id="dlgCopy"><option value="">Boş başla</option></select>
-    </label>
+    <p class="dsub">Temel bilgileri girin. Üniteler, altyapı ve finansman detayı kayıttan sonra lokasyon sayfasında doldurulur.</p>
+    <div class="dgrid">
+      <label class="span2">Lokasyon adı *<input id="dlgName" required maxlength="120" autocomplete="off"></label>
+      <label class="span2">Proje / bölge *<input id="dlgProject" required maxlength="120" list="projectList" autocomplete="off"></label>
+      <datalist id="projectList"></datalist>
+      <label>İl<input id="dlgCity" maxlength="60" list="cityList" autocomplete="off"></label>
+      <datalist id="cityList"><option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Aksaray"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Ardahan"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bartın"><option value="Batman"><option value="Bayburt"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Düzce"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkâri"><option value="Hatay"><option value="Iğdır"><option value="Isparta"><option value="İstanbul"><option value="İzmir"><option value="Kahramanmaraş"><option value="Karabük"><option value="Karaman"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kilis"><option value="Kırıkkale"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Mardin"><option value="Mersin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Osmaniye"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Şanlıurfa"><option value="Şırnak"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Uşak"><option value="Van"><option value="Yalova"><option value="Yozgat"><option value="Zonguldak"></datalist>
+      <label>İlçe<input id="dlgDistrict" maxlength="60" autocomplete="off"></label>
+      <label>Saha tipi<select id="dlgType"><option>İş merkezi</option><option>Sanayi sitesi</option><option>AVM</option><option>Akaryakıt istasyonu</option><option>Otel</option><option>Otopark</option><option>Konut sitesi</option><option>Otoyol / dinlenme tesisi</option><option>Diğer</option></select></label>
+      <label>Sözleşme süresi (yıl)<input id="dlgYears" type="number" min="0" max="99" step="1" inputmode="numeric"></label>
+      <label class="span2">Adres<textarea id="dlgAddress" rows="2" maxlength="300"></textarea></label>
+      <label>Yer sağlayıcı<input id="dlgHost" maxlength="120" autocomplete="off"></label>
+      <label>İletişim kişisi / telefon<input id="dlgContact" maxlength="120" autocomplete="off"></label>
+      <label class="span2">Genel notlar<textarea id="dlgNotes" rows="3" maxlength="2000"></textarea></label>
+    </div>
     <div class="row">
       <button type="button" id="dlgCancel">Vazgeç</button>
       <button type="submit" class="primary">Lokasyonu ekle</button>
@@ -1134,18 +1147,21 @@ function updateDerived(){
 
 /* ---------- events ---------- */
 function openSite(id){guard(()=>{activeId=id;view='site';sub='info';render();window.scrollTo({top:0});});}
-function openAdd(){
-  $('dlgName').value='';$('dlgProject').value=cur()?.project||'';
+function openAdd(){guard(()=>{
+  $('dlgForm').reset();$('dlgProject').value=cur()?.project||'';
   $('projectList').innerHTML=[...new Set(db.sites.map(s=>s.project).filter(Boolean))].map(p=>`<option value="${esc(p)}">`).join('');
-  $('dlgCopy').innerHTML='<option value="">Boş başla</option>'+db.sites.filter(s=>s.units.length).map(s=>`<option value="${s.id}">${esc(s.name)} ünitelerini kopyala</option>`).join('');
   $('dlg').showModal();$('dlgName').focus();
-}
+});}
 $('addSite').onclick=openAdd;
 $('dlgCancel').onclick=()=>$('dlg').close();
-$('dlgForm').onsubmit=e=>{e.preventDefault();const name=$('dlgName').value.trim();if(!name)return;
-  const s=blankSite(name,$('dlgProject').value.trim());const src=db.sites.find(x=>x.id===$('dlgCopy').value);
-  if(src)s.units=src.units.map(u=>({...u,id:uid()}));
-  db.sites.push(s);$('dlg').close();touched(s);guard(()=>{activeId=s.id;view='site';sub='info';render();startEdit();window.scrollTo({top:0});});toast(name+' eklendi.');};
+$('dlgForm').onsubmit=e=>{e.preventDefault();
+  const v=id=>$(id).value.trim(),name=v('dlgName'),project=v('dlgProject');
+  if(!name||!project){toast('Lokasyon adı ve proje / bölge zorunlu.');return;}
+  const s=blankSite(name,project);
+  Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractYears:Math.max(0,Math.round(+$('dlgYears').value||0)),
+    address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),notes:v('dlgNotes')});
+  db.sites.push(s);$('dlg').close();touched(s);
+  activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('vPortfolio').onclick=()=>guard(()=>{view='portfolio';sub='ovw';render();window.scrollTo(0,0);});
 $('vSite').onclick=()=>{if(view==='site')return;guard(()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';sub='info';render();window.scrollTo(0,0);});};
 $('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;guard(()=>{filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();});};
