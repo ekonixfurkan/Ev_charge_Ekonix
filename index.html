@@ -403,6 +403,17 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 
 }
 .nav-group[hidden],.pipeline[hidden]{display:none}
+.edit-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin:0 0 14px;position:sticky;top:0;z-index:5;padding:8px 0;background:var(--bg)}
+.edit-bar .eb-note{margin-right:auto;font-size:12.5px;color:var(--muted)}
+.edit-bar.on .eb-note{color:#b45309;font-weight:600}
+.edit-bar button{display:inline-flex;align-items:center;gap:6px}
+button.save{background:#059669;border-color:#059669;color:#fff;font-weight:600}
+button.save:hover{background:#047857;border-color:#047857;color:#fff}
+#view.ro input:disabled,#view.ro select:disabled,#view.ro textarea:disabled{background:#f8fafc;color:#334155;-webkit-text-fill-color:#334155;border-color:transparent;cursor:default;opacity:1;resize:none}
+#view.ro select:disabled{appearance:none;-webkit-appearance:none;background-image:none}
+#view.ro input[type=checkbox]:disabled,#view.ro input[type=radio]:disabled{opacity:.7}
+#view.ro [data-preset],#view.ro #addTr,#view.ro [data-deltr],#view.ro #applyAll,#view.ro #addDC,#view.ro #addAC,#view.ro [data-del],#view.ro .presets,#view.ro .inline{display:none}
+#view.ro .seg{pointer-events:none}
 .u-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end;margin-bottom:6px}
 .u-form label{display:grid;gap:4px;font-size:12.5px;color:var(--muted)}
 .u-form .pw{display:flex;gap:6px}
@@ -714,12 +725,12 @@ async function poll(){
   let data;try{data=await api('/sites');}catch(e){return;}
   let activeChanged=false;const ids=new Set();
   if(Array.isArray(data.team)&&JSON.stringify(data.team)!==JSON.stringify(team)){team=[...data.team];if(view==='site'&&!editingNow())renderSite();}
-  for(const raw of data.sites||[]){ids.add(raw.id);if(pending.has(raw.id))continue;
+  for(const raw of data.sites||[]){ids.add(raw.id);if(pending.has(raw.id)||(siteEdit&&raw.id===activeId))continue;
     const body=migrateSite(JSON.parse(JSON.stringify(raw))),k=db.sites.findIndex(x=>x.id===raw.id);
     if(k<0)db.sites.push(body);
     else if(JSON.stringify(db.sites[k])!==JSON.stringify(body)){db.sites[k]=body;if(raw.id===activeId)activeChanged=true;}}
   db.sites=db.sites.filter(x=>ids.has(x.id)||pending.has(x.id));
-  if(activeId&&!db.sites.some(x=>x.id===activeId)){activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
+  if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
   if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users')render();
@@ -745,10 +756,14 @@ async function flush(){
   }
   if(pending.size)flushTimer=setTimeout(flush,200);else status('Sunucuda kayıtlı · '+clock());
 }
-function touched(s){s.updatedAt=now();queue(s.id,'save');}
+function touched(s){
+  s.updatedAt=now();
+  if(siteEdit&&s.id===activeId){editDirty=true;status('Kaydedilmemiş değişiklikler var',true);return;}
+  queue(s.id,'save');
+}
 function removeSite(s){db.sites=db.sites.filter(x=>x.id!==s.id);queue(s.id,'delete');}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&pending.size)flush();});
-window.addEventListener('beforeunload',e=>{if(pending.size){flush();e.preventDefault();e.returnValue='';}});
+window.addEventListener('beforeunload',e=>{if(pending.size||(siteEdit&&editDirty)){if(pending.size)flush();e.preventDefault();e.returnValue='';}});
 function ask(msg,okLabel='Tamam'){return new Promise(res=>{const d=$('ask');$('askMsg').textContent=msg;$('askYes').textContent=okLabel;
   d.onclose=()=>res(d.returnValue==='yes');d.returnValue='';d.showModal();$('askNo').focus();});}
 function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3500);}
@@ -874,7 +889,7 @@ function trRow(t){
   <td><select data-tf="payer" ${loan?'':'disabled'} aria-label="Geri ödeyen">${opt(t.payer)}</select></td>
   <td class="num" data-tpay>—</td><td><button class="ghost" data-deltr="${t.id}" aria-label="Kalemi sil">Sil</button></td></tr>`;
 }
-function renderTranches(){const s=cur();$('trBody').innerHTML=s.tranches.map(trRow).join('')||'<tr><td colspan="9" style="color:var(--muted);padding:14px 6px">Finansman kalemi yok. Hazır yapılardan birini seçin veya kalem ekleyin.</td></tr>';}
+function renderTranches(){const s=cur();$('trBody').innerHTML=s.tranches.map(trRow).join('')||'<tr><td colspan="9" style="color:var(--muted);padding:14px 6px">Finansman kalemi yok. Hazır yapılardan birini seçin veya kalem ekleyin.</td></tr>';applyEditState();}
 function applyPreset(s,p){
   const get=item=>{let t=s.tranches.find(x=>x.item===item);if(!t){t=tranche(item);s.tranches.push(t);}return t;};
   const hw=get('Donanım'),epc=get('Saha işleri (EPC)');
@@ -895,6 +910,55 @@ function renderFin(){
   $('finResults').innerHTML=resultsHtml(rows,f,s,tf);
 }
 
+/* ---------- okuma / düzenleme modu ---------- */
+let siteEdit=false,editSnap=null,editDirty=false;
+const ICON_EDIT='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const ICON_SAVE='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICON_X='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+function editBarHtml(){
+  return siteEdit
+    ?`<span class="eb-note">Düzenleme modu: değişiklikler Kaydet'e basana kadar sunucuya gönderilmez.</span><button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
+    :`<span class="eb-note">Salt okunur görünüm. Değiştirmek için Düzenle'ye basın.</span><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
+}
+const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,[data-del],#addLead,#cancelLead';
+function applyEditState(){
+  const v=$('view');if(view!=='site')return;
+  v.classList.toggle('ro',!siteEdit);
+  v.querySelectorAll('input,select,textarea').forEach(el=>{
+    if(el.closest('.subtabs')||el.closest('.edit-bar'))return;
+    el.disabled=!siteEdit;
+  });
+}
+function startEdit(){
+  const s=cur();if(!s||siteEdit)return;
+  siteEdit=true;editDirty=false;editSnap=JSON.parse(JSON.stringify(s));
+  status('Düzenleme modu');renderSite();
+}
+function exitEdit(){siteEdit=false;editSnap=null;editDirty=false;}
+function saveEdit(){
+  const s=cur();if(!s||!siteEdit)return;
+  if($('view').querySelector('[aria-invalid="true"]')){toast('Hatalı alanlar var; düzeltip tekrar kaydedin.');return;}
+  const dirty=editDirty;exitEdit();
+  if(dirty){touched(s);flush();}else status('Sunucuda kayıtlı · '+clock());
+  renderSite();toast('Lokasyon bilgileri güncellendi.');
+}
+function cancelEdit(quiet){
+  const s=cur();if(!siteEdit)return;
+  const snap=editSnap,dirty=editDirty;exitEdit();
+  if(s&&snap&&dirty){const k=db.sites.findIndex(x=>x.id===s.id);if(k>=0)db.sites[k]=snap;}
+  status(pending.size?'Kaydediliyor…':'Sunucuda kayıtlı · '+clock());
+  if(!quiet){renderSite();toast(dirty?'Değişiklikler geri alındı.':'Düzenleme iptal edildi.');}
+}
+// Kaydedilmemiş değişiklik varken başka sayfaya geçişi onaya bağlar.
+function guard(fn){
+  if(!siteEdit||!editDirty){if(siteEdit)exitEdit();fn();return;}
+  ask('Kaydedilmemiş değişiklikler var. Vazgeçip çıkılsın mı?','Değişiklikleri At').then(ok=>{if(!ok)return;cancelEdit(true);fn();});
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#editStart,#editSave,#editCancel');if(!b)return;
+  if(b.id==='editStart')startEdit();else if(b.id==='editSave')saveEdit();else cancelEdit();
+});
+
 function renderSite(){
   const s=cur();
   const projects=[...new Set(db.sites.map(x=>x.project).filter(Boolean))];
@@ -906,6 +970,7 @@ function renderSite(){
   </div></div>
   <div id="ddAlerts"></div>
 
+  <div class="edit-bar no-print ${siteEdit?'on':''}" id="editBar">${editBarHtml()}</div>
   <div class="viewbar subtabs no-print" role="tablist" aria-label="Lokasyon bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" data-sub="${k}" aria-pressed="${sub===k}">${t}</button>`).join('')}</div>
    <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button><button class="ghost" id="delSite">Lokasyonu sil</button></span></h3>
   <div class="grid">
@@ -1003,6 +1068,7 @@ function renderSite(){
   $('view').innerHTML=h;
   renderTranches();
   updateDerived();
+  applyEditState();
 }
 function unitRow(u){
   return `<tr data-u="${u.id}" class="${u.kind==='DC'?'kind-dc':'kind-ac'}">
@@ -1051,7 +1117,7 @@ function updateDerived(){
 }
 
 /* ---------- events ---------- */
-function openSite(id){activeId=id;view='site';sub='info';render();window.scrollTo({top:0});}
+function openSite(id){guard(()=>{activeId=id;view='site';sub='info';render();window.scrollTo({top:0});});}
 function openAdd(){
   $('dlgName').value='';$('dlgProject').value=cur()?.project||'';
   $('projectList').innerHTML=[...new Set(db.sites.map(s=>s.project).filter(Boolean))].map(p=>`<option value="${esc(p)}">`).join('');
@@ -1063,14 +1129,15 @@ $('dlgCancel').onclick=()=>$('dlg').close();
 $('dlgForm').onsubmit=e=>{e.preventDefault();const name=$('dlgName').value.trim();if(!name)return;
   const s=blankSite(name,$('dlgProject').value.trim());const src=db.sites.find(x=>x.id===$('dlgCopy').value);
   if(src)s.units=src.units.map(u=>({...u,id:uid()}));
-  db.sites.push(s);$('dlg').close();touched(s);openSite(s.id);toast(name+' eklendi.');};
-$('vPortfolio').onclick=()=>{view='portfolio';sub='ovw';render();window.scrollTo(0,0);};
-$('vSite').onclick=()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';sub='info';render();window.scrollTo(0,0);};
-$('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();};
+  db.sites.push(s);$('dlg').close();touched(s);guard(()=>{activeId=s.id;view='site';sub='info';render();startEdit();window.scrollTo({top:0});});toast(name+' eklendi.');};
+$('vPortfolio').onclick=()=>guard(()=>{view='portfolio';sub='ovw';render();window.scrollTo(0,0);});
+$('vSite').onclick=()=>{if(view==='site')return;guard(()=>{if(!activeId)activeId=(visibleSites()[0]||db.sites[0])?.id;view='site';sub='info';render();window.scrollTo(0,0);});};
+$('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;guard(()=>{filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();});};
 $('view').addEventListener('click',e=>{const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
   const s=cur();if(!s||view!=='site')return;
+  if(!siteEdit&&e.target.closest(MUTATORS))return;
   const pre=e.target.closest('[data-preset]');if(pre){applyPreset(s,pre.dataset.preset);touched(s);renderTranches();updateDerived();toast('Finansman yapısı uygulandı; tutarları kontrol edin.');return;}
   if(e.target.id==='addTr'){s.tranches.push(tranche('Şebeke bağlantısı'));touched(s);renderTranches();updateDerived();return;}
   if(e.target.id==='addLead'){const name=$('newLead').value.trim().replace(/\s+/g,' ');if(!name){$('newLead').focus();return;}
@@ -1088,9 +1155,9 @@ $('view').addEventListener('click',e=>{
     const rows=document.querySelectorAll('#unitBody tr');rows[rows.length-1]?.querySelector('[data-uf=kw]')?.focus();return;}
   const del=e.target.closest('[data-del]');if(del){s.units=s.units.filter(u=>u.id!==del.dataset.del);touched(s);renderSite();return;}
   if(e.target.id==='delSite'){ask(s.name+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Lokasyonu sil').then(ok=>{if(!ok)return;
-    removeSite(s);activeId=null;view='portfolio';render();toast('Lokasyon silindi.');});return;}
+    exitEdit();removeSite(s);activeId=null;view='portfolio';render();toast('Lokasyon silindi.');});return;}
   if(e.target.id==='dupSite'){const c=JSON.parse(JSON.stringify(s));c.id=uid();c.name=s.name+' (kopya)';c.units.forEach(u=>u.id=uid());c.status='aday';c.dd={};c.amg={scores:{},notes:{}};c.att={};c.sign={};c.createdAt=now();
-    db.sites.push(c);touched(c);openSite(c.id);toast('Lokasyon kopyalandı; kontrol listesi boş başlatıldı.');}
+    db.sites.push(c);touched(c);guard(()=>{activeId=c.id;view='site';sub='info';render();startEdit();window.scrollTo({top:0});});toast('Lokasyon kopyalandı; kontrol listesi boş başlatıldı.');}
 });
 $('view').addEventListener('keydown',e=>{if(e.target.id==='newLead'&&e.key==='Enter'){e.preventDefault();$('addLead').click();return;}const row=e.target.closest('[data-open]');if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSite(row.dataset.open);}});
 $('view').addEventListener('input',e=>{
@@ -1191,10 +1258,13 @@ document.querySelector('aside').addEventListener('click',e=>{
     try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');st[g.dataset.group]=c;localStorage.setItem('saha-nav',JSON.stringify(st));}catch(x){}return;}
   const b=e.target.closest('.nav-item[data-nav]');if(!b)return;
   const k=b.dataset.nav;
-  if(PORT_SUBS.includes(k)){view='portfolio';sub=k;render();window.scrollTo(0,0);}
-  else if(k==='list'){view='locations';render();window.scrollTo(0,0);}
-  else if(k==='users'){view='users';render();window.scrollTo(0,0);}
-  else if(SITE_SUBS.includes(k))goSite(k);
+  if(SITE_SUBS.includes(k)&&view==='site'){sub=k;render();window.scrollTo(0,0);return;}
+  guard(()=>{
+    if(PORT_SUBS.includes(k)){view='portfolio';sub=k;render();window.scrollTo(0,0);}
+    else if(k==='list'){view='locations';render();window.scrollTo(0,0);}
+    else if(k==='users'){view='users';render();window.scrollTo(0,0);}
+    else if(SITE_SUBS.includes(k))goSite(k);
+  });
 });
 /* daraltılabilir sol panel */
 document.querySelectorAll('.nav-item').forEach(b=>{const t=b.textContent.trim();b.dataset.tip=t;b.setAttribute('aria-label',t);});
