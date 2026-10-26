@@ -451,10 +451,6 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
         <button type="button" class="nav-head" aria-expanded="true">Finansman &amp; Uygunluk<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div class="nav-body"><button type="button" class="nav-item" data-nav="credit"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg><span>Kredilendirme &amp; Takip</span></button><button type="button" class="nav-item" data-nav="check"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>Kontrol Listesi (Checklist)</span></button></div>
       </section>
-      <section class="nav-group" data-group="data">
-        <button type="button" class="nav-head" aria-expanded="true">Veri ve Araçlar<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" id="exportJson" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Yedek indir (JSON)</span></button><button type="button" class="nav-item" id="importBtn" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Yedek yükle</span></button><button type="button" class="nav-item" id="exportCsv" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg><span>CSV indir</span></button><button type="button" class="nav-item" id="demoClear" data-nav="x"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg><span>Demo veriyi sil</span></button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
-      </section>
       <section class="nav-group" data-group="admin" id="adminGroup" hidden>
         <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
         <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button></div>
@@ -1128,26 +1124,6 @@ $('view').addEventListener('input',e=>{
 });
 $('view').addEventListener('change',e=>{if(e.target.dataset.f==='status'){const s=cur();s.status=e.target.value;touched(s);updateDerived();}});
 
-/* ---------- backup ---------- */
-async function download(text,type,name){
-  const url=URL.createObjectURL(new Blob([text],{type}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);toast(name+' indirildi.');}
-const stamp=()=>new Date().toISOString().slice(0,10);
-$('exportJson').onclick=()=>{download(JSON.stringify({...db,exportedAt:now()},null,2),'application/json','Saha_Degerlendirme_Yedek_'+stamp()+'.json');};
-$('exportCsv').onclick=()=>{
-  const head=['Lokasyon','Proje','Proje sorumlusu','İl','İlçe','Saha tipi','Durum','DC ünite','DC kW','DC soket','AC ünite','AC kW','AC soket','Trafo kVA','Kullanılabilir kW','Park yeri','Kablo mesafesi m','Sözleşme yıl','AMG skoru','Puanlanan kriter','Karar','Engel','Kullanım %','Satış TL/kWh','Elektrik TL/kWh','Yer sağlayıcı %','Co-CPO %','StarCharge %','EKONİX %','Diğer fon %','İlk yıl enerji kWh','İlk yıl hasılat TL',YEARS+' yıl yer sağlayıcı TL','Finansman yapısı','Toplam finansman TL','StarCharge finansmanı TL','Co-CPO finansmanı TL','Diğer fon finansmanı TL','En düşük DSCR',...AMG.map(c=>c.t+' (/'+c.w+')')];
-  const rows=db.sites.map(s=>{const t=totals(s),d=amgScore(s);return [s.name,s.project,s.survey.lead||'',s.city,s.district,s.type,statusOf(s.status).t,t.dcUnits,t.dcKw,t.dcSock,t.acUnits,t.acKw,t.acSock,s.gridKva,s.survey.availKw??'',s.survey.parkTotal??'',s.survey.cableM??'',s.contractYears,d.done?d.total:'',d.done+'/'+AMG.length,d.dec?d.dec.t:'',d.blockers.join(', '),...(()=>{const f=s.fin,r=calculate(s);const F=finance(s,r),dm=minAll(F.P);return [f.initial,f.sale,f.cost,f.share,f.entShare,f.starShare,f.ekoShare,f.fundShare,Math.round(r[0].energy),Math.round(r[0].revenue),Math.round(r.reduce((a,x)=>a+x.owner,0)),structureLabel(s),totalFin(s),F.P.star.invest,F.P.ent.invest,F.P.fon.invest,dm==null?'':fmtD(dm)];})(),...AMG.map(c=>s.amg.scores[c.k]??'')];});
-  const csv=[head,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
-  download('\ufeff'+csv,'text/csv','Saha_Degerlendirme_'+stamp()+'.csv');
-};
-$('importBtn').onclick=()=>$('importFile').click();
-$('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-  try{const inc=JSON.parse(await f.text());if(!Array.isArray(inc.sites))throw Error('Dosyada lokasyon listesi bulunamadı.');
-    if(!await ask(inc.sites.length+' lokasyon bulundu. Mevcut listeye eklensin mi?','Listeye ekle'))return;
-    for(const s of inc.sites){const c={...blankSite(s.name||'Adsız'),...s,id:uid(),createdAt:now()};c.units=(c.units||[]).map(u=>({...u,id:uid()}));c.dd=c.dd||{};migrateSite(c);c.fin={...FIN_DEFAULT,...(s.fin||{})};c.tranches=(Array.isArray(s.tranches)?s.tranches:defaultTranches()).map(t=>({...t,id:uid()}));db.sites.push(c);touched(c);}
-    view='portfolio';render();toast(inc.sites.length+' lokasyon eklendi.');}
-  catch(err){toast('Yedek yüklenemedi: '+err.message);}
-};
-
 /* ---------- demo data ---------- */
 function demoSites(){
   let n=0;
@@ -1241,12 +1217,6 @@ function seedDemo(){
   try{localStorage.setItem(K,'1');}catch(e){}
   render();
 }
-$('demoClear').onclick=async()=>{
-  const d=db.sites.filter(s=>s.demo);
-  if(!d.length){toast('Silinecek demo veri yok.');return;}
-  if(!await ask(d.length+' demo lokasyon silinsin mi? Kendi eklediklerinize dokunulmaz.','Demoyu sil'))return;
-  d.forEach(removeSite);activeId=null;view='portfolio';render();toast('Demo veri silindi.');
-};
 
 /* ---------- kullanıcı yönetimi (yalnızca yönetici) ---------- */
 let usersCache=null,usersMe='';
