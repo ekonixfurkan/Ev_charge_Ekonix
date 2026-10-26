@@ -530,9 +530,9 @@ const KEY='saha-dd-araci:v1';
 const STATUSES=[
   {k:'aday',t:'Aday',c:'var(--s-aday)'},
   {k:'inceleme',t:'İnceleniyor',c:'var(--s-inceleme)'},
-  {k:'sunuldu',t:'Finansöre sunuldu',c:'var(--s-sunuldu)'},
+  {k:'sunuldu',t:'Finansöre Sunuldu',c:'var(--s-sunuldu)'},
   {k:'onay',t:'Kredilendirilebilir',c:'var(--s-onay)'},
-  {k:'red',t:'Uygun değil',c:'var(--s-red)'}
+  {k:'red',t:'Uygun Değil',c:'var(--s-red)'}
 ];
 const TYPES=['İş merkezi','Sanayi sitesi','AVM','Akaryakıt istasyonu','Otel','Otopark','Konut sitesi','Otoyol / dinlenme tesisi','Diğer'];
 /* AMG / StarCharge site survey & qualification form */
@@ -566,12 +566,19 @@ const CHK={
 };
 const TEAM_DEFAULT=['Alaattin Ersivri','Hilmi Doğan','S. Furkan Keçe'];
 let team=[...TEAM_DEFAULT];
-const DECISIONS=[{min:80,t:'İlerlet',en:'Advance',cls:'hi'},{min:60,t:'Eksikleri gider',en:'Resolve gaps',cls:'mid'},{min:0,t:'Öncelik dışı',en:'Deprioritize',cls:'lo'}];
-const VAL={ok:{t:'Uygun',s:1},risk:{t:'Riskli',s:.5},no:{t:'Uygun değil',s:0}};
+const DECISIONS=[{min:80,t:'İlerlet',en:'Advance',cls:'hi'},{min:60,t:'Eksikleri Gider',en:'Resolve gaps',cls:'mid'},{min:0,t:'Öncelik Dışı',en:'Deprioritize',cls:'lo'}];
+const VAL={ok:{t:'Uygun',s:1},risk:{t:'Riskli',s:.5},no:{t:'Uygun Değil',s:0}};
 
 const $=id=>document.getElementById(id);
 const nf=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:0});
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Türkçe Başlık Düzeni: her kelimenin ilk harfi büyük; DC, EKONİX gibi tamamı büyük kelimeler ve kW korunur.
+const TITLE_SMALL=new Set(['ve','ile','için']),TITLE_KEEP=new Set(['kW','kVA','kWh']);
+const toTurkishTitleCase=str=>String(str).split(' ').map((w,i)=>{
+  if(!w||TITLE_KEEP.has(w)||w===w.toLocaleUpperCase('tr-TR'))return w;
+  if(i&&TITLE_SMALL.has(w.toLocaleLowerCase('tr-TR')))return w.toLocaleLowerCase('tr-TR');
+  return w.charAt(0).toLocaleUpperCase('tr-TR')+w.slice(1);
+}).join(' ');
 const uid=()=>(crypto.randomUUID?crypto.randomUUID():'id'+Date.now().toString(36)+Math.random().toString(36).slice(2));
 const now=()=>new Date().toISOString();
 const statusOf=k=>STATUSES.find(s=>s.k===k)||STATUSES[0];
@@ -581,12 +588,13 @@ const YEARS=7;
 const FIN_DEFAULT={initial:15,growth:2,sale:14.49,cost:5.454,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:0,ekoShare:0,fundShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
 const FIN_LIMITS={initial:[0,100],growth:[-20,20],sale:[0,1000],cost:[0,1000],saleGrowth:[-100,200],costGrowth:[-100,200],share:[0,100],entShare:[0,100],starShare:[0,100],ekoShare:[0,100],fundShare:[0,100],commission:[0,100],opex:[0,1e10],opexGrowth:[0,200]};
 const PARTIES=[
-  {k:'owner',t:'Yer sağlayıcı',sh:'Yer sağlayıcı',c:'var(--p-owner)',share:'share'},
+  {k:'owner',t:'Yer Sağlayıcı',sh:'Yer Sağlayıcı',c:'var(--p-owner)',share:'share'},
   {k:'ent',t:'Co-CPO (Entegre)',sh:'Co-CPO',c:'var(--p-ent)',share:'entShare'},
   {k:'star',t:'StarCharge (AMG)',sh:'StarCharge',c:'var(--p-star)',share:'starShare'},
   {k:'eko',t:'EKONİX',sh:'EKONİX',c:'var(--p-eko)',share:'ekoShare'},
-  {k:'fon',t:'Diğer fon',sh:'Diğer fon',c:'var(--p-fon)',share:'fundShare'}
+  {k:'fon',t:'Diğer Fon',sh:'Diğer Fon',c:'var(--p-fon)',share:'fundShare'}
 ];
+[STATUSES,DECISIONS].forEach(a=>a.forEach(x=>{x.t=toTurkishTitleCase(x.t);}));Object.values(VAL).forEach(x=>{x.t=toTurkishTitleCase(x.t);});PARTIES.forEach(x=>{x.t=toTurkishTitleCase(x.t);x.sh=toTurkishTitleCase(x.sh);});
 const ITEMS=['Donanım','Saha işleri (EPC)','Şebeke bağlantısı','Diğer'];
 const party=k=>PARTIES.find(p=>p.k===k)||PARTIES[0];
 const pName=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).t;
@@ -685,8 +693,8 @@ function chartSvg(P,s){
   for(let j=0;j<4;j++){const v=lo+(hi-lo)*j/3,yy=y(v);o+=`<line x1="90" x2="980" y1="${yy}" y2="${yy}" style="stroke:var(--line)"/><text x="82" y="${yy+4}" text-anchor="end">${df.format(v/1e6)} mn</text>`;}
   if(lo<0)o+=`<line x1="90" x2="980" y1="${y(0)}" y2="${y(0)}" style="stroke:var(--muted)" stroke-dasharray="4 4"/>`;
   ser.forEach(q=>{o+=`<polyline fill="none" style="stroke:${q.color}" stroke-width="2.5" stroke-linejoin="round" points="${q.v.map((v,i)=>x(i)+','+y(v)).join(' ')}"/>`;
-    q.v.forEach((v,i)=>o+=`<circle cx="${x(i)}" cy="${y(v)}" r="4" style="fill:${q.color}"><title>${esc(q.name)}, ${i?i+'. yıl':'başlangıç'}: ${money(v)}</title></circle>`);});
-  for(let i=0;i<=YEARS;i++)o+=`<text x="${x(i)}" y="222" text-anchor="middle">${i?i+'. yıl':'Başlangıç'}</text>`;
+    q.v.forEach((v,i)=>o+=`<circle cx="${x(i)}" cy="${y(v)}" r="4" style="fill:${q.color}"><title>${esc(q.name)}, ${i?i+'. Yıl':'Başlangıç'}: ${money(v)}</title></circle>`);});
+  for(let i=0;i<=YEARS;i++)o+=`<text x="${x(i)}" y="222" text-anchor="middle">${i?i+'. Yıl':'Başlangıç'}</text>`;
   return o+'</svg>';
 }
 function partyTable(P,s){
@@ -700,13 +708,13 @@ function loanTable(loans,withSite){
 }
 function yearlyTable(rows,ds){
   const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),hasDs=ds.some(v=>v>0),R=rows.map((r,i)=>({...r,ds:ds[i]}));
-  const cols=[['energy','Enerji kWh'],['revenue','Hasılat'],['margin','Elektrik sonrası'],['owner','Yer sağlayıcı'],['ent','Co-CPO payı'],['star','StarCharge'],['eko','EKONİX'],...(hasFon?[['fon','Diğer fon']]:[]),['remaining','Dağıtılmayan'],['fee','Komisyon'],['opex','İşletme gideri'],...(hasDs?[['ds','Kredi taksitleri']]:[])];
+  const cols=[['energy','Enerji kWh'],['revenue','Hasılat'],['margin','Elektrik Sonrası'],['owner','Yer Sağlayıcı'],['ent','Co-CPO Payı'],['star','StarCharge'],['eko','EKONİX'],...(hasFon?[['fon','Diğer Fon']]:[]),['remaining','Dağıtılmayan'],['fee','Komisyon'],['opex','İşletme Gideri'],...(hasDs?[['ds','Kredi Taksitleri']]:[])];
   const sum=k=>R.reduce((t,r)=>t+r[k],0);
   return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar TL. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
 }
 function resultsHtml(rows,f,s,tf){
   const k=(l,val,sub)=>`<div class="kpi"><span>${l}</span><strong>${val}</strong><small>${sub}</small></div>`,dmin=minAll(f.P);
-  return `<div class="kpis">${k('İlk yıl enerji',nf.format(rows[0].energy)+' kWh','%'+df.format(rows[0].u)+' kullanım')}${k('İlk yıl hasılat',money(rows[0].revenue),'Elektrik sonrası '+money(rows[0].margin))}${k('Toplam finansman',money(tf),tf?'StarCharge %'+df.format(f.P.star.invest/tf*100):'Tutar girilmedi')}${k('En düşük DSCR',`<span class="score ${dscrClass(dmin)}">${fmtD(dmin)}</span>`,dmin==null?'Kredi kalemi yok':'Kredi taksidi karşılama')}${k(YEARS+' yıl yer sağlayıcı',money(rows.reduce((a,r)=>a+r.owner,0)),'Elektrik sonrası taban')}</div>
+  return `<div class="kpis">${k('İlk Yıl Enerji',nf.format(rows[0].energy)+' kWh','%'+df.format(rows[0].u)+' kullanım')}${k('İlk Yıl Hasılat',money(rows[0].revenue),'Elektrik sonrası '+money(rows[0].margin))}${k('Toplam Finansman',money(tf),tf?'StarCharge %'+df.format(f.P.star.invest/tf*100):'Tutar girilmedi')}${k('En Düşük DSCR',`<span class="score ${dscrClass(dmin)}">${fmtD(dmin)}</span>`,dmin==null?'Kredi kalemi yok':'Kredi taksidi karşılama')}${k(YEARS+' Yıl Yer Sağlayıcı',money(rows.reduce((a,r)=>a+r.owner,0)),'Elektrik sonrası taban')}</div>
   <h4 class="subh">Taraflara Göre Getiri</h4>${partyTable(f.P,s)}
   <h4 class="subh">Kümülatif Nakit</h4>${chartSvg(f.P,s)}
   ${f.loans.length?'<h4 class="subh">Kredi Kalemleri</h4>'+loanTable(f.loans,!s):''}
@@ -828,7 +836,7 @@ function renderPipe(){
   const need=db.sites.reduce((a,s)=>a+totalFin(s),0);
   const ok=db.sites.filter(s=>s.status==='onay');let okKw=0;ok.forEach(s=>okKw+=totals(s).kw);
   const mk=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
-  $('pipeLegend').innerHTML=mk('Lokasyon',total,'')+mk('Toplam kurulu güç',nf.format(kw),'kW')+mk('DC güç',nf.format(dc),'kW')+mk('Kredilendirilebilir',nf.format(okKw),'kW')+mk('Toplam finansman',nf.format(need),'TL');
+  $('pipeLegend').innerHTML=mk('Lokasyon',total,'')+mk('Toplam Kurulu Güç',nf.format(kw),'kW')+mk('DC Güç',nf.format(dc),'kW')+mk('Kredilendirilebilir',nf.format(okKw),'kW')+mk('Toplam Finansman',nf.format(need),'TL');
 }
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
 function renderLocations(){
@@ -867,7 +875,7 @@ function renderPortfolio(){
   list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
   const tot=(l,v)=>`<div class="total"><span>${l}</span><strong>${v}</strong></div>`;
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
-  let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC ünite',T.dcU)}${tot('AC ünite',T.acU)}${tot('Toplam güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj noktası',T.sock)}</div>`;
+  let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj Noktası',T.sock)}</div>`;
   h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${filter?esc(statusOf(filter).t)+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
     <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / Kullanılabilir</th><th class="num">İlk Yıl Hasılat TL</th><th>Finansman</th><th class="num">AMG Skoru</th><th>Karar</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=amgScore(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v,sc=d.done?d.cls:'none';
@@ -994,8 +1002,8 @@ function renderSite(){
   let h=`<div class="site-head"><div><h2 id="siteTitle">${esc(s.name)}</h2><p id="siteSub">${esc([s.project,s.district,s.city].filter(Boolean).join(', '))}</p></div>
   <div class="verdict">
     <div class="vcell"><span>Durum</span><select data-f="status" aria-label="Durum">${STATUSES.map(st=>`<option value="${st.k}" ${st.k===s.status?'selected':''}>${esc(st.t)}</option>`).join('')}</select></div>
-    <div class="vcell"><span>AMG skoru</span><strong id="vScore"></strong><small id="vDec" style="display:block;font-size:12px"></small></div>
-    <div class="vcell"><span>Toplam güç</span><strong id="vKw"></strong></div>
+    <div class="vcell"><span>AMG Skoru</span><strong id="vScore"></strong><small id="vDec" style="display:block;font-size:12px"></small></div>
+    <div class="vcell"><span>Toplam Güç</span><strong id="vKw"></strong></div>
   </div></div>
   <div id="ddAlerts"></div>
 
