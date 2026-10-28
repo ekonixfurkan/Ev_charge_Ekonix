@@ -12,6 +12,7 @@
   --accent:#0f4c9c;--accent-soft:#eaf2fb;
   --dc:#24677d;--ac:#7a9a3a;
   --ok:#2f7d4f;--ok-soft:#e5f3ea;--risk:#b7790c;--risk-soft:#fcf1dc;--no:#b03a2e;--no-soft:#f9e3e0;
+  --stg-01:#8a99a3;--stg-02:#6b86a8;--stg-03:#0f4c9c;--stg-04:#0e7490;--stg-05:#1f8a70;--stg-06:#5f9a1f;--stg-07:#8a8f1f;--stg-08:#b7790c;--stg-09:#c25e1b;--stg-10:#2f7d4f;
   --s-aday:#8a99a3;--s-inceleme:#0f4c9c;--s-sunuldu:#0e7490;--s-onay:#5f9a1f;--s-red:#b03a2e;
   color-scheme:light;
 }
@@ -86,7 +87,7 @@ main{padding:22px 26px;max-width:1300px;width:100%}
 .box h3{font-size:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .box h3 small{font-weight:400;font-size:13px;color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-.span2{grid-column:span 2}.span4{grid-column:1/-1}
+.span2{grid-column:span 2}.span3{grid-column:span 3}.span4{grid-column:1/-1}
 
 .site-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
 .site-head h2{font-size:24px;font-weight:600}
@@ -358,6 +359,15 @@ main{padding:24px 28px}
 .fin-sub{margin-bottom:16px}
 .fin-sub button{white-space:nowrap}
 .fin-brief{margin-top:16px}
+.locbar{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;margin:4px 0 16px}
+.locbar .lf{display:grid;gap:4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600;margin:0}
+.locbar .lf select,.locbar .lf input[type=search]{height:36px;font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;min-width:130px}
+.locbar .lq{flex:1 1 260px}.locbar .lq input{width:100%}
+.locbar .lchk{display:flex;align-items:center;gap:6px;height:36px;text-transform:none;letter-spacing:0;font-weight:500;font-size:13px;color:var(--ink)}
+.locbar .lchk input{width:auto;min-height:0;height:auto}
+.loctbl td{cursor:pointer}
+.loctbl th,.loctbl td{padding:12px 8px}.loctbl tr.closed td{opacity:.6}
+.badge.stg{display:inline-flex;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
 .subtabs{max-width:100%;overflow-x:auto;margin-bottom:16px}
 .subtabs button{white-space:nowrap}
 /* Lokasyon listesi görünümü */
@@ -513,7 +523,7 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
       <label>İl<input id="dlgCity" maxlength="60" list="cityList" autocomplete="off"></label>
       <datalist id="cityList"><option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Aksaray"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Ardahan"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bartın"><option value="Batman"><option value="Bayburt"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Düzce"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkâri"><option value="Hatay"><option value="Iğdır"><option value="Isparta"><option value="İstanbul"><option value="İzmir"><option value="Kahramanmaraş"><option value="Karabük"><option value="Karaman"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kilis"><option value="Kırıkkale"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Mardin"><option value="Mersin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Osmaniye"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Şanlıurfa"><option value="Şırnak"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Uşak"><option value="Van"><option value="Yalova"><option value="Yozgat"><option value="Zonguldak"></datalist>
       <label>İlçe<input id="dlgDistrict" maxlength="60" autocomplete="off"></label>
-      <label>Saha tipi<select id="dlgType"><option>İş merkezi</option><option>Sanayi sitesi</option><option>AVM</option><option>Akaryakıt istasyonu</option><option>Otel</option><option>Otopark</option><option>Konut sitesi</option><option>Otoyol / dinlenme tesisi</option><option>Diğer</option></select></label>
+      <label>Saha tipi<select id="dlgType"><option value="Hotel">Otel</option><option value="Hospital">Hastane</option><option value="Mall">AVM</option><option value="Office">Ofis</option><option value="Industry Zone">Sanayi Sitesi</option><option value="Residence">Konut</option><option value="Commercial Center">Ticari Merkez</option><option value="Car Inspection Center">Araç Muayene İstasyonu</option><option value="Carpark">Otopark</option><option value="High School">Lise</option><option value="University">Üniversite</option><option value="Gym & Restaurant">Spor Salonu ve Restoran</option><option value="Fuel Station">Akaryakıt İstasyonu</option><option value="Logistics Center">Lojistik Merkezi</option><option value="Other">Diğer</option></select></label>
       <label>Sözleşme süresi (yıl)<input id="dlgYears" type="number" min="0" max="99" step="1" inputmode="numeric"></label>
       <label class="span2">Adres<textarea id="dlgAddress" rows="2" maxlength="300"></textarea></label>
       <label>Yer sağlayıcı<input id="dlgHost" maxlength="120" autocomplete="off"></label>
@@ -530,14 +540,33 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
 <script>
 'use strict';
 const KEY='saha-dd-araci:v1';
+const STAGES=[['01','Lokasyon Önerisi'],['02','Ön Değerlendirme'],['03','Fizibilite'],['04','StarCharge Değerlendirmesi'],['05','Sözleşme Süreci'],['06','Sözleşme İmzalandı'],['07','Proje Geliştirme ve İzinler'],['08','Kurulum'],['09','Devreye Alma'],['10','İşletme']];
 const STATUSES=[
-  {k:'aday',t:'Aday',c:'var(--s-aday)'},
-  {k:'inceleme',t:'İnceleniyor',c:'var(--s-inceleme)'},
-  {k:'sunuldu',t:'Finansöre Sunuldu',c:'var(--s-sunuldu)'},
-  {k:'onay',t:'Kredilendirilebilir',c:'var(--s-onay)'},
-  {k:'red',t:'Uygun Değil',c:'var(--s-red)'}
+  {k:'active',t:'Aktif',en:'Active',c:'var(--s-onay)',open:true},
+  {k:'hold',t:'Beklemede',en:'On Hold',c:'var(--s-sunuldu)',open:true},
+  {k:'live',t:'Kuruldu',en:'Live',c:'var(--s-inceleme)',open:true},
+  {k:'ddfailed',t:'Uygun Değil',en:'DD Failed',c:'var(--s-red)'},
+  {k:'lost',t:'Kaybedildi',en:'Lost',c:'var(--s-aday)'},
+  {k:'cancelled',t:'İptal',en:'Cancelled',c:'var(--s-aday)'}
 ];
-const TYPES=['İş merkezi','Sanayi sitesi','AVM','Akaryakıt istasyonu','Otel','Otopark','Konut sitesi','Otoyol / dinlenme tesisi','Diğer'];
+const OLD_STATUS={aday:['01','active'],inceleme:['03','active'],sunuldu:['04','active'],onay:['05','active'],red:['02','ddfailed']};
+// Saha tipi: Feishu ile uyum için değer İngilizce, ekranda Türkçe etiket.
+const TYPES=[['Hotel','Otel'],['Hospital','Hastane'],['Mall','AVM'],['Office','Ofis'],['Industry Zone','Sanayi Sitesi'],['Residence','Konut'],['Commercial Center','Ticari Merkez'],['Car Inspection Center','Araç Muayene İstasyonu'],['Carpark','Otopark'],['High School','Lise'],['University','Üniversite'],['Gym & Restaurant','Spor Salonu ve Restoran'],['Fuel Station','Akaryakıt İstasyonu'],['Logistics Center','Lojistik Merkezi'],['Other','Diğer']];
+const OLD_TYPE={'İş merkezi':'Office','Sanayi sitesi':'Industry Zone','AVM':'Mall','Akaryakıt istasyonu':'Fuel Station','Otel':'Hotel','Otopark':'Carpark','Konut sitesi':'Residence','Otoyol / dinlenme tesisi':'Other','Diğer':'Other'};
+const typeLabel=k=>(TYPES.find(t=>t[0]===k)||[0,k||'—'])[1];
+const stageLabel=k=>{const x=STAGES.find(t=>t[0]===k);return x?x[0]+' '+x[1]:'—';};
+const isOpen=s=>statusOf(s.status).open===true;
+// Excel'deki el ile girilen puan: yeşil 85+, turuncu 75–84, kırmızı 75 altı.
+function scoreOf(s){
+  const raw=s.score,v=(raw===''||raw==null||!Number.isFinite(+raw))?null:+raw;
+  const cls=v==null?'none':v>=85?'hi':v>=75?'mid':'lo';
+  return {v,cls,label:v==null?'—':(Number.isInteger(v)?String(v):String(v).replace('.',',')),
+    text:v==null?'Puanlanmadı':v>=85?'Yüksek':v>=75?'Orta':'75 Altı'};
+}
+// Feishu'nun 27 sütunu (sıra korunur). t: ana alan, f: fx altında metin alanı
+const FEISHU=[['Project Name','name'],['Next Action','nextAction'],['Total Score','score'],['Blocker | Concern | Risk','blocker'],['Survey History','fx.surveyHistory'],['Next Survey','fx.nextSurvey'],['Presentation','fx.presentation'],['Proposal | Contract','fx.proposal'],['Blueprint','fx.blueprint'],['EPC','fx.epc'],['Logistics','fx.logistics'],['Warehouse','fx.warehouse'],['Construction','fx.construction'],['Province | City','city'],['Property Type','type'],['Site Owner | Landlord','host'],['Local Partner','survey.partner'],['Customer Needs','needs'],['Site Size | Boundary','fx.siteSize'],['Parking Spaces','fx.parking'],['Transformer | Power','fx.transformer'],['Distance | Cable Route','fx.distance'],['Meeting | Tariff','fx.meetingTariff'],['Competitor Survey','fx.competitor'],['Key Survey Notes','fx.keyNotes'],['Site Survey Files','siteFiles'],['Total Man Hours','manHours']];
+const getPath=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+function setPath(o,p,v){const ks=p.split('.');let a=o;for(let i=0;i<ks.length-1;i++){a=a[ks[i]]=a[ks[i]]||{};}a[ks[ks.length-1]]=v;}
 /* AMG / StarCharge site survey & qualification form */
 const AMG=[
   {k:'loc',w:15,t:'Konum, trafik ve talep',en:'Location, traffic & demand',h:'Ana yol erişimi, görünürlük, giriş güzergâhı, müşteri bekleme süresi ve tekrar eden talep senaryosu.'},
@@ -727,15 +756,23 @@ function resultsHtml(rows,f,s,tf,mode='all'){
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
 function blankSite(name,project=''){
-  return {id:uid(),name,project,city:'İstanbul',district:'',address:'',type:'İş merkezi',host:'',contact:'',
-    status:'aday',gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
+  return {id:uid(),name,project,city:'',district:'',address:'',type:'Other',host:'',contact:'',
+    status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
-let db={version:1,sites:[]},activeId=null,view='portfolio',filter=null,loaded=false,mode='none',canWrite=true;
+let db={version:1,sites:[]},activeId=null,view='portfolio',F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false},sortKey='updated',loaded=false,mode='none',canWrite=true,me={email:'',role:''};
 const API='/api';
 const pending=new Map();let ver=0,flushTimer=null,flushing=false,pollTimer=null;
 function status(t,err=false){$('saveStatus').textContent=t;$('saveStatus').classList.toggle('err',err);}
-function migrateSite(s){s.fin={...FIN_DEFAULT,...(s.fin||{})};s.units=Array.isArray(s.units)?s.units:[];s.dd=s.dd||{};
+function migrateSite(s){
+  if(OLD_STATUS[s.status]){const [o,n]=OLD_STATUS[s.status];s.stage=s.stage||o;s.status=n;}
+  if(!STAGES.some(x=>x[0]===s.stage))s.stage='01';
+  if(!STATUSES.some(x=>x.k===s.status))s.status='active';
+  if(OLD_TYPE[s.type])s.type=OLD_TYPE[s.type];else if(s.type&&!TYPES.some(x=>x[0]===s.type))s.type='Other';
+  for(const k of ['nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
+  if(s.score==null||!Number.isFinite(+s.score)||s.score==='')s.score='';
+  s.fx=s.fx||{};
+  s.fin={...FIN_DEFAULT,...(s.fin||{})};s.units=Array.isArray(s.units)?s.units:[];s.dd=s.dd||{};
   if(!Array.isArray(s.tranches)){s.tranches=defaultTranches();if(s.fin.investment>0){s.tranches[1].fin='ent';s.tranches[1].amount=s.fin.investment;}}
   s.createdAt=s.createdAt||s.updatedAt||now();s.survey=s.survey||{};s.amg=s.amg||{scores:{},notes:{}};s.amg.scores=s.amg.scores||{};s.amg.notes=s.amg.notes||{};s.att=s.att||{};s.sign=s.sign||{};return s;}
 const byCreated=(a,b)=>String(a.createdAt).localeCompare(String(b.createdAt));
@@ -752,12 +789,12 @@ async function load(){
     if(Array.isArray(data.sites))db.sites=data.sites.map(migrateSite);
     if(Array.isArray(data.team)&&data.team.length)team=data.team;
     db.sites.sort(byCreated);mode='cloud';loaded=true;
-    status('Sunucuda kayıtlı · '+clock());render();startPoll();seedDemo();return;
+    status('Sunucuda kayıtlı · '+clock());render();startPoll();return;
   }catch(e){/* API/DB yok → bu tarayıcıya kaydet */}
   try{const v=localStorage.getItem(KEY);if(v){const d=JSON.parse(v);if(Array.isArray(d.sites))db.sites=d.sites.map(migrateSite);if(Array.isArray(d.team)&&d.team.length)team=d.team;}db.sites.sort(byCreated);mode='local';
     status('Sunucuya bağlanılamadı · bu tarayıcıya kaydediliyor',true);}
   catch(e){mode='none';status('Kayıt yapılamıyor',true);}
-  loaded=true;render();if(mode!=='none')seedDemo();
+  loaded=true;render();
 }
 function editingNow(){const a=document.activeElement;return a&&$('view').contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName);}
 function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(poll,4000);}
@@ -829,34 +866,73 @@ function amgScore(s){
 const capRef=s=>{const a=+s.survey?.availKw||0;return a>0?{v:a,u:'kW kullanılabilir'}:(+s.gridKva>0?{v:+s.gridKva,u:'kVA trafo'}:null);};
 
 /* ---------- rendering ---------- */
-function visibleSites(){
-  return db.sites.filter(s=>(!filter||s.status===filter)&&true);
+const hasFilter=()=>Object.values(F).some(Boolean);
+// Arama için I/İ/ı/i hepsini aynı say (IKEA = ikea = İkea).
+const norm=v=>String(v??'').replace(/[İIı]/g,'i').toLowerCase();
+function matchesF(s){
+  if(F.stage&&s.stage!==F.stage)return false;
+  if(F.status&&s.status!==F.status)return false;
+  if(F.city&&s.city!==F.city)return false;
+  if(F.type&&s.type!==F.type)return false;
+  if(F.owner&&(s.survey.lead||'')!==F.owner)return false;
+  if(F.partner&&(s.survey.partner||'')!==F.partner)return false;
+  if(F.blocked&&!(s.blocker||s.blockerTr))return false;
+  if(F.q){const hay=norm([s.name,s.city,s.district,s.host,s.project,s.survey.partner,s.survey.lead,s.nextAction,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
+  return true;
+}
+const SORTS={updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
+function visibleSites(){return db.sites.filter(matchesF).sort(SORTS[sortKey][1]);}
+function filterText(){
+  const t=[];if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.blocked)t.push('Engelli');if(F.q)t.push('“'+F.q+'”');
+  return t.join(' · ');
 }
 function renderPipe(){
-  const counts=STATUSES.map(st=>({...st,n:db.sites.filter(s=>s.status===st.k).length}));
-  const total=db.sites.length;
-  $('pipe').innerHTML=total?counts.filter(c=>c.n).map(c=>`<button style="flex-grow:${c.n};background:${c.c}" data-status="${c.k}" aria-pressed="${filter===c.k}" title="${esc(c.t)}: ${c.n}"><b>${c.n}</b><span>${esc(c.t)}</span></button>`).join(''):'<div class="empty">Henüz Lokasyon Yok</div>';
-  let kw=0,dc=0;db.sites.forEach(s=>{const t=totals(s);kw+=t.kw;dc+=t.dcKw;});
-  const need=db.sites.reduce((a,s)=>a+totalFin(s),0);
-  const ok=db.sites.filter(s=>s.status==='onay');let okKw=0;ok.forEach(s=>okKw+=totals(s).kw);
+  const total=db.sites.length,open=db.sites.filter(isOpen),closed=db.sites.filter(s=>!isOpen(s));
+  const counts=STAGES.map(([k,t])=>({k,t,n:open.filter(s=>s.stage===k).length}));
+  $('pipe').innerHTML=total?counts.filter(c=>c.n).map(c=>`<button style="flex-grow:${Math.max(c.n,6)};background:var(--stg-${c.k})" data-stage="${c.k}" aria-pressed="${F.stage===c.k}" title="${esc(c.k+' '+c.t)}: ${c.n}"><b>${c.n}</b><span>${esc(c.k+' '+c.t)}</span></button>`).join('')+(closed.length?`<button style="flex-grow:6;background:var(--s-red)" data-closed="1" aria-pressed="false" title="Kapalı sahalar"><b>${closed.length}</b><span>Kapalı</span></button>`:''):'<div class="empty">Henüz Lokasyon Yok</div>';
+  const scored=open.map(s=>scoreOf(s).v).filter(v=>v!=null),avg=scored.length?scored.reduce((a,b)=>a+b,0)/scored.length:null;
+  const blocked=open.filter(s=>s.blocker||s.blockerTr).length,contracted=db.sites.filter(s=>s.stage>='06'&&isOpen(s)).length;
   const mk=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
-  $('pipeLegend').innerHTML=mk('Lokasyon',total,'')+mk('Toplam Kurulu Güç',nf.format(kw),'kW')+mk('DC Güç',nf.format(dc),'kW')+mk('Kredilendirilebilir',nf.format(okKw),'kW')+mk('Toplam Finansman',nf.format(need),'TL');
+  $('pipeLegend').innerHTML=mk('Toplam Lokasyon',total,'')+mk('Aktif',open.length,'')+mk('Ortalama Skor',avg==null?'—':df.format(avg),avg==null?'':'/100')+mk('Engelli Aktif',blocked,'')+mk('Sözleşme ve Sonrası',contracted,'');
 }
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
-function renderLocations(){
+function locRowsHtml(list){
+  return list.map(s=>{const st=statusOf(s.status),sc=scoreOf(s),bl=s.blocker||s.blockerTr||'';
+    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.city,typeLabel(s.type)].filter(Boolean).join(' · '))}</span></td>
+    <td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
+    <td class="num"><span class="amgscore ${sc.cls}">${sc.label}</span></td>
+    <td>${esc(s.survey.lead||'—')}${s.survey.partner?`<span class="p2">${esc(s.survey.partner)}</span>`:''}</td>
+    <td style="min-width:170px"><span class="p1" style="font-weight:500">${esc(s.nextAction||'—')}</span>${s.nextActionDate?`<span class="p2">${esc(fmtDate(s.nextActionDate))}</span>`:''}</td>
+    <td style="min-width:150px">${bl?`<span class="p2 bad" style="margin:0">${esc(bl)}</span>`:'<span class="p2" style="margin:0">—</span>'}</td>
+    <td class="num"><span class="p2" style="margin:0">${esc(fmtDate(s.updatedAt))}</span></td></tr>`;}).join('');
+}
+const fmtDate=v=>{if(!v)return '';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleDateString('tr-TR');};
+function paintLocRows(){
   const list=visibleSites();
-  const note=filter?`<div class="filter-note"><span>Filtre: ${esc(statusOf(filter).t)}</span><button id="clearFilter">Filtreyi kaldır</button></div>`:'';
+  $('locRows').innerHTML=list.length?locRowsHtml(list):'<tr><td colspan="8" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan lokasyon yok.</td></tr>';
+  $('locCount').textContent=list.length+' / '+db.sites.length+' lokasyon';
+  $('locClear').hidden=!hasFilter();
+}
+function renderLocations(){
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
-  const chev='<svg class="loc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
-  $('view').innerHTML=`<section class="box"><h3>Lokasyon Listesi<small>${list.length} lokasyon · Satıra tıklayarak detayı açın</small></h3>${note}
-    <div class="loclist" role="list">`+(list.length?`<div class="loc-head" aria-hidden="true"><span>Lokasyon</span><span>Durum</span><span>Ünite ve güç</span><span>AMG skoru</span><span></span></div>`+list.map(s=>{const t=totals(s),st=statusOf(s.status),d=amgScore(s);
-      return `<button type="button" role="listitem" class="loc-row ${s.id===activeId?'active':''}" data-id="${s.id}">
-        <span class="loc-name"><strong>${esc(s.name)}</strong><small>${esc([s.district,s.city].filter(Boolean).join(', ')||s.project||'')}</small></span>
-        <span class="loc-status"><span class="pill" style="--c:${st.c}">${esc(st.t)}</span></span>
-        <span class="loc-units">${t.dcUnits} DC · ${t.acUnits} AC · ${nf.format(t.kw)} kW</span>
-        <span class="loc-score"><span class="amg ${d.cls}">${d.done?'AMG '+d.label:'Skor yok'}</span></span>
-        ${chev}
-      </button>`;}).join(''):'<p class="note">Bu filtreye uyan lokasyon yok.</p>')+`</div></section>`;
+  const uniq=f=>[...new Set(db.sites.map(f).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'tr'));
+  const opt=(v,cur,t)=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(t??v)}</option>`;
+  const selF=(id,label,key,items)=>`<label class="lf">${label}<select data-lf="${key}" id="${id}"><option value="">Tümü</option>${items.map(([v,t])=>opt(v,F[key],t)).join('')}</select></label>`;
+  $('view').innerHTML=`<section class="box"><h3>Lokasyon Listesi<small id="locCount"></small></h3>
+    <div class="locbar no-print">
+      <label class="lf lq">Ara<input type="search" id="locQ" data-lf="q" value="${esc(F.q)}" placeholder="Ad, şehir, mal sahibi, ortak, sıradaki iş…" autocomplete="off"></label>
+      ${selF('lfStage','Aşama','stage',STAGES.map(([k,t])=>[k,k+' '+t]))}
+      ${selF('lfStatus','Durum','status',STATUSES.map(x=>[x.k,x.t]))}
+      ${selF('lfCity','Şehir','city',uniq(s=>s.city).map(x=>[x,x]))}
+      ${selF('lfType','Saha Tipi','type',TYPES.filter(t=>db.sites.some(s=>s.type===t[0])))}
+      ${selF('lfOwner','Sorumlu','owner',uniq(s=>s.survey.lead).map(x=>[x,x]))}
+      ${selF('lfPartner','Yerel Ortak','partner',uniq(s=>s.survey.partner).map(x=>[x,x]))}
+      <label class="lf lchk"><input type="checkbox" id="lfBlocked" data-lf="blocked" ${F.blocked?'checked':''}>Sadece Engelli</label>
+      <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
+      <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
+    </div>
+    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Güncelleme</th></tr></thead><tbody id="locRows"></tbody></table></div></section>`;
+  paintLocRows();
 }
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
@@ -878,15 +954,15 @@ function renderPortfolio(){
   const tot=(l,v)=>`<div class="total"><span>${l}</span><strong>${v}</strong></div>`;
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
   let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj Noktası',T.sock)}</div>`;
-  h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${filter?esc(statusOf(filter).t)+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
-    <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / Kullanılabilir</th><th class="num">İlk Yıl Hasılat TL</th><th>Finansman</th><th class="num">AMG Skoru</th><th>Karar</th></tr></thead><tbody>`+
-    list.map(s=>{const t=totals(s),d=amgScore(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v,sc=d.done?d.cls:'none';
+  h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
+    <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / Kullanılabilir</th><th class="num">İlk Yıl Hasılat TL</th><th>Finansman</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
+    list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v,sc=d.cls;
       return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.district,s.city].filter(Boolean).join(', '))||'&nbsp;'}</span></td><td><span class="p1">${esc(s.project)||'—'}</span>${s.survey.lead?`<span class="p2">Sorumlu: ${esc(s.survey.lead)}</span>`:''}</td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num"><span class="p1">${nf.format(t.dcKw)}</span></td><td class="num"><span class="p1">${nf.format(t.acKw)}</span></td><td class="num"><span class="p1">${t.sockets}</span></td>
       <td class="num" ${over?'title="Kurulu güç kullanılabilir gücü aşıyor"':''}><span class="p1" ${over?'style="color:var(--no)"':''}>${s.gridKva?nf.format(s.gridKva)+' kVA':'—'}</span>${+s.survey.availKw?`<span class="p2${over?' bad':''}">${nf.format(s.survey.availKw)} kW kullanılabilir</span>`:''}</td>
       <td class="num"><span class="p1">${nf.format(calculate(s)[0].revenue)}</span></td><td style="min-width:150px;max-width:210px"><span class="p1">${esc(structureLabel(s))}</span><span class="p2">${money(totalFin(s))}</span></td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
-      <td><span class="badge ${sc}">${esc(d.decLabel)}</span>${d.blockers.length?`<span class="p2 bad">Engel: ${esc(d.blockers.join(', '))}</span>`:''}</td></tr>`;}).join('')+
+      <td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td></tr>`;}).join('')+
     `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(T.dcKw)}</td><td class="num">${nf.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td class="num">${nf.format(rows[0].revenue)}</td><td>${money(list.reduce((a,s)=>a+totalFin(s),0))}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
@@ -902,7 +978,9 @@ function renderPortfolio(){
 function field(key,label,type='text',extra=''){
   const s=cur();return `<label${extra}>${label}<input data-f="${key}" type="${type}" value="${esc(s[key])}" ${type==='number'?'min="0" step="any" inputmode="decimal"':''}></label>`;
 }
+const BLANK_OK=new Set(['score','manHours','evseKw']);
 const cur=()=>db.sites.find(s=>s.id===activeId);
+function fxf(key,label,extra='',area=false){const v=cur().fx?.[key]??'';return area?`<label${extra}>${label}<textarea data-fx="${key}" rows="2">${esc(v)}</textarea></label>`:`<label${extra}>${label}<input data-fx="${key}" value="${esc(v)}"></label>`;}
 function leadField(){
   const v=cur().survey.lead||'',names=[...team];if(v&&!names.includes(v))names.push(v);
   return `<div class="leadcell"><label>Proje sorumlusu<select data-lead aria-label="Proje sorumlusu"><option value="">Seçin</option>${names.map((n,i)=>`<option value="${esc(n)}" ${n===v?'selected':''}>${i<team.length?(i+1)+'. ':''}${esc(n)}</option>`).join('')}<option value="__new">+ Yeni kişi ekle</option></select></label>
@@ -1004,29 +1082,57 @@ function renderSite(){
   const projects=[...new Set(db.sites.map(x=>x.project).filter(Boolean))];
   let h=`<div class="site-head"><div><h2 id="siteTitle">${esc(s.name)}</h2><p id="siteSub">${esc([s.project,s.district,s.city].filter(Boolean).join(', '))}</p></div>
   <div class="verdict">
-    <div class="vcell"><span>Durum</span><select data-f="status" aria-label="Durum">${STATUSES.map(st=>`<option value="${st.k}" ${st.k===s.status?'selected':''}>${esc(st.t)}</option>`).join('')}</select></div>
-    <div class="vcell"><span>AMG Skoru</span><strong id="vScore"></strong><small id="vDec" style="display:block;font-size:12px"></small></div>
+    <div class="vcell"><span>Aşama</span><strong id="vStage" style="font-size:15px"></strong></div>
+    <div class="vcell"><span>Durum</span><strong id="vStatus" style="font-size:15px"></strong></div>
+    <div class="vcell"><span>Skor</span><strong id="vScore"></strong><small id="vDec" style="display:block;font-size:12px"></small></div>
     <div class="vcell"><span>Toplam Güç</span><strong id="vKw"></strong></div>
   </div></div>
   <div id="ddAlerts"></div>
 
   <div class="edit-bar no-print ${siteEdit?'on':''}" id="editBar">${editBarHtml()}</div>
   <div class="viewbar subtabs no-print" role="tablist" aria-label="Lokasyon bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" data-sub="${k}" aria-pressed="${sub===k}">${t}</button>`).join('')}</div>
-   <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button><button class="ghost" id="delSite">Lokasyonu sil</button></span></h3>
+   <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button>${me.role==='admin'?'<button class="ghost" id="delSite">Lokasyonu sil</button>':''}</span></h3>
   <div class="grid">
     ${field('name','Lokasyon adı','text',' class="span2"')}
     <label class="span2">Proje / bölge<input data-f="project" list="projList" value="${esc(s.project)}"><datalist id="projList">${projects.map(p=>`<option value="${esc(p)}">`).join('')}</datalist></label>
     ${field('city','İl')}${field('district','İlçe')}
-    <label>Saha tipi<select data-f="type">${TYPES.map(t=>`<option ${t===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
+    <label>Saha tipi<select data-f="type">${TYPES.map(([k,t])=>`<option value="${esc(k)}" ${k===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
     ${field('contractYears','Sözleşme süresi (yıl)','number')}
     ${field('address','Adres','text',' class="span4"')}
     ${field('host','Yer sağlayıcı','text',' class="span2"')}
     ${field('contact','İletişim kişisi / telefon','text',' class="span2"')}
   </div></section>
 
+  <section class="box" data-tab="info"><h3>Takip ve Durum<small>Sıradaki iş, engel ve aşama bilgisi</small></h3>
+  <div class="grid">
+    <label>Aşama<select data-f="stage">${STAGES.map(([k,t])=>`<option value="${k}" ${k===s.stage?'selected':''}>${esc(k+' '+t)}</option>`).join('')}</select></label>
+    <label>Durum<select data-f="status">${STATUSES.map(st=>`<option value="${st.k}" ${st.k===s.status?'selected':''}>${esc(st.t)}</option>`).join('')}</select></label>
+    ${field('score','Skor (0–100)','number')}
+    ${leadField()}
+    ${field('nextAction','Sıradaki iş (Next Action)','text',' class="span3"')}${field('nextActionDate','Sıradaki iş tarihi','date')}
+    ${field('blocker','Engel / risk (kategori: sorun)','text',' class="span4"')}
+    ${field('statusTr','Son durum (TR, haftalık rapor)','text',' class="span4"')}
+    ${field('blockerTr','Engel (TR, haftalık rapor)','text',' class="span4"')}
+  </div><p class="note">Engel kategorileri: Contract, Technical, Site, Design, Permit, Commercial, Logistics. Skor: 85 ve üzeri yeşil, 75–84 turuncu, 75 altı kırmızı.</p></section>
+
+  <section class="box" data-tab="info"><h3>Feishu Alanları<small>Feishu ile aktarılan metinler</small></h3>
+  <details><summary>Süreç Sütunları</summary><div class="grid subgrid">
+    ${fxf('surveyHistory','Survey History',' class="span2"',true)}${fxf('nextSurvey','Next Survey',' class="span2"',true)}
+    ${fxf('presentation','Presentation',' class="span2"',true)}${fxf('proposal','Proposal | Contract',' class="span2"',true)}
+    ${fxf('blueprint','Blueprint')}${fxf('epc','EPC')}${fxf('logistics','Logistics')}${fxf('warehouse','Warehouse')}${fxf('construction','Construction',' class="span2"')}
+  </div></details>
+  <details><summary>Saha Detay Sütunları</summary><div class="grid subgrid">
+    ${sv('partner','Local Partner (yerel ortak)')}${field('needs','Customer Needs')}${field('cpoPartner','CPO Partner')}${field('siteFiles','Site Survey Files (link)')}
+    ${fxf('siteSize','Site Size | Boundary',' class="span2"')}${fxf('parking','Parking Spaces',' class="span2"')}
+    ${fxf('transformer','Transformer | Power',' class="span2"')}${fxf('distance','Distance | Cable Route',' class="span2"')}
+    ${fxf('meetingTariff','Meeting | Tariff',' class="span2"',true)}${fxf('competitor','Competitor Survey',' class="span2"',true)}
+    ${fxf('keyNotes','Key Survey Notes',' class="span4"',true)}
+    ${field('manHours','Total Man Hours','number')}${field('evseKw','EVSE Capacity (kW)','number')}${field('pvbess','PV & BESS Capacity')}${field('approvalDate','StarCharge Approval Date','date')}
+  </div></details></section>
+
   <section class="box" data-tab="infra"><h3>Saha Keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
   <details open><summary>Proje Bilgileri</summary><div class="grid subgrid">
-    ${leadField()}${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}${sv('partner','Yerel ortak')}
+    ${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}
     ${sv('gps','GPS / harita bağlantısı','text',' class="span2"')}${sv('phase','Hedef aşama / COD','text',' class="span2"')}
     ${chk('scope','Ana kapsam',' class="span4"')}
   </div><p class="note">Saha sahibi / mal sahibi, lokasyon bilgilerindeki “Yer sağlayıcı” alanıdır.</p></details>
@@ -1124,8 +1230,9 @@ function unitRow(u){
     <td><button class="ghost" data-del="${u.id}" aria-label="Üniteyi sil">Sil</button></td></tr>`;
 }
 function updateDerived(){
-  const s=cur();if(!s)return;const t=totals(s),d=amgScore(s);
-  $('vScore').textContent=d.label;$('vScore').className='score '+d.cls;$('vDec').textContent=d.decLabel;$('vDec').className='score '+d.cls;
+  const s=cur();if(!s)return;const t=totals(s),d=amgScore(s),sc=scoreOf(s);
+  $('vScore').textContent=sc.label;$('vScore').className='score '+sc.cls;$('vDec').textContent=sc.text;$('vDec').className='score '+sc.cls;
+  $('vStage').textContent=stageLabel(s.stage);$('vStatus').textContent=statusOf(s.status).t;
   $('amgTotal').textContent=d.done?d.label:'Puanlanmadı';$('amgTotal').className='score '+d.cls;
   $('amgDec').textContent=d.complete?'Karar: '+d.dec.t+' ('+d.dec.en+')':d.done?`${AMG.length-d.done} kriter daha puanlanınca karar gösterilir`:'Her kriteri 0 ile ağırlığı arasında puanlayın';
   AMG.forEach(c=>{const m=document.querySelector(`[data-meter="${c.k}"]`),raw=s.amg.scores[c.k],v=+raw;if(m)m.style.width=(raw!==''&&raw!=null&&Number.isFinite(v)?v/c.w*100:0)+'%';});
@@ -1144,17 +1251,14 @@ function updateDerived(){
   $('ddProgress').textContent=`${d.done}/${AMG.length} kriter puanlandı`;
   let a='';
   if(d.blockers.length)a+=`<div class="alert">Engel: ${esc(d.blockers.join(', '))} uygun değil.</div>`;
-  if(d.complete&&d.total<60)a+=`<div class="alert">AMG skoru ${d.total}/100; form kılavuzuna göre öncelik dışı.</div>`;
-  if(s.status==='sunuldu'||s.status==='onay'){
-    const miss=AMG.filter(c=>{const v=s.amg.scores[c.k];return v===''||v==null;}).map(c=>c.t);
-    if(miss.length)a+=`<div class="alert warn">Durum "${esc(statusOf(s.status).t)}" ama puanlanmamış AMG kriterleri var: ${esc(miss.join(', '))}.</div>`;
-  }
+  if(sc.v!=null&&sc.v<75&&isOpen(s))a+=`<div class="alert warn">Skor ${sc.label}; 75 altı. Sahayla devam edilip edilmeyeceği değerlendirilmeli.</div>`;
+  if(s.blocker&&isOpen(s))a+=`<div class="alert warn">Engel: ${esc(s.blocker)}</div>`;
   const todo=[];
   if(!s.units.length)todo.push('Şarj Üniteleri');
   if(!(+s.gridKva)&&!(+s.survey.availKw))todo.push('Altyapı & Güç');
   if(!totalFin(s))todo.push('Finansman');
   if(!d.done&&!Object.values(s.dd||{}).some(x=>x&&(x.v||x.note)))todo.push('Kontrol Listesi');
-  if(todo.length)a+=`<div class="alert warn">Girilmesi gereken bölümler: ${todo.map(esc).join(', ')}. Lütfen giriniz.</div>`;
+  if(todo.length&&s.stage>='03'&&isOpen(s))a+=`<div class="alert warn">Girilmesi gereken bölümler: ${todo.map(esc).join(', ')}. Lütfen giriniz.</div>`;
   if(shareTotal(s.fin)>100)a+=`<div class="alert">Gelir paylaşımı toplamı %100'ü aşıyor.</div>`;
   renderFin();
   $('ddAlerts').innerHTML=a;
@@ -1181,8 +1285,8 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
     address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
-$('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;guard(()=>{filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();});};
-$('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
+$('pipe').onclick=e=>{const b=e.target.closest('[data-stage],[data-closed]');if(!b)return;guard(()=>{const wasStage=b.dataset.stage&&F.stage===b.dataset.stage;F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};if(b.dataset.closed)F.status='ddfailed';else if(!wasStage)F.stage=b.dataset.stage;view='locations';render();window.scrollTo(0,0);});};
+$('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
   const s=cur();if(!s||view!=='site')return;
@@ -1205,13 +1309,21 @@ $('view').addEventListener('click',e=>{
   const del=e.target.closest('[data-del]');if(del){s.units=s.units.filter(u=>u.id!==del.dataset.del);touched(s);renderSite();return;}
   if(e.target.id==='delSite'){ask(s.name+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Lokasyonu sil').then(ok=>{if(!ok)return;
     exitEdit();removeSite(s);activeId=null;view='portfolio';render();toast('Lokasyon silindi.');});return;}
-  if(e.target.id==='dupSite'){const c=JSON.parse(JSON.stringify(s));c.id=uid();c.name=s.name+' (kopya)';c.units.forEach(u=>u.id=uid());c.status='aday';c.dd={};c.amg={scores:{},notes:{}};c.att={};c.sign={};c.createdAt=now();
+  if(e.target.id==='dupSite'){const c=JSON.parse(JSON.stringify(s));c.id=uid();c.name=s.name+' (kopya)';c.units.forEach(u=>u.id=uid());c.status='active';c.stage='01';c.dd={};c.amg={scores:{},notes:{}};c.att={};c.sign={};c.createdAt=now();
     db.sites.push(c);touched(c);guard(()=>{activeId=c.id;view='site';sub='info';render();startEdit();window.scrollTo({top:0});});toast('Lokasyon kopyalandı; kontrol listesi boş başlatıldı.');}
 });
+$('view').addEventListener('input',e=>{const el=e.target;if(view!=='locations'||!el.dataset.lf)return;F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();});
+$('view').addEventListener('change',e=>{const el=e.target;if(view!=='locations')return;
+  if(el.dataset.lf){F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();}
+  else if(el.id==='lfSort'){sortKey=el.value;paintLocRows();}});
+$('view').addEventListener('click',e=>{if(e.target.id==='locClear'){F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};renderLocations();}});
 $('view').addEventListener('keydown',e=>{if(e.target.id==='newLead'&&e.key==='Enter'){e.preventDefault();$('addLead').click();return;}const row=e.target.closest('[data-open]');if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSite(row.dataset.open);}});
 $('view').addEventListener('input',e=>{
   const s=cur();if(!s||view!=='site')return;const el=e.target;
-  if(el.dataset.f){let v=el.value;if(el.type==='number')v=Math.max(0,+v||0);s[el.dataset.f]=v;touched(s);updateDerived();return;}
+  if(el.dataset.f){const k=el.dataset.f;let v=el.value;
+    if(el.type==='number'){if(v===''&&BLANK_OK.has(k))v='';else{v=Math.max(0,+v||0);if(k==='score')v=Math.min(100,v);}}
+    s[k]=v;touched(s);updateDerived();return;}
+  if(el.dataset.fx){s.fx=s.fx||{};s.fx[el.dataset.fx]=el.value;touched(s);return;}
   if(el.dataset.fin){const k=el.dataset.fin,[lo,hi]=FIN_LIMITS[k],v=el.value.trim()===''?NaN:+el.value;
     if(!Number.isFinite(v)||v<lo||v>hi){el.setAttribute('aria-invalid','true');status('Hatalı giriş: '+lo+' ile '+nf.format(hi)+' arasında değer girin',true);return;}
     el.removeAttribute('aria-invalid');s.fin[k]=v;touched(s);updateDerived();return;}
@@ -1236,58 +1348,7 @@ $('view').addEventListener('input',e=>{
     if(el.dataset.uf==='kind')tr.className=v==='DC'?'kind-dc':'kind-ac';
     tr.querySelector('[data-utotal]').textContent=nf.format((+u.kw||0)*(+u.qty||0));touched(s);updateDerived();}
 });
-$('view').addEventListener('change',e=>{if(e.target.dataset.f==='status'){const s=cur();s.status=e.target.value;touched(s);updateDerived();}});
 
-/* ---------- demo data ---------- */
-function demoSites(){
-  let n=0;
-  const mk=(id,name,project,o)=>{
-    const s=blankSite(name,project);Object.assign(s,o.base);s.demo=true;s.id='demo-'+id;s.createdAt=new Date(Date.UTC(2026,9,1,9,0,++n)).toISOString();
-    s.units=o.units.map(u=>unit(...u));
-    s.amg.scores=Object.fromEntries(AMG.map((c,i)=>[c.k,o.amg[i]]));
-    s.amg.notes=o.amgNotes||{};
-    s.dd=o.dd||{};s.survey={...o.survey};
-    s.fin={...FIN_DEFAULT,...o.fin};
-    s.tranches=o.tr.map(([item,amount,fin,mode,term,rate,payer])=>({...tranche(item,fin,mode),amount,term,rate,payer}));
-    return s;
-  };
-  const ok={v:'ok'},risk={v:'risk'};
-  return [
-    mk('maslak','Maslak Plaza Otopark','Demo · İstanbul Avrupa',{
-      base:{city:'İstanbul',district:'Sarıyer',address:'Büyükdere Cd. No:120',type:'İş merkezi',host:'Maslak Plaza Yönetimi',contact:'0212 555 01 01',status:'onay',gridKva:1000,contractYears:10,notes:'Demo veri. Katlı otopark, 7/24 erişim.'},
-      units:[['DC',120,2,4,'StarCharge Lightning 120'],['AC',22,2,6,'AC Duvar Tipi 22']],
-      amg:[14,8,12,11,13,11,7,13],dd:{izin:ok,epdk:ok},
-      survey:{lead:'Alaattin Ersivri',availKw:700,parkTotal:420,cableM:35,date:'2026-09-12',tariff:'Ticarethane',serviceFee:'4,5',scope:['ev','pv'],access:['road','turn'],pave:['concrete'],lay:['tray'],pvpot:['carport'],exist:['light','cctv','fire','sec']},
-      fin:{share:20,entShare:30,starShare:30,ekoShare:20},
-      tr:[['Donanım',9600000,'star','share',5,0,'ent'],['Saha işleri (EPC)',1800000,'eko','loan',5,28,'ent']]}),
-    mk('gebze','Gebze OSB Lojistik','Demo · Kocaeli',{
-      base:{city:'Kocaeli',district:'Gebze',address:'OSB 3. Cadde',type:'Sanayi sitesi',host:'Anadolu Lojistik A.Ş.',contact:'0262 555 02 02',status:'sunuldu',gridKva:1600,contractYears:8,notes:'Demo veri. Tır park alanı, gece yoğun kullanım.'},
-      units:[['DC',180,2,3,'StarCharge Lightning 180'],['DC',60,2,4,'DC 60 kW']],
-      amg:[12,6,12,10,12,9,5,12],dd:{izin:ok,epdk:risk},
-      survey:{lead:'Hilmi Doğan',availKw:900,parkTotal:150,cableM:80,date:'2026-09-20',tariff:'Sanayi',serviceFee:'4,0',scope:['ev'],access:['road'],pave:['asphalt'],lay:['trench'],pvpot:['roof'],exist:['light','cctv']},
-      fin:{share:15,entShare:35,starShare:30,ekoShare:20},
-      tr:[['Donanım',11500000,'star','share',5,0,'ent'],['Şebeke bağlantısı',2200000,'ent','loan',6,30,'owner']]}),
-    mk('bodrum','Bodrum Marina Otel','Demo · Muğla',{
-      base:{city:'Muğla',district:'Bodrum',address:'Marina Cd. No:8',type:'Otel',host:'Marina Otel İşletmeleri',contact:'0252 555 03 03',status:'inceleme',gridKva:400,contractYears:7,notes:'Demo veri. Yaz sezonu yoğun, kış düşük kullanım.'},
-      units:[['DC',60,2,2,'DC 60 kW'],['AC',22,2,8,'AC Duvar Tipi 22']],
-      amg:[11,7,9,8,8,8,6,10],dd:{izin:risk,epdk:ok},
-      survey:{lead:'S. Furkan Keçe',availKw:180,parkTotal:90,cableM:50,date:'2026-10-02',scope:['ev','pvbessev'],access:['turn'],pave:['pavers'],lay:['duct'],pvpot:['carport'],exist:['light','sec']},
-      fin:{share:25,entShare:25,starShare:25,ekoShare:25},
-      tr:[['Donanım',4800000,'star','share',5,0,'ent']]}),
-    mk('ankara','Ankara Çayyolu AVM','Demo · Ankara',{
-      base:{city:'Ankara',district:'Çankaya',address:'Çayyolu Mah. 2. Sk.',type:'AVM',host:'Çayyolu AVM Yönetimi',contact:'0312 555 04 04',status:'aday',gridKva:800,contractYears:5,notes:'Demo veri. Kira şartları görüşülüyor.'},
-      units:[['DC',120,2,2,'StarCharge Lightning 120'],['AC',22,2,4,'AC Duvar Tipi 22']],
-      amg:[13,5,8,6,9,7,4,9],dd:{izin:risk,epdk:ok},
-      survey:{lead:'Alaattin Ersivri',availKw:300,parkTotal:600,cableM:60,date:'2026-10-10',scope:['ev'],access:['road','turn'],pave:['concrete'],lay:['tray','wall'],pvpot:['na'],exist:['light','cctv','sec']},
-      fin:{share:30,entShare:20,starShare:30,ekoShare:20},tr:[]}),
-    mk('konya','Konya Yol Üstü İstasyon','Demo · İç Anadolu',{
-      base:{city:'Konya',district:'Selçuklu',address:'Ankara Yolu 12. km',type:'Akaryakıt istasyonu',host:'Yol Petrol',contact:'0332 555 05 05',status:'red',gridKva:250,contractYears:5,notes:'Demo veri. Trafo yetersiz, yükseltme maliyeti yüksek.'},
-      units:[['DC',60,2,1,'DC 60 kW']],
-      amg:[8,3,6,5,3,4,2,6],dd:{izin:ok,epdk:{v:'no'}},
-      survey:{lead:'Hilmi Doğan',availKw:60,parkTotal:20,cableM:140,date:'2026-10-15',scope:['ev'],access:['road'],pave:['asphalt'],lay:['trench'],pvpot:['na'],exist:['light']},
-      fin:{share:20,entShare:0,starShare:40,ekoShare:40},tr:[]})
-  ];
-}
 /* ---------- sol navigasyon ---------- */
 let sub='ovw',fsub='ozet';
 const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yapısı'],['sonuc','Detaylı Sonuçlar']];
@@ -1327,14 +1388,8 @@ $('sbToggle').onclick=()=>setSidebar(!document.body.classList.contains('sb-colla
 try{if(localStorage.getItem('saha-sidebar')==='1')setSidebar(true);}catch(x){}
 try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');for(const g in st)if(st[g]){const el=document.querySelector(`.nav-group[data-group="${g}"]`);if(el){el.classList.add('collapsed');el.querySelector('.nav-head').setAttribute('aria-expanded','false');}}}catch(x){}
 
-function seedDemo(){
-  const K=KEY+':seeded';
-  try{if(localStorage.getItem(K))return;}catch(e){}
-  if(db.sites.length)return;
-  demoSites().forEach(x=>{db.sites.push(x);touched(x);});
-  try{localStorage.setItem(K,'1');}catch(e){}
-  render();
-}
+
+
 
 /* ---------- kullanıcı yönetimi (yalnızca yönetici) ---------- */
 let usersCache=null,usersMe='';
@@ -1412,7 +1467,7 @@ document.addEventListener('click',async e=>{
     const r=await fetch('/api/auth/me',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){$('whoami').textContent=d.email;$('whoami').title=d.email;$('whoami').hidden=false;}
-      if(d.role==='admin')$('adminGroup').hidden=false;}
+      me={email:d.email,role:d.role};if(d.role==='admin')$('adminGroup').hidden=false;if(view==='site')render();}
   }catch(e){/* çevrimdışı: yerel kayıtla devam */}
   document.documentElement.classList.remove('pending');
 })();

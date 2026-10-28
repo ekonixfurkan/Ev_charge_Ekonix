@@ -4,7 +4,8 @@ import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   try {
-    if (!(await requireAuth(req, res))) return;
+    const user = await requireAuth(req, res);
+    if (!user) return;
     await ensureSchema();
     const s = sql();
 
@@ -31,6 +32,8 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
+      // Excel'deki kural: kayıt silinmez, Durum ile kapatılır. Silme yalnızca yönetici.
+      if (user.role !== 'admin') return res.status(403).json({ error: 'Silme için yönetici yetkisi gerekli' });
       const id = req.query?.id;
       if (!id) return res.status(400).json({ error: 'id gerekli' });
       await s`DELETE FROM sites WHERE id = ${id}`;
