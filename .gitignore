@@ -5,3 +5,7 @@ node_modules
 !.env.example
 .DS_Store
 *.log
+
+# İş verisi içeren Excel dosyaları repoya girmesin
+*.xlsx
+*.xls
