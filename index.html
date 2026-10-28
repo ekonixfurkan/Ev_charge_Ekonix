@@ -359,6 +359,10 @@ main{padding:24px 28px}
 .fin-sub{margin-bottom:16px}
 .fin-sub button{white-space:nowrap}
 .fin-brief{margin-top:16px}
+.row-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.imp-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:14px 0}
+.imp-sum div{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--soft)}
+.imp-sum strong{display:block;font-size:22px}.imp-sum span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .locbar{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;margin:4px 0 16px}
 .locbar .lf{display:grid;gap:4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600;margin:0}
 .locbar .lf select,.locbar .lf input[type=search]{height:36px;font-size:13px;text-transform:none;letter-spacing:0;font-weight:400;min-width:130px}
@@ -366,7 +370,10 @@ main{padding:24px 28px}
 .locbar .lchk{display:flex;align-items:center;gap:6px;height:36px;text-transform:none;letter-spacing:0;font-weight:500;font-size:13px;color:var(--ink)}
 .locbar .lchk input{width:auto;min-height:0;height:auto}
 .loctbl td{cursor:pointer}
-.loctbl th,.loctbl td{padding:12px 8px}.loctbl tr.closed td{opacity:.6}
+.loctbl th,.loctbl td{padding:12px 8px}
+.loctbl .p1,.loctbl td{font-size:13px}
+.loctbl td:nth-child(6){max-width:230px}
+.loctbl td:nth-child(7){max-width:210px}.loctbl tr.closed td{opacity:.6}
 .badge.stg{display:inline-flex;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
 .subtabs{max-width:100%;overflow-x:auto;margin-bottom:16px}
 .subtabs button{white-space:nowrap}
@@ -500,7 +507,7 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
       </section>
       <section class="nav-group" data-group="admin" id="adminGroup" hidden>
         <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button><button type="button" class="nav-item" data-nav="feishu"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Excel / Feishu Aktarımı</span></button></div>
       </section>
     </nav>
     <div class="sb-user"><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
@@ -931,17 +938,17 @@ function renderLocations(){
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Güncelleme</th></tr></thead><tbody id="locRows"></tbody></table></div></section>`;
+    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div></section>`;
   paintLocRows();
 }
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='feishu')?'':sub;
   $('view').dataset.fsub=fsub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='users';
-  if(view==='users')renderUsers();
+  document.querySelector('.pipeline').hidden=view==='users'||view==='feishu';
+  if(view==='users')renderUsers();else if(view==='feishu')renderFeishu();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
 }
 
@@ -1355,7 +1362,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Kontrol Listesi']];
 function paintNav(){
-  const key=view==='users'?'users':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='feishu'?'feishu':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -1374,6 +1381,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     if(PORT_SUBS.includes(k)){view='portfolio';sub=k;render();window.scrollTo(0,0);}
     else if(k==='list'){view='locations';render();window.scrollTo(0,0);}
     else if(k==='users'){view='users';render();window.scrollTo(0,0);}
+    else if(k==='feishu'){view='feishu';render();window.scrollTo(0,0);}
     else if(SITE_SUBS.includes(k))goSite(k);
   });
 });
@@ -1459,6 +1467,143 @@ document.addEventListener('click',async e=>{
     }
     renderUsers();
   }catch(x){toast(x.message);b.disabled=false;}
+});
+
+/* ---------- Excel / Feishu aktarımı (yalnızca yönetici) ---------- */
+let xlsxP=null;
+function loadXlsx(){
+  if(window.XLSX)return Promise.resolve(window.XLSX);
+  return xlsxP??=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    sc.onload=()=>res(window.XLSX);sc.onerror=()=>{xlsxP=null;rej(new Error('Excel kütüphanesi yüklenemedi. İnternet bağlantısını kontrol edin.'));};document.head.appendChild(sc);});
+}
+// Başlık (küçük harf) -> alan. Hem Excel takip dosyası (Sites + SiteDetails) hem Feishu dışa aktarımı hem bizim dışa aktarımımız okunur.
+const IMPORT_MAP={'project name':'name','next action':'nextAction','total score':'score','blocker | concern | risk':'blocker','survey history':'fx.surveyHistory','next survey':'fx.nextSurvey','presentation':'fx.presentation','proposal | contract':'fx.proposal','blueprint':'fx.blueprint','epc':'fx.epc','logistics':'fx.logistics','warehouse':'fx.warehouse','construction':'fx.construction',
+  'province | city':'city','city':'city','property type':'type','site owner | landlord':'host','local partner':'survey.partner','customer needs':'needs','site size | boundary':'fx.siteSize','parking spaces':'fx.parking','transformer | power':'fx.transformer','distance | cable route':'fx.distance','meeting | tariff':'fx.meetingTariff','competitor survey':'fx.competitor','key survey notes':'fx.keyNotes','site survey files':'siteFiles','total man hours':'manHours',
+  'ekonix owner':'survey.lead','stage (aşama)':'stage','status':'status','next action date':'nextActionDate','last updated':'updatedAt','son durum (tr)':'statusTr','engel (tr)':'blockerTr','evse capacity (kw)':'evseKw','pv & bess capacity':'pvbess','starcharge approval date':'approvalDate','cpo partner':'cpoPartner'};
+const STATUS_IN={'':'active','active':'active','aktif':'active','on hold':'hold','beklemede':'hold','live':'live','kuruldu':'live','dd failed':'ddfailed','uygun değil':'ddfailed','lost':'lost','kaybedildi':'lost','cancelled':'cancelled','iptal':'cancelled'};
+const isoDate=v=>{if(v==null||v==='')return '';
+  if(v instanceof Date)return isNaN(v)?'':new Date(Date.UTC(v.getFullYear(),v.getMonth(),v.getDate())).toISOString().slice(0,10);
+  const m=String(v).trim().match(/^(\d{1,2})[.\/](\d{1,2})[.\/](\d{4})$/);if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  const d=new Date(v);return isNaN(d)?'':d.toISOString().slice(0,10);};
+const numOrBlank=v=>{if(v===''||v==null)return '';const n=+String(v).replace(',','.');return Number.isFinite(n)?n:'';};
+function convertIn(key,v){
+  if(v==null)return '';
+  if(key==='score'||key==='manHours'||key==='evseKw')return numOrBlank(v);
+  if(key==='nextActionDate'||key==='approvalDate')return isoDate(v);
+  if(key==='updatedAt'){const d=isoDate(v);return d?d+'T12:00:00.000Z':'';}
+  if(key==='stage'){const m=String(v).trim().match(/^(\d{1,2})/);const k=m?m[1].padStart(2,'0'):'';return STAGES.some(x=>x[0]===k)?k:'';}
+  if(key==='status')return STATUS_IN[String(v).trim().toLowerCase()]??'active';
+  if(key==='type'){const t=String(v).trim();const hit=TYPES.find(x=>x[0].toLowerCase()===t.toLowerCase()||x[1].toLowerCase()===t.toLowerCase());return hit?hit[0]:(t?'Other':'');}
+  return String(v).replace(/\s+$/,'').replace(/^\s+/,'');
+}
+// Çalışma kitabını okuyup { rows: Map(norm ad -> alanlar), warns, sheets } döndürür.
+function parseWorkbook(XL,buf){
+  const wb=XL.read(buf,{type:'array',cellDates:true});
+  const rows=new Map(),warns=[],used=[];let skipped=0;
+  for(const name of wb.SheetNames){
+    const aoa=XL.utils.sheet_to_json(wb.Sheets[name],{header:1,raw:true,defval:null,blankrows:false});
+    const hi=aoa.findIndex(r=>r&&r.some(c=>String(c??'').trim().toLowerCase()==='project name'));
+    if(hi<0)continue;
+    const cols=[];aoa[hi].forEach((h,i)=>{const key=IMPORT_MAP[String(h??'').trim().toLowerCase()];if(key)cols.push([i,key]);});
+    // Kullanım Rehberi, Contracts gibi sayfalar da “Project Name” içerir; en az 5 tanınan sütun yoksa saha tablosu sayılmaz.
+    if(!cols.some(c=>c[1]==='name')||cols.length<5)continue;
+    used.push(name);
+    for(const r of aoa.slice(hi+1)){
+      const o={};let any=false;
+      for(const [i,key] of cols){const v=convertIn(key,r[i]);o[key]=v;if(key!=='name'&&v!=='')any=true;}
+      const nm=(o.name||'').trim();if(!nm){continue;}
+      if(/\(example\)/i.test(nm)){skipped++;continue;}
+      const nk=norm(nm),cur=rows.get(nk);
+      if(!cur)rows.set(nk,{...o,name:nm,_sheet:name});
+      else{
+        if(cur._sheet===name){warns.push('Mükerrer satır atlandı: '+nm);continue;}
+        for(const [k,v] of Object.entries(o))if(v!==''&&(cur[k]===''||cur[k]==null))cur[k]=v;
+      }
+    }
+  }
+  return {rows,warns,used,skipped};
+}
+function planImport(parsed){
+  const byName=new Map(db.sites.map(s=>[norm(s.name),s]));
+  let add=0,upd=0;const items=[];
+  for(const [nk,o] of parsed.rows){const ex=byName.get(nk);items.push({o,ex});ex?upd++:add++;}
+  return {items,add,upd};
+}
+function applyFields(site,o){
+  for(const [k,v] of Object.entries(o)){
+    if(k==='_sheet'||k==='name'||v===''||v==null)continue;
+    if(k==='updatedAt')continue;
+    setPath(site,k,v);
+  }
+}
+async function runImport(plan,parsed){
+  const base=Date.now();let i=0;
+  for(const {o,ex} of plan.items){
+    let site=ex;
+    if(!site){site=blankSite(o.name,'');site.createdAt=new Date(base+i).toISOString();db.sites.push(site);}
+    applyFields(site,o);
+    if(!site.stage)site.stage='01';
+    migrateSite(site);
+    site.updatedAt=o.updatedAt||now();
+    if(site.survey.lead)addTeamMember(site.survey.lead);
+    queue(site.id,'save');i++;
+  }
+  db.sites.sort(byCreated);
+}
+function exportRows(){
+  const f=['Project Name','Next Action','Total Score','Blocker | Concern | Risk','Survey History','Next Survey','Presentation','Proposal | Contract','Blueprint','EPC','Logistics','Warehouse','Construction','Province | City','Property Type','Site Owner | Landlord','Local Partner','Customer Needs','Site Size | Boundary','Parking Spaces','Transformer | Power','Distance | Cable Route','Meeting | Tariff','Competitor Survey','Key Survey Notes','Site Survey Files','Total Man Hours'];
+  const feishu=[f,...db.sites.map(s=>FEISHU.map(([,p])=>{const v=getPath(s,p);return v==null?'':v;}))];
+  const eh=['Project Name','EKONIX Owner','Stage (Aşama)','Status','Next Action Date','Last Updated','Son Durum (TR)','Engel (TR)','EVSE Capacity (kW)','PV & BESS Capacity','StarCharge Approval Date','CPO Partner'];
+  const ekonix=[eh,...db.sites.map(s=>[s.name,s.survey.lead||'',stageLabel(s.stage),statusOf(s.status).en,s.nextActionDate||'',s.updatedAt?String(s.updatedAt).slice(0,10):'',s.statusTr||'',s.blockerTr||'',s.evseKw,s.pvbess||'',s.approvalDate||'',s.cpoPartner||''])];
+  return {feishu,ekonix};
+}
+async function renderFeishu(){
+  const demo=db.sites.filter(s=>s.demo).length;
+  $('view').innerHTML=`<section class="box"><h3>Excel'den İçe Aktar<small>Takip dosyası (Sites + SiteDetails) veya Feishu dışa aktarımı</small></h3>
+    <p class="note">.xlsx dosyasını seçin. Saha adı eşleşirse mevcut kayıt güncellenir, yoksa yeni kayıt açılır. Boş hücreler mevcut değeri silmez. “(Example)” satırları ve mükerrer adlar atlanır. Önce bir önizleme gösterilir, onaylamadan hiçbir şey kaydedilmez.</p>
+    <div class="row-actions"><input type="file" id="impFile" accept=".xlsx,.xls,.csv"><span class="note" id="impMsg" role="status"></span></div>
+    <div id="impPreview"></div></section>
+  <section class="box"><h3>Feishu'ya ve Excel'e Aktar<small>${db.sites.length} lokasyon</small></h3>
+    <p class="note">İndirilen dosyada iki sayfa vardır: <b>Feishu</b> (27 sütun, Feishu sırasıyla; Feishu tablosuna yapıştırılır) ve <b>EKONIX</b> (aşama, durum, sorumlu, tarihler). Aynı dosya tekrar içe aktarılabilir.</p>
+    <div class="row-actions"><button type="button" class="primary" id="expXlsx">Excel Olarak İndir (.xlsx)</button><button type="button" id="expJson">Tam Yedek (JSON)</button></div></section>
+  ${demo?`<section class="box"><h3>Demo Kayıtları<small>${demo} kayıt</small></h3><p class="note">Önceki denemelerden kalan örnek lokasyonlar. Gerçek veriyi aktarmadan önce silebilirsiniz; kendi kayıtlarınıza dokunulmaz.</p><div class="row-actions"><button type="button" class="danger" id="delDemo">Demo Kayıtlarını Sil</button></div></section>`:''}`;
+}
+document.addEventListener('change',async e=>{
+  if(e.target.id!=='impFile')return;
+  const f=e.target.files[0];if(!f)return;
+  const msg=$('impMsg');msg.textContent='Okunuyor…';$('impPreview').innerHTML='';
+  try{
+    const XL=await loadXlsx(),parsed=parseWorkbook(XL,await f.arrayBuffer());
+    if(!parsed.used.length){msg.textContent='Dosyada “Project Name” başlıklı bir tablo bulunamadı.';return;}
+    const plan=planImport(parsed);window._plan={plan,parsed};
+    msg.textContent='';
+    const sample=plan.items.slice(0,8).map(({o,ex})=>`<tr><td>${esc(o.name)}</td><td>${ex?'Güncellenecek':'Yeni'}</td><td>${o.stage?esc(stageLabel(o.stage)):'—'}</td><td>${o.score===''||o.score==null?'—':esc(o.score)}</td><td>${esc(o['survey.lead']||'—')}</td></tr>`).join('');
+    $('impPreview').innerHTML=`<div class="imp-sum"><div><strong>${plan.items.length}</strong><span>Okunan Saha</span></div><div><strong>${plan.add}</strong><span>Yeni</span></div><div><strong>${plan.upd}</strong><span>Güncellenecek</span></div><div><strong>${parsed.skipped}</strong><span>Atlanan (Example)</span></div></div>
+      <p class="note">Okunan sayfalar: ${esc(parsed.used.join(', '))}.${parsed.warns.length?' Uyarılar: '+esc(parsed.warns.slice(0,5).join('; '))+(parsed.warns.length>5?' …':''):''}</p>
+      <div class="scroll"><table class="yearly"><thead><tr><th>Saha</th><th>İşlem</th><th>Aşama</th><th class="num">Skor</th><th>Sorumlu</th></tr></thead><tbody>${sample}</tbody></table></div>
+      <p class="note">İlk ${Math.min(8,plan.items.length)} satır gösteriliyor.</p>
+      <div class="row-actions"><button type="button" class="primary" id="impGo">${plan.items.length} Saha İçe Aktar</button></div>`;
+  }catch(err){msg.textContent='Hata: '+err.message;}
+});
+document.addEventListener('click',async e=>{
+  const id=e.target.id;
+  if(id==='impGo'){
+    const {plan,parsed}=window._plan||{};if(!plan)return;
+    e.target.disabled=true;await runImport(plan,parsed);window._plan=null;
+    toast(plan.items.length+' saha aktarıldı ('+plan.add+' yeni, '+plan.upd+' güncelleme).');
+    view='locations';F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};render();
+  }else if(id==='expXlsx'){
+    try{const XL=await loadXlsx(),{feishu,ekonix}=exportRows(),wb=XL.utils.book_new();
+      XL.utils.book_append_sheet(wb,XL.utils.aoa_to_sheet(feishu),'Feishu');XL.utils.book_append_sheet(wb,XL.utils.aoa_to_sheet(ekonix),'EKONIX');
+      XL.writeFile(wb,'EKONIX_Saha_Takip_'+new Date().toISOString().slice(0,10)+'.xlsx');}catch(err){toast(err.message);}
+  }else if(id==='expJson'){
+    const url=URL.createObjectURL(new Blob([JSON.stringify({...db,team,exportedAt:now()},null,2)],{type:'application/json'}));
+    const a=document.createElement('a');a.href=url;a.download='EKONIX_Yedek_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
+  }else if(id==='delDemo'){
+    const d=db.sites.filter(s=>s.demo);
+    if(!await ask(d.length+' demo kayıt silinsin mi? Bu geri alınamaz.','Demoyu Sil'))return;
+    d.forEach(removeSite);toast('Demo kayıtları silindi.');renderFeishu();
+  }
 });
 
 /* ---------- oturum ---------- */
