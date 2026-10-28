@@ -1558,15 +1558,13 @@ function exportRows(){
   return {feishu,ekonix};
 }
 async function renderFeishu(){
-  const demo=db.sites.filter(s=>s.demo).length;
   $('view').innerHTML=`<section class="box"><h3>Excel'den İçe Aktar<small>Takip dosyası (Sites + SiteDetails) veya Feishu dışa aktarımı</small></h3>
     <p class="note">.xlsx dosyasını seçin. Saha adı eşleşirse mevcut kayıt güncellenir, yoksa yeni kayıt açılır. Boş hücreler mevcut değeri silmez. “(Example)” satırları ve mükerrer adlar atlanır. Önce bir önizleme gösterilir, onaylamadan hiçbir şey kaydedilmez.</p>
     <div class="row-actions"><input type="file" id="impFile" accept=".xlsx,.xls,.csv"><span class="note" id="impMsg" role="status"></span></div>
     <div id="impPreview"></div></section>
   <section class="box"><h3>Feishu'ya ve Excel'e Aktar<small>${db.sites.length} lokasyon</small></h3>
     <p class="note">İndirilen dosyada iki sayfa vardır: <b>Feishu</b> (27 sütun, Feishu sırasıyla; Feishu tablosuna yapıştırılır) ve <b>EKONIX</b> (aşama, durum, sorumlu, tarihler). Aynı dosya tekrar içe aktarılabilir.</p>
-    <div class="row-actions"><button type="button" class="primary" id="expXlsx">Excel Olarak İndir (.xlsx)</button><button type="button" id="expJson">Tam Yedek (JSON)</button></div></section>
-  ${demo?`<section class="box"><h3>Demo Kayıtları<small>${demo} kayıt</small></h3><p class="note">Önceki denemelerden kalan örnek lokasyonlar. Gerçek veriyi aktarmadan önce silebilirsiniz; kendi kayıtlarınıza dokunulmaz.</p><div class="row-actions"><button type="button" class="danger" id="delDemo">Demo Kayıtlarını Sil</button></div></section>`:''}`;
+    <div class="row-actions"><button type="button" class="primary" id="expXlsx">Excel Olarak İndir (.xlsx)</button><button type="button" id="expJson">Tam Yedek (JSON)</button></div></section>`;
 }
 document.addEventListener('change',async e=>{
   if(e.target.id!=='impFile')return;
@@ -1599,10 +1597,6 @@ document.addEventListener('click',async e=>{
   }else if(id==='expJson'){
     const url=URL.createObjectURL(new Blob([JSON.stringify({...db,team,exportedAt:now()},null,2)],{type:'application/json'}));
     const a=document.createElement('a');a.href=url;a.download='EKONIX_Yedek_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
-  }else if(id==='delDemo'){
-    const d=db.sites.filter(s=>s.demo);
-    if(!await ask(d.length+' demo kayıt silinsin mi? Bu geri alınamaz.','Demoyu Sil'))return;
-    d.forEach(removeSite);toast('Demo kayıtları silindi.');renderFeishu();
   }
 });
 
