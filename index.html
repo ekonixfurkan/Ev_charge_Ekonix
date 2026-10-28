@@ -350,7 +350,14 @@ main{padding:24px 28px}
   #view[data-sub="infra"] [data-tab]:not([data-tab="infra"]),
   #view[data-sub="credit"] [data-tab]:not([data-tab="credit"]),
   #view[data-sub="check"] [data-tab]:not([data-tab="check"]){display:none}
+  #view[data-fsub="ozet"] [data-fsub]:not([data-fsub="ozet"]),
+  #view[data-fsub="gelir"] [data-fsub]:not([data-fsub="gelir"]),
+  #view[data-fsub="yapi"] [data-fsub]:not([data-fsub="yapi"]),
+  #view[data-fsub="sonuc"] [data-fsub]:not([data-fsub="sonuc"]){display:none}
 }
+.fin-sub{margin-bottom:16px}
+.fin-sub button{white-space:nowrap}
+.fin-brief{margin-top:16px}
 .subtabs{max-width:100%;overflow-x:auto;margin-bottom:16px}
 .subtabs button{white-space:nowrap}
 /* Lokasyon listesi görünümü */
@@ -708,13 +715,14 @@ function yearlyTable(rows,ds){
   const sum=k=>R.reduce((t,r)=>t+r[k],0);
   return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar TL. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
 }
-function resultsHtml(rows,f,s,tf){
+function resultsHtml(rows,f,s,tf,mode='all'){
   const k=(l,val,sub)=>`<div class="kpi"><span>${l}</span><strong>${val}</strong><small>${sub}</small></div>`,dmin=minAll(f.P);
-  return `<div class="kpis">${k('İlk Yıl Enerji',nf.format(rows[0].energy)+' kWh','%'+df.format(rows[0].u)+' kullanım')}${k('İlk Yıl Hasılat',money(rows[0].revenue),'Elektrik sonrası '+money(rows[0].margin))}${k('Toplam Finansman',money(tf),tf?'StarCharge %'+df.format(f.P.star.invest/tf*100):'Tutar girilmedi')}${k('En Düşük DSCR',`<span class="score ${dscrClass(dmin)}">${fmtD(dmin)}</span>`,dmin==null?'Kredi kalemi yok':'Kredi taksidi karşılama')}${k(YEARS+' Yıl Yer Sağlayıcı',money(rows.reduce((a,r)=>a+r.owner,0)),'Elektrik sonrası taban')}</div>
-  <h4 class="subh">Taraflara Göre Getiri</h4>${partyTable(f.P,s)}
-  <h4 class="subh">Kümülatif Nakit</h4>${chartSvg(f.P,s)}
+  const kpis=`<div class="kpis">${k('İlk Yıl Enerji',nf.format(rows[0].energy)+' kWh','%'+df.format(rows[0].u)+' kullanım')}${k('İlk Yıl Hasılat',money(rows[0].revenue),'Elektrik sonrası '+money(rows[0].margin))}${k('Toplam Finansman',money(tf),tf?'StarCharge %'+df.format(f.P.star.invest/tf*100):'Tutar girilmedi')}${k('En Düşük DSCR',`<span class="score ${dscrClass(dmin)}">${fmtD(dmin)}</span>`,dmin==null?'Kredi kalemi yok':'Kredi taksidi karşılama')}${k(YEARS+' Yıl Yer Sağlayıcı',money(rows.reduce((a,r)=>a+r.owner,0)),'Elektrik sonrası taban')}</div>`,
+  party=`<h4 class="subh">Taraflara Göre Getiri</h4>${partyTable(f.P,s)}`,
+  detail=`<h4 class="subh">Kümülatif Nakit</h4>${chartSvg(f.P,s)}
   ${f.loans.length?'<h4 class="subh">Kredi Kalemleri</h4>'+loanTable(f.loans,!s):''}
   <h4 class="subh">Yıllık Sonuçlar</h4>${yearlyTable(rows,f.ds)}`;
+  return mode==='kpi'?kpis+party:mode==='detail'?detail:kpis+party+detail;
 }
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
@@ -854,6 +862,7 @@ function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
   $('view').dataset.sub=(view==='locations'||view==='users')?'':sub;
+  $('view').dataset.fsub=fsub;
   renderPipe();paintNav();
   document.querySelector('.pipeline').hidden=view==='users';
   if(view==='users')renderUsers();
@@ -935,11 +944,12 @@ function renderFin(){
   document.querySelectorAll('#trBody [data-t]').forEach(tr=>{const x=s.tranches.find(q=>q.id===tr.dataset.t);tr.querySelector('[data-tpay]').textContent=x&&x.mode==='loan'&&+x.amount?nf.format(annuity(x)):'—';});
   $('finSummary').textContent=structureLabel(s)+', toplam '+money(tf);
   $('finAlerts').innerHTML=finWarnings(s,f).map(([l,x])=>`<div class="alert${l==='warn'?' warn':''}">${esc(x)}</div>`).join('');
-  if(bad){$('finResults').innerHTML='<div class="alert">Pay toplamı %100\'ü aştığı için sonuçlar hesaplanmıyor.</div>';return;}
-  if(!totals(s).kw){$('finResults').innerHTML='<p class="note">Ünite girilince sonuçlar burada görünür.</p>';return;}
-  $('finResults').innerHTML=resultsHtml(rows,f,s,tf);
+  const put=h=>{$('finKpis').innerHTML=h;$('finResults').innerHTML=h;};
+  if(bad){put('<div class="alert">Pay toplamı %100\'ü aştığı için sonuçlar hesaplanmıyor.</div>');return;}
+  if(!totals(s).kw){put('<p class="note">Ünite girilince sonuçlar burada görünür.</p>');return;}
+  $('finKpis').innerHTML=resultsHtml(rows,f,s,tf,'kpi');
+  $('finResults').innerHTML=resultsHtml(rows,f,s,tf,'detail');
 }
-
 /* ---------- okuma / düzenleme modu ---------- */
 let siteEdit=false,editSnap=null,editDirty=false;
 const ICON_EDIT='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
@@ -1046,7 +1056,10 @@ function renderSite(){
     <div class="capnote" id="capnote"></div>
   </div></section>
 
-  <section class="box" data-tab="credit"><h3>Gelir Modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
+  <div class="viewbar subtabs fin-sub no-print" data-tab="credit" role="tablist" aria-label="Finansman bölümleri">${FIN_TABS.map(([k,t])=>`<button type="button" data-fs="${k}" aria-pressed="${fsub===k}">${t}</button>`).join('')}</div>
+  <section class="box" data-tab="credit" data-fsub="ozet"><h3>Finansman Özeti<small>${YEARS} yıl, nominal TL</small></h3><div id="finKpis"></div></section>
+
+  <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
   <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO (Entegre) payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
   <div class="shareinfo" id="shareStatus"></div>
   <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','TL/kWh')}${finField('cost','Elektrik maliyeti','TL/kWh')}</div>
@@ -1055,7 +1068,7 @@ function renderSite(){
     <p class="note">Komisyon ve işletme gideri Co-CPO payından düşülür. Varsayılan fiyatlar örnektir, tarife teklifi değildir.</p>
   </details></section>
 
-  <section class="box" data-tab="credit"><h3>Finansman Yapısı<small id="finSummary"></small></h3>
+  <section class="box" data-tab="credit" data-fsub="yapi"><h3>Finansman Yapısı<small id="finSummary"></small></h3>
   <div class="presets no-print"><span class="note">Hazır yapı:</span><button data-preset="star">Tamamı StarCharge (AMG)</button><button data-preset="split">Donanım StarCharge, saha işleri Co-CPO</button><button data-preset="loan">Saha işleri dış fon kredisi</button></div>
   <div class="scroll"><table class="units tranches"><thead><tr><th>Kalem</th><th class="num">Tutar TL</th><th>Finansör</th><th>Geri Dönüş</th><th class="num">Vade Yıl</th><th class="num">Faiz %</th><th>Geri Ödeyen</th><th class="num">Yıllık Taksit</th><th></th></tr></thead><tbody id="trBody"></tbody></table></div>
   <datalist id="itemList">${ITEMS.map(i=>`<option value="${esc(i)}">`).join('')}</datalist>
@@ -1068,7 +1081,7 @@ function renderSite(){
     <button id="applyAll">Uygula</button></div>
   </section>
 
-  <section class="box" data-tab="credit"><h3>Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
+  <section class="box" data-tab="credit" data-fsub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
 
   <section class="box" data-tab="check"><h3>Skorlama ve Yeterlilik<small id="ddProgress"></small></h3>
   <div class="scoretotal"><strong id="amgTotal"></strong><span id="amgDec"></span></div>
@@ -1169,7 +1182,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('pipe').onclick=e=>{const b=e.target.closest('[data-status]');if(!b)return;guard(()=>{filter=filter===b.dataset.status?null:b.dataset.status;view='portfolio';sub='ovw';render();});};
-$('view').addEventListener('click',e=>{const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
+$('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}if(e.target.id==='clearFilter'){filter=null;render();return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
   const s=cur();if(!s||view!=='site')return;
@@ -1276,7 +1289,8 @@ function demoSites(){
   ];
 }
 /* ---------- sol navigasyon ---------- */
-let sub='ovw';
+let sub='ovw',fsub='ozet';
+const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yapısı'],['sonuc','Detaylı Sonuçlar']];
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Kontrol Listesi']];
 function paintNav(){
