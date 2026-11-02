@@ -261,6 +261,7 @@ header p{color:var(--muted);font-size:14px;line-height:1.5;margin:4px 0 0;max-wi
 /* KPI kartları + durum çubuğu */
 .pipeline{background:var(--bg);color:var(--ink);padding:20px 28px 4px;display:flex;flex-direction:column}
 .pipe-legend{order:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;margin:0 0 16px;color:var(--ink)}
+.site-tabs{order:3;align-self:flex-start;margin:12px 0 0}
 .pipe{order:2;height:44px;border-radius:var(--radius);background:var(--soft);border:1px solid var(--line)}
 .pipe button{font-weight:500}
 .pipe button[aria-pressed=true]{box-shadow:inset 0 -4px 0 rgba(255,255,255,.85)}
@@ -491,6 +492,7 @@ button.danger{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,trans
 <section class="pipeline" aria-label="Lokasyonların durum dağılımı">
   <div class="pipe" id="pipe"></div>
   <div class="pipe-legend" id="pipeLegend"></div>
+  <div class="viewbar subtabs site-tabs no-print" id="siteTabs" role="tablist" aria-label="Lokasyon bölümleri" hidden></div>
 </section>
 
 <div class="shell">
@@ -941,6 +943,11 @@ function renderLocations(){
     <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div></section>`;
   paintLocRows();
 }
+function paintSiteTabs(){
+  const el=$('siteTabs'),on=view==='site'&&!!db.sites.find(s=>s.id===activeId);
+  el.hidden=!on;
+  el.innerHTML=on?SITE_TABS.map(([k,t])=>`<button type="button" role="tab" data-sub="${k}" aria-pressed="${sub===k}" aria-selected="${sub===k}">${t}</button>`).join(''):'';
+}
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
@@ -948,6 +955,7 @@ function render(){
   $('view').dataset.fsub=fsub;
   renderPipe();paintNav();
   document.querySelector('.pipeline').hidden=view==='users'||view==='feishu';
+  paintSiteTabs();
   if(view==='users')renderUsers();else if(view==='feishu')renderFeishu();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
 }
@@ -1097,7 +1105,6 @@ function renderSite(){
   <div id="ddAlerts"></div>
 
   <div class="edit-bar no-print ${siteEdit?'on':''}" id="editBar">${editBarHtml()}</div>
-  <div class="viewbar subtabs no-print" role="tablist" aria-label="Lokasyon bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" data-sub="${k}" aria-pressed="${sub===k}">${t}</button>`).join('')}</div>
    <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button>${me.role==='admin'?'<button class="ghost" id="delSite">Lokasyonu sil</button>':''}</span></h3>
   <div class="grid">
     ${field('name','Lokasyon adı','text',' class="span2"')}
@@ -1293,6 +1300,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('pipe').onclick=e=>{const b=e.target.closest('[data-stage],[data-closed]');if(!b)return;guard(()=>{const wasStage=b.dataset.stage&&F.stage===b.dataset.stage;F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};if(b.dataset.closed)F.status='ddfailed';else if(!wasStage)F.stage=b.dataset.stage;view='locations';render();window.scrollTo(0,0);});};
+$('siteTabs').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');if(!b||view!=='site')return;sub=b.dataset.sub;render();window.scrollTo(0,0);});
 $('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
