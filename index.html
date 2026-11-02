@@ -185,7 +185,9 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
   #view[data-fsub="ozet"] [data-fsub]:not([data-fsub="ozet"]),
   #view[data-fsub="gelir"] [data-fsub]:not([data-fsub="gelir"]),
   #view[data-fsub="yapi"] [data-fsub]:not([data-fsub="yapi"]),
-  #view[data-fsub="sonuc"] [data-fsub]:not([data-fsub="sonuc"]){display:none}
+  #view[data-fsub="sonuc"] [data-fsub]:not([data-fsub="sonuc"]),
+  #view[data-psub="ozet"] [data-psub]:not([data-psub="ozet"]),
+  #view[data-psub="sonuc"] [data-psub]:not([data-psub="sonuc"]){display:none}
 }
 .nav-group[hidden],.pipeline[hidden]{display:none}
 
@@ -883,7 +885,7 @@ function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
   $('view').dataset.sub=(view==='locations'||view==='users'||view==='feishu')?'':sub;
-  $('view').dataset.fsub=fsub;
+  $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
   document.querySelector('.pipeline').hidden=view==='users'||view==='feishu';
   paintSiteTabs();
@@ -912,12 +914,13 @@ function renderPortfolio(){
     `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(T.dcKw)}</td><td class="num">${nf.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td class="num">${nf.format(rows[0].revenue)}</td><td>${money(list.reduce((a,s)=>a+totalFin(s),0))}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
-    h+=`<section class="box" data-tab="port"><h3>Gelir ve Finansman, Portföy Toplamı<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>
-    ${invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:''}
-    ${valid.length?resultsHtml(vrows,f,null,tf):''}</section>`;
+    const warn=invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:'';
+    h+=`<div class="viewbar subtabs fin-sub no-print" data-tab="port" role="tablist" aria-label="Portföy bölümleri">${PORT_TABS.map(([k,t])=>`<button type="button" data-ps="${k}" aria-pressed="${psub===k}">${t}</button>`).join('')}</div>
+    <section class="box" data-tab="port" data-psub="ozet"><h3>Portföy Özeti<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'kpi'):''}</section>
+    <section class="box" data-tab="port" data-psub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'detail'):''}</section>`;
   }
-  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Hesaplama Esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
-  h+=`<details class="box" data-tab="port"><summary style="cursor:pointer;font-weight:600">Skor Nasıl Hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
+  h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Hesaplama Esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
+  h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Skor Nasıl Hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
   $('view').innerHTML=h;
 }
 
@@ -1232,7 +1235,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('pipe').onclick=e=>{const b=e.target.closest('[data-stage],[data-closed]');if(!b)return;guard(()=>{const wasStage=b.dataset.stage&&F.stage===b.dataset.stage;F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};if(b.dataset.closed)F.status='ddfailed';else if(!wasStage)F.stage=b.dataset.stage;view='locations';render();window.scrollTo(0,0);});};
 $('siteTabs').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');if(!b||view!=='site')return;sub=b.dataset.sub;render();window.scrollTo(0,0);});
-$('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
+$('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const pb=e.target.closest('.fin-sub [data-ps]');if(pb){psub=pb.dataset.ps;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
   const s=cur();if(!s||view!=='site')return;
@@ -1296,7 +1299,8 @@ $('view').addEventListener('input',e=>{
 });
 
 /* ---------- sol navigasyon ---------- */
-let sub='ovw',fsub='ozet';
+let sub='ovw',fsub='ozet',psub='ozet';
+const PORT_TABS=[['ozet','Özet'],['sonuc','Detaylı Sonuçlar ve Notlar']];
 const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yapısı'],['sonuc','Detaylı Sonuçlar']];
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Kontrol Listesi']];
