@@ -951,10 +951,19 @@ function amgScore(s){
 }
 // Skor: Skor Hesaplama sekmesindeki 8 kriterin tamamı puanlanınca toplam puan skor olur (kilitli).
 // Henüz hesaplanmamış eski kayıtlarda (ör. Excel'den gelen) kayıtlı skor olduğu gibi gösterilir.
+// Excel kuralı: hesaplanan skor 75'in altındaysa saha DD Failed (Uygun Değil) ile kapatılır; skor 75'e çıkarsa Aktif'e döner.
+// Yalnızca durum Aktif iken ve yalnızca Skor Hesaplama değişince çalışır; elle verilen durum bozulmaz.
 function syncScore(s){
   const d=amgScore(s);
-  if(d.complete){s.score=d.total;s.scoreSrc='amg';}
-  else if(s.scoreSrc==='amg'){s.score='';s.scoreSrc='';}
+  if(d.complete){
+    s.score=d.total;s.scoreSrc='amg';
+    if(d.total<SCORE_MID&&s.status==='active'){s.status='ddfailed';s.autoClosed=true;toast('Skor '+d.total+' (75 altı): durum otomatik "Uygun Değil" yapıldı.');}
+    else if(d.total>=SCORE_MID&&s.autoClosed&&s.status==='ddfailed'){s.status='active';s.autoClosed=false;toast('Skor '+d.total+': durum tekrar "Aktif" oldu.');}
+  }
+  else if(s.scoreSrc==='amg'){
+    s.score='';s.scoreSrc='';
+    if(s.autoClosed&&s.status==='ddfailed'){s.status='active';s.autoClosed=false;}
+  }
   const b=$('scoreBox');if(b&&s===cur())b.value=scoreOf(s).label;
 }
 const capRef=s=>{const a=+s.survey?.availKw||0;return a>0?{v:a,u:'kW kullanılabilir'}:(+s.gridKva>0?{v:+s.gridKva,u:'kVA trafo'}:null);};
@@ -1383,7 +1392,8 @@ function updateDerived(){
   $('ddProgress').textContent=`${d.done}/${AMG.length} kriter puanlandı`;
   let a='';
   if(d.blockers.length)a+=`<div class="alert">Engel: ${esc(d.blockers.join(', '))} uygun değil.</div>`;
-  if(sc.v!=null&&sc.v<75&&isOpen(s))a+=`<div class="alert warn">Skor ${sc.label}; 75 altı. Sahayla devam edilip edilmeyeceği değerlendirilmeli.</div>`;
+  if(s.autoClosed&&s.status==='ddfailed')a+=`<div class="alert warn">Skor ${sc.label} (75 altı) olduğu için durum otomatik “Uygun Değil” yapıldı. Skor 75’e çıkarsa Aktif’e döner; Durum’u elle de değiştirebilirsiniz.</div>`;
+  else if(sc.v!=null&&sc.v<75&&isOpen(s))a+=`<div class="alert warn">Skor ${sc.label}; 75 altı. Sahayla devam edilip edilmeyeceği değerlendirilmeli.</div>`;
   if((s.blockerTr||s.blocker)&&isOpen(s))a+=`<div class="alert warn">Engel: ${esc(s.blockerTr||s.blocker)}</div>`;
   const todo=[];
   if(!s.units.length)todo.push('Şarj Üniteleri');
@@ -1457,6 +1467,7 @@ $('view').addEventListener('input',e=>{
     if(el.type==='number'){if(v===''&&BLANK_OK.has(k))v='';else{v=Math.max(0,+v||0);if(k==='score')v=Math.min(100,v);}}
     s[k]=v;
     if(k==='contractBase'||k==='contractExt'){const t=contractTotal(s);s.contractYears=t===''?0:+t;$('ctTotal').value=t;}
+    if(k==='status')s.autoClosed=false;
     if(k==='stage'){s.nextAction=nextStageOf(s);const nb=$('nextActionBox');if(nb)nb.value=s.nextAction;}
     if(k==='blockerTr')s.blocker='';
     if(k==='city'){s.district='';const d=document.querySelector('[data-f="district"]');if(d){d.innerHTML=ilceOptions(v,'');d.disabled=!siteEdit||!v;}}
