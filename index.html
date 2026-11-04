@@ -377,6 +377,8 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 .u-tbl .role-sel{width:auto;min-height:0;padding:5px 8px;font-size:12.5px}
 .u-tbl .acts button{padding:5px 9px;font-size:12.5px;min-height:0}
 .u-tbl tr.off td{opacity:.55}
+.u-h3r{display:flex;align-items:center;gap:14px}
+.u-btns{display:flex;gap:8px;align-items:center}
 .u-tbl .name-in{font-weight:600;min-height:30px;padding:4px 8px;margin:0 0 2px -8px;width:calc(100% + 8px);border-color:transparent;background:transparent}
 .u-tbl .name-in:hover{border-color:var(--hair-strong)}
 .u-tbl .name-in:focus{background:var(--card)}
@@ -1369,21 +1371,25 @@ async function renderUsers(){
         <button type="button" data-act="active" ${lock?'disabled':''}>${u.active?'Pasifleştir':'Aktifleştir'}</button>
         <button type="button" data-act="del" class="danger" ${lock?'disabled':''}>Sil</button>
       </div></td></tr>`;}).join('');
-  $('view').innerHTML=`<section class="box"><h3>Yeni Kullanıcı Ekle<small>Hesabı yönetici açar; kendi kendine kayıt yok</small></h3>
+  $('view').innerHTML=`<section class="box" id="uNewBox" hidden><h3>Yeni Kullanıcı Ekle<small>Hesabı yönetici açar; kendi kendine kayıt yok</small></h3>
     <form id="uForm" class="u-form" autocomplete="off">
       <label>Ad soyad<input id="uName" required maxlength="120"></label>
       <label>E-posta<input id="uEmail" type="email" required maxlength="254"></label>
       <label>Şifre (en az 8)<span class="pw"><input id="uPass" type="text" required minlength="8" maxlength="200" autocomplete="new-password"><button type="button" id="uGen">Üret</button></span></label>
       <label>Rol<select id="uRole"><option value="user">Kullanıcı</option><option value="admin">Yönetici</option></select></label>
-      <button type="submit" class="primary">Kullanıcıyı ekle</button>
+      <span class="u-btns"><button type="submit" class="primary">Kullanıcıyı Ekle</button><button type="button" id="uCancel" class="ghost">Vazgeç</button></span>
     </form><p class="u-msg" id="uMsg" role="status"></p>
     <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
-    <section class="box"><h3>Kayıtlı Kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
     const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
     try{await userApi('POST',body);toast('Kullanıcı eklendi: '+body.email.trim().toLowerCase());renderUsers();}catch(x){userMsg(x.message,true);}};
 }
+document.addEventListener('click',e=>{
+  if(e.target.closest('#uNew')){const b=$('uNewBox');b.hidden=!b.hidden;if(!b.hidden){$('uName').focus();b.scrollIntoView({block:'nearest'});}}
+  else if(e.target.id==='uCancel'){$('uForm').reset();userMsg('');$('uNewBox').hidden=true;}
+});
 document.addEventListener('change',async e=>{
   const nm=e.target.closest('.u-tbl .name-in');
   if(nm){try{await userApi('PATCH',{email:nm.dataset.nm,name:nm.value});toast('Ad güncellendi.');renderUsers();}catch(x){toast(x.message);}return;}
