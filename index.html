@@ -86,23 +86,18 @@ label > input[type=checkbox],label > input[type=radio]{margin-top:0}
 /* ---------- Sayfa başlığı ---------- */
 header{background:var(--card);color:var(--ink);border-bottom:1px solid var(--hair);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
 header h1{font-size:20px;font-weight:700}
-#saveStatus{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;color:var(--ok);background:var(--ok-soft);border:1.5px solid currentColor}
-#saveStatus::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
-#saveStatus.err{color:var(--no);background:var(--no-soft)}
+#saveStatus{display:flex;align-items:flex-start;gap:8px;margin:0 4px 10px;padding:7px 10px;border-radius:var(--radius);font-size:11.5px;line-height:1.35;font-weight:600;color:#7fe0a8;background:rgba(95,193,135,.12);border:1px solid rgba(127,224,168,.45)}
+#saveStatus::before{content:"";width:7px;height:7px;margin-top:4px;border-radius:50%;background:currentColor;flex:none}
+#saveStatus.err{color:#ffb0a6;background:rgba(236,122,108,.14);border-color:rgba(255,176,166,.5)}
 #saveStatus.err::before{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}
 @keyframes pulse{50%{opacity:.35}}
 @media (prefers-reduced-motion:reduce){#saveStatus.err::before{animation:none}}
 
 /* ---------- Üst özet: KPI + aşama çubuğu + sekmeler ---------- */
-.pipeline{background:var(--paper);padding:20px 28px 4px;display:flex;flex-direction:column}
-.pipe-legend{order:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:0 0 14px}
-.pipe{order:2;display:flex;height:40px;border-radius:var(--radius);overflow:hidden;background:var(--soft);border:1px solid var(--hair);gap:1px}
+.pipeline{background:var(--paper);padding:20px 28px 14px;display:flex;flex-direction:column}
+.pipe-legend,.totals{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:0}
+.totals{margin-bottom:16px}
 .site-tabs{order:3;align-self:stretch;margin:14px 0 0}
-.pipe button{border:0;border-radius:0;padding:0 12px;display:flex;align-items:center;gap:8px;color:#fff;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;min-width:0;transition:flex-grow .3s ease}
-.pipe button:hover{filter:brightness(1.08)}
-.pipe button b{font-size:16px}
-.pipe button[aria-pressed=true]{box-shadow:inset 0 -4px 0 rgba(255,255,255,.9)}
-.pipe .empty{color:var(--muted);padding:0 12px;display:flex;align-items:center;font-size:13px}
 .mk{background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:12px 16px}
 .mk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .mk strong{display:block;margin-top:3px;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -111,6 +106,7 @@ header h1{font-size:20px;font-weight:700}
 /* ---------- Gövde düzeni + sol menü ---------- */
 .shell{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:calc(100vh - 170px)}
 main{padding:24px 28px;max-width:none;width:100%}
+body[data-page="ovw"] main{padding-top:0}
 @media (min-width:701px){
   body{display:grid;grid-template-columns:256px minmax(0,1fr);grid-template-rows:auto auto 1fr;min-height:100vh}
   .shell{display:contents}
@@ -129,6 +125,8 @@ main{padding:24px 28px;max-width:none;width:100%}
   .sb-collapsed .nav-group+.nav-group{border-top:1px solid rgba(255,255,255,.1);margin-top:6px;padding-top:6px}
   .sb-collapsed .nav-item{justify-content:center;gap:0;padding:12px 0;margin:2px 8px 0;width:calc(100% - 16px);position:relative}
   .sb-collapsed .nav-item span,.sb-collapsed .logout span,.sb-collapsed .whoami{display:none}
+  .sb-collapsed #saveStatus{font-size:0;padding:8px 0;justify-content:center;margin:0 8px 10px}
+  .sb-collapsed #saveStatus::before{margin-top:0}
   .sb-collapsed .logout{justify-content:center;gap:0;padding:12px 0;position:relative}
   .sb-collapsed .logout::after,.sb-collapsed .nav-item::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);white-space:nowrap;padding:6px 10px;border-radius:var(--radius);background:var(--side-d);color:var(--side-ink);font-size:12px;font-weight:500;border:1px solid rgba(255,255,255,.18);opacity:0;pointer-events:none;transition:opacity .15s}
   .sb-collapsed .logout:hover::after,.sb-collapsed .logout:focus-visible::after,.sb-collapsed .nav-item:hover::after,.sb-collapsed .nav-item:focus-visible::after{opacity:1}
@@ -372,8 +370,11 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 /* ---------- Kullanıcı yönetimi ve aktarım ---------- */
 .u-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end;margin-bottom:6px}
 .u-form .pw{display:flex;gap:6px}
-.u-tbl td,.u-tbl th{padding:9px 8px;text-align:left;vertical-align:middle}
-.u-tbl .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.u-tbl td,.u-tbl th{padding:9px 6px;text-align:left;vertical-align:middle}
+.u-tbl td{white-space:nowrap}
+.u-tbl td:first-child{min-width:190px;white-space:normal}
+.u-tbl td:first-child small{display:block;margin-top:1px}
+.u-tbl .acts{display:flex;gap:6px;flex-wrap:nowrap;justify-content:flex-end;align-items:center}
 .u-tbl .role-sel{width:auto;min-height:0;padding:5px 8px;font-size:12.5px}
 .u-tbl .acts button{padding:5px 9px;font-size:12.5px;min-height:0}
 .u-tbl tr.off td{opacity:.55}
@@ -393,12 +394,12 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   .grid,.grid.g5{grid-template-columns:repeat(2,minmax(0,1fr))}
   .totals{grid-template-columns:repeat(3,minmax(0,1fr))}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .pipe-legend{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pipe-legend,.totals{grid-template-columns:repeat(3,minmax(0,1fr))}
   .shell{grid-template-columns:240px minmax(0,1fr)}
 }
 @media (max-width:700px){
   header{padding:16px 14px}.pipeline{padding:16px 14px 4px}
-  .pipe-legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .pipe-legend,.totals{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .mk{padding:10px 12px}.mk strong{font-size:18px}
   .shell{display:block}
   aside{position:static;height:auto;overflow:visible}
@@ -407,12 +408,10 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   .dd-row,.amg-row{grid-template-columns:1fr}
   fieldset.chks.span2{grid-column:1/-1}
   .verdict{width:100%}.vcell{flex:1;min-width:0}
-  .pipe button span{display:none}
   .emptystate{padding:36px 16px}
   #dlg .dgrid{grid-template-columns:1fr}
 }
-@media (prefers-reduced-motion:reduce){.pipe button{transition:none}}
-@media print{
+@media (prefers-reduced-motion:reduce){@media print{
   header,.pipeline{background:none;color:#000}
   aside,.viewbar,.unit-actions,#toast,.no-print,button.ghost{display:none!important}
   body{display:block}.shell{display:block}main{max-width:none;padding:0}
@@ -423,10 +422,8 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   <div>
     <h1>Saha Değerlendirme</h1>
   </div>
-  <div id="saveStatus" role="status">Yükleniyor…</div>
 </header>
 <section class="pipeline" aria-label="Lokasyonların durum dağılımı">
-  <div class="pipe" id="pipe"></div>
   <div class="pipe-legend" id="pipeLegend"></div>
   <div class="viewbar subtabs site-tabs no-print" id="siteTabs" role="tablist" aria-label="Lokasyon bölümleri" hidden></div>
 </section>
@@ -448,7 +445,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
         <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button><button type="button" class="nav-item" data-nav="activity"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>İşlem Geçmişi</span></button></div>
       </section>
     </nav>
-    <div class="sb-user"><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
+    <div class="sb-user"><div id="saveStatus" role="status">Yükleniyor…</div><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
   </aside>
   <main>
     <div id="view"></div>
@@ -829,9 +826,7 @@ function filterText(){
   return t.join(' · ');
 }
 function renderPipe(){
-  const total=db.sites.length,open=db.sites.filter(isOpen),closed=db.sites.filter(s=>!isOpen(s));
-  const counts=STAGES.map(([k,t])=>({k,t,n:open.filter(s=>s.stage===k).length}));
-  $('pipe').innerHTML=total?counts.filter(c=>c.n).map(c=>`<button style="flex-grow:${Math.max(c.n,6)};background:var(--stg-${c.k})" data-stage="${c.k}" aria-pressed="${F.stage===c.k}" title="${esc(c.k+' '+c.t)}: ${c.n}"><b>${c.n}</b><span>${esc(c.k+' '+c.t)}</span></button>`).join('')+(closed.length?`<button style="flex-grow:6;background:var(--s-red)" data-closed="1" aria-pressed="false" title="Kapalı sahalar"><b>${closed.length}</b><span>Kapalı</span></button>`:''):'<div class="empty">Henüz Lokasyon Yok</div>';
+  const total=db.sites.length,open=db.sites.filter(isOpen);
   const scored=open.map(s=>scoreOf(s).v).filter(v=>v!=null),avg=scored.length?scored.reduce((a,b)=>a+b,0)/scored.length:null;
   const blocked=open.filter(s=>s.blocker||s.blockerTr).length,contracted=db.sites.filter(s=>s.stage>='06'&&isOpen(s)).length;
   const mk=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
@@ -885,6 +880,7 @@ function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
   $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity')?'':sub;
+  document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
   document.querySelector('.pipeline').hidden=view==='users'||view==='activity';
@@ -899,9 +895,9 @@ function renderPortfolio(){
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
   let T={dcU:0,acU:0,dcKw:0,acKw:0,sock:0};
   list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
-  const tot=(l,v)=>`<div class="total"><span>${l}</span><strong>${v}</strong></div>`;
+  const tot=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
-  let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw)+' kW')}${tot('Şarj Noktası',T.sock)}</div>`;
+  let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div>`;
   h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
     <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / Kullanılabilir</th><th class="num">İlk Yıl Hasılat TL</th><th>Finansman</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v,sc=d.cls;
@@ -1233,7 +1229,6 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
     address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
-$('pipe').onclick=e=>{const b=e.target.closest('[data-stage],[data-closed]');if(!b)return;guard(()=>{const wasStage=b.dataset.stage&&F.stage===b.dataset.stage;F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};if(b.dataset.closed)F.status='ddfailed';else if(!wasStage)F.stage=b.dataset.stage;view='locations';render();window.scrollTo(0,0);});};
 $('siteTabs').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');if(!b||view!=='site')return;sub=b.dataset.sub;render();window.scrollTo(0,0);});
 $('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const pb=e.target.closest('.fin-sub [data-ps]');if(pb){psub=pb.dataset.ps;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
@@ -1361,7 +1356,8 @@ async function renderUsers(){
   if(view!=='users')return;
   usersCache=d.users;usersMe=d.me;
   const rows=d.users.map(u=>{const self=u.email===d.me,lock=self||(u.owner&&!d.owner);
-    return `<tr class="${u.active?'':'off'}"><td><input class="name-in" data-nm="${esc(u.email)}" value="${esc(u.name||'')}" placeholder="Ad soyad ekle" maxlength="120" aria-label="Ad soyad" ${lock&&!self?'disabled':''}><small style="color:var(--muted)">${esc(u.email)}${self?' · (siz)':''}${u.owner?' · Sahip':''}</small></td>
+    return `<tr class="${u.active?'':'off'}"><td><input class="name-in" data-nm="${esc(u.email)}" value="${esc(u.name||'')}" placeholder="Ad soyad ekle" maxlength="120" aria-label="Ad soyad" ${lock&&!self?'disabled':''}>${self||u.owner?`<small style="color:var(--muted)">${[self?'Siz':'',u.owner?'Sahip':''].filter(Boolean).join(' · ')}</small>`:''}</td>
+      <td style="white-space:nowrap">${esc(u.email)}</td>
       <td><span class="pill" style="--c:${u.active?'var(--ok)':'var(--muted)'}">${u.active?'Aktif':'Pasif'}</span></td>
       <td>${fmtDt(u.lastLogin)}</td>
       ${d.owner?`<td>${fmtDt(u.passChangedAt||u.createdAt)}</td>`:''}
@@ -1380,7 +1376,7 @@ async function renderUsers(){
       <span class="u-btns"><button type="submit" class="primary">Kullanıcıyı Ekle</button><button type="button" id="uCancel" class="ghost">Vazgeç</button></span>
     </form><p class="u-msg" id="uMsg" role="status"></p>
     <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
-    <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
     const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
