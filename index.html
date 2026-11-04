@@ -221,6 +221,8 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .box summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink2)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .grid.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+/* Lokasyon Bilgileri: dar, iki sütunlu form; tek kalan alan yarım genişlikte, yanı boş kalır */
+.grid.infogrid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:760px}
 .span2{grid-column:span 2}.span3{grid-column:span 3}.span4{grid-column:1/-1}
 .subgrid{margin-top:14px}
 .subh{font-size:11.5px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em;margin:22px 0 8px}
@@ -490,14 +492,15 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
     <p class="dsub">Temel bilgileri girin. Üniteler, altyapı ve finansman detayı kayıttan sonra lokasyon sayfasında doldurulur.</p>
     <div class="dgrid">
       <label class="span2">Lokasyon adı *<input id="dlgName" required maxlength="120" autocomplete="off"></label>
+      <label>İletişim kişisi<input id="dlgContact" maxlength="120" autocomplete="off"></label>
+      <label>Telefon<input id="dlgPhone" type="tel" maxlength="40" autocomplete="off"></label>
+      <label>Saha tipi<select id="dlgType"><option value="Hotel">Otel</option><option value="Hospital">Hastane</option><option value="Mall">AVM</option><option value="Office">Ofis</option><option value="Industry Zone">Sanayi Sitesi</option><option value="Residence">Konut</option><option value="Commercial Center">Ticari Merkez</option><option value="Car Inspection Center">Araç Muayene İstasyonu</option><option value="Carpark">Otopark</option><option value="High School">Lise</option><option value="University">Üniversite</option><option value="Gym & Restaurant">Spor Salonu ve Restoran</option><option value="Fuel Station">Akaryakıt İstasyonu</option><option value="Logistics Center">Lojistik Merkezi</option><option value="Other">Diğer</option></select></label>
+      <label>Sözleşme süresi (yıl)<input id="dlgYears" type="number" min="0" max="99" step="1" inputmode="numeric"></label>
       <label>İl<input id="dlgCity" maxlength="60" list="cityList" autocomplete="off"></label>
       <datalist id="cityList"><option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Aksaray"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Ardahan"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bartın"><option value="Batman"><option value="Bayburt"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Düzce"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkâri"><option value="Hatay"><option value="Iğdır"><option value="Isparta"><option value="İstanbul"><option value="İzmir"><option value="Kahramanmaraş"><option value="Karabük"><option value="Karaman"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kilis"><option value="Kırıkkale"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Mardin"><option value="Mersin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Osmaniye"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Şanlıurfa"><option value="Şırnak"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Uşak"><option value="Van"><option value="Yalova"><option value="Yozgat"><option value="Zonguldak"></datalist>
       <label>İlçe<input id="dlgDistrict" maxlength="60" autocomplete="off"></label>
-      <label>Saha tipi<select id="dlgType"><option value="Hotel">Otel</option><option value="Hospital">Hastane</option><option value="Mall">AVM</option><option value="Office">Ofis</option><option value="Industry Zone">Sanayi Sitesi</option><option value="Residence">Konut</option><option value="Commercial Center">Ticari Merkez</option><option value="Car Inspection Center">Araç Muayene İstasyonu</option><option value="Carpark">Otopark</option><option value="High School">Lise</option><option value="University">Üniversite</option><option value="Gym & Restaurant">Spor Salonu ve Restoran</option><option value="Fuel Station">Akaryakıt İstasyonu</option><option value="Logistics Center">Lojistik Merkezi</option><option value="Other">Diğer</option></select></label>
-      <label>Sözleşme süresi (yıl)<input id="dlgYears" type="number" min="0" max="99" step="1" inputmode="numeric"></label>
       <label class="span2">Adres<textarea id="dlgAddress" rows="2" maxlength="300"></textarea></label>
       <label>Yer sağlayıcı<input id="dlgHost" maxlength="120" autocomplete="off"></label>
-      <label>İletişim kişisi / telefon<input id="dlgContact" maxlength="120" autocomplete="off"></label>
       <label class="span2">Genel notlar<textarea id="dlgNotes" rows="3" maxlength="2000"></textarea></label>
     </div>
     <div class="row">
@@ -722,7 +725,7 @@ function resultsHtml(rows,f,s,tf,mode='all'){
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
 function blankSite(name){
-  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',
+  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',phone:'',
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
@@ -735,7 +738,7 @@ function migrateSite(s){
   if(!STAGES.some(x=>x[0]===s.stage))s.stage='01';
   if(!STATUSES.some(x=>x.k===s.status))s.status='active';
   if(OLD_TYPE[s.type])s.type=OLD_TYPE[s.type];else if(s.type&&!TYPES.some(x=>x[0]===s.type))s.type='Other';
-  for(const k of ['nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
+  for(const k of ['phone','nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
   if(s.score==null||!Number.isFinite(+s.score)||s.score==='')s.score='';
   s.fx=s.fx||{};
   s.fin={...FIN_DEFAULT,...(s.fin||{})};s.units=Array.isArray(s.units)?s.units:[];s.dd=s.dd||{};
@@ -1069,14 +1072,14 @@ function renderSite(){
   <div id="ddAlerts"></div>
 
    <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button>${me.role==='admin'?'<button class="ghost" id="delSite">Lokasyonu sil</button>':''}</span></h3>
-  <div class="grid">
+  <div class="grid infogrid">
     ${field('name','Lokasyon adı','text',' class="span4"')}
-    ${field('city','İl')}${field('district','İlçe')}
+    ${field('contact','İletişim kişisi')}${field('phone','Telefon','tel')}
     <label>Saha tipi<select data-f="type">${TYPES.map(([k,t])=>`<option value="${esc(k)}" ${k===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
     ${field('contractYears','Sözleşme süresi (yıl)','number')}
+    ${field('city','İl')}${field('district','İlçe')}
     ${field('address','Adres','text',' class="span4"')}
-    ${field('host','Yer sağlayıcı','text',' class="span2"')}
-    ${field('contact','İletişim kişisi / telefon','text',' class="span2"')}
+    ${field('host','Yer sağlayıcı')}
   </div></section>
 
   <section class="box" data-tab="info"><h3>Takip ve Durum<small>Sıradaki iş, engel ve aşama bilgisi</small></h3>
@@ -1256,7 +1259,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   if(!name){toast('Lokasyon adı zorunlu.');return;}
   const s=blankSite(name);
   Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractYears:Math.max(0,Math.round(+$('dlgYears').value||0)),
-    address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),notes:v('dlgNotes')});
+    address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),phone:v('dlgPhone'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const pb=e.target.closest('.fin-sub [data-ps]');if(pb){psub=pb.dataset.ps;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
