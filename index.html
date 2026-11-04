@@ -100,8 +100,15 @@ header h1{font-size:20px;font-weight:700}
 
 /* ---------- Üst özet: KPI + aşama çubuğu + sekmeler ---------- */
 .pipeline{max-width:calc(var(--wrap) + 56px);background:var(--paper);padding:20px 28px 14px;display:flex;flex-direction:column}
-.pipe-legend,.totals{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:0}
-.totals{margin-bottom:16px}
+.pipe-legend{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:0}
+.ovw-grid{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px;align-items:start}
+.ovw-grid .box{margin-bottom:0}
+.kpi-col{display:grid;gap:12px;align-content:start}
+.ovwtbl{width:100%}
+/* Sayı ve durum sütunları içeriği kadar yer tutar; artan genişliği Lokasyon, Aşama ve Sorumlu alır. */
+.ovwtbl th:nth-child(n+3),.ovwtbl td:nth-child(n+3){white-space:nowrap}
+.ovwtbl th:nth-child(n+4),.ovwtbl td:nth-child(n+4){width:1%;padding-left:14px;padding-right:14px}
+.ovwtbl th:last-child,.ovwtbl td:last-child{padding-right:16px}
 .site-tabs{order:3;align-self:stretch;margin:14px 0 0}
 .mk{background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:12px 16px}
 .mk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
@@ -114,9 +121,8 @@ header h1{font-size:20px;font-weight:700}
 /* ---------- Gövde düzeni + sol menü ---------- */
 .shell{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:calc(100vh - 170px)}
 /* İçerik genişliği sınırlı: tarayıcı uzaklaştırıldığında (örn. %67) tablolar uçtan uca açılıp sütunlar arasında boşluk bırakmasın. */
-:root{--wrap:1440px}
+:root{--wrap:2400px}
 main{padding:24px 28px;max-width:calc(var(--wrap) + 56px);width:100%}
-body[data-page="ovw"] main{padding-top:0}
 @media (min-width:701px){
   body{display:grid;grid-template-columns:256px minmax(0,1fr);grid-template-rows:auto auto 1fr;min-height:100vh}
   .shell{display:contents}
@@ -316,10 +322,6 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 #ask p{text-transform:none}
 
 /* ---------- Toplamlar, kapasite, DD, AMG ---------- */
-.totals{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:16px}
-.total{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:12px 14px}
-.total span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
-.total strong{font-size:22px;font-variant-numeric:tabular-nums}
 .capacity{margin-top:14px}
 .capbar{height:14px;border-radius:7px;background:var(--soft);border:1px solid var(--hair);overflow:hidden;display:flex}
 .capbar i{display:block;height:100%}
@@ -402,22 +404,21 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 .row-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0}
 
 /* ---------- Duyarlı ---------- */
+@media (max-width:1100px){.ovw-grid{grid-template-columns:1fr}.kpi-col{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));order:-1}}
 @media (max-width:1000px){
   .grid,.grid.g5{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .totals{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .pipe-legend,.totals{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pipe-legend{grid-template-columns:repeat(3,minmax(0,1fr))}
   .shell{grid-template-columns:240px minmax(0,1fr)}
 }
 @media (max-width:700px){
   header{padding:16px 14px}.pipeline{padding:16px 14px 4px}
-  .pipe-legend,.totals{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .pipe-legend{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .mk{padding:10px 12px}.mk strong{font-size:18px}
   .shell{display:block}
   aside{position:static;height:auto;overflow:visible}
   main{padding:14px}
-  .totals{grid-template-columns:1fr 1fr}
-  .dd-row,.amg-row{grid-template-columns:1fr}
+    .dd-row,.amg-row{grid-template-columns:1fr}
   fieldset.chks.span2{grid-column:1/-1}
   .verdict{width:100%}.vcell{flex:1;min-width:0}
   .emptystate{padding:36px 16px}
@@ -835,13 +836,13 @@ function filterText(){
   const t=[];if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.blocked)t.push('Engelli');if(F.q)t.push('“'+F.q+'”');
   return t.join(' · ');
 }
-function renderPipe(){
+function legendHtml(){
   const total=db.sites.length,active=db.sites.filter(isOpen).length,passive=total-active;
   const mk=(l,v)=>`<div class="mk"><span>${l}</span><strong>${v}</strong></div>`;
   // Aktif / Pasif tek kutuda, ortadan ikiye bölünmüş.
-  const split=`<div class="mk split"><div><span>Aktif</span><strong>${active}</strong></div><div><span>Pasif</span><strong>${passive}</strong></div></div>`;
-  $('pipeLegend').innerHTML=mk('Qualified Lead',total)+split;
+  return mk('Qualified Lead',total)+`<div class="mk split"><div><span>Aktif</span><strong>${active}</strong></div><div><span>Pasif</span><strong>${passive}</strong></div></div>`;
 }
+function renderPipe(){$('pipeLegend').innerHTML=legendHtml();}
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
 function locRowsHtml(list){
   return list.map(s=>{const st=statusOf(s.status),sc=scoreOf(s),bl=s.blocker||s.blockerTr||'';
@@ -893,7 +894,7 @@ function render(){
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='users'||view==='activity';
+  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||(view==='portfolio'&&sub==='ovw');
   paintSiteTabs();
   if(view==='users')renderUsers();else if(view==='activity')renderActivity();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
@@ -907,15 +908,15 @@ function renderPortfolio(){
   list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
   const tot=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
-  let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div>`;
-  h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
+  let h=`<div class="ovw-grid" data-tab="ovw"><section class="box"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio ovwtbl"><thead><tr>
     <th>Lokasyon</th><th>Aşama</th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">Skor</th><th>Durum</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
       return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.survey.lead)||'—'}</td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
       <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td></tr>`;}).join('')+
-    `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
+    `</tbody><tfoot><tr><td>Toplam</td><td></td><td></td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td></td><td></td></tr></tfoot></table></div></section>
+    <div class="kpi-col">${legendHtml()}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div></div>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
     const warn=invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:'';
