@@ -31,6 +31,7 @@ export default async function handler(req, res) {
       const email = norm(b.email);
       const name = typeof b.name === 'string' ? b.name.trim().slice(0, 120) : '';
       const role = ROLES.includes(b.role) ? b.role : 'user';
+      if (name.length < 2) return bad(res, 'Ad soyad girin');
       if (!EMAIL_RE.test(email) || email.length > 254) return bad(res, 'Geçerli bir e-posta girin');
       if (!checkPassword(b.password)) return bad(res, `Şifre en az ${MIN_PASS} karakter olmalı`);
       if (!(await createUser({ email, name, role, password: b.password }, me.email))) return bad(res, 'Bu e-posta zaten kayıtlı', 409);

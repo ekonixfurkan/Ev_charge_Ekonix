@@ -377,6 +377,10 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 .u-tbl .role-sel{width:auto;min-height:0;padding:5px 8px;font-size:12.5px}
 .u-tbl .acts button{padding:5px 9px;font-size:12.5px;min-height:0}
 .u-tbl tr.off td{opacity:.55}
+.u-tbl .name-in{font-weight:600;min-height:30px;padding:4px 8px;margin:0 0 2px -8px;width:calc(100% + 8px);border-color:transparent;background:transparent}
+.u-tbl .name-in:hover{border-color:var(--hair-strong)}
+.u-tbl .name-in:focus{background:var(--card)}
+.u-tbl .name-in:placeholder-shown{border-color:var(--hair-strong);border-style:dashed}
 .u-wrap{overflow-x:auto}
 .u-msg{font-size:13px;margin:8px 0 0;min-height:18px}
 .u-msg.err{color:var(--no)}
@@ -1355,7 +1359,7 @@ async function renderUsers(){
   if(view!=='users')return;
   usersCache=d.users;usersMe=d.me;
   const rows=d.users.map(u=>{const self=u.email===d.me,lock=self||(u.owner&&!d.owner);
-    return `<tr class="${u.active?'':'off'}"><td><strong>${esc(u.name||u.email.split('@')[0])}</strong><br><small style="color:var(--muted)">${esc(u.email)}${self?' · (siz)':''}${u.owner?' · Sahip':''}</small></td>
+    return `<tr class="${u.active?'':'off'}"><td><input class="name-in" data-nm="${esc(u.email)}" value="${esc(u.name||'')}" placeholder="Ad soyad ekle" maxlength="120" aria-label="Ad soyad" ${lock&&!self?'disabled':''}><small style="color:var(--muted)">${esc(u.email)}${self?' · (siz)':''}${u.owner?' · Sahip':''}</small></td>
       <td><span class="pill" style="--c:${u.active?'var(--ok)':'var(--muted)'}">${u.active?'Aktif':'Pasif'}</span></td>
       <td>${fmtDt(u.lastLogin)}</td>
       ${d.owner?`<td>${fmtDt(u.passChangedAt||u.createdAt)}</td>`:''}
@@ -1367,7 +1371,7 @@ async function renderUsers(){
       </div></td></tr>`;}).join('');
   $('view').innerHTML=`<section class="box"><h3>Yeni Kullanıcı Ekle<small>Hesabı yönetici açar; kendi kendine kayıt yok</small></h3>
     <form id="uForm" class="u-form" autocomplete="off">
-      <label>Ad soyad<input id="uName" maxlength="120"></label>
+      <label>Ad soyad<input id="uName" required maxlength="120"></label>
       <label>E-posta<input id="uEmail" type="email" required maxlength="254"></label>
       <label>Şifre (en az 8)<span class="pw"><input id="uPass" type="text" required minlength="8" maxlength="200" autocomplete="new-password"><button type="button" id="uGen">Üret</button></span></label>
       <label>Rol<select id="uRole"><option value="user">Kullanıcı</option><option value="admin">Yönetici</option></select></label>
@@ -1381,6 +1385,8 @@ async function renderUsers(){
     try{await userApi('POST',body);toast('Kullanıcı eklendi: '+body.email.trim().toLowerCase());renderUsers();}catch(x){userMsg(x.message,true);}};
 }
 document.addEventListener('change',async e=>{
+  const nm=e.target.closest('.u-tbl .name-in');
+  if(nm){try{await userApi('PATCH',{email:nm.dataset.nm,name:nm.value});toast('Ad güncellendi.');renderUsers();}catch(x){toast(x.message);}return;}
   const sel=e.target.closest('.u-tbl .role-sel');if(!sel)return;
   const email=sel.parentElement.dataset.email;sel.disabled=true;
   try{await userApi('PATCH',{email,role:sel.value});toast('Rol güncellendi.');renderUsers();}
@@ -1422,11 +1428,12 @@ async function fetchActivity(reset){
   if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
   actRows=reset?d.rows:actRows.concat(d.rows);actMore=d.more;actActors=d.actors||[];
 }
+const actWho=x=>x.actor_name?`<span class="p1" style="font-weight:600">${esc(x.actor_name)}</span><span class="p2" style="display:block;color:var(--muted);font-size:12px">${esc(x.actor)}</span>`:esc(x.actor||'—');
 function actRowsHtml(){
   if(!actRows.length)return '<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Kayıt yok.</td></tr>';
   return actRows.map(x=>{const [lab,cls]=ACT_LABEL[x.action]||[x.action,'none'];
-    return `<tr data-act="${x.id}" tabindex="0"><td style="white-space:nowrap">${esc(fmtTs(x.at))}</td><td>${esc(x.actor||'—')}</td>
-    <td><span class="badge ${cls}">${esc(lab)}</span></td><td><span class="p1">${esc(x.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[x.entity]||x.entity)}</span></td>
+    return `<tr data-act="${x.id}" tabindex="0"><td style="white-space:nowrap">${esc(fmtTs(x.at))}</td><td>${actWho(x)}</td>
+    <td><span class="badge ${cls}">${esc(lab)}</span></td><td><span class="p1">${esc(x.entity_user_name||x.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[x.entity]||x.entity)}${x.entity_user_name?' · '+esc(x.entity_name):''}</span></td>
     <td style="max-width:420px">${esc(x.summary||'')}</td></tr>`;}).join('');
 }
 function paintActivity(){
@@ -1442,7 +1449,7 @@ async function renderActivity(){
   $('view').innerHTML=`<section class="box"><h3>İşlem Geçmişi<small>Kim, ne zaman, neyi değiştirdi</small></h3>
     <div class="locbar no-print">
       <label class="lf lq">Ara<input type="search" id="actQ" value="${esc(actF.q)}" placeholder="Lokasyon, kullanıcı veya özet…" autocomplete="off"></label>
-      <label class="lf">Kullanıcı<select id="actActor"><option value="">Tümü</option>${actActors.map(a=>opt(a,actF.actor)).join('')}</select></label>
+      <label class="lf">Kullanıcı<select id="actActor"><option value="">Tümü</option>${actActors.map(a=>opt(a.email,actF.actor,a.name||a.email)).join('')}</select></label>
       <label class="lf">Tür<select id="actEntity"><option value="">Tümü</option>${Object.entries(ENT_LABEL).map(([k,t])=>opt(k,actF.entity,t)).join('')}</select></label>
       <button type="button" id="actClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
@@ -1454,8 +1461,8 @@ async function renderActivity(){
 function actDetail(id){
   const x=actRows.find(r=>String(r.id)===String(id));if(!x)return;
   const ch=Array.isArray(x.changes)?x.changes:[];
-  $('actBody').innerHTML=`<h2>İşlem Detayı</h2><p class="dsub">${esc(fmtTs(x.at))} · ${esc(x.actor||'—')}</p>
-    <p><strong>${esc((ACT_LABEL[x.action]||[x.action])[0])}</strong> · ${esc(ENT_LABEL[x.entity]||x.entity)}: ${esc(x.entity_name||'—')}</p><p class="note">${esc(x.summary||'')}</p>
+  $('actBody').innerHTML=`<h2>İşlem Detayı</h2><p class="dsub">${esc(fmtTs(x.at))} · ${esc(x.actor_name||x.actor||'—')}</p>
+    <p><strong>${esc((ACT_LABEL[x.action]||[x.action])[0])}</strong> · ${esc(ENT_LABEL[x.entity]||x.entity)}: ${esc(x.entity_user_name||x.entity_name||'—')}</p><p class="note">${esc(x.summary||'')}</p>
     ${ch.length?`<div class="scroll"><table class="yearly"><thead><tr><th>Alan</th><th>Önce</th><th>Sonra</th></tr></thead><tbody>${ch.map(c=>`<tr><th>${esc(c.alan)}</th><td style="text-align:left;white-space:normal">${esc(c.eski)}</td><td style="text-align:left;white-space:normal">${esc(c.yeni)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
   $('actDlg').showModal();
 }
@@ -1477,7 +1484,7 @@ document.addEventListener('click',async e=>{
   try{
     const r=await fetch('/api/auth/me',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
-    if(r.ok){const d=await r.json();if(d.email){$('whoami').textContent=d.email;$('whoami').title=d.email;$('whoami').hidden=false;}
+    if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
       me={email:d.email,role:d.role};if(d.role==='admin')$('adminGroup').hidden=false;if(view==='site')render();}
   }catch(e){/* çevrimdışı: yerel kayıtla devam */}
   document.documentElement.classList.remove('pending');
