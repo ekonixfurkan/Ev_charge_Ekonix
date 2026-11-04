@@ -1,0 +1,21 @@
+// StarCharge ürün kataloğu. Kaynak: https://www.starcharge.com/products/ev-charging (ürün sayfaları, Kasım 2026).
+// Yalnızca sitede yazan değerler alınmıştır. kw: null ise sitede güç yazmaz (dispenser'ın gücü bağlı olduğu güç kabinine göre belirlenir).
+// type: DC | AC · form: ürün türü · sockets: ünite başına soket/konnektör sayısı (0 = soket yok, güç kabini)
+window.SC_CATALOG=[
+ {brand:'StarCharge',model:'Venus V3',type:'DC',form:'Entegre (duvar/ayaklı)',kws:[20,30],sockets:1,conn:'1 × CCS2',volt:'150–1000 Vdc',amp:'20 kW: 80 A · 30 kW: 100 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/81'},
+ {brand:'StarCharge',model:'Jupiter V5',type:'DC',form:'Entegre',kws:[60,80,120],sockets:2,conn:'CCS2 + CCS2 / CCS2 + GBT',volt:'150–1000 Vdc',amp:'CCS2 200–250 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/11'},
+ {brand:'StarCharge',model:'Titan V4',type:'DC',form:'Entegre',kws:[240,320],sockets:2,conn:'CCS2 + CCS2 (eş zamanlı)',volt:'150–1000 Vdc',amp:'300 A (500 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/10'},
+ {brand:'StarCharge',model:'Titan V5',type:'DC',form:'Entegre',kws:[120,180,240],sockets:2,conn:'120 kW: CCS2+CCS2 · 180 kW: CCS2+GBT · 240 kW: GB/T+GB/T',volt:'150–1000 Vdc',amp:'CCS2 300 A · GB/T 250 A (300 A boost)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/9'},
+ {brand:'StarCharge',model:'Nova V4',type:'DC',form:'Güç kabini (ayrık tip)',kws:[480,720],sockets:0,conn:'12 çıkış portuna kadar',volt:'150–1000 Vdc',amp:'480 kW: 1600 A · 720 kW: 2400 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/91'},
+ {brand:'StarCharge',model:'Nova V5',type:'DC',form:'Güç kabini',kws:[360,480],sockets:0,conn:'Dispenser bağlantılı',volt:'150–1000 Vdc',amp:'1600 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/90'},
+ {brand:'StarCharge',model:'Nereus',type:'DC',form:'Sıvı soğutmalı güç kabini',kws:[720],sockets:0,conn:'Dispenser bağlantılı',volt:'150–1000 Vdc',amp:'2400 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/89'},
+ {brand:'StarCharge',model:'Hydrus',type:'DC',form:'Dispenser (güç kabinine bağlı)',kws:[null],sockets:2,conn:'2 × CCS2 / CCS2 + GBT',volt:'150–1000 Vdc',amp:'250 A (400 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/88'},
+ {brand:'StarCharge',model:'Hydrus Pro',type:'DC',form:'Dispenser (sıvı soğutmalı)',kws:[null],sockets:2,conn:'2 × CCS2 / CCS2 + GBT',volt:'150–1000 Vdc',amp:'400 A (600 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/87'},
+ {brand:'StarCharge',model:'Hydrus Plus',type:'DC',form:'Dispenser (sıvı soğutmalı)',kws:[null],sockets:2,conn:'2 × CCS2 / CCS2 + GBT',volt:'150–1000 Vdc',amp:'600 A (800 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/86'},
+ {brand:'StarCharge',model:'Aries V2',type:'DC',form:'Dispenser (ayrık tip)',kws:[null],sockets:2,conn:'2 × CCS2',volt:'150–1000 Vdc',amp:'380 A (600 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/85'},
+ {brand:'StarCharge',model:'Triton V2',type:'DC',form:'Dispenser (otobüs depoları için)',kws:[null],sockets:1,conn:'1 × CCS2',volt:'150–1000 Vdc',amp:'380 A (500 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/84'},
+ {brand:'StarCharge',model:'Halo (V2G çift yönlü)',type:'DC',form:'Çift yönlü DC wallbox (V2G)',kws:[7.4,11],sockets:1,conn:'',volt:'',amp:'',ip:'',url:'https://www.starcharge.com/products/ev-charging/v2g/93'},
+ {brand:'StarCharge',model:'Artemis V2',type:'AC',form:'AC wallbox',kws:[7.4,11,22],sockets:1,conn:'1 × Tip 2',volt:'230/400 Vac',amp:'',ip:'IP65',url:'https://www.starcharge.com/products/ev-charging/ac-charger/82'},
+ {brand:'StarCharge',model:'Arc V1',type:'AC',form:'AC şarj ünitesi',kws:[7,11,22],sockets:1,conn:'1 × Tip 2',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/19'},
+ {brand:'StarCharge',model:'Saturn',type:'AC',form:'AC çift soketli',kws:[44],sockets:2,conn:'2 × Tip 2 (2 × 22 kW)',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/18'}
+];

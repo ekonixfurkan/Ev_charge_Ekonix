@@ -259,7 +259,7 @@ input[data-locked]{background:var(--soft);color:var(--ink2);border-style:dashed;
 #view.ro input:disabled,#view.ro select:disabled,#view.ro textarea:disabled{background:var(--soft);color:var(--ink);-webkit-text-fill-color:var(--ink);border-color:transparent;cursor:default;opacity:1;resize:none}
 #view.ro select:disabled{appearance:none;-webkit-appearance:none;background-image:none}
 #view.ro input[type=checkbox]:disabled,#view.ro input[type=radio]:disabled{opacity:.7}
-#view.ro [data-preset],#view.ro #addTr,#view.ro [data-deltr],#view.ro #applyAll,#view.ro #addDC,#view.ro #addAC,#view.ro [data-del],#view.ro .presets,#view.ro .inline{display:none}
+#view.ro [data-preset],#view.ro #addTr,#view.ro [data-deltr],#view.ro #applyAll,#view.ro #addDC,#view.ro #addAC,#view.ro #addCat,#view.ro [data-del],#view.ro .presets,#view.ro .inline{display:none}
 #view.ro .seg{pointer-events:none}
 
 /* ---------- Tablolar ---------- */
@@ -272,6 +272,7 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--hair-strong)
 .units td input,.units td select{padding:6px 8px;min-height:34px}
 .units td input:disabled,.units td select:disabled{opacity:.35}
 .units td.w-n input,.tranches td input[type=number]{text-align:right}
+.uinfo{display:block;margin-top:3px;font-size:11.5px;color:var(--muted);line-height:1.35}.uinfo a{color:var(--navy)}
 .units td.w-kind{width:92px}.units td.w-n{width:90px}
 .kind-dc{border-left:4px solid var(--dc)}.kind-ac{border-left:4px solid var(--ac)}
 .tranches td select{min-width:140px}.tranches td input[data-tf=term],.tranches td input[data-tf=rate]{min-width:64px}.tranches td input[data-tf=item]{min-width:170px}.tranches td input[data-tf=amount]{min-width:120px}
@@ -353,6 +354,18 @@ table.yearly{width:auto;min-width:min(100%,640px)}
 .np-form{display:grid;gap:8px;padding:12px 16px 16px;border-top:1px solid var(--hair)}
 .np-form textarea{min-height:72px}
 
+/* ---------- StarCharge katalog penceresi ---------- */
+#catDlg{width:min(1100px,96vw);max-width:none;max-height:92vh;overflow:auto}
+.cat-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.cat-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0 12px}
+.cat-bar .viewbar{margin:0;border:0}
+.cat-bar .viewbar button{border:1px solid var(--hair-strong);border-radius:var(--radius);margin:0 4px 0 0;padding:6px 14px}
+.cat-bar .viewbar button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.cat-bar input{max-width:260px;height:36px;min-height:36px}
+.cat-tbl td,.cat-tbl th{vertical-align:top;padding:8px 8px;font-size:12.5px}
+.cat-tbl td:first-child{min-width:170px}.cat-tbl .sub{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.cat-tbl tr:hover{background:var(--navy-soft)}
+.cat-tbl button{padding:4px 12px;font-size:12.5px;white-space:nowrap}
 /* ---------- Diyaloglar ---------- */
 dialog{max-width:28rem;width:min(448px,92vw);border:1px solid var(--hair-strong);border-radius:8px;padding:24px;background:var(--card);color:var(--ink);font-family:var(--font)}
 dialog::backdrop{background:rgba(8,26,48,.5)}
@@ -371,7 +384,13 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 #ask p{text-transform:none}
 
 /* ---------- Toplamlar, kapasite, DD, AMG ---------- */
-.capacity{margin-top:14px}
+.capacity{margin-top:16px;border:1px solid var(--hair);border-radius:var(--radius);padding:14px 16px;background:var(--card)}
+.cap-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;font-size:13px}
+.cap-head strong{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink2)}
+.cap-head #capstat{font-weight:600;font-variant-numeric:tabular-nums}.cap-head #capstat.bad{color:var(--no)}
+.cap-legend{display:flex;gap:14px;margin:6px 0 4px;font-size:12px;color:var(--muted)}
+.cap-legend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.dot.dc{background:var(--dc)}.dot.ac{background:var(--ac)}
+.capacity label{margin-top:12px}
 .capbar{height:14px;border-radius:7px;background:var(--soft);border:1px solid var(--hair);overflow:hidden;display:flex}
 .capbar i{display:block;height:100%}
 .capnote{font-size:12.5px;color:var(--muted);margin-top:6px}
@@ -566,6 +585,12 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 </div>
 <div id="toast" role="status" hidden></div>
 <dialog id="actDlg"><div id="actBody"></div><div class="row"><button type="button" id="actClose" class="primary">Kapat</button></div></dialog>
+<dialog id="catDlg">
+  <div class="cat-head"><div><h2>StarCharge Ürün Kataloğu</h2><p class="dsub">Satıra "Ekle" diyerek ünite listesine direkt ekleyin; marka/model, tip, güç ve soket sayısı otomatik dolar.</p></div><button type="button" id="catClose" class="ghost" aria-label="Kapat">✕</button></div>
+  <div class="cat-bar"><div class="viewbar" id="catType"><button type="button" data-ct="" aria-pressed="true">Tümü</button><button type="button" data-ct="DC" aria-pressed="false">DC</button><button type="button" data-ct="AC" aria-pressed="false">AC</button></div><input type="search" id="catQ" placeholder="Model ara…" autocomplete="off"></div>
+  <div class="scroll"><table class="cat-tbl"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
+  <p class="note">Kaynak: starcharge.com ürün sayfaları. Güç yazmayan dispenser modellerinde (Hydrus, Aries, Triton) güç, bağlı güç kabinine göre belirlenir; kW elle girilir.</p>
+</dialog>
 <dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:15px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
 <dialog id="dlg">
   <form id="dlgForm">
@@ -595,6 +620,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 </dialog>
 
 <script src="/data/turkey-locations.js"></script>
+<script src="/data/starcharge-catalog.js"></script>
 <script>
 'use strict';
 const KEY='saha-dd-araci:v1';
@@ -1122,7 +1148,7 @@ function editBarHtml(){
     ?`${me.role==='admin'?`<button type="button" class="danger" id="delSite">Sil</button>`:''}<button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
     :`<button type="button" class="print-btn" id="printBtn" title="A4 dikey yazdır">${ICON_PRINT}Yazdır</button><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
 }
-const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,[data-del],';
+const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,#addCat,[data-del],';
 function applyEditState(){
   const v=$('view');if(view!=='site')return;
   v.classList.toggle('ro',!siteEdit);
@@ -1242,11 +1268,15 @@ function renderSite(){
   <div class="scroll"><table class="units"><thead><tr><th>Tip</th><th class="num">Ünite Gücü kW</th><th class="num">Ünite Başına Soket</th><th class="num">Adet</th><th>Marka / Model</th><th class="num">Toplam kW</th><th></th></tr></thead>
   <tbody id="unitBody">${s.units.map(u=>unitRow(u)).join('')||`<tr><td colspan="7" style="color:var(--muted);padding:14px 6px">Henüz ünite yok. Aşağıdan DC veya AC ünite ekleyin.</td></tr>`}</tbody>
   <tfoot id="unitFoot"></tfoot></table></div>
-  <div class="unit-actions"><button id="addDC">+ DC ünite</button><button id="addAC">+ AC ünite</button></div>
+  <div class="unit-actions"><button id="addDC">+ DC ünite</button><button id="addAC">+ AC ünite</button><button id="addCat" type="button">Katalogdan Seç</button></div>
   <div class="capacity">
-    <div class="grid">${field('gridNote','Şebeke notu (trafo, dağıtım şirketi)','text',' class="span4"')}</div>
-    <div class="capbar" id="capbar" style="margin-top:12px" role="img" aria-label="Kurulu gücün şebeke kapasitesine oranı"></div>
-    <div class="capnote" id="capnote"></div>
+    <div class="cap-head"><strong>Şebeke Kapasitesi</strong><span id="capstat"></span></div>
+    <div id="capview">
+      <div class="capbar" id="capbar" role="img" aria-label="Kurulu gücün şebeke kapasitesine oranı"></div>
+      <div class="cap-legend"><span><i class="dot dc"></i>DC</span><span><i class="dot ac"></i>AC</span></div>
+      <div class="capnote" id="capnote"></div>
+    </div>
+    <label>Şebeke notu (trafo, dağıtım şirketi)<input data-f="gridNote" value="${esc(s.gridNote)}"></label>
   </div></section>
 
   <div class="viewbar subtabs fin-sub no-print" data-tab="credit" role="tablist" aria-label="Finansman bölümleri">${FIN_TABS.map(([k,t])=>`<button type="button" data-fs="${k}" aria-pressed="${fsub===k}">${t}</button>`).join('')}</div>
@@ -1313,7 +1343,7 @@ function unitRow(u){
     <td class="w-n"><input data-uf="kw" type="number" min="0" step="any" inputmode="decimal" value="${u.kw}" aria-label="Ünite gücü kW"></td>
     <td class="w-n"><input data-uf="sockets" type="number" min="1" step="1" inputmode="numeric" value="${u.sockets}" aria-label="Soket"></td>
     <td class="w-n"><input data-uf="qty" type="number" min="1" step="1" inputmode="numeric" value="${u.qty}" aria-label="Adet"></td>
-    <td><input data-uf="model" value="${esc(u.model)}" placeholder="ör. StarCharge" aria-label="Marka / model"></td>
+    <td><input data-uf="model" value="${esc(u.model)}" placeholder="ör. StarCharge" aria-label="Marka / model">${u.info?`<small class="uinfo">${esc(u.info)}${u.src?` · <a href="${esc(u.src)}" target="_blank" rel="noopener">ürün sayfası</a>`:''}</small>`:''}</td>
     <td class="num" data-utotal>${nf.format((+u.kw||0)*(+u.qty||0))}</td>
     <td><button class="ghost" data-del="${u.id}" aria-label="Üniteyi sil">Sil</button></td></tr>`;
 }
@@ -1330,12 +1360,15 @@ function updateDerived(){
   $('unitSummary').textContent=`${t.dcUnits} DC (${t.dcSock} soket) · ${t.acUnits} AC (${t.acSock} soket)`;
   $('unitFoot').innerHTML=s.units.length?`<tr><td colspan="5">DC ${nf.format(t.dcKw)} kW + AC ${nf.format(t.acKw)} kW</td><td class="num">${nf.format(t.kw)}</td><td></td></tr>`:'';
   const cr=capRef(s),g=cr?cr.v:0,bar=$('capbar'),note=$('capnote');
+  $('capview').hidden=g<=0;$('capstat').textContent='';
   if(g>0){const scale=Math.max(g,t.kw);
     bar.innerHTML=`<i style="width:${t.dcKw/scale*100}%;background:var(--dc)"></i><i style="width:${t.acKw/scale*100}%;background:var(--ac)"></i>`;
     const pct=Math.round(t.kw/g*100);
-    note.textContent=t.kw>g?`Kurulu güç ${nf.format(t.kw)} kW, ${nf.format(g)} ${cr.u}: %${pct}. Ek bağlantı, yük yönetimi veya daha az ünite gerekir.`:`Kurulu güç, ${nf.format(g)} ${cr.u} gücün %${pct}'ini kullanıyor (güç faktörü 1 varsayımıyla kaba kontrol).`;
-    note.className='capnote'+(t.kw>g?' bad':'');
-  }else{bar.innerHTML=`<i style="width:${t.kw?t.dcKw/t.kw*100:0}%;background:var(--dc)"></i><i style="width:${t.kw?t.acKw/t.kw*100:0}%;background:var(--ac)"></i>`;note.textContent='Saha keşfinde trafo veya kullanılabilir güç girilmedi; kapasite kontrolü yapılamıyor.';note.className='capnote';}
+    $('capstat').textContent=`${nf.format(t.kw)} kW kurulu · ${nf.format(g)} ${cr.u} · %${pct}`;
+    $('capstat').className=t.kw>g?'bad':'';
+    note.textContent=t.kw>g?`Kurulu güç ${nf.format(t.kw)} kW, ${nf.format(g)} ${cr.u}: %${pct}. Ek bağlantı, yük yönetimi veya daha az ünite gerekir.`:'';
+    note.className='capnote'+(t.kw>g?' bad':'');note.hidden=!note.textContent;
+  }
   $('ddProgress').textContent=`${d.done}/${AMG.length} kriter puanlandı`;
   let a='';
   if(d.blockers.length)a+=`<div class="alert">Engel: ${esc(d.blockers.join(', '))} uygun değil.</div>`;
@@ -1722,6 +1755,35 @@ document.addEventListener('click',e=>{
     else toast('Lokasyon bulunamadı.');}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&bell.open&&!$('ask').open)closeBell();});
+
+/* ---------- StarCharge ürün kataloğu ---------- */
+let catType='',catList=[];
+function catFlat(){
+  const rows=[];(window.SC_CATALOG||[]).forEach(p=>p.kws.forEach(kw=>rows.push({p,kw})));return rows;
+}
+function paintCat(){
+  const q=norm($('catQ').value),rows=catFlat().filter(r=>(!catType||r.p.type===catType)&&(!q||norm(r.p.brand+' '+r.p.model+' '+r.p.form).includes(q)));
+  catList=rows;
+  $('catRows').innerHTML=rows.length?rows.map((r,i)=>`<tr><td><b>${esc(r.p.brand+' '+r.p.model)}</b><span class="sub">${esc(r.p.form)}</span></td><td><span class="badge stg">${r.p.type}</span></td>
+    <td class="num">${r.kw==null?'<span title="Güç kabinine göre">—</span>':nf.format(r.kw)}</td><td class="num">${r.p.sockets||'—'}</td><td>${esc(r.p.conn||'—')}</td><td>${esc([r.p.volt,r.p.amp].filter(Boolean).join(' · ')||'—')}</td><td>${esc(r.p.ip||'—')}</td>
+    <td><button type="button" class="primary" data-catpick="${i}">Ekle</button></td></tr>`).join(''):'<tr><td colspan="8" class="note" style="padding:20px;text-align:center">Eşleşen ürün yok.</td></tr>';
+}
+function openCat(){$('catQ').value='';catType='';document.querySelectorAll('#catType [data-ct]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ct==='')));paintCat();$('catDlg').showModal();}
+function pickCat(i){
+  const r=catList[i],s=cur();if(!r||!s||!siteEdit)return;
+  const p=r.p,model=p.brand+' '+p.model+(r.kw!=null&&p.kws.length>1?' '+nf.format(r.kw)+' kW':'');
+  const u=unit(p.type,r.kw==null?0:r.kw,p.sockets,1,model);
+  u.info=[p.conn,[p.volt,p.amp].filter(Boolean).join(' · '),p.ip,p.form].filter(Boolean).join(' · ');u.src=p.url;
+  s.units.push(u);touched(s);renderSite();
+  toast(model+' eklendi'+(r.kw==null?'; gücü (kW) elle girin.':'.'));
+}
+document.addEventListener('click',e=>{
+  if(e.target.closest('#addCat')){if(siteEdit)openCat();return;}
+  if(e.target.closest('#catClose')){$('catDlg').close();return;}
+  const t=e.target.closest('#catType [data-ct]');if(t){catType=t.dataset.ct;document.querySelectorAll('#catType [data-ct]').forEach(b=>b.setAttribute('aria-pressed',String(b===t)));paintCat();return;}
+  const pk=e.target.closest('[data-catpick]');if(pk)pickCat(+pk.dataset.catpick);
+});
+document.addEventListener('input',e=>{if(e.target.id==='catQ')paintCat();});
 
 /* ---------- oturum ---------- */
 (async()=>{
