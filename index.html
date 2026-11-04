@@ -464,8 +464,6 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
     <p class="dsub">Temel bilgileri girin. Üniteler, altyapı ve finansman detayı kayıttan sonra lokasyon sayfasında doldurulur.</p>
     <div class="dgrid">
       <label class="span2">Lokasyon adı *<input id="dlgName" required maxlength="120" autocomplete="off"></label>
-      <label class="span2">Proje / bölge *<input id="dlgProject" required maxlength="120" list="projectList" autocomplete="off"></label>
-      <datalist id="projectList"></datalist>
       <label>İl<input id="dlgCity" maxlength="60" list="cityList" autocomplete="off"></label>
       <datalist id="cityList"><option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Aksaray"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Ardahan"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bartın"><option value="Batman"><option value="Bayburt"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Düzce"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkâri"><option value="Hatay"><option value="Iğdır"><option value="Isparta"><option value="İstanbul"><option value="İzmir"><option value="Kahramanmaraş"><option value="Karabük"><option value="Karaman"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kilis"><option value="Kırıkkale"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Mardin"><option value="Mersin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Osmaniye"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Şanlıurfa"><option value="Şırnak"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Uşak"><option value="Van"><option value="Yalova"><option value="Yozgat"><option value="Zonguldak"></datalist>
       <label>İlçe<input id="dlgDistrict" maxlength="60" autocomplete="off"></label>
@@ -697,8 +695,8 @@ function resultsHtml(rows,f,s,tf,mode='all'){
 }
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
-function blankSite(name,project=''){
-  return {id:uid(),name,project,city:'',district:'',address:'',type:'Other',host:'',contact:'',
+function blankSite(name){
+  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
@@ -819,7 +817,7 @@ function matchesF(s){
   if(F.owner&&(s.survey.lead||'')!==F.owner)return false;
   if(F.partner&&(s.survey.partner||'')!==F.partner)return false;
   if(F.blocked&&!(s.blocker||s.blockerTr))return false;
-  if(F.q){const hay=norm([s.name,s.city,s.district,s.host,s.project,s.survey.partner,s.survey.lead,s.nextAction,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
+  if(F.q){const hay=norm([s.name,s.city,s.district,s.host,s.survey.partner,s.survey.lead,s.nextAction,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
   return true;
 }
 const SORTS={updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
@@ -902,9 +900,9 @@ function renderPortfolio(){
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
   let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div>`;
   h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
-    <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">İlk Yıl Hasılat TL</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
+    <th>Lokasyon</th><th>Sorumlu</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">İlk Yıl Hasılat TL</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
-      return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span></td><td><span class="p1">${esc(s.project)||'—'}</span>${s.survey.lead?`<span class="p2">Sorumlu: ${esc(s.survey.lead)}</span>`:''}</td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
+      return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span></td><td>${esc(s.survey.lead)||'—'}</td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td>
       <td class="num"><span class="p1">${nf.format(calculate(s)[0].revenue)}</span></td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
@@ -1026,8 +1024,7 @@ document.addEventListener('click',e=>{
 
 function renderSite(){
   const s=cur();
-  const projects=[...new Set(db.sites.map(x=>x.project).filter(Boolean))];
-  let h=`<div class="site-head"><div><h2 id="siteTitle">${esc(s.name)}</h2><p id="siteSub">${esc([s.project,s.district,s.city].filter(Boolean).join(', '))}</p></div>
+  let h=`<div class="site-head"><div><h2 id="siteTitle">${esc(s.name)}</h2><p id="siteSub">${esc([s.district,s.city].filter(Boolean).join(', '))}</p></div>
   <div class="verdict">
     <div class="vcell"><span>Aşama</span><strong id="vStage" style="font-size:15px"></strong></div>
     <div class="vcell"><span>Durum</span><strong id="vStatus" style="font-size:15px"></strong></div>
@@ -1039,8 +1036,7 @@ function renderSite(){
   <div class="edit-bar no-print ${siteEdit?'on':''}" id="editBar">${editBarHtml()}</div>
    <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button>${me.role==='admin'?'<button class="ghost" id="delSite">Lokasyonu sil</button>':''}</span></h3>
   <div class="grid">
-    ${field('name','Lokasyon adı','text',' class="span2"')}
-    <label class="span2">Proje / bölge<input data-f="project" list="projList" value="${esc(s.project)}"><datalist id="projList">${projects.map(p=>`<option value="${esc(p)}">`).join('')}</datalist></label>
+    ${field('name','Lokasyon adı','text',' class="span4"')}
     ${field('city','İl')}${field('district','İlçe')}
     <label>Saha tipi<select data-f="type">${TYPES.map(([k,t])=>`<option value="${esc(k)}" ${k===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
     ${field('contractYears','Sözleşme süresi (yıl)','number')}
@@ -1128,7 +1124,7 @@ function renderSite(){
   <div class="grid subgrid"><label class="span2">Diğer fonun adı<input data-fin-text="fundName" value="${esc(s.fin.fundName)}" placeholder="ör. yerli banka, yatırım fonu" maxlength="60"></label></div>
   <div id="finAlerts" style="margin-top:12px"></div>
   <p class="note">Gelir payı ile: finansör yatırımını kendi gelir payından geri alır. Kredi: geri ödeyen taraf eşit yıllık taksit öder; taksit onun nakdinden düşülür ve finansöre gider.</p>
-  <div class="inline no-print"><span class="note">${s.project?'Aynı projedeki':'Tüm'} lokasyonlara aktar:</span>
+  <div class="inline no-print"><span class="note">Tüm lokasyonlara aktar:</span>
     <label><input type="checkbox" id="apShare" checked>Paylaşım</label><label><input type="checkbox" id="apPrice">Fiyatlar</label><label><input type="checkbox" id="apUsage">Kullanım</label><label><input type="checkbox" id="apFin">Finansman yapısı</label>
     <button id="applyAll">Uygula</button></div>
   </section>
@@ -1209,7 +1205,7 @@ function updateDerived(){
   renderFin();
   $('ddAlerts').innerHTML=a;
   $('siteTitle').textContent=s.name||'Adsız lokasyon';
-  $('siteSub').textContent=[s.project,s.district,s.city].filter(Boolean).join(', ');
+  $('siteSub').textContent=[s.district,s.city].filter(Boolean).join(', ');
   $('upd').textContent=new Date(s.updatedAt).toLocaleString('tr-TR');
   renderPipe();
 }
@@ -1217,16 +1213,15 @@ function updateDerived(){
 /* ---------- events ---------- */
 function openSite(id){guard(()=>{activeId=id;view='site';sub='info';render();window.scrollTo({top:0});});}
 function openAdd(){guard(()=>{
-  $('dlgForm').reset();$('dlgProject').value=cur()?.project||'';
-  $('projectList').innerHTML=[...new Set(db.sites.map(s=>s.project).filter(Boolean))].map(p=>`<option value="${esc(p)}">`).join('');
+  $('dlgForm').reset();
   $('dlg').showModal();$('dlgName').focus();
 });}
 $('addSite').onclick=openAdd;
 $('dlgCancel').onclick=()=>$('dlg').close();
 $('dlgForm').onsubmit=e=>{e.preventDefault();
-  const v=id=>$(id).value.trim(),name=v('dlgName'),project=v('dlgProject');
-  if(!name||!project){toast('Lokasyon adı ve proje / bölge zorunlu.');return;}
-  const s=blankSite(name,project);
+  const v=id=>$(id).value.trim(),name=v('dlgName');
+  if(!name){toast('Lokasyon adı zorunlu.');return;}
+  const s=blankSite(name);
   Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractYears:Math.max(0,Math.round(+$('dlgYears').value||0)),
     address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
@@ -1245,7 +1240,7 @@ $('view').addEventListener('click',e=>{
   const dtr=e.target.closest('[data-deltr]');if(dtr){s.tranches=s.tranches.filter(t=>t.id!==dtr.dataset.deltr);touched(s);renderTranches();updateDerived();return;}
   if(e.target.id==='applyAll'){const keys=[],fin=$('apFin').checked;if($('apShare').checked)keys.push('share','entShare','starShare','ekoShare','fundShare');if($('apPrice').checked)keys.push('sale','cost','saleGrowth','costGrowth');if($('apUsage').checked)keys.push('initial','growth');
     if(!keys.length&&!fin){toast('En az bir grup seçin.');return;}
-    const targets=db.sites.filter(x=>x.id!==s.id&&(!s.project||x.project===s.project));
+    const targets=db.sites.filter(x=>x.id!==s.id&&true);
     targets.forEach(x=>{keys.forEach(k=>x.fin[k]=s.fin[k]);if(fin){x.fin.fundName=s.fin.fundName;const old=x.tranches||[];x.tranches=s.tranches.map(t=>({...t,id:uid(),amount:(old.find(o=>o.item===t.item)||{}).amount??t.amount}));}touched(x);});touched(s);updateDerived();toast(targets.length+' lokasyona uygulandı.');return;}
   const seg=e.target.closest('.seg button');
   if(seg){const k=seg.closest('.dd-row').dataset.c,v=seg.dataset.v;s.dd[k]=s.dd[k]||{};s.dd[k].v=s.dd[k].v===v?'':v;
