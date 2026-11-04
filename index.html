@@ -900,14 +900,13 @@ function renderPortfolio(){
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
   let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div>`;
   h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
-    <th>Lokasyon</th><th>Sorumlu</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">İlk Yıl Hasılat TL</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
+    <th>Lokasyon</th><th>Aşama</th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">Skor</th><th>Durum</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
-      return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span></td><td>${esc(s.survey.lead)||'—'}</td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
+      return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.survey.lead)||'—'}</td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td>
-      <td class="num"><span class="p1">${nf.format(calculate(s)[0].revenue)}</span></td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
-      <td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td></tr>`;}).join('')+
-    `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(rows[0].revenue)}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
+      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td></tr>`;}).join('')+
+    `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
     const warn=invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:'';
