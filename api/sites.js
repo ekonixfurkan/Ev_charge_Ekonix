@@ -2,6 +2,7 @@
 import { sql, ensureSchema, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
+import { seedOnce } from '../lib/seed.js';
 
 export default async function handler(req, res) {
   try {
@@ -11,6 +12,7 @@ export default async function handler(req, res) {
     const s = sql();
 
     if (req.method === 'GET') {
+      try { await seedOnce(s); } catch { /* başlangıç listesi eklenemezse okuma bozulmasın */ }
       const rows = await s`SELECT data FROM sites ORDER BY updated_at`;
       const cfg = await s`SELECT data FROM config WHERE key = 'team'`;
       const team = cfg[0]?.data?.names;
