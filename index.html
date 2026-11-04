@@ -899,15 +899,14 @@ function renderPortfolio(){
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
   let h=`<div class="totals" data-tab="ovw">${tot('Lokasyon',list.length)}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div>`;
   h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
-    <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">DC kW</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Trafo / Kullanılabilir</th><th class="num">İlk Yıl Hasılat TL</th><th>Finansman</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
-    list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),cr=capRef(s),over=cr&&t.kw>cr.v,sc=d.cls;
+    <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">İlk Yıl Hasılat TL</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
+    list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
       return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.district,s.city].filter(Boolean).join(', '))||'&nbsp;'}</span></td><td><span class="p1">${esc(s.project)||'—'}</span>${s.survey.lead?`<span class="p2">Sorumlu: ${esc(s.survey.lead)}</span>`:''}</td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
-      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num"><span class="p1">${nf.format(t.dcKw)}</span></td><td class="num"><span class="p1">${nf.format(t.acKw)}</span></td><td class="num"><span class="p1">${t.sockets}</span></td>
-      <td class="num" ${over?'title="Kurulu güç kullanılabilir gücü aşıyor"':''}><span class="p1" ${over?'style="color:var(--no)"':''}>${s.gridKva?nf.format(s.gridKva)+' kVA':'—'}</span>${+s.survey.availKw?`<span class="p2${over?' bad':''}">${nf.format(s.survey.availKw)} kW kullanılabilir</span>`:''}</td>
-      <td class="num"><span class="p1">${nf.format(calculate(s)[0].revenue)}</span></td><td style="min-width:150px;max-width:210px"><span class="p1">${esc(structureLabel(s))}</span><span class="p2">${money(totalFin(s))}</span></td>
+      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td>
+      <td class="num"><span class="p1">${nf.format(calculate(s)[0].revenue)}</span></td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
       <td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td></tr>`;}).join('')+
-    `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(T.dcKw)}</td><td class="num">${nf.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td class="num">${nf.format(rows[0].revenue)}</td><td>${money(list.reduce((a,s)=>a+totalFin(s),0))}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
+    `</tbody><tfoot><tr><td colspan="3">Toplam</td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td class="num">${nf.format(rows[0].revenue)}</td><td colspan="2"></td></tr></tfoot></table></div></section>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
     const warn=invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:'';
