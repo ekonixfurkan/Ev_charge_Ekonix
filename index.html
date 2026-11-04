@@ -4,6 +4,7 @@
 <link rel="preload" href="/fonts/plus-jakarta-sans-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
 <title>Saha Değerlendirme Aracı</title>
 <meta name="robots" content="noindex,nofollow">
+<script src="/i18n.js"></script>
 <style>html.pending body{visibility:hidden}</style>
 <script>document.documentElement.classList.add("pending")</script>
 <style>
@@ -179,6 +180,14 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .nav-item.active:hover{background:rgba(255,255,255,.14);color:#fff;border-left-color:var(--teal)}
 .nav-item:focus-visible,.nav-head:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
 .sb-user{margin-top:auto;padding:12px 8px 16px;border-top:1px solid rgba(255,255,255,.1);position:sticky;bottom:0;background:var(--side)}
+.sb-user .lang-sw{display:flex;margin:0 4px 10px;border:1px solid rgba(255,255,255,.18);border-radius:var(--radius);overflow:hidden}
+.sb-user .lang-sw button{flex:1;padding:6px 0;border:0;border-radius:0;background:transparent;color:var(--side-muted);font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.sb-user .lang-sw button+button{border-left:1px solid rgba(255,255,255,.18)}
+.sb-user .lang-sw button:hover{color:#fff}
+.sb-user .lang-sw button[aria-pressed=true]{background:rgba(255,255,255,.14);color:#fff}
+.sb-user .lang-sw button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.sb-collapsed .lang-sw{flex-direction:column;margin:0 8px 10px}
+.sb-collapsed .lang-sw button+button{border-left:0;border-top:1px solid rgba(255,255,255,.18)}
 .whoami{display:block;padding:0 8px 8px;font-size:12px;color:var(--side-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logout{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;border:1px solid rgba(255,140,130,.35);border-radius:var(--radius);background:transparent;color:#ff9a8f;font-size:12.5px;font-weight:600;text-align:left}
 .logout:hover{background:rgba(255,120,110,.12);color:#ffb8b0;border-color:rgba(255,140,130,.6)}
@@ -565,7 +574,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
         <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button></div>
       </section>
     </nav>
-    <div class="sb-user"><div id="saveStatus" role="status">Yükleniyor…</div><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
+    <div class="sb-user"><div class="lang-sw" translate="no" role="group" aria-label="Dil / Language"><button type="button" data-lang="tr" aria-pressed="true">TR</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div><div id="saveStatus" role="status">Yükleniyor…</div><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
   </aside>
   <main>
     <div class="print-head"><img src="/ekonix-logo.jpeg" alt="Ekonix"><div><strong id="phTitle"></strong><span id="phMeta"></span></div></div>
@@ -639,7 +648,7 @@ const isOpen=s=>statusOf(s.status).open===true;
 function scoreOf(s){
   const raw=s.score,v=(raw===''||raw==null||!Number.isFinite(+raw))?null:+raw;
   const cls=v==null?'none':v>=SCORE_HI?'hi':v>=SCORE_MID?'mid':'lo';
-  return {v,cls,label:v==null?'—':(Number.isInteger(v)?String(v):String(v).replace('.',',')),
+  return {v,cls,label:v==null?'—':(Number.isInteger(v)?String(v):String(v).replace('.',I18N.lang==='en'?'.':',')),
     text:v==null?'Puanlanmadı':v>=SCORE_HI?'Yüksek':v>=SCORE_MID?'Orta':'75 Altı'};
 }
 /* AMG / StarCharge site survey & qualification form */
@@ -679,7 +688,7 @@ const DECISIONS=[{min:SCORE_HI,t:'İlerlet',en:'Advance',cls:'hi'},{min:SCORE_MI
 const VAL={ok:{t:'Uygun',s:1},risk:{t:'Riskli',s:.5},no:{t:'Uygun Değil',s:0}};
 
 const $=id=>document.getElementById(id);
-const nf=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:0});
+const nf=new Intl.NumberFormat(LOC,{maximumFractionDigits:0});
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // Türkçe Başlık Düzeni: her kelimenin ilk harfi büyük; DC, EKONİX gibi tamamı büyük kelimeler ve kW korunur.
 const TITLE_SMALL=new Set(['ve','ile','için']),TITLE_KEEP=new Set(['kW','kVA','kWh']);
@@ -709,8 +718,8 @@ const party=k=>PARTIES.find(p=>p.k===k)||PARTIES[0];
 const pName=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).t;
 const pShort=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).sh;
 const money=v=>nf.format(v)+' TL';
-const df=new Intl.NumberFormat('tr-TR',{maximumFractionDigits:1});
-const df2=new Intl.NumberFormat('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const df=new Intl.NumberFormat(LOC,{maximumFractionDigits:1});
+const df2=new Intl.NumberFormat(LOC,{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtD=v=>v==null?'—':v>=99?'>99':df2.format(v);
 const dscrClass=v=>v==null?'':v<1?'lo':v<1.2?'mid':'hi';
 const shareTotal=v=>v.share+v.entShare+v.starShare+v.ekoShare+(v.fundShare||0);
@@ -857,7 +866,7 @@ function migrateSite(s){
   if(!Array.isArray(s.tranches)){s.tranches=defaultTranches();if(s.fin.investment>0){s.tranches[1].fin='ent';s.tranches[1].amount=s.fin.investment;}}
   s.createdAt=s.createdAt||s.updatedAt||now();s.survey=s.survey||{};s.amg=s.amg||{scores:{},notes:{}};s.amg.scores=s.amg.scores||{};s.amg.notes=s.amg.notes||{};s.att=s.att||{};s.sign=s.sign||{};return s;}
 const byCreated=(a,b)=>String(a.createdAt).localeCompare(String(b.createdAt));
-const clock=()=>new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+const clock=()=>new Date().toLocaleTimeString(LOC,{hour:'2-digit',minute:'2-digit'});
 async function api(path,opts){
   const r=await fetch(API+path,{credentials:'same-origin',headers:{'content-type':'application/json'},...opts});
   if(r.status===401){location.replace('/login.html');}
@@ -1012,7 +1021,7 @@ function locRowsHtml(list){
     <td style="min-width:150px">${bl?`<span class="p2 bad" style="margin:0">${esc(bl)}</span>`:'<span class="p2" style="margin:0">—</span>'}</td>
     <td class="num"><span class="p2" style="margin:0">${esc(fmtDate(s.updatedAt))}</span></td></tr>`;}).join('');
 }
-const fmtDate=v=>{if(!v)return '';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleDateString('tr-TR');};
+const fmtDate=v=>{if(!v)return '';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
   const list=visibleSites();
   $('locRows').innerHTML=list.length?locRowsHtml(list):'<tr><td colspan="8" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan lokasyon yok.</td></tr>';
@@ -1201,7 +1210,7 @@ function guard(fn){
 window.addEventListener('beforeprint',()=>{
   document.body.dataset.print=view;
   const x=view==='site'?cur():null;
-  if(x){$('phTitle').textContent=(x.name||'Lokasyon')+' · Lokasyon Raporu';$('phMeta').textContent=new Date().toLocaleString('tr-TR',{dateStyle:'long',timeStyle:'short'})+(me.email?' · '+(me.name||me.email):'');}
+  if(x){$('phTitle').textContent=(x.name||'Lokasyon')+' · Lokasyon Raporu';$('phMeta').textContent=new Date().toLocaleString(LOC,{dateStyle:'long',timeStyle:'short'})+(me.email?' · '+(me.name||me.email):'');}
 });
 window.addEventListener('afterprint',()=>{delete document.body.dataset.print;});
 document.addEventListener('click',e=>{
@@ -1397,7 +1406,7 @@ function updateDerived(){
   renderFin();
   $('ddAlerts').innerHTML=a;
   setPageTitle();
-  $('upd').textContent=new Date(s.updatedAt).toLocaleString('tr-TR');
+  $('upd').textContent=new Date(s.updatedAt).toLocaleString(LOC);
   renderPipe();
 }
 
@@ -1519,6 +1528,8 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(SITE_SUBS.includes(k))goSite(k);
   });
 });
+/* dil seçimi (TR / EN) */
+document.querySelectorAll('.lang-sw button').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.lang===I18N.lang));b.addEventListener('click',()=>{if(b.dataset.lang!==I18N.lang)I18N.set(b.dataset.lang);});});
 /* daraltılabilir sol panel */
 document.querySelectorAll('.nav-item').forEach(b=>{const t=b.textContent.trim();b.dataset.tip=t;b.setAttribute('aria-label',t);});
 function setSidebar(c){
@@ -1535,7 +1546,7 @@ try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');for(const g in s
 
 /* ---------- kullanıcı yönetimi (yalnızca yönetici) ---------- */
 let usersCache=null,usersMe='';
-const fmtDt=v=>v?new Date(v).toLocaleString('tr-TR',{dateStyle:'short',timeStyle:'short'}):'—';
+const fmtDt=v=>v?new Date(v).toLocaleString(LOC,{dateStyle:'short',timeStyle:'short'}):'—';
 function genPass(){const a='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',b=new Uint32Array(14);crypto.getRandomValues(b);return Array.from(b,x=>a[x%a.length]).join('');}
 async function userApi(method,body,qs=''){
   const r=await fetch('/api/users'+qs,{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
@@ -1615,7 +1626,7 @@ document.addEventListener('click',async e=>{
 let actF={q:'',actor:'',entity:''},actRows=[],actMore=false,actActors=[];
 const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo']};
 const ENT_LABEL={lokasyon:'Lokasyon',kullanici:'Kullanıcı',oturum:'Oturum'};
-const fmtTs=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleString('tr-TR',{dateStyle:'short',timeStyle:'short'});};
+const fmtTs=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleString(LOC,{dateStyle:'short',timeStyle:'short'});};
 async function fetchActivity(reset){
   const qs=new URLSearchParams({limit:'50'});
   if(!reset&&actRows.length)qs.set('before',String(actRows[actRows.length-1].id));
