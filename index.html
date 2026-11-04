@@ -222,7 +222,12 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .grid.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
 /* Lokasyon Bilgileri: dar, iki sütunlu form; tek kalan alan yarım genişlikte, yanı boş kalır */
-.grid.infogrid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:760px}
+.grid.infogrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.info-pair{display:grid;grid-template-columns:repeat(2,minmax(0,640px));gap:16px;justify-content:start;align-items:start;margin-bottom:16px}
+.info-pair .box{margin-bottom:0}
+@media (max-width:1400px){.info-pair{grid-template-columns:minmax(0,640px)}.info-pair .box{margin-bottom:16px}}
+.trio{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+input[data-locked]{background:var(--soft);color:var(--ink2);border-style:dashed;cursor:not-allowed}
 .span2{grid-column:span 2}.span3{grid-column:span 3}.span4{grid-column:1/-1}
 .subgrid{margin-top:14px}
 .subh{font-size:11.5px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em;margin:22px 0 8px}
@@ -493,14 +498,17 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
     <div class="dgrid">
       <label class="span2">Lokasyon adı *<input id="dlgName" required maxlength="120" autocomplete="off"></label>
       <label>İletişim kişisi<input id="dlgContact" maxlength="120" autocomplete="off"></label>
-      <label>Telefon<input id="dlgPhone" type="tel" maxlength="40" autocomplete="off"></label>
+      <label>Telefon<input id="dlgPhone" data-phone type="tel" inputmode="tel" maxlength="22" placeholder="+90 (5__) ___ __ __" autocomplete="off"></label>
       <label>Saha tipi<select id="dlgType"><option value="Hotel">Otel</option><option value="Hospital">Hastane</option><option value="Mall">AVM</option><option value="Office">Ofis</option><option value="Industry Zone">Sanayi Sitesi</option><option value="Residence">Konut</option><option value="Commercial Center">Ticari Merkez</option><option value="Car Inspection Center">Araç Muayene İstasyonu</option><option value="Carpark">Otopark</option><option value="High School">Lise</option><option value="University">Üniversite</option><option value="Gym & Restaurant">Spor Salonu ve Restoran</option><option value="Fuel Station">Akaryakıt İstasyonu</option><option value="Logistics Center">Lojistik Merkezi</option><option value="Other">Diğer</option></select></label>
-      <label>Sözleşme süresi (yıl)<input id="dlgYears" type="number" min="0" max="99" step="1" inputmode="numeric"></label>
-      <label>İl<input id="dlgCity" maxlength="60" list="cityList" autocomplete="off"></label>
-      <datalist id="cityList"><option value="Adana"><option value="Adıyaman"><option value="Afyonkarahisar"><option value="Ağrı"><option value="Aksaray"><option value="Amasya"><option value="Ankara"><option value="Antalya"><option value="Ardahan"><option value="Artvin"><option value="Aydın"><option value="Balıkesir"><option value="Bartın"><option value="Batman"><option value="Bayburt"><option value="Bilecik"><option value="Bingöl"><option value="Bitlis"><option value="Bolu"><option value="Burdur"><option value="Bursa"><option value="Çanakkale"><option value="Çankırı"><option value="Çorum"><option value="Denizli"><option value="Diyarbakır"><option value="Düzce"><option value="Edirne"><option value="Elazığ"><option value="Erzincan"><option value="Erzurum"><option value="Eskişehir"><option value="Gaziantep"><option value="Giresun"><option value="Gümüşhane"><option value="Hakkâri"><option value="Hatay"><option value="Iğdır"><option value="Isparta"><option value="İstanbul"><option value="İzmir"><option value="Kahramanmaraş"><option value="Karabük"><option value="Karaman"><option value="Kars"><option value="Kastamonu"><option value="Kayseri"><option value="Kilis"><option value="Kırıkkale"><option value="Kırklareli"><option value="Kırşehir"><option value="Kocaeli"><option value="Konya"><option value="Kütahya"><option value="Malatya"><option value="Manisa"><option value="Mardin"><option value="Mersin"><option value="Muğla"><option value="Muş"><option value="Nevşehir"><option value="Niğde"><option value="Ordu"><option value="Osmaniye"><option value="Rize"><option value="Sakarya"><option value="Samsun"><option value="Siirt"><option value="Sinop"><option value="Sivas"><option value="Şanlıurfa"><option value="Şırnak"><option value="Tekirdağ"><option value="Tokat"><option value="Trabzon"><option value="Tunceli"><option value="Uşak"><option value="Van"><option value="Yalova"><option value="Yozgat"><option value="Zonguldak"></datalist>
-      <label>İlçe<input id="dlgDistrict" maxlength="60" autocomplete="off"></label>
+      <span></span>
+      <div class="trio">
+        <label>İlk süre (yıl)<input id="dlgBase" type="number" min="0" step="any" inputmode="decimal"></label>
+        <label>Uzatma (yıl)<input id="dlgExt" type="number" min="0" step="any" inputmode="decimal"></label>
+        <label>Toplam (yıl)<input id="dlgTotal" data-locked readonly tabindex="-1" title="İlk süre ile uzatmanın toplamı"></label>
+      </div>
+      <label>İl<select id="dlgCity"></select></label>
+      <label>İlçe<select id="dlgDistrict" disabled></select></label>
       <label class="span2">Adres<textarea id="dlgAddress" rows="2" maxlength="300"></textarea></label>
-      <label>Yer sağlayıcı<input id="dlgHost" maxlength="120" autocomplete="off"></label>
       <label class="span2">Genel notlar<textarea id="dlgNotes" rows="3" maxlength="2000"></textarea></label>
     </div>
     <div class="row">
@@ -510,6 +518,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   </form>
 </dialog>
 
+<script src="/data/turkey-locations.js"></script>
 <script>
 'use strict';
 const KEY='saha-dd-araci:v1';
@@ -725,7 +734,7 @@ function resultsHtml(rows,f,s,tf,mode='all'){
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
 function blankSite(name){
-  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',phone:'',
+  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',phone:'',contractBase:'',contractExt:'',
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
@@ -738,6 +747,8 @@ function migrateSite(s){
   if(!STAGES.some(x=>x[0]===s.stage))s.stage='01';
   if(!STATUSES.some(x=>x.k===s.status))s.status='active';
   if(OLD_TYPE[s.type])s.type=OLD_TYPE[s.type];else if(s.type&&!TYPES.some(x=>x[0]===s.type))s.type='Other';
+  if(s.contractBase===undefined)s.contractBase=(+s.contractYears>0)?+s.contractYears:'';
+  if(s.contractExt===undefined)s.contractExt='';
   for(const k of ['phone','nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
   if(s.score==null||!Number.isFinite(+s.score)||s.score==='')s.score='';
   s.fx=s.fx||{};
@@ -848,7 +859,7 @@ function matchesF(s){
   if(F.owner&&(s.survey.lead||'')!==F.owner)return false;
   if(F.partner&&(s.survey.partner||'')!==F.partner)return false;
   if(F.blocked&&!(s.blocker||s.blockerTr))return false;
-  if(F.q){const hay=norm([s.name,s.city,s.district,s.host,s.survey.partner,s.survey.lead,s.nextAction,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
+  if(F.q){const hay=norm([s.name,s.city,s.district,s.survey.partner,s.survey.lead,s.nextAction,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
   return true;
 }
 const SORTS={updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
@@ -956,13 +967,26 @@ function renderPortfolio(){
 function field(key,label,type='text',extra=''){
   const s=cur();return `<label${extra}>${label}<input data-f="${key}" type="${type}" value="${esc(s[key])}" ${type==='number'?'min="0" step="any" inputmode="decimal"':''}></label>`;
 }
-const BLANK_OK=new Set(['score','manHours','evseKw']);
+const BLANK_OK=new Set(['score','manHours','evseKw','contractBase','contractExt']);
 const cur=()=>db.sites.find(s=>s.id===activeId);
-function fxf(key,label,extra='',area=false){const v=cur().fx?.[key]??'';return area?`<label${extra}>${label}<textarea data-fx="${key}" rows="2">${esc(v)}</textarea></label>`:`<label${extra}>${label}<input data-fx="${key}" value="${esc(v)}"></label>`;}
+/* İl / ilçe listeleri (data/turkey-locations.js) */
+const optsOf=(list,cur)=>'<option value="">Seçin</option>'+[...(cur&&!list.includes(cur)?[cur]:[]),...list].map(x=>`<option ${x===cur?'selected':''}>${esc(x)}</option>`).join('');
+const ilOptions=cur=>optsOf(window.TR_ILLER||[],cur);
+const ilceOptions=(il,cur)=>optsOf((window.TR_IL_ILCE||{})[il]||[],cur);
+/* Sözleşme süresi: ilk süre + uzatma = toplam (toplam elle girilmez) */
+const contractTotal=s=>{const a=s.contractBase,b=s.contractExt;return (a===''||a==null)&&(b===''||b==null)?'':String(+((+a||0)+(+b||0)).toFixed(2));};
+/* Telefon: +90 (5XX) XXX XX XX */
+function fmtPhone(v,prevDigits,deleting){
+  let d=String(v).replace(/\D/g,'');if(d.startsWith('90'))d=d.slice(2);if(d.startsWith('0'))d=d.slice(1);d=d.slice(0,10);
+  if(deleting&&prevDigits!=null&&d.length===prevDigits)d=d.slice(0,-1);
+  if(!d)return '';let o='+90 ('+d.slice(0,3);if(d.length>=3)o+=')';if(d.length>3)o+=' '+d.slice(3,6);if(d.length>6)o+=' '+d.slice(6,8);if(d.length>8)o+=' '+d.slice(8,10);return o;
+}
+document.addEventListener('focusin',e=>{const el=e.target;if(el.dataset&&'phone' in el.dataset&&!el.disabled&&!el.readOnly&&!el.value)el.value='+90 (';});
+document.addEventListener('focusout',e=>{const el=e.target;if(el.dataset&&'phone' in el.dataset&&!/\d/.test(el.value.replace(/^\+90/,'')))el.value='';});
 function leadField(){
   const v=cur().survey.lead||'',names=[...team];if(v&&!names.includes(v))names.push(v);
-  return `<div class="leadcell"><label>Proje sorumlusu<select data-lead aria-label="Proje sorumlusu"><option value="">Seçin</option>${names.map((n,i)=>`<option value="${esc(n)}" ${n===v?'selected':''}>${i<team.length?(i+1)+'. ':''}${esc(n)}</option>`).join('')}<option value="__new">+ Yeni kişi ekle</option></select></label>
-  <div class="newlead" id="newLeadRow" hidden><input id="newLead" maxlength="60" placeholder="Ad soyad" aria-label="Yeni proje sorumlusu"><button id="addLead" class="primary">Ekle</button><button id="cancelLead" class="ghost">Vazgeç</button></div></div>`;
+  return `<div class="leadcell"><label>Sorumlu<select data-lead aria-label="Sorumlu"><option value="">Seçin</option>${names.map((n,i)=>`<option value="${esc(n)}" ${n===v?'selected':''}>${i<team.length?(i+1)+'. ':''}${esc(n)}</option>`).join('')}<option value="__new">+ Yeni kişi ekle</option></select></label>
+  <div class="newlead" id="newLeadRow" hidden><input id="newLead" maxlength="60" placeholder="Ad soyad" aria-label="Yeni sorumlu"><button id="addLead" class="primary">Ekle</button><button id="cancelLead" class="ghost">Vazgeç</button></div></div>`;
 }
 async function addTeamMember(name){
   if(team.includes(name))return;team=[...team,name];
@@ -1013,7 +1037,7 @@ const ICON_SAVE='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" str
 const ICON_X='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 function editBarHtml(){
   return siteEdit
-    ?`<button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
+    ?`${me.role==='admin'?`<button type="button" class="danger" id="delSite">Sil</button>`:''}<button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
     :`<button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
 }
 const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,[data-del],#addLead,#cancelLead';
@@ -1022,7 +1046,8 @@ function applyEditState(){
   v.classList.toggle('ro',!siteEdit);
   v.querySelectorAll('input,select,textarea').forEach(el=>{
     if(el.closest('.subtabs')||el.closest('.edit-actions'))return;
-    el.disabled=!siteEdit;
+    if(el.hasAttribute('data-locked')){el.disabled=false;el.readOnly=true;return;}
+    el.disabled=!siteEdit||(el.hasAttribute('data-needs-city')&&!cur().city);
   });
 }
 function startEdit(){
@@ -1071,43 +1096,38 @@ function renderSite(){
   ${siteEdit?'<p class="eb-note-line no-print">Düzenleme modu: değişiklikler Kaydet\'e basana kadar sunucuya gönderilmez.</p>':''}
   <div id="ddAlerts"></div>
 
-   <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button>${me.role==='admin'?'<button class="ghost" id="delSite">Lokasyonu sil</button>':''}</span></h3>
+  <div class="info-pair" data-tab="info">
+  <section class="box"><h3>Lokasyon Bilgileri</h3>
   <div class="grid infogrid">
     ${field('name','Lokasyon adı','text',' class="span4"')}
-    ${field('contact','İletişim kişisi')}${field('phone','Telefon','tel')}
+    ${field('contact','İletişim kişisi')}
+    <label>Telefon<input data-f="phone" data-phone type="tel" inputmode="tel" placeholder="+90 (5__) ___ __ __" value="${esc(s.phone)}"></label>
     <label>Saha tipi<select data-f="type">${TYPES.map(([k,t])=>`<option value="${esc(k)}" ${k===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
-    ${field('contractYears','Sözleşme süresi (yıl)','number')}
-    ${field('city','İl')}${field('district','İlçe')}
+    <span></span>
+    <div class="trio">
+      <label>İlk süre (yıl)<input data-f="contractBase" type="number" min="0" step="any" inputmode="decimal" value="${esc(s.contractBase)}"></label>
+      <label>Uzatma (yıl)<input data-f="contractExt" type="number" min="0" step="any" inputmode="decimal" value="${esc(s.contractExt)}"></label>
+      <label>Toplam (yıl)<input id="ctTotal" data-locked readonly tabindex="-1" value="${esc(contractTotal(s))}" title="İlk süre ile uzatmanın toplamı; elle değiştirilemez"></label>
+    </div>
+    <label>İl<select data-f="city">${ilOptions(s.city)}</select></label>
+    <label>İlçe<select data-f="district" data-needs-city ${s.city?'':'disabled'}>${ilceOptions(s.city,s.district)}</select></label>
     ${field('address','Adres','text',' class="span4"')}
-    ${field('host','Yer sağlayıcı')}
   </div></section>
 
-  <section class="box" data-tab="info"><h3>Takip ve Durum<small>Sıradaki iş, engel ve aşama bilgisi</small></h3>
-  <div class="grid">
+  <section class="box"><h3>Takip ve Durum<small>Sıradaki iş, engel ve aşama</small></h3>
+  <div class="grid infogrid">
     <label>Aşama<select data-f="stage">${STAGES.map(([k,t])=>`<option value="${k}" ${k===s.stage?'selected':''}>${esc(k+' '+t)}</option>`).join('')}</select></label>
     <label>Durum<select data-f="status">${STATUSES.map(st=>`<option value="${st.k}" ${st.k===s.status?'selected':''}>${esc(st.t)}</option>`).join('')}</select></label>
     ${field('score','Skor (0–100)','number')}
     ${leadField()}
-    ${field('nextAction','Sıradaki iş (Next Action)','text',' class="span3"')}${field('nextActionDate','Sıradaki iş tarihi','date')}
+    ${field('nextAction','Sıradaki iş (Next Action)','text',' class="span4"')}
+    ${field('nextActionDate','Sıradaki iş tarihi','date')}
+    ${sv('partner','Yerel ortak')}
     ${field('blocker','Engel / risk (kategori: sorun)','text',' class="span4"')}
     ${field('statusTr','Son durum (TR, haftalık rapor)','text',' class="span4"')}
     ${field('blockerTr','Engel (TR, haftalık rapor)','text',' class="span4"')}
   </div><p class="note">Engel kategorileri: Contract, Technical, Site, Design, Permit, Commercial, Logistics. Skor: 85 ve üzeri yeşil, 75–84 turuncu, 75 altı kırmızı.</p></section>
-
-  <section class="box" data-tab="info"><h3>Feishu Alanları<small>Feishu ile aktarılan metinler</small></h3>
-  <details><summary>Süreç Sütunları</summary><div class="grid subgrid">
-    ${fxf('surveyHistory','Survey History',' class="span2"',true)}${fxf('nextSurvey','Next Survey',' class="span2"',true)}
-    ${fxf('presentation','Presentation',' class="span2"',true)}${fxf('proposal','Proposal | Contract',' class="span2"',true)}
-    ${fxf('blueprint','Blueprint')}${fxf('epc','EPC')}${fxf('logistics','Logistics')}${fxf('warehouse','Warehouse')}${fxf('construction','Construction',' class="span2"')}
-  </div></details>
-  <details><summary>Saha Detay Sütunları</summary><div class="grid subgrid">
-    ${sv('partner','Local Partner (yerel ortak)')}${field('needs','Customer Needs')}${field('cpoPartner','CPO Partner')}${field('siteFiles','Site Survey Files (link)')}
-    ${fxf('siteSize','Site Size | Boundary',' class="span2"')}${fxf('parking','Parking Spaces',' class="span2"')}
-    ${fxf('transformer','Transformer | Power',' class="span2"')}${fxf('distance','Distance | Cable Route',' class="span2"')}
-    ${fxf('meetingTariff','Meeting | Tariff',' class="span2"',true)}${fxf('competitor','Competitor Survey',' class="span2"',true)}
-    ${fxf('keyNotes','Key Survey Notes',' class="span4"',true)}
-    ${field('manHours','Total Man Hours','number')}${field('evseKw','EVSE Capacity (kW)','number')}${field('pvbess','PV & BESS Capacity')}${field('approvalDate','StarCharge Approval Date','date')}
-  </div></details></section>
+  </div>
 
   <section class="box" data-tab="infra"><h3>Saha Keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
   <details open><summary>Proje Bilgileri</summary><div class="grid subgrid">
@@ -1248,8 +1268,15 @@ function updateDerived(){
 
 /* ---------- events ---------- */
 function openSite(id){guard(()=>{activeId=id;view='site';sub='info';render();window.scrollTo({top:0});});}
+// Yeni Lokasyon penceresi: telefon maskesi, il -> ilçe zinciri, süre toplamı
+document.addEventListener('input',e=>{
+  const el=e.target;if(!el.closest||!el.closest('#dlg'))return;
+  if(el.id==='dlgPhone'){el.value=fmtPhone(el.value,(el._dg??null),/^delete/.test(e.inputType||''));el._dg=el.value.replace(/\D/g,'').replace(/^90/,'').length;}
+  if(el.id==='dlgBase'||el.id==='dlgExt'){const a=$('dlgBase').value,b=$('dlgExt').value;$('dlgTotal').value=(a===''&&b==='')?'':String(+((+a||0)+(+b||0)).toFixed(2));}
+});
+document.addEventListener('change',e=>{if(e.target.id!=='dlgCity')return;const d=$('dlgDistrict');d.innerHTML=ilceOptions(e.target.value,'');d.disabled=!e.target.value;});
 function openAdd(){guard(()=>{
-  $('dlgForm').reset();
+  $('dlgForm').reset();$('dlgCity').innerHTML=ilOptions('');$('dlgDistrict').innerHTML=ilceOptions('','');$('dlgDistrict').disabled=true;$('dlgTotal').value='';
   $('dlg').showModal();$('dlgName').focus();
 });}
 $('addSite').onclick=openAdd;
@@ -1258,8 +1285,9 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   const v=id=>$(id).value.trim(),name=v('dlgName');
   if(!name){toast('Lokasyon adı zorunlu.');return;}
   const s=blankSite(name);
-  Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractYears:Math.max(0,Math.round(+$('dlgYears').value||0)),
-    address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),phone:v('dlgPhone'),notes:v('dlgNotes')});
+  const base=$('dlgBase').value===''?'':Math.max(0,+$('dlgBase').value||0),ext=$('dlgExt').value===''?'':Math.max(0,+$('dlgExt').value||0);
+  Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractBase:base,contractExt:ext,contractYears:(+base||0)+(+ext||0),
+    address:v('dlgAddress'),contact:v('dlgContact'),phone:v('dlgPhone'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const pb=e.target.closest('.fin-sub [data-ps]');if(pb){psub=pb.dataset.ps;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
@@ -1285,8 +1313,6 @@ $('view').addEventListener('click',e=>{
   const del=e.target.closest('[data-del]');if(del){s.units=s.units.filter(u=>u.id!==del.dataset.del);touched(s);renderSite();return;}
   if(e.target.id==='delSite'){ask(s.name+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Lokasyonu sil').then(ok=>{if(!ok)return;
     exitEdit();removeSite(s);activeId=null;view='portfolio';render();toast('Lokasyon silindi.');});return;}
-  if(e.target.id==='dupSite'){const c=JSON.parse(JSON.stringify(s));c.id=uid();c.name=s.name+' (kopya)';c.units.forEach(u=>u.id=uid());c.status='active';c.stage='01';c.dd={};c.amg={scores:{},notes:{}};c.att={};c.sign={};c.createdAt=now();
-    db.sites.push(c);touched(c);guard(()=>{activeId=c.id;view='site';sub='info';render();startEdit();window.scrollTo({top:0});});toast('Lokasyon kopyalandı; kontrol listesi boş başlatıldı.');}
 });
 $('view').addEventListener('input',e=>{const el=e.target;if(view!=='locations'||!el.dataset.lf)return;F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();});
 $('view').addEventListener('change',e=>{const el=e.target;if(view!=='locations')return;
@@ -1297,8 +1323,12 @@ $('view').addEventListener('keydown',e=>{if(e.target.id==='newLead'&&e.key==='En
 $('view').addEventListener('input',e=>{
   const s=cur();if(!s||view!=='site')return;const el=e.target;
   if(el.dataset.f){const k=el.dataset.f;let v=el.value;
+    if('phone' in el.dataset){const prev=(String(s.phone||'').replace(/\D/g,'').replace(/^90/,'')).length;v=el.value=fmtPhone(v,prev,/^delete/.test(e.inputType||''));}
     if(el.type==='number'){if(v===''&&BLANK_OK.has(k))v='';else{v=Math.max(0,+v||0);if(k==='score')v=Math.min(100,v);}}
-    s[k]=v;touched(s);updateDerived();return;}
+    s[k]=v;
+    if(k==='contractBase'||k==='contractExt'){const t=contractTotal(s);s.contractYears=t===''?0:+t;$('ctTotal').value=t;}
+    if(k==='city'){s.district='';const d=document.querySelector('[data-f="district"]');if(d){d.innerHTML=ilceOptions(v,'');d.disabled=!siteEdit||!v;}}
+    touched(s);updateDerived();return;}
   if(el.dataset.fx){s.fx=s.fx||{};s.fx[el.dataset.fx]=el.value;touched(s);return;}
   if(el.dataset.fin){const k=el.dataset.fin,[lo,hi]=FIN_LIMITS[k],v=el.value.trim()===''?NaN:+el.value;
     if(!Number.isFinite(v)||v<lo||v>hi){el.setAttribute('aria-invalid','true');status('Hatalı giriş: '+lo+' ile '+nf.format(hi)+' arasında değer girin',true);return;}
