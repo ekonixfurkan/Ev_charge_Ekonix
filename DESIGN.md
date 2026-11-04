@@ -16,7 +16,7 @@ Saha tespit formu gibi okunan, düz ve çizgili bir panel. Süs yok: veri, çizg
 
 ## Ekran ve yakınlaştırma
 
-- Tasarım **%67 tarayıcı yakınlaştırmasına** göre hazırlanır (MKT Motors ile aynı). Üst çubukta bunu söyleyen uyarı (`.zoom-note`) durur; kaldırma.
+- Tasarım **%75 tarayıcı yakınlaştırmasına** göre hazırlanır (MKT Motors'ta %67; Ekonix'te deneyip %75 daha iyi bulundu). Üst çubukta bunu söyleyen uyarı (`.zoom-note`) durur; kaldırma.
 - Tablo başlıkları tek satır (`white-space:nowrap`); iki kelimeli başlık satır kırıp hücresinden kaymasın.
 - Başlık ve hücre aynı sütunda aynı yana hizalı olur (sayılar sağa, metin sola).
 - İçerik genişliği en fazla 2400px; Genel Bakış tabloyu solda, KPI kutularını sağda dikey sütun olarak gösterir.

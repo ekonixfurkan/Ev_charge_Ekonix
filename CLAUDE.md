@@ -8,7 +8,7 @@ Bu depoda değişiklik yaparken (insan ya da yapay zekâ) şunlara uy.
   Yazı tipi yalnızca `--font` değişkeniyle verilir; satır içi ya da yeni `font-family` yazma.
   Dosyalar `/fonts/` altında (kendi sunucumuz), Google Fonts gibi dış kaynak kullanma.
 - Renk, köşe, gölge, rozet, sekme stilleri `index.html` içindeki `design-v1` CSS jetonlarındandır; yeni renk uydurma.
-- Arayüz %67 tarayıcı yakınlaştırmasına göre tasarlanır; üst çubuktaki `.zoom-note` uyarısını ve tablo başlıklarındaki `nowrap`'ı kaldırma. Başlık ile hücre aynı yana hizalı olmalı.
+- Arayüz %75 tarayıcı yakınlaştırmasına göre tasarlanır; üst çubuktaki `.zoom-note` uyarısını ve tablo başlıklarındaki `nowrap`'ı kaldırma. Başlık ile hücre aynı yana hizalı olmalı.
 - Başlıklar Türkçe Başlık Düzeni (her kelime büyük; ve/ile/için küçük).
 
 ## Proje

@@ -96,7 +96,7 @@ header h1{font-size:20px;font-weight:700}
 #saveStatus.err{color:#ffb0a6;background:rgba(236,122,108,.14);border-color:rgba(255,176,166,.5)}
 #saveStatus.err::before{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}
 @keyframes pulse{50%{opacity:.35}}
-/* Tasarım %67 tarayıcı yakınlaştırmasına göre hazırlandı (MKT Motors ile aynı uyarı). */
+/* Tasarım %75 tarayıcı yakınlaştırmasına göre hazırlandı (MKT Motors'taki uyarının Ekonix karşılığı). */
 .zoom-note{display:none;align-items:center;gap:8px;max-width:30rem;padding:6px 12px;border-radius:var(--radius);font-size:12px;font-weight:600;line-height:1.35;color:var(--no);background:var(--no-soft);border:1px solid color-mix(in srgb,var(--no) 35%,transparent);animation:pulse 2.4s cubic-bezier(.4,0,.6,1) infinite}
 .zoom-note svg{flex:none}
 @media (min-width:1100px){.zoom-note{display:flex}}
@@ -125,7 +125,7 @@ header h1{font-size:20px;font-weight:700}
 
 /* ---------- Gövde düzeni + sol menü ---------- */
 .shell{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:calc(100vh - 170px)}
-/* İçerik genişliği sınırlı: tarayıcı uzaklaştırıldığında (örn. %67) tablolar uçtan uca açılıp sütunlar arasında boşluk bırakmasın. */
+/* İçerik genişliği sınırlı: tarayıcı uzaklaştırıldığında (örn. %75) tablolar uçtan uca açılıp sütunlar arasında boşluk bırakmasın. */
 :root{--wrap:2400px}
 main{padding:24px 28px;max-width:calc(var(--wrap) + 56px);width:100%}
 @media (min-width:701px){
@@ -440,7 +440,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   <div>
     <h1>Saha Değerlendirme</h1>
   </div>
-  <span class="zoom-note" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Web site yakınlaştırma ayarı %67'ye göre tasarlanmıştır. Verimli kullanılabilmek adına ayarlarınızı kontrol ediniz.</span>
+  <span class="zoom-note" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Web site yakınlaştırma ayarı %75'e göre tasarlanmıştır. Verimli kullanılabilmek adına ayarlarınızı kontrol ediniz.</span>
 </header>
 <section class="pipeline" aria-label="Lokasyonların durum dağılımı">
   <div class="pipe-legend" id="pipeLegend"></div>
