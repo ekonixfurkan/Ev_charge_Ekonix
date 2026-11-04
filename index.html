@@ -99,7 +99,7 @@ header h1{font-size:20px;font-weight:700}
 @media (prefers-reduced-motion:reduce){#saveStatus.err::before{animation:none}}
 
 /* ---------- Üst özet: KPI + aşama çubuğu + sekmeler ---------- */
-.pipeline{background:var(--paper);padding:20px 28px 14px;display:flex;flex-direction:column}
+.pipeline{max-width:calc(var(--wrap) + 56px);background:var(--paper);padding:20px 28px 14px;display:flex;flex-direction:column}
 .pipe-legend,.totals{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:0}
 .totals{margin-bottom:16px}
 .site-tabs{order:3;align-self:stretch;margin:14px 0 0}
@@ -113,7 +113,9 @@ header h1{font-size:20px;font-weight:700}
 
 /* ---------- Gövde düzeni + sol menü ---------- */
 .shell{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:calc(100vh - 170px)}
-main{padding:24px 28px;max-width:none;width:100%}
+/* İçerik genişliği sınırlı: tarayıcı uzaklaştırıldığında (örn. %67) tablolar uçtan uca açılıp sütunlar arasında boşluk bırakmasın. */
+:root{--wrap:1440px}
+main{padding:24px 28px;max-width:calc(var(--wrap) + 56px);width:100%}
 body[data-page="ovw"] main{padding-top:0}
 @media (min-width:701px){
   body{display:grid;grid-template-columns:256px minmax(0,1fr);grid-template-rows:auto auto 1fr;min-height:100vh}
@@ -239,6 +241,7 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--hair-strong)
 .scroll{overflow-x:auto}
 .units td input,.units td select{padding:6px 8px;min-height:34px}
 .units td input:disabled,.units td select:disabled{opacity:.35}
+.units td.w-n input,.tranches td input[type=number]{text-align:right}
 .units td.w-kind{width:92px}.units td.w-n{width:90px}
 .kind-dc{border-left:4px solid var(--dc)}.kind-ac{border-left:4px solid var(--ac)}
 .tranches td select{min-width:140px}.tranches td input[data-tf=term],.tranches td input[data-tf=rate]{min-width:64px}.tranches td input[data-tf=item]{min-width:170px}.tranches td input[data-tf=amount]{min-width:120px}
@@ -248,7 +251,8 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--hair-strong)
 .yearly tbody th{font-weight:600;color:var(--ink)}
 
 /* Lokasyonlar / Lokasyon Listesi tabloları */
-table.portfolio{border-collapse:separate;border-spacing:0;font-size:13.5px}
+table.portfolio{border-collapse:separate;border-spacing:0;font-size:13.5px;width:auto;min-width:min(100%,760px)}
+table.yearly{width:auto;min-width:min(100%,640px)}
 .portfolio th,.portfolio td{padding:13px 10px;vertical-align:middle;border-bottom:1px solid var(--hair)}
 .portfolio th:first-child,.portfolio td:first-child{padding-left:16px;min-width:170px;border-left:3px solid transparent}
 .portfolio th:nth-child(2),.portfolio td:nth-child(2){min-width:130px}
