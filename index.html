@@ -101,6 +101,9 @@ header h1{font-size:20px;font-weight:700}
 .mk{background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:12px 16px}
 .mk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .mk strong{display:block;margin-top:3px;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.mk.split{display:grid;grid-template-columns:1fr 1fr;padding:0}
+.mk.split>div{padding:12px 16px}
+.mk.split>div+div{border-left:1px solid var(--hair)}
 .mk strong small{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
 
 /* ---------- Gövde düzeni + sol menü ---------- */
@@ -826,11 +829,11 @@ function filterText(){
   return t.join(' · ');
 }
 function renderPipe(){
-  const total=db.sites.length,open=db.sites.filter(isOpen);
-  const scored=open.map(s=>scoreOf(s).v).filter(v=>v!=null),avg=scored.length?scored.reduce((a,b)=>a+b,0)/scored.length:null;
-  const blocked=open.filter(s=>s.blocker||s.blockerTr).length,contracted=db.sites.filter(s=>s.stage>='06'&&isOpen(s)).length;
-  const mk=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
-  $('pipeLegend').innerHTML=mk('Toplam Lokasyon',total,'')+mk('Aktif',open.length,'')+mk('Ortalama Skor',avg==null?'—':df.format(avg),avg==null?'':'/100')+mk('Engelli Aktif',blocked,'')+mk('Sözleşme ve Sonrası',contracted,'');
+  const total=db.sites.length,active=db.sites.filter(isOpen).length,passive=total-active;
+  const mk=(l,v)=>`<div class="mk"><span>${l}</span><strong>${v}</strong></div>`;
+  // Aktif / Pasif tek kutuda, ortadan ikiye bölünmüş.
+  const split=`<div class="mk split"><div><span>Aktif</span><strong>${active}</strong></div><div><span>Pasif</span><strong>${passive}</strong></div></div>`;
+  $('pipeLegend').innerHTML=mk('Qualified Lead',total)+split;
 }
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
 function locRowsHtml(list){
@@ -901,7 +904,7 @@ function renderPortfolio(){
   h+=`<section class="box" data-tab="ovw"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio"><thead><tr>
     <th>Lokasyon</th><th>Proje / Bölge</th><th>Durum</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">İlk Yıl Hasılat TL</th><th class="num">Skor</th><th>Aşama</th></tr></thead><tbody>`+
     list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
-      return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.district,s.city].filter(Boolean).join(', '))||'&nbsp;'}</span></td><td><span class="p1">${esc(s.project)||'—'}</span>${s.survey.lead?`<span class="p2">Sorumlu: ${esc(s.survey.lead)}</span>`:''}</td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
+      return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span></td><td><span class="p1">${esc(s.project)||'—'}</span>${s.survey.lead?`<span class="p2">Sorumlu: ${esc(s.survey.lead)}</span>`:''}</td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td>
       <td class="num"><span class="p1">${nf.format(calculate(s)[0].revenue)}</span></td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
