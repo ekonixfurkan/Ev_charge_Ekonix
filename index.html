@@ -96,6 +96,11 @@ header h1{font-size:20px;font-weight:700}
 #saveStatus.err{color:#ffb0a6;background:rgba(236,122,108,.14);border-color:rgba(255,176,166,.5)}
 #saveStatus.err::before{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}
 @keyframes pulse{50%{opacity:.35}}
+/* Tasarım %67 tarayıcı yakınlaştırmasına göre hazırlandı (MKT Motors ile aynı uyarı). */
+.zoom-note{display:none;align-items:center;gap:8px;max-width:30rem;padding:6px 12px;border-radius:var(--radius);font-size:12px;font-weight:600;line-height:1.35;color:var(--no);background:var(--no-soft);border:1px solid color-mix(in srgb,var(--no) 35%,transparent);animation:pulse 2.4s cubic-bezier(.4,0,.6,1) infinite}
+.zoom-note svg{flex:none}
+@media (min-width:1100px){.zoom-note{display:flex}}
+@media (prefers-reduced-motion:reduce){.zoom-note{animation:none}}
 @media (prefers-reduced-motion:reduce){#saveStatus.err::before{animation:none}}
 
 /* ---------- Üst özet: KPI + aşama çubuğu + sekmeler ---------- */
@@ -241,7 +246,7 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 /* ---------- Tablolar ---------- */
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13.5px}
 th,td{padding:8px 8px;border-bottom:1px solid var(--hair);text-align:left;vertical-align:middle}
-thead th{font-size:11px;color:var(--ink2);font-weight:700;text-transform:uppercase;letter-spacing:.07em;background:var(--soft);border-bottom:2px solid var(--hair-strong)}
+thead th{white-space:nowrap;font-size:11px;color:var(--ink2);font-weight:700;text-transform:uppercase;letter-spacing:.07em;background:var(--soft);border-bottom:2px solid var(--hair-strong)}
 td.num,th.num{text-align:right}
 tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--hair-strong);background:var(--soft)}
 .scroll{overflow-x:auto}
@@ -435,6 +440,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   <div>
     <h1>Saha Değerlendirme</h1>
   </div>
+  <span class="zoom-note" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Web site yakınlaştırma ayarı %67'ye göre tasarlanmıştır. Verimli kullanılabilmek adına ayarlarınızı kontrol ediniz.</span>
 </header>
 <section class="pipeline" aria-label="Lokasyonların durum dağılımı">
   <div class="pipe-legend" id="pipeLegend"></div>

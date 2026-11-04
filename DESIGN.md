@@ -14,6 +14,13 @@ Saha tespit formu gibi okunan, düz ve çizgili bir panel. Süs yok: veri, çizg
 - **Sol menü:** koyu lacivert zemin, aktif öğe %12 beyaz dolgu + 3px teal sol çizgi.
 - **Başlıklar:** Türkçe Başlık Düzeni (her kelime büyük; ve/ile/için küçük).
 
+## Ekran ve yakınlaştırma
+
+- Tasarım **%67 tarayıcı yakınlaştırmasına** göre hazırlanır (MKT Motors ile aynı). Üst çubukta bunu söyleyen uyarı (`.zoom-note`) durur; kaldırma.
+- Tablo başlıkları tek satır (`white-space:nowrap`); iki kelimeli başlık satır kırıp hücresinden kaymasın.
+- Başlık ve hücre aynı sütunda aynı yana hizalı olur (sayılar sağa, metin sola).
+- İçerik genişliği en fazla 2400px; Genel Bakış tabloyu solda, KPI kutularını sağda dikey sütun olarak gösterir.
+
 ## Renkler
 
 | Rol | Değer |
