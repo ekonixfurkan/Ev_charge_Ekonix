@@ -2,7 +2,7 @@
 import { readJson } from '../lib/db.js';
 import { requireAdmin } from '../lib/auth.js';
 import { logActivity } from '../lib/activity.js';
-import { ROLES, dbOn, listUsers, createUser, updateUser, deleteUser, findUser, activeAdminCount } from '../lib/users.js';
+import { ROLES, isOwner, dbOn, listUsers, createUser, updateUser, deleteUser, findUser, activeAdminCount } from '../lib/users.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASS = 8;
@@ -21,7 +21,9 @@ export default async function handler(req, res) {
     if (!dbOn()) return bad(res, 'Kullanıcı yönetimi için veritabanı (DATABASE_URL) gerekli', 503);
 
     if (req.method === 'GET') {
-      return res.status(200).json({ users: await listUsers(), me: me.email });
+      // Şifre değişim bilgisi yalnızca sahibe gösterilir.
+      const users = (await listUsers()).map((u) => (me.owner ? u : { ...u, passChangedAt: undefined }));
+      return res.status(200).json({ users, me: me.email, owner: Boolean(me.owner) });
     }
 
     if (req.method === 'POST') {
@@ -41,6 +43,7 @@ export default async function handler(req, res) {
       const email = norm(b.email);
       const target = email && (await findUser(email));
       if (!target) return bad(res, 'Kullanıcı bulunamadı', 404);
+      if (isOwner(email) && !me.owner) return bad(res, 'Sahip hesabı yalnızca sahibi tarafından değiştirilebilir', 403);
       const patch = {};
       if (b.name !== undefined) patch.name = typeof b.name === 'string' ? b.name.trim().slice(0, 120) : '';
       if (b.role !== undefined) {
@@ -71,6 +74,7 @@ export default async function handler(req, res) {
       const email = norm(req.query?.email);
       const target = email && (await findUser(email));
       if (!target) return bad(res, 'Kullanıcı bulunamadı', 404);
+      if (isOwner(email) && !me.owner) return bad(res, 'Sahip hesabı silinemez', 403);
       if (email === me.email) return bad(res, 'Kendi hesabınızı silemezsiniz', 409);
       if (target.role === 'admin' && target.active && (await activeAdminCount(email)) < 1) return bad(res, 'Son yönetici silinemez', 409);
       await deleteUser(email);

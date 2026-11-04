@@ -1354,15 +1354,16 @@ async function renderUsers(){
   try{d=await userApi('GET');}catch(e){if(view!=='users')return;$('view').innerHTML='<section class="box"><h3>Kullanıcı Yönetimi</h3><p class="note">'+esc(e.message)+'</p></section>';return;}
   if(view!=='users')return;
   usersCache=d.users;usersMe=d.me;
-  const rows=d.users.map(u=>{const self=u.email===d.me;
-    return `<tr class="${u.active?'':'off'}"><td><strong>${esc(u.name||u.email.split('@')[0])}</strong><br><small style="color:var(--muted)">${esc(u.email)}${self?' · (siz)':''}</small></td>
-      <td><span class="pill" style="--c:${u.active?'#7cb52b':'#94a3b8'}">${u.active?'Aktif':'Pasif'}</span></td>
+  const rows=d.users.map(u=>{const self=u.email===d.me,lock=self||(u.owner&&!d.owner);
+    return `<tr class="${u.active?'':'off'}"><td><strong>${esc(u.name||u.email.split('@')[0])}</strong><br><small style="color:var(--muted)">${esc(u.email)}${self?' · (siz)':''}${u.owner?' · Sahip':''}</small></td>
+      <td><span class="pill" style="--c:${u.active?'var(--ok)':'var(--muted)'}">${u.active?'Aktif':'Pasif'}</span></td>
       <td>${fmtDt(u.lastLogin)}</td>
+      ${d.owner?`<td>${fmtDt(u.passChangedAt||u.createdAt)}</td>`:''}
       <td><div class="acts" data-email="${esc(u.email)}">
-        <button type="button" data-act="pw">Şifre belirle</button>
-        <select class="role-sel" data-act="role" aria-label="Rol" ${self?'disabled title="Kendi rolünüzü değiştiremezsiniz"':''}><option value="user" ${u.role==='user'?'selected':''}>Kullanıcı</option><option value="admin" ${u.role==='admin'?'selected':''}>Yönetici</option></select>
-        <button type="button" data-act="active" ${self?'disabled':''}>${u.active?'Pasifleştir':'Aktifleştir'}</button>
-        <button type="button" data-act="del" class="danger" ${self?'disabled':''}>Sil</button>
+        <button type="button" data-act="pw" ${u.owner&&!d.owner?'disabled':''}>Şifre belirle</button>
+        <select class="role-sel" data-act="role" aria-label="Rol" ${lock||u.owner?'disabled title="Bu hesabın rolü değiştirilemez"':''}><option value="user" ${u.role==='user'?'selected':''}>Kullanıcı</option><option value="admin" ${u.role==='admin'?'selected':''}>Yönetici</option></select>
+        <button type="button" data-act="active" ${lock?'disabled':''}>${u.active?'Pasifleştir':'Aktifleştir'}</button>
+        <button type="button" data-act="del" class="danger" ${lock?'disabled':''}>Sil</button>
       </div></td></tr>`;}).join('');
   $('view').innerHTML=`<section class="box"><h3>Yeni Kullanıcı Ekle<small>Hesabı yönetici açar; kendi kendine kayıt yok</small></h3>
     <form id="uForm" class="u-form" autocomplete="off">
@@ -1373,7 +1374,7 @@ async function renderUsers(){
       <button type="submit" class="primary">Kullanıcıyı ekle</button>
     </form><p class="u-msg" id="uMsg" role="status"></p>
     <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
-    <section class="box"><h3>Kayıtlı Kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son Giriş</th><th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="box"><h3>Kayıtlı Kullanıcılar<small>${d.users.length} hesap</small></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
     const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
