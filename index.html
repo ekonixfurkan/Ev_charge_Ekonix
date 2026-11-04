@@ -118,9 +118,13 @@ header h1{font-size:20px;font-weight:700}
 .mk{background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:12px 16px}
 .mk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .mk strong{display:block;margin-top:3px;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-.mk.split{display:grid;grid-template-columns:1fr 1fr;padding:0}
-.mk.split>div{padding:12px 16px}
-.mk.split>div+div{border-left:1px solid var(--hair)}
+.mk.split{display:grid;grid-template-columns:1fr 1fr;padding:0;overflow:hidden}
+.mk.split>button{display:block;text-align:left;padding:12px 16px;border:0;border-radius:0;background:transparent;color:inherit;font-weight:inherit;cursor:pointer;transition:background .12s}
+.mk.split>button+button{border-left:1px solid var(--hair)}
+.mk.split>button:hover{background:var(--soft)}
+.mk.split>button[aria-pressed=true]{background:var(--navy-soft);box-shadow:inset 0 -3px 0 var(--navy)}
+.mk.split>button[aria-pressed=true] span{color:var(--navy)}
+.mk.split>button:focus-visible{outline-offset:-2px}
 .mk strong small{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
 
 /* ---------- Gövde düzeni + sol menü ---------- */
@@ -716,7 +720,7 @@ function blankSite(name){
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
-let db={version:1,sites:[]},activeId=null,view='portfolio',F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false},sortKey='updated',loaded=false,mode='none',canWrite=true,me={email:'',role:''};
+let db={version:1,sites:[]},activeId=null,view='portfolio',F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false},sortKey='updated',loaded=false,mode='none',canWrite=true,me={email:'',role:''};
 const API='/api';
 const pending=new Map();let ver=0,flushTimer=null,flushing=false,pollTimer=null;
 function status(t,err=false){$('saveStatus').textContent=t;$('saveStatus').classList.toggle('err',err);}
@@ -826,6 +830,8 @@ const hasFilter=()=>Object.values(F).some(Boolean);
 // Arama için I/İ/ı/i hepsini aynı say (IKEA = ikea = İkea).
 const norm=v=>String(v??'').replace(/[İIı]/g,'i').toLowerCase();
 function matchesF(s){
+  if(F.act==='active'&&!isOpen(s))return false;
+  if(F.act==='passive'&&isOpen(s))return false;
   if(F.stage&&s.stage!==F.stage)return false;
   if(F.status&&s.status!==F.status)return false;
   if(F.city&&s.city!==F.city)return false;
@@ -839,14 +845,15 @@ function matchesF(s){
 const SORTS={updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
 function visibleSites(){return db.sites.filter(matchesF).sort(SORTS[sortKey][1]);}
 function filterText(){
-  const t=[];if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.blocked)t.push('Engelli');if(F.q)t.push('“'+F.q+'”');
+  const t=[];if(F.act)t.push(F.act==='active'?'Aktif':'Pasif');if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.blocked)t.push('Engelli');if(F.q)t.push('“'+F.q+'”');
   return t.join(' · ');
 }
 function legendHtml(){
   const total=db.sites.length,active=db.sites.filter(isOpen).length,passive=total-active;
   const mk=(l,v)=>`<div class="mk"><span>${l}</span><strong>${v}</strong></div>`;
-  // Aktif / Pasif tek kutuda, ortadan ikiye bölünmüş.
-  return mk('Qualified Lead',total)+`<div class="mk split"><div><span>Aktif</span><strong>${active}</strong></div><div><span>Pasif</span><strong>${passive}</strong></div></div>`;
+  // Aktif / Pasif tek kutuda ortadan ikiye bölünmüş; tıklayınca altındaki değerler ve liste o gruba göre süzülür.
+  const half=(k,l,n)=>`<button type="button" data-act="${k}" aria-pressed="${F.act===k}" title="${l} lokasyonları göster (tekrar tıklayınca tümü)"><span>${l}</span><strong>${n}</strong></button>`;
+  return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 function renderPipe(){$('pipeLegend').innerHTML=legendHtml();}
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
@@ -1272,7 +1279,7 @@ $('view').addEventListener('input',e=>{const el=e.target;if(view!=='locations'||
 $('view').addEventListener('change',e=>{const el=e.target;if(view!=='locations')return;
   if(el.dataset.lf){F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();}
   else if(el.id==='lfSort'){sortKey=el.value;paintLocRows();}});
-$('view').addEventListener('click',e=>{if(e.target.id==='locClear'){F={q:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};renderLocations();}});
+$('view').addEventListener('click',e=>{if(e.target.id==='locClear'){F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};renderLocations();}});
 $('view').addEventListener('keydown',e=>{if(e.target.id==='newLead'&&e.key==='Enter'){e.preventDefault();$('addLead').click();return;}const row=e.target.closest('[data-open]');if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSite(row.dataset.open);}});
 $('view').addEventListener('input',e=>{
   const s=cur();if(!s||view!=='site')return;const el=e.target;
@@ -1480,6 +1487,15 @@ function actDetail(id){
     ${ch.length?`<div class="scroll"><table class="yearly"><thead><tr><th>Alan</th><th>Önce</th><th>Sonra</th></tr></thead><tbody>${ch.map(c=>`<tr><th>${esc(c.alan)}</th><td style="text-align:left;white-space:normal">${esc(c.eski)}</td><td style="text-align:left;white-space:normal">${esc(c.yeni)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
   $('actDlg').showModal();
 }
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.mk.split [data-act]');if(!b)return;
+  const k=b.dataset.act;
+  guard(()=>{
+    F.act=F.act===k?'':k;
+    if(!(view==='portfolio'&&sub==='ovw')&&view!=='locations'){view='portfolio';sub='ovw';}
+    render();window.scrollTo(0,0);
+  });
+});
 let actT=null;
 document.addEventListener('input',e=>{if(e.target.id!=='actQ')return;actF.q=e.target.value;clearTimeout(actT);actT=setTimeout(async()=>{try{await fetchActivity(true);paintActivity();}catch(x){toast(x.message);}},300);});
 document.addEventListener('change',async e=>{
