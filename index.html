@@ -852,6 +852,7 @@ function migrateSite(s){
   if(s.contractBase===undefined)s.contractBase=(+s.contractYears>0)?+s.contractYears:'';
   if(s.contractExt===undefined)s.contractExt='';
   s.nextAction=nextStageOf(s);
+  if(s.amg&&s.amg.scores){const dn=amgScore(s);if(dn.complete){s.score=dn.total;s.scoreSrc='amg';}}
   for(const k of ['phone','nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
   if(s.score==null||!Number.isFinite(+s.score)||s.score==='')s.score='';
   s.fx=s.fx||{};
@@ -945,6 +946,14 @@ function amgScore(s){
   return {total,done,max,complete,dec,cls:dec?dec.cls:'',blockers,
     label:done?(complete?`${total}/100`:`${total}/${max}`):'—',
     decLabel:dec?dec.t:done?`${done}/${AMG.length} kriter puanlandı`:'Puanlanmadı'};
+}
+// Skor: Skor Hesaplama sekmesindeki 8 kriterin tamamı puanlanınca toplam puan skor olur (kilitli).
+// Henüz hesaplanmamış eski kayıtlarda (ör. Excel'den gelen) kayıtlı skor olduğu gibi gösterilir.
+function syncScore(s){
+  const d=amgScore(s);
+  if(d.complete){s.score=d.total;s.scoreSrc='amg';}
+  else if(s.scoreSrc==='amg'){s.score='';s.scoreSrc='';}
+  const b=$('scoreBox');if(b&&s===cur())b.value=scoreOf(s).label;
 }
 const capRef=s=>{const a=+s.survey?.availKw||0;return a>0?{v:a,u:'kW kullanılabilir'}:(+s.gridKva>0?{v:+s.gridKva,u:'kVA trafo'}:null);};
 
@@ -1233,7 +1242,7 @@ function renderSite(){
   <div class="grid infogrid">
     <label>Aşama<select data-f="stage">${STAGES.map(([k,t])=>`<option value="${k}" ${k===s.stage?'selected':''}>${esc(k+' '+t)}</option>`).join('')}</select></label>
     <label>Durum<select data-f="status">${STATUSES.map(st=>`<option value="${st.k}" ${st.k===s.status?'selected':''}>${esc(st.t)}</option>`).join('')}</select></label>
-    ${field('score','Skor (0–100)','number')}
+    <label>Skor<input id="scoreBox" data-locked readonly tabindex="-1" value="${esc(scoreOf(s).label)}" title="Skor Hesaplama sekmesindeki 8 kriterin toplamından gelir; elle değiştirilemez"></label>
     ${leadField()}
     <label class="span4">Sıradaki iş<input id="nextActionBox" data-locked readonly tabindex="-1" value="${esc(nextStageOf(s))}" title="Bir sonraki aşama; aşama değişince kendiliğinden güncellenir"></label>
     ${field('nextActionDate','Sıradaki iş tarihi','date')}
@@ -1306,7 +1315,7 @@ function renderSite(){
 
   <section class="box" data-tab="credit" data-fsub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
 
-  <section class="box" data-tab="check"><h3>Skorlama ve Yeterlilik<small id="ddProgress"></small></h3>
+  <section class="box" data-tab="check"><h3>Skor Hesaplama<small id="ddProgress"></small></h3>
   <div class="scoretotal"><strong id="amgTotal"></strong><span id="amgDec"></span></div>
   <div class="guide"><span class="score lo">60 altı: öncelik dışı</span><span class="score mid">60–79: eksikleri gider</span><span class="score hi">80 ve üzeri: ilerlet</span></div>
   ${AMG.map(c=>`<div class="amg-row" data-a="${c.k}">
@@ -1378,7 +1387,7 @@ function updateDerived(){
   if(!s.units.length)todo.push('Şarj Üniteleri');
   if(!(+s.gridKva)&&!(+s.survey.availKw))todo.push('Altyapı & Güç');
   if(!totalFin(s))todo.push('Finansman');
-  if(!d.done&&!Object.values(s.dd||{}).some(x=>x&&(x.v||x.note)))todo.push('Kontrol Listesi');
+  if(!d.done&&!Object.values(s.dd||{}).some(x=>x&&(x.v||x.note)))todo.push('Skor Hesaplama');
   if(todo.length&&s.stage>='03'&&isOpen(s))a+=`<div class="alert warn">Girilmesi gereken bölümler: ${todo.map(esc).join(', ')}. Lütfen giriniz.</div>`;
   if(shareTotal(s.fin)>100)a+=`<div class="alert">Gelir paylaşımı toplamı %100'ü aşıyor.</div>`;
   renderFin();
@@ -1462,9 +1471,9 @@ $('view').addEventListener('input',e=>{
   if(el.dataset.sv){const k=el.dataset.sv;s.survey[k]=el.type==='number'?(el.value===''?'':Math.max(0,+el.value||0)):el.value;touched(s);updateDerived();return;}
   if(el.dataset.svc){const k=el.dataset.svc;s.survey[k]=[...document.querySelectorAll(`[data-svc="${k}"]:checked`)].map(x=>x.value);touched(s);return;}
   if(el.dataset.amg){const c=AMG.find(x=>x.k===el.dataset.amg),raw=el.value.trim();
-    if(raw===''){s.amg.scores[c.k]='';el.removeAttribute('aria-invalid');touched(s);updateDerived();return;}
+    if(raw===''){s.amg.scores[c.k]='';el.removeAttribute('aria-invalid');syncScore(s);touched(s);updateDerived();return;}
     const v=+raw;if(!Number.isFinite(v)||v<0||v>c.w){el.setAttribute('aria-invalid','true');status(c.t+': 0 ile '+c.w+' arasında puan girin',true);return;}
-    el.removeAttribute('aria-invalid');s.amg.scores[c.k]=v;touched(s);updateDerived();return;}
+    el.removeAttribute('aria-invalid');s.amg.scores[c.k]=v;syncScore(s);touched(s);updateDerived();return;}
   if(el.dataset.amgnote){s.amg.notes[el.dataset.amgnote]=el.value;touched(s);return;}
   if(el.dataset.att){s.att[el.dataset.att]=el.value;touched(s);updateDerived();return;}
   if(el.dataset.sign){s.sign[el.dataset.sign]=el.value;touched(s);return;}
@@ -1480,7 +1489,7 @@ let sub='ovw',fsub='ozet',psub='ozet';
 const PORT_TABS=[['ozet','Özet'],['sonuc','Detaylı Sonuçlar ve Notlar']];
 const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yapısı'],['sonuc','Detaylı Sonuçlar']];
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
-const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Kontrol Listesi']];
+const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Skor Hesaplama']];
 function paintNav(){
   const key=view==='users'?'users':view==='activity'?'activity':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
