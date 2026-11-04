@@ -471,11 +471,51 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   .emptystate{padding:36px 16px}
   #dlg .dgrid{grid-template-columns:1fr}
 }
-@media (prefers-reduced-motion:reduce){@media print{
-  header,.pipeline{background:none;color:#000}
-  aside,.viewbar,.unit-actions,#toast,.no-print,button.ghost{display:none!important}
-  body{display:block}.shell{display:block}main{max-width:none;padding:0}
-  .box{break-inside:avoid}
+/* ---------- Yazdırma: A4 dikey ---------- */
+@page{size:A4 portrait;margin:12mm}
+.print-head{display:none}
+.print-btn{background:var(--ok);border-color:var(--ok);color:#fff;font-weight:600}
+.print-btn:hover{background:var(--ok);border-color:var(--ok);color:#fff;filter:brightness(.92)}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{background:#fff!important;color:#000}
+  body{display:block!important;font-size:10px;line-height:1.35}
+  .shell{display:block}
+  aside,.zoom-note,.pipeline,.sitetabs,.edit-actions,.eb-note-line,.no-print,#notesPanel,#bellPanel,#toast,dialog,button,.viewbar,.unit-actions,#ddAlerts .alert.warn{display:none!important}
+  header{background:#fff;border:0;padding:0 0 4px;display:block}
+  header h1{font-size:15px}.page-sub{font-size:10px}
+  body[data-print="site"] header{display:none}
+  main{padding:0!important;max-width:none!important}
+  body[data-print="site"] .print-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:8px;margin-bottom:8px;border-bottom:2px solid #0b2e57}
+  .print-head img{height:34px;width:auto}
+  .print-head div{text-align:right;font-size:10px;color:#444}
+  .print-head strong{display:block;font-size:13px;color:#000}
+  .site-bar{display:block;margin:0 0 8px}
+  .site-head{display:block}
+  .verdict{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .vcell{min-width:0;padding:4px 8px;border:1px solid #999;border-radius:3px}
+  .vcell strong{font-size:13px!important}
+  .box{break-inside:avoid;border:1px solid #bbb;border-radius:3px;padding:8px;margin:0 0 8px;background:#fff}
+  .box::before{display:none}
+  .box h3{font-size:11px;margin:0 0 6px;padding-bottom:4px}
+  .info-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .info-pair .box{margin:0}
+  .grid,.grid.g5,.grid.infogrid{gap:6px 8px}
+  .grid:not(.infogrid){grid-template-columns:repeat(4,1fr)}
+  label{font-size:8px}
+  input,select,textarea{border:0!important;border-bottom:1px solid #ccc!important;border-radius:0!important;background:transparent!important;padding:1px 0!important;min-height:0!important;height:auto!important;font-size:10px!important;color:#000!important;-webkit-text-fill-color:#000!important;opacity:1!important;appearance:none;-webkit-appearance:none;box-shadow:none!important}
+  textarea{resize:none;border:1px solid #ccc!important;padding:2px 4px!important}
+  input[data-locked]{border-bottom:1px dashed #999!important}
+  input[type=checkbox]{appearance:auto;-webkit-appearance:checkbox}
+  .scroll{overflow:visible!important}
+  table{font-size:8.5px}
+  th,td{padding:3px 4px}
+  .yearly td,.yearly th{white-space:normal}
+  .units td input{text-align:left}
+  details>summary{font-size:10px}
+  .badge,.pill{border-width:1px}
+  .amg-row,.dd-row{break-inside:avoid}
+  tr,.kpi{break-inside:avoid}
 }
 </style>
 <header>
@@ -509,6 +549,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
     <div class="sb-user"><div id="saveStatus" role="status">Yükleniyor…</div><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
   </aside>
   <main>
+    <div class="print-head"><img src="/ekonix-logo.jpeg" alt="Ekonix"><div><strong id="phTitle"></strong><span id="phMeta"></span></div></div>
     <div id="view"></div>
   </main>
 </div>
@@ -1074,11 +1115,12 @@ function renderFin(){
 let siteEdit=false,editSnap=null,editDirty=false;
 const ICON_EDIT='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 const ICON_SAVE='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+const ICON_PRINT='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>';
 const ICON_X='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 function editBarHtml(){
   return siteEdit
     ?`${me.role==='admin'?`<button type="button" class="danger" id="delSite">Sil</button>`:''}<button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
-    :`<button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
+    :`<button type="button" class="print-btn" id="printBtn" title="A4 dikey yazdır">${ICON_PRINT}Yazdır</button><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
 }
 const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,[data-del],';
 function applyEditState(){
@@ -1115,7 +1157,14 @@ function guard(fn){
   if(!siteEdit||!editDirty){if(siteEdit)exitEdit();fn();return;}
   ask('Kaydedilmemiş değişiklikler var. Vazgeçip çıkılsın mı?','Değişiklikleri At').then(ok=>{if(!ok)return;cancelEdit(true);fn();});
 }
+window.addEventListener('beforeprint',()=>{
+  document.body.dataset.print=view;
+  const x=view==='site'?cur():null;
+  if(x){$('phTitle').textContent=(x.name||'Lokasyon')+' · Lokasyon Raporu';$('phMeta').textContent=new Date().toLocaleString('tr-TR',{dateStyle:'long',timeStyle:'short'})+(me.email?' · '+(me.name||me.email):'');}
+});
+window.addEventListener('afterprint',()=>{delete document.body.dataset.print;});
 document.addEventListener('click',e=>{
+  if(e.target.closest('#printBtn')){window.print();return;}
   const b=e.target.closest('#editStart,#editSave,#editCancel');if(!b)return;
   if(b.id==='editStart')startEdit();else if(b.id==='editSave')saveEdit();else cancelEdit();
 });
@@ -1173,7 +1222,7 @@ function renderSite(){
     ${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}
     ${sv('gps','GPS / harita bağlantısı','text',' class="span2"')}${sv('phase','Hedef aşama / COD','text',' class="span2"')}
     ${chk('scope','Ana kapsam',' class="span4"')}
-  </div><p class="note">Saha sahibi / mal sahibi, lokasyon bilgilerindeki “Yer sağlayıcı” alanıdır.</p></details>
+  </div></details>
   <details open><summary>Saha Koşulları ve Teknik Yapılabilirlik</summary><div class="grid subgrid">
     ${sv('area','Kullanılabilir alan (ör. 20 × 15 m)')}${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}
     ${chk('access','Erişim ve yol durumu')}${sv('heightLimit','Yükseklik / genişlik sınırı','text',' class="span2"')}
@@ -1680,7 +1729,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&bell.open&&!$('ask'
     const r=await fetch('/api/auth/me',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
-      me={email:d.email,role:d.role};if(d.role==='admin')$('adminGroup').hidden=false;if(view==='site')render();}
+      me={email:d.email,name:d.name||'',role:d.role};if(d.role==='admin')$('adminGroup').hidden=false;if(view==='site')render();}
   }catch(e){/* çevrimdışı: yerel kayıtla devam */}
   document.documentElement.classList.remove('pending');
 })();
