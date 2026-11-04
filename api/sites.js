@@ -49,6 +49,7 @@ export default async function handler(req, res) {
       if (!id) return res.status(400).json({ error: 'id gerekli' });
       const prev = await s`SELECT data FROM sites WHERE id = ${id}`;
       await s`DELETE FROM sites WHERE id = ${id}`;
+      try { await s`DELETE FROM site_notes WHERE site_id = ${id}`; } catch { /* not tablosu henüz yoksa */ }
       await logActivity({ actor: user.email, action: 'sil', entity: 'lokasyon', entityId: id, entityName: prev[0]?.data?.name || id, summary: 'Lokasyon silindi' });
       return res.status(204).end();
     }
