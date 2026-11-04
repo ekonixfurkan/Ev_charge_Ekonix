@@ -8,7 +8,7 @@ Saha tespit formu gibi okunan, düz ve çizgili bir panel. Süs yok: veri, çizg
 - **Düz:** gölge yok. Derinlik 1px çizgi (`--hair`) ve kartın sol üst köşesindeki teal köşe işaretiyle verilir.
 - **Köşeler:** kart, düğme, alan 6px. Tam yuvarlak yalnızca rozetler (999px).
 - **Zemin:** soğuk gri-mavi `#f2f5f8`, kart beyaz. Sıcak krem kullanılmaz.
-- **Tipografi:** tek aile, Aptos (yoksa sistem fontu). Alan etiketleri ve tablo başlıkları 11–11.5px, büyük harf, 0.07–0.08em aralık. Sayılar `tabular-nums`.
+- **Tipografi:** tek aile, **Plus Jakarta Sans** (MKT Motors ile aynı; Inter ve sistem fontu yalnızca yedek). Dosyalar `/fonts/` altında kendi sunucumuzdan gelir (SIL OFL), dışarıdan font yüklenmez. Gövde 14px, ağırlıklar 400/500/600/700. Alan etiketleri ve tablo başlıkları 11–11.5px, büyük harf, 0.07–0.08em aralık. Sayılar `tabular-nums`.
 - **Rozet (mühür):** 1.5px çerçeve + sol nokta + yumuşak zemin. Durum ve aşama için tek stil; ikinci bir hap stili eklenmez.
 - **Sekmeler:** alt çizgili; aktif sekme lacivert alt çizgi.
 - **Sol menü:** koyu lacivert zemin, aktif öğe %12 beyaz dolgu + 3px teal sol çizgi.
@@ -32,6 +32,6 @@ Koyu tema `prefers-color-scheme: dark` ve `data-theme="dark"` ile aynı jetonlar
 ## Yapma
 
 - Gölge, bulanıklık, gradyan, dekoratif doku ekleme.
-- İkinci yazı tipi ekleme.
+- İkinci yazı tipi ekleme; yazı tipini değiştirme. Tek kaynak `--font` değişkenidir (`index.html` ve `login.html`), sabit `font-family` yazma.
 - Yeni durum rengi uydurma; mevcut yeşil/sarı/kırmızı/lacivert/gri jetonlarını kullan.
 - Teal'i dolgu olarak kullanma.
