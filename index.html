@@ -442,7 +442,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
       </section>
       <section class="nav-group" data-group="admin" id="adminGroup" hidden>
         <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button><button type="button" class="nav-item" data-nav="feishu"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Excel / Feishu Aktarımı</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="users"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button><button type="button" class="nav-item" data-nav="feishu"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>Excel / Feishu Aktarımı</span></button><button type="button" class="nav-item" data-nav="activity"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>İşlem Geçmişi</span></button></div>
       </section>
     </nav>
     <div class="sb-user"><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
@@ -453,6 +453,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 </div>
 
 <div id="toast" role="status" hidden></div>
+<dialog id="actDlg"><div id="actBody"></div><div class="row"><button type="button" id="actClose" class="primary">Kapat</button></div></dialog>
 <dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:15px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
 <dialog id="dlg">
   <form id="dlgForm">
@@ -884,12 +885,12 @@ function paintSiteTabs(){
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='feishu')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='feishu'||view==='activity')?'':sub;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='users'||view==='feishu';
+  document.querySelector('.pipeline').hidden=view==='users'||view==='feishu'||view==='activity';
   paintSiteTabs();
-  if(view==='users')renderUsers();else if(view==='feishu')renderFeishu();
+  if(view==='users')renderUsers();else if(view==='feishu')renderFeishu();else if(view==='activity')renderActivity();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
 }
 
@@ -1305,7 +1306,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Kontrol Listesi']];
 function paintNav(){
-  const key=view==='users'?'users':view==='feishu'?'feishu':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='feishu'?'feishu':view==='activity'?'activity':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -1325,6 +1326,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(k==='list'){view='locations';render();window.scrollTo(0,0);}
     else if(k==='users'){view='users';render();window.scrollTo(0,0);}
     else if(k==='feishu'){view='feishu';render();window.scrollTo(0,0);}
+    else if(k==='activity'){view='activity';render();window.scrollTo(0,0);}
     else if(SITE_SUBS.includes(k))goSite(k);
   });
 });
@@ -1541,6 +1543,71 @@ document.addEventListener('click',async e=>{
     const url=URL.createObjectURL(new Blob([JSON.stringify({...db,team,exportedAt:now()},null,2)],{type:'application/json'}));
     const a=document.createElement('a');a.href=url;a.download='EKONIX_Yedek_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
   }
+});
+
+/* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
+let actF={q:'',actor:'',entity:''},actRows=[],actMore=false,actActors=[];
+const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo']};
+const ENT_LABEL={lokasyon:'Lokasyon',kullanici:'Kullanıcı',oturum:'Oturum'};
+const fmtTs=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleString('tr-TR',{dateStyle:'short',timeStyle:'short'});};
+async function fetchActivity(reset){
+  const qs=new URLSearchParams({limit:'50'});
+  if(!reset&&actRows.length)qs.set('before',String(actRows[actRows.length-1].id));
+  for(const k of ['q','actor','entity'])if(actF[k])qs.set(k,actF[k]);
+  const r=await fetch('/api/activity?'+qs,{credentials:'same-origin'});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
+  actRows=reset?d.rows:actRows.concat(d.rows);actMore=d.more;actActors=d.actors||[];
+}
+function actRowsHtml(){
+  if(!actRows.length)return '<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Kayıt yok.</td></tr>';
+  return actRows.map(x=>{const [lab,cls]=ACT_LABEL[x.action]||[x.action,'none'];
+    return `<tr data-act="${x.id}" tabindex="0"><td style="white-space:nowrap">${esc(fmtTs(x.at))}</td><td>${esc(x.actor||'—')}</td>
+    <td><span class="badge ${cls}">${esc(lab)}</span></td><td><span class="p1">${esc(x.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[x.entity]||x.entity)}</span></td>
+    <td style="max-width:420px">${esc(x.summary||'')}</td></tr>`;}).join('');
+}
+function paintActivity(){
+  $('actRows').innerHTML=actRowsHtml();
+  $('actMore').hidden=!actMore;
+  $('actClear').hidden=!(actF.q||actF.actor||actF.entity);
+}
+async function renderActivity(){
+  $('view').innerHTML='<section class="box"><h3>İşlem Geçmişi<small>Yükleniyor…</small></h3></section>';
+  try{await fetchActivity(true);}catch(e){if(view!=='activity')return;$('view').innerHTML='<section class="box"><h3>İşlem Geçmişi</h3><p class="note">'+esc(e.message)+'</p></section>';return;}
+  if(view!=='activity')return;
+  const opt=(v,cur,t)=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(t??v)}</option>`;
+  $('view').innerHTML=`<section class="box"><h3>İşlem Geçmişi<small>Kim, ne zaman, neyi değiştirdi</small></h3>
+    <div class="locbar no-print">
+      <label class="lf lq">Ara<input type="search" id="actQ" value="${esc(actF.q)}" placeholder="Lokasyon, kullanıcı veya özet…" autocomplete="off"></label>
+      <label class="lf">Kullanıcı<select id="actActor"><option value="">Tümü</option>${actActors.map(a=>opt(a,actF.actor)).join('')}</select></label>
+      <label class="lf">Tür<select id="actEntity"><option value="">Tümü</option>${Object.entries(ENT_LABEL).map(([k,t])=>opt(k,actF.entity,t)).join('')}</select></label>
+      <button type="button" id="actClear" class="ghost" hidden>Filtreleri Temizle</button>
+    </div>
+    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
+    <div class="row-actions"><button type="button" id="actMore" hidden>Daha Fazla Yükle</button></div>
+    <p class="note">Günlük sunucuda tutulur; kayıtlar arayüzden silinemez veya düzenlenemez.</p></section>`;
+  paintActivity();
+}
+function actDetail(id){
+  const x=actRows.find(r=>String(r.id)===String(id));if(!x)return;
+  const ch=Array.isArray(x.changes)?x.changes:[];
+  $('actBody').innerHTML=`<h2>İşlem Detayı</h2><p class="dsub">${esc(fmtTs(x.at))} · ${esc(x.actor||'—')}</p>
+    <p><strong>${esc((ACT_LABEL[x.action]||[x.action])[0])}</strong> · ${esc(ENT_LABEL[x.entity]||x.entity)}: ${esc(x.entity_name||'—')}</p><p class="note">${esc(x.summary||'')}</p>
+    ${ch.length?`<div class="scroll"><table class="yearly"><thead><tr><th>Alan</th><th>Önce</th><th>Sonra</th></tr></thead><tbody>${ch.map(c=>`<tr><th>${esc(c.alan)}</th><td style="text-align:left;white-space:normal">${esc(c.eski)}</td><td style="text-align:left;white-space:normal">${esc(c.yeni)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+  $('actDlg').showModal();
+}
+let actT=null;
+document.addEventListener('input',e=>{if(e.target.id!=='actQ')return;actF.q=e.target.value;clearTimeout(actT);actT=setTimeout(async()=>{try{await fetchActivity(true);paintActivity();}catch(x){toast(x.message);}},300);});
+document.addEventListener('change',async e=>{
+  if(e.target.id==='actActor')actF.actor=e.target.value;else if(e.target.id==='actEntity')actF.entity=e.target.value;else return;
+  try{await fetchActivity(true);paintActivity();}catch(x){toast(x.message);}
+});
+document.addEventListener('click',async e=>{
+  if(e.target.id==='actClear'){actF={q:'',actor:'',entity:''};renderActivity();return;}
+  if(e.target.id==='actMore'){try{await fetchActivity(false);paintActivity();}catch(x){toast(x.message);}return;}
+  if(e.target.id==='actClose'){$('actDlg').close();return;}
+  const tr=e.target.closest('#actRows tr[data-act]');if(tr)actDetail(tr.dataset.act);
 });
 
 /* ---------- oturum ---------- */

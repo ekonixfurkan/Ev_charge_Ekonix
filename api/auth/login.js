@@ -1,5 +1,6 @@
 // POST /api/auth/login  { email, password } → HttpOnly oturum çerezi
 import { readJson } from '../../lib/db.js';
+import { logActivity } from '../../lib/activity.js';
 import { ConfigError, assertConfigured, attempt, clearAttempts, checkLogin, clientIp, sameOrigin, setSession } from '../../lib/auth.js';
 
 const MAX_PER_EMAIL = 8;
@@ -29,9 +30,13 @@ export default async function handler(req, res) {
     }
 
     const user = await checkLogin(email, password);
-    if (!user) return res.status(401).json({ error: 'E-posta veya şifre hatalı' });
+    if (!user) {
+      await logActivity({ actor: email, action: 'giris-basarisiz', entity: 'oturum', entityName: email, summary: 'Başarısız giriş denemesi' });
+      return res.status(401).json({ error: 'E-posta veya şifre hatalı' });
+    }
     await clearAttempts(emKey);
     setSession(req, res, email);
+    await logActivity({ actor: email, action: 'giris', entity: 'oturum', entityName: email, summary: 'Giriş yapıldı' });
     return res.status(200).json({ ok: true, email, role: user.role });
   } catch (e) {
     if (e instanceof ConfigError) return res.status(503).json({ error: 'Kimlik doğrulama yapılandırılmamış' });
