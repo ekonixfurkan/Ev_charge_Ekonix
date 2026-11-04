@@ -703,7 +703,7 @@ const FIN_DEFAULT={initial:15,growth:2,sale:14.49,cost:5.454,saleGrowth:0,costGr
 const FIN_LIMITS={initial:[0,100],growth:[-20,20],sale:[0,1000],cost:[0,1000],saleGrowth:[-100,200],costGrowth:[-100,200],share:[0,100],entShare:[0,100],starShare:[0,100],ekoShare:[0,100],fundShare:[0,100],commission:[0,100],opex:[0,1e10],opexGrowth:[0,200]};
 const PARTIES=[
   {k:'owner',t:'Yer Sağlayıcı',sh:'Yer Sağlayıcı',c:'var(--p-owner)',share:'share'},
-  {k:'ent',t:'Co-CPO (Entegre)',sh:'Co-CPO',c:'var(--p-ent)',share:'entShare'},
+  {k:'ent',t:'Co-CPO',sh:'Co-CPO',c:'var(--p-ent)',share:'entShare'},
   {k:'star',t:'StarCharge (AMG)',sh:'StarCharge',c:'var(--p-star)',share:'starShare'},
   {k:'eko',t:'EKONİX',sh:'EKONİX',c:'var(--p-eko)',share:'ekoShare'},
   {k:'fon',t:'Diğer Fon',sh:'Diğer Fon',c:'var(--p-fon)',share:'fundShare'}
@@ -1266,18 +1266,15 @@ function renderSite(){
   <section class="box" data-tab="infra"><h3>Saha Keşfi<small>AMG saha keşif formu, bölüm 1–2</small></h3>
   <details open><summary>Proje Bilgileri</summary><div class="grid subgrid">
     ${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}
-    ${sv('gps','GPS / harita bağlantısı','text',' class="span2"')}${sv('phase','Hedef aşama / COD','text',' class="span2"')}
+    ${sv('gps','GPS / harita bağlantısı','text',' class="span2"')}
     ${chk('scope','Ana kapsam',' class="span4"')}
   </div></details>
   <details open><summary>Saha Koşulları ve Teknik Yapılabilirlik</summary><div class="grid subgrid">
-    ${sv('area','Kullanılabilir alan (ör. 20 × 15 m)')}${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}
-    ${chk('access','Erişim ve yol durumu')}${sv('heightLimit','Yükseklik / genişlik sınırı','text',' class="span2"')}
-    ${chk('pave','Zemin / inşaat işleri')}${sv('restore','Zemin onarım notları','text',' class="span2"')}
-    ${field('gridKva','Trafo gücü (kVA)','number')}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}${sv('freq','Frekans (Hz)','number')}
-    ${sel('breaker','Yedek kesici',[['y','Var'],['n','Yok']])}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${chk('lay','Kablo döşeme')}
-    ${sv('meter','Sayaç noktası')}${sv('tariff','Elektrik tarifesi (TL/kWh)','number')}${sv('serviceFee','Hizmet bedeli')}${sv('parkFee','Park ücreti kuralı')}
-    ${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}${chk('pvpot','PV potansiyeli')}
-    ${sv('export','Şebekeye verme / öz tüketim','text',' class="span2"')}${sel('net','4G iletişim',[['good','İyi'],['weak','Zayıf'],['none','Yok']])}<span></span>
+    ${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}<span></span>
+    ${chk('access','Erişim ve yol durumu')}${chk('pave','Zemin / inşaat işleri')}
+    ${field('gridKva','Trafo gücü (kVA)','number')}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}
+    ${chk('lay','Kablo döşeme')}${chk('pvpot','PV potansiyeli')}
+    ${sv('tariff','Elektrik tarifesi (TL/kWh)','number')}${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
     ${sv('compSites','3 km içindeki hızlı şarj sahası','number')}${sv('compConn','Rakip konnektör sayısı','number')}${sv('compNotes','Rakip fiyat / hizmet / kullanım notları','text',' class="span2"')}
     <label class="span4">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label>
@@ -1303,7 +1300,7 @@ function renderSite(){
   <section class="box" data-tab="credit" data-fsub="ozet"><h3>Finansman Özeti<small>${YEARS} yıl, nominal TL</small></h3><div id="finKpis"></div></section>
 
   <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
-  <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO (Entegre) payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
+  <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
   <div class="shareinfo" id="shareStatus"></div>
   <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','TL/kWh')}${finField('cost','Elektrik maliyeti','TL/kWh')}</div>
   <details><summary>Fiyat Artışları ve İşletme Gideri</summary>
