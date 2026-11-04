@@ -643,9 +643,9 @@ const isOpen=s=>statusOf(s.status).open===true;
 // Excel'deki el ile girilen puan: yeşil 85+, turuncu 75–84, kırmızı 75 altı.
 function scoreOf(s){
   const raw=s.score,v=(raw===''||raw==null||!Number.isFinite(+raw))?null:+raw;
-  const cls=v==null?'none':v>=85?'hi':v>=75?'mid':'lo';
+  const cls=v==null?'none':v>=SCORE_HI?'hi':v>=SCORE_MID?'mid':'lo';
   return {v,cls,label:v==null?'—':(Number.isInteger(v)?String(v):String(v).replace('.',',')),
-    text:v==null?'Puanlanmadı':v>=85?'Yüksek':v>=75?'Orta':'75 Altı'};
+    text:v==null?'Puanlanmadı':v>=SCORE_HI?'Yüksek':v>=SCORE_MID?'Orta':'75 Altı'};
 }
 /* AMG / StarCharge site survey & qualification form */
 const AMG=[
@@ -678,7 +678,9 @@ const CHK={
 };
 const TEAM_DEFAULT=['Alaattin Ersivri','Hilmi Doğan','S. Furkan Keçe'];
 let team=[...TEAM_DEFAULT];
-const DECISIONS=[{min:80,t:'İlerlet',en:'Advance',cls:'hi'},{min:60,t:'Eksikleri Gider',en:'Resolve gaps',cls:'mid'},{min:0,t:'Öncelik Dışı',en:'Deprioritize',cls:'lo'}];
+// Skor eşikleri Excel takip dosyasıyla aynı: 85 ve üzeri yeşil (ilerlet), 75–84 turuncu, 75 altı kırmızı.
+const SCORE_HI=85,SCORE_MID=75;
+const DECISIONS=[{min:SCORE_HI,t:'İlerlet',en:'Advance',cls:'hi'},{min:SCORE_MID,t:'Eksikleri Gider',en:'Resolve gaps',cls:'mid'},{min:0,t:'Öncelik Dışı',en:'Deprioritize',cls:'lo'}];
 const VAL={ok:{t:'Uygun',s:1},risk:{t:'Riskli',s:.5},no:{t:'Uygun Değil',s:0}};
 
 const $=id=>document.getElementById(id);
@@ -1073,7 +1075,7 @@ function renderPortfolio(){
     <section class="box" data-tab="port" data-psub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'detail'):''}</section>`;
   }
   h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Hesaplama Esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). “Gelir payı ile” kalemlerde finansör yatırımını kendi gelir payından geri alır. “Kredi” kalemlerinde geri ödeyen taraf eşit taksit (anüite) öder; taksit onun nakdinden düşülür, finansörün nakdine eklenir. DSCR = geri ödeyen tarafın kredi öncesi yıllık nakdi / o yılki taksitleri. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
-  h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Skor Nasıl Hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Formun karar kılavuzu: 80 ve üzeri ilerlet, 60–79 eksikleri gider, 60 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
+  h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Skor Nasıl Hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Karar kılavuzu (Excel takip dosyasıyla aynı): 85 ve üzeri ilerlet, 75–84 eksikleri gider, 75 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
   $('view').innerHTML=h;
 }
 
@@ -1317,7 +1319,7 @@ function renderSite(){
 
   <section class="box" data-tab="check"><h3>Skor Hesaplama<small id="ddProgress"></small></h3>
   <div class="scoretotal"><strong id="amgTotal"></strong><span id="amgDec"></span></div>
-  <div class="guide"><span class="score lo">60 altı: öncelik dışı</span><span class="score mid">60–79: eksikleri gider</span><span class="score hi">80 ve üzeri: ilerlet</span></div>
+  <div class="guide"><span class="score lo">75 altı: öncelik dışı</span><span class="score mid">75–84: eksikleri gider</span><span class="score hi">85 ve üzeri: ilerlet</span></div>
   ${AMG.map(c=>`<div class="amg-row" data-a="${c.k}">
     <div class="q">${esc(c.t)}<small class="en">${esc(c.en)} · ağırlık ${c.w}</small><small>${esc(c.h)}</small></div>
     <div class="pts"><input data-amg="${c.k}" type="number" min="0" max="${c.w}" step="1" inputmode="numeric" value="${s.amg.scores[c.k]??''}" aria-label="${esc(c.t)} puanı, en fazla ${c.w}"><span>/ ${c.w}</span>
