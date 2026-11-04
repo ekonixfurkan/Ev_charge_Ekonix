@@ -114,7 +114,6 @@ header h1{font-size:20px;font-weight:700}
 .ovwtbl th:nth-child(n+3),.ovwtbl td:nth-child(n+3){white-space:nowrap}
 .ovwtbl th:nth-child(n+4),.ovwtbl td:nth-child(n+4){width:1%;padding-left:14px;padding-right:14px}
 .ovwtbl th:last-child,.ovwtbl td:last-child{padding-right:16px}
-.site-tabs{order:3;align-self:stretch;margin:14px 0 0}
 .mk{background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:12px 16px}
 .mk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .mk strong{display:block;margin-top:3px;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -196,7 +195,6 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .subtabs button{white-space:nowrap}
 .fin-sub{margin-bottom:16px}
 .fin-sub button{white-space:nowrap}
-.pipeline .site-tabs{margin-bottom:0;border-bottom:0}
 @media screen{
   #view[data-sub="ovw"] [data-tab]:not([data-tab="ovw"]),
   #view[data-sub="port"] [data-tab]:not([data-tab="port"]),
@@ -228,19 +226,23 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .subh{font-size:11.5px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em;margin:22px 0 8px}
 
 /* Lokasyon başlığı + karar kutuları */
-.site-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.site-head h2{font-size:24px;font-weight:700}
-.site-head p{color:var(--muted);font-size:13px}
+.site-head{display:flex;justify-content:flex-end;align-items:stretch;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.site-head.editing{position:sticky;top:0;z-index:6;background:var(--paper);padding:8px 0;margin-top:-8px}
+.page-sub{margin:2px 0 0;font-size:13px;color:var(--muted)}
 .verdict{display:flex;gap:10px;align-items:stretch}
+.edit-actions{display:flex;gap:8px;align-items:stretch}
+.edit-actions button{display:inline-flex;align-items:center;gap:6px;padding:0 20px;font-size:14px}
+.eb-note-line{margin:0 0 12px;font-size:12.5px;font-weight:600;color:var(--risk);text-align:right}
+/* Lokasyon bölümleri: tıklanabilir olduğu belli olsun diye kutu düğmeler */
+.sitetabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px;overflow:visible}
+.sitetabs button{padding:9px 18px;border:1px solid var(--hair-strong);border-radius:var(--radius);background:var(--card);color:var(--ink2);font-weight:600}
+.sitetabs button:hover{border-color:var(--navy);color:var(--navy);background:var(--navy-soft)}
+.sitetabs button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
 .vcell{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:8px 14px;min-width:120px}
 .vcell span{display:block;font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .vcell strong{font-size:22px;font-variant-numeric:tabular-nums}
 
 /* Düzenleme çubuğu */
-.edit-bar{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin:0 0 14px;position:sticky;top:0;z-index:5;padding:8px 0;background:var(--paper)}
-.edit-bar .eb-note{margin-right:auto;font-size:12.5px;color:var(--muted)}
-.edit-bar.on .eb-note{color:var(--risk);font-weight:600}
-.edit-bar button{display:inline-flex;align-items:center;gap:6px}
 #view.ro input:disabled,#view.ro select:disabled,#view.ro textarea:disabled{background:var(--soft);color:var(--ink);-webkit-text-fill-color:var(--ink);border-color:transparent;cursor:default;opacity:1;resize:none}
 #view.ro select:disabled{appearance:none;-webkit-appearance:none;background-image:none}
 #view.ro input[type=checkbox]:disabled,#view.ro input[type=radio]:disabled{opacity:.7}
@@ -442,13 +444,13 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 </style>
 <header>
   <div>
-    <h1>Saha Değerlendirme</h1>
+    <h1 id="pageTitle">Saha Değerlendirme</h1>
+    <p class="page-sub" id="pageSub" hidden></p>
   </div>
   <span class="zoom-note" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Web site yakınlaştırma ayarı %75'e göre tasarlanmıştır. Verimli kullanılabilmek adına ayarlarınızı kontrol ediniz.</span>
 </header>
 <section class="pipeline" aria-label="Lokasyonların durum dağılımı">
   <div class="pipe-legend" id="pipeLegend"></div>
-  <div class="viewbar subtabs site-tabs no-print" id="siteTabs" role="tablist" aria-label="Lokasyon bölümleri" hidden></div>
 </section>
 
 <div class="shell">
@@ -855,6 +857,13 @@ function legendHtml(){
   const half=(k,l,n)=>`<button type="button" data-act="${k}" aria-pressed="${F.act===k}" title="${l} lokasyonları göster (tekrar tıklayınca tümü)"><span>${l}</span><strong>${n}</strong></button>`;
   return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
+// Üst başlık: lokasyon sayfasında lokasyon adı (altında il/ilçe), diğer sayfalarda uygulama adı.
+function setPageTitle(){
+  const x=view==='site'?cur():null,sub2=x?[x.district,x.city].filter(Boolean).join(', '):'';
+  $('pageTitle').textContent=x?(x.name||'Adsız Lokasyon'):'Saha Değerlendirme';
+  $('pageSub').textContent=sub2;$('pageSub').hidden=!sub2;
+  document.title=x?(x.name||'Lokasyon')+' · Saha Değerlendirme':'Saha Değerlendirme Aracı';
+}
 function renderPipe(){$('pipeLegend').innerHTML=legendHtml();}
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
 function locRowsHtml(list){
@@ -895,11 +904,6 @@ function renderLocations(){
     <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div></section>`;
   paintLocRows();
 }
-function paintSiteTabs(){
-  const el=$('siteTabs'),on=view==='site'&&!!db.sites.find(s=>s.id===activeId);
-  el.hidden=!on;
-  el.innerHTML=on?SITE_TABS.map(([k,t])=>`<button type="button" role="tab" data-sub="${k}" aria-pressed="${sub===k}" aria-selected="${sub===k}">${t}</button>`).join(''):'';
-}
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
@@ -907,10 +911,10 @@ function render(){
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||(view==='portfolio'&&sub==='ovw');
-  paintSiteTabs();
+  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||view==='site'||(view==='portfolio'&&sub==='ovw');
   if(view==='users')renderUsers();else if(view==='activity')renderActivity();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
+  setPageTitle();
 }
 
 function renderPortfolio(){
@@ -1002,7 +1006,7 @@ const ICON_SAVE='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" str
 const ICON_X='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 function editBarHtml(){
   return siteEdit
-    ?`<span class="eb-note">Düzenleme modu: değişiklikler Kaydet'e basana kadar sunucuya gönderilmez.</span><button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
+    ?`<button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
     :`<button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
 }
 const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,[data-del],#addLead,#cancelLead';
@@ -1010,7 +1014,7 @@ function applyEditState(){
   const v=$('view');if(view!=='site')return;
   v.classList.toggle('ro',!siteEdit);
   v.querySelectorAll('input,select,textarea').forEach(el=>{
-    if(el.closest('.subtabs')||el.closest('.edit-bar'))return;
+    if(el.closest('.subtabs')||el.closest('.edit-actions'))return;
     el.disabled=!siteEdit;
   });
 }
@@ -1046,16 +1050,18 @@ document.addEventListener('click',e=>{
 
 function renderSite(){
   const s=cur();
-  let h=`<div class="site-head"><div><h2 id="siteTitle">${esc(s.name)}</h2><p id="siteSub">${esc([s.district,s.city].filter(Boolean).join(', '))}</p></div>
+  let h=`<div class="site-head ${siteEdit?'editing':''}">
   <div class="verdict">
     <div class="vcell"><span>Aşama</span><strong id="vStage" style="font-size:15px"></strong></div>
     <div class="vcell"><span>Durum</span><strong id="vStatus" style="font-size:15px"></strong></div>
     <div class="vcell"><span>Skor</span><strong id="vScore"></strong><small id="vDec" style="display:block;font-size:12px"></small></div>
     <div class="vcell"><span>Toplam Güç</span><strong id="vKw"></strong></div>
-  </div></div>
+  </div>
+  <div class="edit-actions no-print" id="editBar">${editBarHtml()}</div></div>
+  ${siteEdit?'<p class="eb-note-line no-print">Düzenleme modu: değişiklikler Kaydet\'e basana kadar sunucuya gönderilmez.</p>':''}
+  <div class="sitetabs subtabs no-print" role="tablist" aria-label="Lokasyon bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" role="tab" data-sub="${k}" aria-pressed="${sub===k}" aria-selected="${sub===k}">${t}</button>`).join('')}</div>
   <div id="ddAlerts"></div>
 
-  <div class="edit-bar no-print ${siteEdit?'on':''}" id="editBar">${editBarHtml()}</div>
    <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button>${me.role==='admin'?'<button class="ghost" id="delSite">Lokasyonu sil</button>':''}</span></h3>
   <div class="grid">
     ${field('name','Lokasyon adı','text',' class="span4"')}
@@ -1195,7 +1201,7 @@ function unitRow(u){
 }
 function updateDerived(){
   const s=cur();if(!s)return;const t=totals(s),d=amgScore(s),sc=scoreOf(s);
-  $('vScore').textContent=sc.label;$('vScore').className='score '+sc.cls;$('vDec').textContent=sc.text;$('vDec').className='score '+sc.cls;
+  $('vScore').textContent=sc.label;$('vScore').className='score '+sc.cls;$('vDec').textContent=sc.v==null?'':sc.text;$('vDec').className='score '+sc.cls;
   $('vStage').textContent=stageLabel(s.stage);$('vStatus').textContent=statusOf(s.status).t;
   $('amgTotal').textContent=d.done?d.label:'Puanlanmadı';$('amgTotal').className='score '+d.cls;
   $('amgDec').textContent=d.complete?'Karar: '+d.dec.t+' ('+d.dec.en+')':d.done?`${AMG.length-d.done} kriter daha puanlanınca karar gösterilir`:'Her kriteri 0 ile ağırlığı arasında puanlayın';
@@ -1226,8 +1232,7 @@ function updateDerived(){
   if(shareTotal(s.fin)>100)a+=`<div class="alert">Gelir paylaşımı toplamı %100'ü aşıyor.</div>`;
   renderFin();
   $('ddAlerts').innerHTML=a;
-  $('siteTitle').textContent=s.name||'Adsız lokasyon';
-  $('siteSub').textContent=[s.district,s.city].filter(Boolean).join(', ');
+  setPageTitle();
   $('upd').textContent=new Date(s.updatedAt).toLocaleString('tr-TR');
   renderPipe();
 }
@@ -1248,7 +1253,6 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
     address:v('dlgAddress'),host:v('dlgHost'),contact:v('dlgContact'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
-$('siteTabs').addEventListener('click',e=>{const b=e.target.closest('[data-sub]');if(!b||view!=='site')return;sub=b.dataset.sub;render();window.scrollTo(0,0);});
 $('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const pb=e.target.closest('.fin-sub [data-ps]');if(pb){psub=pb.dataset.ps;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
 $('view').addEventListener('click',e=>{
   const row=e.target.closest('[data-open]');if(row){openSite(row.dataset.open);return;}
