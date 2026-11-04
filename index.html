@@ -188,6 +188,23 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .sb-user .lang-sw button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
 .sb-collapsed .lang-sw{flex-direction:column;margin:0 8px 10px}
 .sb-collapsed .lang-sw button+button{border-left:0;border-top:1px solid rgba(255,255,255,.18)}
+.portfolio.ct-tbl{table-layout:fixed;width:100%}
+.portfolio.ct-tbl th{padding-left:21px}
+.ct-tbl td{padding:3px 4px;vertical-align:middle}
+.ct-in{width:100%;min-height:32px;padding:4px 8px;border:1px solid transparent;border-radius:var(--radius);background:transparent;font:inherit;font-size:13px;color:var(--ink)}
+.ct-in:hover{border-color:var(--hair-strong)}
+.ct-in:focus{background:var(--card);border-color:var(--navy);outline:none}
+.ct-in::placeholder{color:var(--muted);opacity:.55}
+.ct-grp td{background:var(--soft);border-top:1px solid var(--hair);padding:7px 10px}
+.ct-grp strong{font-size:13px}.ct-grp small{margin:0 8px;color:var(--muted)}
+.ct-grp .ct-tg{padding:2px 6px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.ct-grp .ct-tg[aria-expanded=false] svg{transform:rotate(-90deg)}
+.ct-act{width:44px;text-align:center}
+.ct-act button{padding:4px 7px}
+#ctState{font-size:12px;color:var(--muted)}#ctState.err{color:var(--no)}
+#ctDlg{width:min(900px,96vw);max-width:none;max-height:92vh;overflow:auto}
+#ctDlgRows tr{cursor:pointer}#ctDlgRows tr:hover td{background:var(--navy-soft)}
+.pick-btn{font-size:12px;padding:5px 10px}
 .whoami{display:block;padding:0 8px 8px;font-size:12px;color:var(--side-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logout{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;border:1px solid rgba(255,140,130,.35);border-radius:var(--radius);background:transparent;color:#ff9a8f;font-size:12.5px;font-weight:600;text-align:left}
 .logout:hover{background:rgba(255,120,110,.12);color:#ffb8b0;border-color:rgba(255,140,130,.6)}
@@ -567,7 +584,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
       </section>
       <section class="nav-group" data-group="site">
         <button type="button" class="nav-head" aria-expanded="true">Saha &amp; Lokasyon Yönetimi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="port"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>Portföy Özeti</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Lokasyon Listesi</span></button><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Lokasyon Ekle</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="port"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>Portföy Özeti</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Lokasyon Listesi</span></button><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Lokasyon Ekle</span></button><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Contact</span></button></div>
       </section>
       <section class="nav-group" data-group="admin" id="adminGroup" hidden>
         <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -589,6 +606,12 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 </div>
 <div id="toast" role="status" hidden></div>
 <dialog id="actDlg"><div id="actBody"></div><div class="row"><button type="button" id="actClose" class="primary">Kapat</button></div></dialog>
+<dialog id="ctDlg">
+  <div class="cat-head"><div><h2>Kişilerden Seç</h2><p class="dsub">Satıra tıklayın; ad, telefon ve şirket lokasyona işlenir.</p></div><button type="button" id="ctDlgClose" class="ghost" aria-label="Kapat">✕</button></div>
+  <div class="cat-bar"><input type="search" id="ctDlgQ" placeholder="Şirket, kişi veya telefon…" autocomplete="off"></div>
+  <div class="scroll"><table class="cat-tbl"><thead><tr><th>Şirket</th><th>Ad Soyad</th><th>Telefon</th><th>E-posta</th></tr></thead><tbody id="ctDlgRows"></tbody></table></div>
+  <p class="note">Listede yoksa Contact sayfasından ekleyin.</p>
+</dialog>
 <dialog id="catDlg">
   <div class="cat-head"><div><h2>StarCharge Ürün Kataloğu</h2><p class="dsub">Satıra "Ekle" diyerek ünite listesine direkt ekleyin; marka/model, tip, güç ve soket sayısı otomatik dolar.</p></div><button type="button" id="catClose" class="ghost" aria-label="Kapat">✕</button></div>
   <div class="cat-bar"><div class="viewbar" id="catType"><button type="button" data-ct="" aria-pressed="true">Tümü</button><button type="button" data-ct="DC" aria-pressed="false">DC</button><button type="button" data-ct="AC" aria-pressed="false">AC</button></div><input type="search" id="catQ" placeholder="Model ara…" autocomplete="off"></div>
@@ -602,10 +625,11 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
     <p class="dsub">Temel bilgileri girin. Üniteler, altyapı ve finansman detayı kayıttan sonra lokasyon sayfasında doldurulur.</p>
     <div class="dgrid">
       <label class="span2">Lokasyon adı *<input id="dlgName" required maxlength="120" autocomplete="off"></label>
+      <div class="span2" style="display:flex;justify-content:flex-end"><button type="button" class="ghost pick-btn" id="dlgPickContact">Kişilerden Seç</button></div>
       <label>İletişim kişisi<input id="dlgContact" maxlength="120" autocomplete="off"></label>
       <label>Telefon<input id="dlgPhone" data-phone type="tel" inputmode="tel" maxlength="22" placeholder="+90 (5__) ___ __ __" autocomplete="off"></label>
       <label>Saha tipi<select id="dlgType"><option value="Hotel">Otel</option><option value="Hospital">Hastane</option><option value="Mall">AVM</option><option value="Office">Ofis</option><option value="Industry Zone">Sanayi Sitesi</option><option value="Residence">Konut</option><option value="Commercial Center">Ticari Merkez</option><option value="Car Inspection Center">Araç Muayene İstasyonu</option><option value="Carpark">Otopark</option><option value="High School">Lise</option><option value="University">Üniversite</option><option value="Gym & Restaurant">Spor Salonu ve Restoran</option><option value="Fuel Station">Akaryakıt İstasyonu</option><option value="Logistics Center">Lojistik Merkezi</option><option value="Other">Diğer</option></select></label>
-      <span></span>
+      <label>Şirket<input id="dlgCompany" maxlength="120" autocomplete="off"></label>
       <div class="trio">
         <label>İlk süre (yıl)<input id="dlgBase" type="number" min="0" step="any" inputmode="decimal"></label>
         <label>Uzatma (yıl)<input id="dlgExt" type="number" min="0" step="any" inputmode="decimal"></label>
@@ -842,7 +866,7 @@ function resultsHtml(rows,f,s,tf,mode='all'){
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
 function blankSite(name){
-  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',phone:'',contractBase:'',contractExt:'',
+  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',contactCompany:'',phone:'',contractBase:'',contractExt:'',
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
@@ -857,6 +881,7 @@ function migrateSite(s){
   if(OLD_TYPE[s.type])s.type=OLD_TYPE[s.type];else if(s.type&&!TYPES.some(x=>x[0]===s.type))s.type='Other';
   if(s.contractBase===undefined)s.contractBase=(+s.contractYears>0)?+s.contractYears:'';
   if(s.contractExt===undefined)s.contractExt='';
+  if(s.contactCompany===undefined)s.contactCompany='';
   s.nextAction=nextStageOf(s);
   if(s.amg&&s.amg.scores){const dn=amgScore(s);if(dn.complete){s.score=dn.total;s.scoreSrc='amg';}}
   for(const k of ['phone','nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
@@ -901,7 +926,7 @@ async function poll(){
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity')render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -1052,12 +1077,12 @@ function renderLocations(){
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='activity')renderActivity();
+  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||view==='contacts'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   setPageTitle();
   if(view!=='site'&&notesOpen)closeNotes();
@@ -1236,13 +1261,13 @@ function renderSite(){
   <div id="ddAlerts"></div>
 
   <div class="info-pair" data-tab="info">
-  <section class="box"><h3>Lokasyon Bilgileri</h3>
+  <section class="box"><h3>Lokasyon Bilgileri${siteEdit&&mode==='cloud'?'<button type="button" class="ghost pick-btn no-print" id="pickContact">Kişilerden Seç</button>':''}</h3>
   <div class="grid infogrid">
     ${field('name','Lokasyon adı','text',' class="span4"')}
     ${field('contact','İletişim kişisi')}
     <label>Telefon<input data-f="phone" data-phone type="tel" inputmode="tel" placeholder="+90 (5__) ___ __ __" value="${esc(s.phone)}"></label>
     <label>Saha tipi<select data-f="type">${TYPES.map(([k,t])=>`<option value="${esc(k)}" ${k===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
-    <span></span>
+    ${field('contactCompany','Şirket')}
     <div class="trio">
       <label>İlk süre (yıl)<input data-f="contractBase" type="number" min="0" step="any" inputmode="decimal" value="${esc(s.contractBase)}"></label>
       <label>Uzatma (yıl)<input data-f="contractExt" type="number" min="0" step="any" inputmode="decimal" value="${esc(s.contractExt)}"></label>
@@ -1431,7 +1456,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   const s=blankSite(name);
   const base=$('dlgBase').value===''?'':Math.max(0,+$('dlgBase').value||0),ext=$('dlgExt').value===''?'':Math.max(0,+$('dlgExt').value||0);
   Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractBase:base,contractExt:ext,contractYears:(+base||0)+(+ext||0),
-    address:v('dlgAddress'),contact:v('dlgContact'),phone:v('dlgPhone'),notes:v('dlgNotes')});
+    address:v('dlgAddress'),contact:v('dlgContact'),contactCompany:v('dlgCompany'),phone:v('dlgPhone'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const pb=e.target.closest('.fin-sub [data-ps]');if(pb){psub=pb.dataset.ps;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
@@ -1505,7 +1530,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Skor Hesaplama']];
 function paintNav(){
-  const key=view==='users'?'users':view==='activity'?'activity':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -1525,6 +1550,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(k==='list'){view='locations';render();window.scrollTo(0,0);}
     else if(k==='users'){view='users';render();window.scrollTo(0,0);}
     else if(k==='activity'){view='activity';render();window.scrollTo(0,0);}
+    else if(k==='contacts'){view='contacts';render();window.scrollTo(0,0);}
     else if(SITE_SUBS.includes(k))goSite(k);
   });
 });
@@ -1625,7 +1651,7 @@ document.addEventListener('click',async e=>{
 /* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
 let actF={q:'',actor:'',entity:''},actRows=[],actMore=false,actActors=[];
 const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo']};
-const ENT_LABEL={lokasyon:'Lokasyon',kullanici:'Kullanıcı',oturum:'Oturum'};
+const ENT_LABEL={lokasyon:'Lokasyon',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
 const fmtTs=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleString(LOC,{dateStyle:'short',timeStyle:'short'});};
 async function fetchActivity(reset){
   const qs=new URLSearchParams({limit:'50'});
@@ -1697,6 +1723,123 @@ document.addEventListener('click',async e=>{
   if(e.target.id==='actClose'){$('actDlg').close();return;}
   const tr=e.target.closest('#actRows tr[data-act]');if(tr)actDetail(tr.dataset.act);
 });
+
+/* ---------- Contact rehberi (şirket · kişi · telefon) ---------- */
+let ct={rows:[],loaded:false,q:'',group:true,collapsed:{},admin:false,me:'',regroup:false},ctQueue={},ctTimer={},ctPickCb=null;
+const CT_COLS=[['company','Şirket','text',120],['firstName','Ad','text',80],['lastName','Soyad','text',80],['phone','Telefon','tel',30],['email','E-posta','email',254],['title','Unvan','text',100]];
+const ctName=c=>[c.firstName,c.lastName].filter(Boolean).join(' ');
+const ctLow=v=>String(v||'').toLocaleLowerCase('tr-TR');
+async function ctApi(method,qs,body){
+  const r=await fetch('/api/contacts'+(qs||''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
+  return d;
+}
+async function loadContacts(){const d=await ctApi('GET');ct.rows=d.contacts||[];ct.me=d.me;ct.admin=!!d.admin;ct.loaded=true;}
+function ctMatch(c,q){q=ctLow(q).trim();return !q||[c.company,c.firstName,c.lastName,c.phone,c.email,c.title].some(v=>ctLow(v).includes(q));}
+function ctSort(a,b){
+  if(!a.company!==!b.company)return a.company?1:-1;
+  return (a.company||'').localeCompare(b.company||'','tr')||ctName(a).localeCompare(ctName(b),'tr')||(+a.id)-(+b.id);
+}
+function ctRowHtml(c){
+  const can=c.createdBy===ct.me||ct.admin;
+  return `<tr data-ct="${esc(c.id)}">${CT_COLS.map(([k,l,t,m])=>`<td><input class="ct-in" data-ctf="${k}" type="${t}" value="${esc(c[k])}" placeholder="${l}" aria-label="${l}" maxlength="${m}" autocomplete="off"${k==='phone'?' data-phone inputmode="tel"':''}></td>`).join('')}<td class="ct-act"><button type="button" class="ghost" data-ctdel="${esc(c.id)}" aria-label="Kişiyi sil" title="Kişiyi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></td></tr>`;
+}
+function paintContacts(){
+  const t=$('ctRows');if(!t)return;
+  const list=ct.rows.filter(c=>ctMatch(c,ct.q)).sort(ctSort);
+  const n=$('ctCount');if(n)n.textContent=ct.rows.length+' kişi';
+  if(!list.length){t.innerHTML=`<tr><td colspan="7" class="note" style="padding:24px;text-align:center">${ct.rows.length?'Eşleşen kişi yok.':'Henüz kişi yok. “Yeni Kişi” ile ekleyin.'}</td></tr>`;return;}
+  if(!ct.group){t.innerHTML=list.map(ctRowHtml).join('');return;}
+  const groups=new Map();list.forEach(c=>{const k=c.company||'';if(!groups.has(k))groups.set(k,[]);groups.get(k).push(c);});
+  let h='';
+  groups.forEach((rows,k)=>{const open=!ct.collapsed[k];
+    h+=`<tr class="ct-grp"><td colspan="7"><button type="button" class="ct-tg" data-ctgrp="${esc(k)}" aria-expanded="${open}" aria-label="${esc(k||'Şirket Belirtilmemiş')}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><strong>${esc(k||'Şirket Belirtilmemiş')}</strong><small>${rows.length} kişi</small><button type="button" class="ghost pick-btn" data-ctaddto="${esc(k)}">+ Kişi Ekle</button></td></tr>`;
+    if(open)h+=rows.map(ctRowHtml).join('');});
+  t.innerHTML=h;
+}
+function ctState(t,err){const e=$('ctState');if(!e)return;e.textContent=t||'';e.className=err?'err':'';}
+async function renderContacts(){
+  if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Contact</h3><p class="note">Contact rehberi için sunucu bağlantısı gerekli.</p></section>';return;}
+  $('view').innerHTML=`<section class="box"><h3>Contact<small><span>Şirket, kişi ve telefon rehberi</span> · <span id="ctCount"></span></small></h3>
+    <div class="locbar no-print">
+      <label class="lf lq">Ara<input type="search" id="ctQ" value="${esc(ct.q)}" placeholder="Şirket, kişi veya telefon…" autocomplete="off"></label>
+      <label class="lf lchk"><input type="checkbox" id="ctGroup" ${ct.group?'checked':''}>Şirkete Göre Grupla</label>
+      <button type="button" class="primary" id="ctAdd">+ Yeni Kişi</button><span id="ctState" role="status"></span>
+    </div>
+    <div class="scroll"><table class="portfolio ct-tbl"><thead><tr>${CT_COLS.map(([k,l])=>`<th>${l}</th>`).join('')}<th></th></tr></thead><tbody id="ctRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <p class="note">Hücreye tıklayıp yazın; değişiklikler kendiliğinden kaydedilir. Bu kişiler lokasyon girişinde “Kişilerden Seç” ile kullanılabilir.</p></section>`;
+  if(ct.loaded)paintContacts();
+  try{await loadContacts();}catch(e){if(view==='contacts')ctState(e.message,true);return;}
+  if(view==='contacts')paintContacts();
+}
+function ctSave(id,k,v){const c=ct.rows.find(x=>x.id===id);if(c)c[k]=v;(ctQueue[id]=ctQueue[id]||{})[k]=v;clearTimeout(ctTimer[id]);ctTimer[id]=setTimeout(()=>ctFlush(id),600);ctState('Kaydediliyor…');}
+async function ctFlush(id){
+  clearTimeout(ctTimer[id]);const b=ctQueue[id];if(!b)return;delete ctQueue[id];
+  try{await ctApi('PATCH','?id='+id,b);ctState('Kaydedildi · '+clock());}catch(e){ctState('Kaydedilemedi',true);toast(e.message);}
+}
+async function ctAdd(company){
+  try{const d=await ctApi('POST','',company?{company}:{});ct.rows.push(d.contact);ct.q='';const q=$('ctQ');if(q)q.value='';ct.collapsed[company||'']=false;paintContacts();
+    const first=document.querySelector(`#ctRows tr[data-ct="${d.contact.id}"] .ct-in[data-ctf="${company?'firstName':'company'}"]`);
+    if(first){first.focus();first.scrollIntoView({block:'nearest'});}ctState('');}
+  catch(e){toast(e.message);}
+}
+document.addEventListener('input',e=>{
+  const el=e.target;if(!el.closest)return;
+  if(el.id==='ctQ'){ct.q=el.value;paintContacts();return;}
+  if(el.id==='ctDlgQ'){paintCtPicker();return;}
+  const f=el.closest('#ctRows .ct-in');if(!f)return;
+  if('phone' in f.dataset){f.value=fmtPhone(f.value,(f._dg??null),/^delete/.test(e.inputType||''));f._dg=f.value.replace(/\D/g,'').replace(/^90/,'').length;}
+  const id=f.closest('tr').dataset.ct;ctSave(id,f.dataset.ctf,f.value.trim());
+  if(f.dataset.ctf==='company')ct.regroup=true;
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='ctGroup'){ct.group=e.target.checked;paintContacts();return;}
+  const f=e.target.closest&&e.target.closest('#ctRows .ct-in');if(f)ctFlush(f.closest('tr').dataset.ct);
+});
+document.addEventListener('focusout',e=>{
+  if(!e.target.closest||!e.target.closest('#ctRows'))return;
+  setTimeout(()=>{if(ct.regroup&&view==='contacts'&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#ctRows'))){ct.regroup=false;paintContacts();}},0);
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('#ctAdd')){ctAdd('');return;}
+  const ad=e.target.closest('[data-ctaddto]');if(ad){ctAdd(ad.dataset.ctaddto);return;}
+  const tg=e.target.closest('[data-ctgrp]');if(tg){const k=tg.dataset.ctgrp;ct.collapsed[k]=!ct.collapsed[k];paintContacts();return;}
+  const dl=e.target.closest('[data-ctdel]');
+  if(dl&&!dl.disabled){const id=dl.dataset.ctdel,c=ct.rows.find(x=>x.id===id);
+    ask((ctName(c)||c.company||'Bu kişi')+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Kişiyi sil').then(async ok=>{if(!ok)return;
+      try{await ctApi('DELETE','?id='+id);ct.rows=ct.rows.filter(x=>x.id!==id);paintContacts();toast('Kişi silindi.');}catch(x){toast(x.message);}});return;}
+});
+setInterval(async()=>{
+  if(view!=='contacts'||document.hidden||Object.keys(ctQueue).length)return;
+  const a=document.activeElement;if(a&&a.closest&&a.closest('#ctRows'))return;
+  try{await loadContacts();paintContacts();}catch(e){}
+},20000);
+
+/* Lokasyon girişinde "Kişilerden Seç" */
+function paintCtPicker(){
+  const q=$('ctDlgQ').value,list=ct.rows.filter(c=>(c.company||c.firstName||c.lastName)&&ctMatch(c,q)).sort(ctSort);
+  $('ctDlgRows').innerHTML=list.length?list.map(c=>`<tr data-ctpick="${esc(c.id)}" tabindex="0"><td>${esc(c.company||'—')}</td><td>${esc(ctName(c)||'—')}</td><td>${esc(c.phone||'—')}</td><td>${esc(c.email||'—')}</td></tr>`).join(''):'<tr><td colspan="4" class="note" style="padding:18px;text-align:center">Eşleşen kişi yok.</td></tr>';
+}
+async function openCtPicker(cb){
+  ctPickCb=cb;
+  try{if(!ct.loaded)await loadContacts();}catch(e){toast(e.message);return;}
+  $('ctDlgQ').value='';paintCtPicker();$('ctDlg').showModal();$('ctDlgQ').focus();
+}
+function ctPickSet(c){
+  const cb=ctPickCb;ctPickCb=null;$('ctDlg').close();if(cb)cb(c);
+}
+document.addEventListener('click',e=>{
+  if(e.target.closest('#ctDlgClose')){$('ctDlg').close();return;}
+  const r=e.target.closest('#ctDlgRows [data-ctpick]');if(r){const c=ct.rows.find(x=>x.id===r.dataset.ctpick);if(c)ctPickSet(c);return;}
+  if(e.target.closest('#pickContact')){openCtPicker(c=>{const s=cur();if(!s)return;
+    s.contact=ctName(c);s.phone=c.phone||'';s.contactCompany=c.company||'';
+    for(const [k,v] of [['contact',s.contact],['phone',s.phone],['contactCompany',s.contactCompany]]){const i=document.querySelector(`[data-f="${k}"]`);if(i)i.value=v;}
+    touched(s);updateDerived();});return;}
+  if(e.target.closest('#dlgPickContact')){openCtPicker(c=>{$('dlgContact').value=ctName(c);const p=$('dlgPhone');p.value=c.phone||'';p._dg=p.value.replace(/\D/g,'').replace(/^90/,'').length;$('dlgCompany').value=c.company||'';});return;}
+});
+document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#ctDlgRows [data-ctpick]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const c=ct.rows.find(x=>x.id===r.dataset.ctpick);if(c)ctPickSet(c);}});
 
 /* ---------- Şirket içi bilgilendirme (lokasyon notları) ---------- */
 const notesBy={};let notesOpen=false,notesFor=null;

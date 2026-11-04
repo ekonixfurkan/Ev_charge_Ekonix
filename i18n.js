@@ -243,6 +243,20 @@
     /* diyaloglar */
     ' hesabı silinsin mi? Bu geri alınamaz.': ' account will be deleted. This cannot be undone.',
     'Bu şifre bir daha gösterilmez; kopyalayın.': 'This password will not be shown again; copy it.',
+
+    /* contact rehberi */
+    'Contact': 'Contacts', 'Şirket': 'Company', 'Ad': 'First Name', 'Soyad': 'Last Name', 'Unvan': 'Job Title', 'Ad Soyad': 'Full Name', 'Kişi': 'Contact',
+    'Şirket, kişi ve telefon rehberi': 'Company, people and phone directory', 'Şirket, kişi veya telefon…': 'Company, person or phone…',
+    'Şirkete Göre Grupla': 'Group by Company', '+ Yeni Kişi': '+ New Contact', 'Şirket Belirtilmemiş': 'No Company', '+ Kişi Ekle': '+ Add Contact',
+    'Kişiyi sil': 'Delete contact', 'Kişi silindi.': 'Contact deleted.', 'Eşleşen kişi yok.': 'No matching contacts.',
+    'Henüz kişi yok. “Yeni Kişi” ile ekleyin.': 'No contacts yet. Add one with “New Contact”.',
+    'Contact rehberi için sunucu bağlantısı gerekli.': 'A server connection is required for the contact directory.',
+    'Hücreye tıklayıp yazın; değişiklikler kendiliğinden kaydedilir. Bu kişiler lokasyon girişinde “Kişilerden Seç” ile kullanılabilir.': 'Click a cell and type; changes are saved automatically. These contacts can be used when entering a location via “Pick from Contacts”.',
+    'Kişilerden Seç': 'Pick from Contacts', 'Satıra tıklayın; ad, telefon ve şirket lokasyona işlenir.': 'Click a row; the name, phone and company are filled into the location.',
+    'Listede yoksa Contact sayfasından ekleyin.': 'If not listed, add it on the Contact page.', 'Kaydedildi': 'Saved', 'Kaydedilemedi': 'Could not save',
+    'Contact için veritabanı gerekli': 'A database is required for Contacts', 'Contact işlenemedi': 'Could not process Contacts', 'Kişi bulunamadı': 'Contact not found',
+    'Kişiyi yalnızca ekleyen veya yönetici silebilir': 'Only the person who added the contact or an administrator can delete it',
+    'Contact silindi': 'Contact deleted',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
@@ -253,6 +267,10 @@
   function sub(s) { return tr(String(s).trim()); }
   var P = [
     [/^(.+) hesabı silinsin mi\? Bu geri alınamaz\.$/, function (m) { return 'Delete the account ' + m[1] + '? This cannot be undone.'; }],
+    [/^(\d+) kişi$/, function (m) { return m[1] + (m[1] === '1' ? ' person' : ' people'); }],
+    [/^Contact eklendi(?:: (.+))?$/, function (m) { return 'Contact added' + (m[1] ? ': ' + m[1] : ''); }],
+    [/^Contact silindi(?:: (.+))?$/, function (m) { return 'Contact deleted' + (m[1] ? ': ' + m[1] : ''); }],
+    [/^Kaydedildi · (.+)$/, function (m) { return 'Saved · ' + m[1]; }],
     [/^(.+) silinsin mi\? Bu işlem herkes için geçerli olur ve geri alınamaz\.$/, function (m) { return 'Delete ' + m[1] + '? This applies to everyone and cannot be undone.'; }],
     [/^Hatalı giriş: (.*)$/, function (m) { return 'Invalid entry: ' + m[1]; }],
     [/^Tamamı StarCharge, toplam (.+)$/, function (m) { return 'All StarCharge, total ' + m[1]; }],
