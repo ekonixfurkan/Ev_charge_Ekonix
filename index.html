@@ -223,9 +223,9 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .grid.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
 /* Lokasyon Bilgileri: dar, iki sütunlu form; tek kalan alan yarım genişlikte, yanı boş kalır */
 .grid.infogrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.info-pair{display:grid;grid-template-columns:repeat(2,minmax(0,640px));gap:16px;justify-content:start;align-items:start;margin-bottom:16px}
+.info-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;margin-bottom:16px}
 .info-pair .box{margin-bottom:0}
-@media (max-width:1400px){.info-pair{grid-template-columns:minmax(0,640px)}.info-pair .box{margin-bottom:16px}}
+@media (max-width:1100px){.info-pair{grid-template-columns:minmax(0,1fr)}.info-pair .box{margin-bottom:16px}}
 .trio{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 input[data-locked]{background:var(--soft);color:var(--ink2);border-style:dashed;cursor:not-allowed}
 .span2{grid-column:span 2}.span3{grid-column:span 3}.span4{grid-column:1/-1}
