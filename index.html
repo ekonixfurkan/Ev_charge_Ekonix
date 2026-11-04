@@ -226,21 +226,25 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .subh{font-size:11.5px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em;margin:22px 0 8px}
 
 /* Lokasyon başlığı + karar kutuları */
-.site-head{display:flex;justify-content:flex-end;align-items:stretch;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.site-head.editing{position:sticky;top:0;z-index:6;background:var(--paper);padding:8px 0;margin-top:-8px}
+/* Sekmeler solda, Aşama/Durum/Skor/Toplam Güç kutuları ve Düzenle sağda; hepsi aynı satırda, aynı yükseklikte */
+.site-bar{display:flex;align-items:stretch;justify-content:space-between;gap:12px 16px;flex-wrap:wrap;margin-bottom:14px}
+.site-bar.editing{position:sticky;top:0;z-index:6;background:var(--paper);padding:8px 0;margin-top:-8px}
+.site-head{display:flex;align-items:stretch;gap:10px;margin-left:auto}
 .page-sub{margin:2px 0 0;font-size:13px;color:var(--muted)}
 .verdict{display:flex;gap:10px;align-items:stretch}
 .edit-actions{display:flex;gap:8px;align-items:stretch}
 .edit-actions button{display:inline-flex;align-items:center;gap:6px;padding:0 20px;font-size:14px}
 .eb-note-line{margin:0 0 12px;font-size:12.5px;font-weight:600;color:var(--risk);text-align:right}
 /* Lokasyon bölümleri: tıklanabilir olduğu belli olsun diye kutu düğmeler */
-.sitetabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px;overflow:visible}
-.sitetabs button{padding:9px 18px;border:1px solid var(--hair-strong);border-radius:var(--radius);background:var(--card);color:var(--ink2);font-weight:600}
+.sitetabs{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:0;overflow:visible}
+.sitetabs button{display:inline-flex;align-items:center;padding:0 18px;border:1px solid var(--hair-strong);border-radius:var(--radius);background:var(--card);color:var(--ink2);font-weight:600}
 .sitetabs button:hover{border-color:var(--navy);color:var(--navy);background:var(--navy-soft)}
 .sitetabs button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
-.vcell{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:8px 14px;min-width:120px}
+.vcell{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:8px 14px;min-width:110px}
 .vcell span{display:block;font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.vcell strong{font-size:22px;font-variant-numeric:tabular-nums}
+.vcell strong{font-size:22px;font-variant-numeric:tabular-nums;line-height:1.25}
+.vrow{display:flex;align-items:baseline;gap:8px}
+.vrow small{font-size:12px;font-weight:600}
 
 /* Düzenleme çubuğu */
 #view.ro input:disabled,#view.ro select:disabled,#view.ro textarea:disabled{background:var(--soft);color:var(--ink);-webkit-text-fill-color:var(--ink);border-color:transparent;cursor:default;opacity:1;resize:none}
@@ -1050,16 +1054,18 @@ document.addEventListener('click',e=>{
 
 function renderSite(){
   const s=cur();
-  let h=`<div class="site-head ${siteEdit?'editing':''}">
-  <div class="verdict">
-    <div class="vcell"><span>Aşama</span><strong id="vStage" style="font-size:15px"></strong></div>
-    <div class="vcell"><span>Durum</span><strong id="vStatus" style="font-size:15px"></strong></div>
-    <div class="vcell"><span>Skor</span><strong id="vScore"></strong><small id="vDec" style="display:block;font-size:12px"></small></div>
-    <div class="vcell"><span>Toplam Güç</span><strong id="vKw"></strong></div>
-  </div>
-  <div class="edit-actions no-print" id="editBar">${editBarHtml()}</div></div>
-  ${siteEdit?'<p class="eb-note-line no-print">Düzenleme modu: değişiklikler Kaydet\'e basana kadar sunucuya gönderilmez.</p>':''}
+  let h=`<div class="site-bar ${siteEdit?'editing':''}">
   <div class="sitetabs subtabs no-print" role="tablist" aria-label="Lokasyon bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" role="tab" data-sub="${k}" aria-pressed="${sub===k}" aria-selected="${sub===k}">${t}</button>`).join('')}</div>
+  <div class="site-head">
+    <div class="verdict">
+      <div class="vcell"><span>Aşama</span><strong id="vStage" style="font-size:15px"></strong></div>
+      <div class="vcell"><span>Durum</span><strong id="vStatus" style="font-size:15px"></strong></div>
+      <div class="vcell"><span>Skor</span><div class="vrow"><strong id="vScore"></strong><small id="vDec"></small></div></div>
+      <div class="vcell"><span>Toplam Güç</span><strong id="vKw"></strong></div>
+    </div>
+    <div class="edit-actions no-print" id="editBar">${editBarHtml()}</div>
+  </div></div>
+  ${siteEdit?'<p class="eb-note-line no-print">Düzenleme modu: değişiklikler Kaydet\'e basana kadar sunucuya gönderilmez.</p>':''}
   <div id="ddAlerts"></div>
 
    <section class="box" data-tab="info"><h3>Lokasyon Bilgileri<span class="no-print" style="display:flex;gap:6px"><button id="dupSite">Kopyala</button>${me.role==='admin'?'<button class="ghost" id="delSite">Lokasyonu sil</button>':''}</span></h3>
