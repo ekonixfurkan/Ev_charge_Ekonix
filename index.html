@@ -1138,13 +1138,13 @@ function renderPortfolio(){
   const tot=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
   let h=`<div class="ovw-grid" data-tab="ovw"><section class="box"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio ovwtbl"><thead><tr>
-    <th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">Skor</th><th>Durum</th></tr></thead><tbody>`+
+    <th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th></tr></thead><tbody>`+
     pi.rows.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
       return `<tr data-open="${s.id}" tabindex="0"><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
-      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td>
+      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
-      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td></tr>`;}).join('')+
-    `</tbody><tfoot><tr><td colspan="2">Toplam</td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td></td><td></td></tr></tfoot></table></div>${pagerHtml('ovw',pi)}</section>
+      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td></tr>`;}).join('')+
+    `</tbody><tfoot><tr><td colspan="2">Toplam</td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td></tr></tfoot></table></div>${pagerHtml('ovw',pi)}</section>
     <div class="kpi-col">${legendHtml()}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div></div>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
