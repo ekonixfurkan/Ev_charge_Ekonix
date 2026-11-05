@@ -1,4 +1,4 @@
-// /api/notifications — lokasyon ve kişi işlemleri. Kendi işlemlerin listelenir ama okunmamış sayılmaz. GET: okunmamış sayısı + son 100 kayıt · POST: tümünü okundu say
+// /api/notifications — başkalarının lokasyonlardaki güncellemeleri (oluşturma, güncelleme, silme, şirket içi not). Giriş, görüntüleme gibi işlemler yalnız işlem geçmişindedir. GET: okunmamış sayısı + son 100 kayıt · POST: tümünü okundu say
 import { sql } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureActivity } from '../lib/activity.js';
@@ -17,7 +17,7 @@ function ensureSeen() {
 }
 
 const ACTIONS = ['olustur', 'guncelle', 'sil', 'not-ekle'];
-const ENTITIES = ['lokasyon', 'kisi'];
+const ENTITIES = ['lokasyon'];
 
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'no-store');
@@ -37,9 +37,9 @@ export default async function handler(req, res) {
       }
       const last = String(seen[0].last_id);
       const items = await s`SELECT a.id, a.at, a.actor, a.action, a.entity, a.entity_id, a.entity_name, a.summary, NULLIF(u.name, '') AS actor_name,
-          (a.id > ${last}::bigint AND a.actor <> ${user.email}) AS unread
+          (a.id > ${last}::bigint) AS unread
         FROM activity_log a LEFT JOIN users u ON u.email = a.actor
-        WHERE a.entity = ANY(${ENTITIES}) AND a.action = ANY(${ACTIONS}) AND a.actor <> 'Sistem'
+        WHERE a.entity = ANY(${ENTITIES}) AND a.action = ANY(${ACTIONS}) AND a.actor <> ${user.email} AND a.actor <> 'Sistem'
         ORDER BY a.id DESC LIMIT 100`;
       const unread = items.filter((x) => x.unread).length;
       const more = await s`SELECT count(*)::int AS n FROM activity_log

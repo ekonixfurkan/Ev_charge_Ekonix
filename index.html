@@ -1471,7 +1471,11 @@ function updateDerived(){
 }
 
 /* ---------- events ---------- */
-function openSite(id){guard(()=>{if(notesOpen&&activeId!==id)closeNotes();activeId=id;view='site';sub='info';render();window.scrollTo({top:0});});}
+const viewLogged={};
+// Lokasyon sayfasının açılması işlem geçmişine yazılır (aynı lokasyon 10 dk içinde bir kez).
+function logView(id){if(mode!=='cloud')return;const t=Date.now();if(viewLogged[id]&&t-viewLogged[id]<600000)return;viewLogged[id]=t;
+  fetch('/api/activity',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({action:'goruntule',id})}).catch(()=>{});}
+function openSite(id){guard(()=>{if(notesOpen&&activeId!==id)closeNotes();activeId=id;view='site';sub='info';render();window.scrollTo({top:0});logView(id);});}
 // Yeni Lokasyon penceresi: telefon maskesi, il -> ilçe zinciri, süre toplamı
 document.addEventListener('input',e=>{
   const el=e.target;if(!el.closest||!el.closest('#dlg'))return;
@@ -1693,7 +1697,7 @@ document.addEventListener('click',async e=>{
 
 /* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
 let actF={q:'',actor:'',entity:''},actRows=[],actMore=false,actActors=[];
-const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo']};
+const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none']};
 const ENT_LABEL={lokasyon:'Lokasyon',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
 const fmtTs=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleString(LOC,{dateStyle:'short',timeStyle:'short'});};
 async function fetchActivity(reset){
@@ -1935,17 +1939,17 @@ function paintBell(){
 }
 function paintNotifRows(){
   const t=$('notifRows');if(!t)return;
-  t.innerHTML=bell.items.length?bell.items.map(n=>{const [lab,cls]=ACT_LABEL[n.action]||[n.action,'none'],mine=n.actor===me.email;
-    const who=mine?'<span class="p1" style="font-weight:600">Siz</span>':actWho(n);
+  t.innerHTML=bell.items.length?bell.items.map(n=>{const [lab,cls]=ACT_LABEL[n.action]||[n.action,'none'];
+    const who=actWho(n);
     return `<tr data-bellent="${esc(n.entity||'lokasyon')}" data-bellsite="${esc(n.entity_id||'')}" data-bellact="${esc(n.action)}" tabindex="0"${n.unread?' class="unread"':''}><td style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td>${who}</td><td><span class="badge ${cls}">${esc(lab)}</span></td><td><span class="p1">${esc(n.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[n.entity]||'Lokasyon')}</span></td><td>${esc(n.summary||'')}</td></tr>`;}).join('')
-    :'<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Henüz bildirim yok. Lokasyonlarda ve Kişiler’de işlem yapıldıkça burada görünür.</td></tr>';
+    :'<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Henüz bildirim yok. Diğer kullanıcılar lokasyonlarda güncelleme yaptıkça burada görünür.</td></tr>';
   const r=$('bellRead');if(r)r.hidden=!bell.unread;
 }
 async function renderNotifs(){
-  $('view').innerHTML=`<section class="box"><h3>Bildirimler<small>Lokasyonlardaki ve Kişiler’deki son işlemler</small></h3>
+  $('view').innerHTML=`<section class="box"><h3>Bildirimler<small>Diğer kullanıcıların lokasyonlardaki güncellemeleri</small></h3>
     <div class="scroll"><table class="portfolio loctbl act-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="notifRows"><tr><td colspan="5" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
     <div class="row-actions"><button type="button" id="bellRead" hidden>Tümünü Okundu Say</button></div>
-    <p class="note">Satıra tıklayınca ilgili lokasyon ya da kişi açılır. Kendi işlemlerin de listelenir ama okunmamış sayılmaz.</p></section>`;
+    <p class="note">Satıra tıklayınca ilgili lokasyon açılır. Giriş ve sayfa görüntüleme gibi hareketler İşlem Geçmişi’nde görünür.</p></section>`;
   paintNotifRows();
   await pollBell(true);
   if(view==='notifs'&&bell.unread)await markBellRead(true);

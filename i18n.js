@@ -274,6 +274,11 @@
     'Henüz bildirim yok. Lokasyonlarda ve Kişiler’de işlem yapıldıkça burada görünür.': 'No notifications yet. They appear here as actions are made on Locations and Contacts.',
     'Satıra tıklayınca ilgili lokasyon ya da kişi açılır. Kendi işlemlerin de listelenir ama okunmamış sayılmaz.': 'Click a row to open the related location or contact. Your own actions are listed too but not counted as unread.',
     'Bu kayıt silinmiş.': 'This record has been deleted.',
+
+    'Diğer kullanıcıların lokasyonlardaki güncellemeleri': 'Other users’ updates on locations',
+    'Henüz bildirim yok. Diğer kullanıcılar lokasyonlarda güncelleme yaptıkça burada görünür.': 'No notifications yet. They appear here when other users update locations.',
+    'Satıra tıklayınca ilgili lokasyon açılır. Giriş ve sayfa görüntüleme gibi hareketler İşlem Geçmişi’nde görünür.': 'Click a row to open the location. Logins and page views appear in the Activity Log.',
+    'Görüntülendi': 'Viewed', 'Lokasyon sayfası açıldı': 'Location page opened',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
