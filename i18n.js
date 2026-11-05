@@ -257,6 +257,17 @@
     'Contact için veritabanı gerekli': 'A database is required for Contacts', 'Contact işlenemedi': 'Could not process Contacts', 'Kişi bulunamadı': 'Contact not found',
     'Kişiyi yalnızca ekleyen veya yönetici silebilir': 'Only the person who added the contact or an administrator can delete it',
     'Contact silindi': 'Contact deleted',
+
+    /* enlem/boylam, kayıt tarihi, bağlantı şekli, dağıtım kabini, gelir paylaşım oranı */
+    'Enlem': 'Latitude', 'Boylam': 'Longitude', 'Kayıt tarihi': 'Record date', 'Kayıt Tarihi': 'Record Date',
+    'Bağlantı şekli': 'Connection type', 'Dağıtım Kabini': 'Distribution Cabinet', '+ Dağıtım Kabini': '+ Distribution Cabinet',
+    'ör. dağıtım kabini modeli': 'e.g. distribution cabinet model',
+    'Gelir Paylaşım Oranı %': 'Revenue Share Rate %',
+    'Finansör yatırımını kendi gelir payından geri alır. Gelir Paylaşım Oranı, Gelir Modeli sekmesindeki Paylaşım bölümünden gelir; burada değiştirilmez.': 'The financier recovers its investment from its own revenue share. The Revenue Share Rate comes from the Revenue Sharing section on the Revenue Model tab and cannot be changed here.',
+    'Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). Finansör yatırımını kendi gelir payından geri alır; Gelir Paylaşım Oranı, Paylaşım bölümündeki finansör payıdır. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.': 'Financing is entered item by item (hardware, site works, grid connection). The financier recovers its investment from its own revenue share; the Revenue Share Rate is the financier’s share in the Revenue Sharing section. IRR and payback are calculated from each party’s own cash flow, undiscounted and limited to 7 years. Taxes, financing costs, depreciation and energy losses are not included; results are not a revenue guarantee.',
+    'Nakit girişi: gelir payı (Co-CPO için komisyon ve işletme gideri düşülmüş). İç verim yalnız 7 yıllık nakde dayanır; ekipmanın kalan değeri ve sözleşme sonrası gelir dahil değildir.': 'Cash inflow: revenue share (commission and operating cost deducted for Co-CPO). IRR is based only on 7-year cash; residual equipment value and post-contract revenue are not included.',
+    'İletişim kişisi *': 'Contact person *', 'Telefon *': 'Phone *', 'İletişim kişisi zorunlu.': 'Contact person is required.',
+    'Telefon numarasını +90 (5xx) xxx xx xx biçiminde eksiksiz girin.': 'Enter the full phone number as +90 (5xx) xxx xx xx.',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
@@ -291,7 +302,7 @@
     [/^(\d+)\/(\d+) kriter puanlandı$/, function (m) { return m[1] + '/' + m[2] + ' criteria scored'; }],
     [/^(\d+) kriter daha puanlanınca karar gösterilir$/, function (m) { return 'Decision shown after ' + m[1] + ' more criteria are scored'; }],
     [/^%([\d.,]+) kullanım$/, function (m) { return m[1] + '% utilization'; }],
-    [/^(\d+) DC \((\d+) soket\) · (\d+) AC \((\d+) soket\)$/, function (m) { return m[1] + ' DC (' + m[2] + ' sockets) · ' + m[3] + ' AC (' + m[4] + ' sockets)'; }],
+    [/^(\d+) DC \((\d+) soket\) · (\d+) AC \((\d+) soket\)(?: · (\d+) Dağıtım Kabini)?$/, function (m) { return m[1] + ' DC (' + m[2] + ' sockets) · ' + m[3] + ' AC (' + m[4] + ' sockets)' + (m[5] ? ' · ' + m[5] + ' Distribution Cabinet' : ''); }],
     [/^Pay toplamı %([\d.,]+): dağıtılmayan %([\d.,-]+)$/, function (m) { return 'Share total ' + m[1] + '%: undistributed ' + m[2] + '%'; }],
     [/^Pay toplamı %([\d.,]+)$/, function (m) { return 'Share total ' + m[1] + '%'; }],
     [/^Sunucuda kayıtlı · (.+)$/, function (m) { return 'Saved on server · ' + m[1]; }],
