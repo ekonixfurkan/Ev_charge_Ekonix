@@ -279,6 +279,8 @@
     'Henüz bildirim yok. Diğer kullanıcılar lokasyonlarda güncelleme yaptıkça burada görünür.': 'No notifications yet. They appear here when other users update locations.',
     'Satıra tıklayınca ilgili lokasyon açılır. Giriş ve sayfa görüntüleme gibi hareketler İşlem Geçmişi’nde görünür.': 'Click a row to open the location. Logins and page views appear in the Activity Log.',
     'Görüntülendi': 'Viewed', 'Lokasyon sayfası açıldı': 'Location page opened',
+
+    'Eski Değer': 'Old Value', 'Yeni Değer': 'New Value', 'Yeni lokasyon eklendi': 'New location added', 'Lokasyon silindi': 'Location deleted', 'Şirket içi not eklendi': 'Internal note added',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'

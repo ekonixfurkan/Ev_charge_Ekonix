@@ -221,9 +221,17 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .pager .pg-btns button:disabled{opacity:.45;cursor:default}
 .pager .pg-gap{padding:0 4px;color:var(--muted)}
 #notifRows tr{cursor:pointer}
+.portfolio.notif-tbl{width:100%;table-layout:fixed}
+table.portfolio.notif-tbl :is(th,td){min-width:0}
+.notif-tbl th:nth-child(1){width:12%}.notif-tbl th:nth-child(2){width:16%}.notif-tbl th:nth-child(3){width:19%}.notif-tbl th:nth-child(4){width:15%}
+.notif-tbl td{white-space:normal;word-break:break-word;vertical-align:top}
+#notifRows tr.grp-first td{border-top:1px solid var(--hair-strong)}
+#notifRows .nv-old{color:var(--muted)}
+#notifRows .nv-new{font-weight:600;color:var(--ink)}
 #notifRows tr:hover td{background:var(--navy-soft)}
 #notifRows tr.unread td{background:var(--teal-soft)}
-#notifRows tr.unread td:first-child{box-shadow:inset 3px 0 0 var(--teal)}
+#notifRows tr.unread.grp-first td:first-child{box-shadow:inset 3px 0 0 var(--teal)}
+#notifRows tr:not(.grp-first) td:first-child{padding-left:8px;border-left:0}
 .whoami{display:block;padding:0 8px 8px;font-size:12px;color:var(--side-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logout{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;border:1px solid rgba(255,140,130,.35);border-radius:var(--radius);background:transparent;color:#ff9a8f;font-size:12.5px;font-weight:600;text-align:left}
 .logout:hover{background:rgba(255,120,110,.12);color:#ffb8b0;border-color:rgba(255,140,130,.6)}
@@ -1937,17 +1945,30 @@ function paintBell(){
   const c=$('bellCount');if(c){c.textContent=bell.unread>99?'99+':bell.unread;c.hidden=!bell.unread;}
   if(view==='notifs')paintNotifRows();
 }
+const NOTIF_MSG={olustur:'Yeni lokasyon eklendi',sil:'Lokasyon silindi','not-ekle':'Şirket içi not eklendi'};
+// Güncelleme: her değişen alan ayrı satır (Alan · Eski Değer · Yeni Değer); diğer işlemler tek satır.
+function notifChanges(n){
+  if(n.action!=='guncelle')return null;
+  if(Array.isArray(n.changes)&&n.changes.length)return n.changes;
+  const parts=String(n.summary||'').split('; ').map(p=>/^(.+?): (.*) → (.*)$/.exec(p));
+  return parts.length&&parts.every(Boolean)?parts.map(m=>({alan:m[1],eski:m[2],yeni:m[3]})):null;
+}
+function notifGroupHtml(n){
+  const ch=notifChanges(n),k=ch?ch.length:1,cls=n.unread?' unread':'';
+  const attrs=`data-bellent="${esc(n.entity||'lokasyon')}" data-bellsite="${esc(n.entity_id||'')}" data-bellact="${esc(n.action)}" tabindex="0"`;
+  const head=`<td rowspan="${k}" style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td rowspan="${k}">${actWho(n)}</td><td rowspan="${k}"><span class="p1">${esc(n.entity_name||'—')}</span></td>`;
+  if(!ch)return `<tr class="grp-first${cls}" ${attrs}>${head}<td colspan="3">${esc(NOTIF_MSG[n.action]||n.summary||'')}</td></tr>`;
+  return ch.map((c,i)=>`<tr class="${i?'':'grp-first'}${cls}" ${attrs}>${i?'':head}<td>${esc(c.alan)}</td><td class="nv-old">${esc(c.eski)}</td><td class="nv-new">${esc(c.yeni)}</td></tr>`).join('');
+}
 function paintNotifRows(){
   const t=$('notifRows');if(!t)return;
-  t.innerHTML=bell.items.length?bell.items.map(n=>{const [lab,cls]=ACT_LABEL[n.action]||[n.action,'none'];
-    const who=actWho(n);
-    return `<tr data-bellent="${esc(n.entity||'lokasyon')}" data-bellsite="${esc(n.entity_id||'')}" data-bellact="${esc(n.action)}" tabindex="0"${n.unread?' class="unread"':''}><td style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td>${who}</td><td><span class="badge ${cls}">${esc(lab)}</span></td><td><span class="p1">${esc(n.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[n.entity]||'Lokasyon')}</span></td><td>${esc(n.summary||'')}</td></tr>`;}).join('')
-    :'<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Henüz bildirim yok. Diğer kullanıcılar lokasyonlarda güncelleme yaptıkça burada görünür.</td></tr>';
+  t.innerHTML=bell.items.length?bell.items.map(notifGroupHtml).join('')
+    :'<tr><td colspan="6" class="note" style="padding:24px;text-align:center">Henüz bildirim yok. Diğer kullanıcılar lokasyonlarda güncelleme yaptıkça burada görünür.</td></tr>';
   const r=$('bellRead');if(r)r.hidden=!bell.unread;
 }
 async function renderNotifs(){
   $('view').innerHTML=`<section class="box"><h3>Bildirimler<small>Diğer kullanıcıların lokasyonlardaki güncellemeleri</small></h3>
-    <div class="scroll"><table class="portfolio loctbl act-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="notifRows"><tr><td colspan="5" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <div class="scroll"><table class="portfolio loctbl notif-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Lokasyon</th><th>Alan</th><th>Eski Değer</th><th>Yeni Değer</th></tr></thead><tbody id="notifRows"><tr><td colspan="6" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
     <div class="row-actions"><button type="button" id="bellRead" hidden>Tümünü Okundu Say</button></div>
     <p class="note">Satıra tıklayınca ilgili lokasyon açılır. Giriş ve sayfa görüntüleme gibi hareketler İşlem Geçmişi’nde görünür.</p></section>`;
   paintNotifRows();

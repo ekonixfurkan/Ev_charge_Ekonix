@@ -36,7 +36,7 @@ export default async function handler(req, res) {
                        ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING last_id`;
       }
       const last = String(seen[0].last_id);
-      const items = await s`SELECT a.id, a.at, a.actor, a.action, a.entity, a.entity_id, a.entity_name, a.summary, NULLIF(u.name, '') AS actor_name,
+      const items = await s`SELECT a.id, a.at, a.actor, a.action, a.entity, a.entity_id, a.entity_name, a.summary, a.changes, NULLIF(u.name, '') AS actor_name,
           (a.id > ${last}::bigint) AS unread
         FROM activity_log a LEFT JOIN users u ON u.email = a.actor
         WHERE a.entity = ANY(${ENTITIES}) AND a.action = ANY(${ACTIONS}) AND a.actor <> ${user.email} AND a.actor <> 'Sistem'
