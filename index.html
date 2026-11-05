@@ -1462,7 +1462,7 @@ function unitRow(u){
     <td class="w-n"><input data-uf="kw" type="number" min="0" step="any" inputmode="decimal" value="${cab?'':u.kw}" ${cab?'disabled placeholder="—"':''} aria-label="Ünite gücü kW"></td>
     <td class="w-n"><input data-uf="sockets" type="number" min="1" step="1" inputmode="numeric" value="${cab?'':u.sockets}" ${cab?'disabled placeholder="—"':''} aria-label="Soket"></td>
     <td class="w-n"><input data-uf="qty" type="number" min="1" step="1" inputmode="numeric" value="${u.qty}" aria-label="Adet"></td>
-    <td><input data-uf="model" value="${esc(u.model)}" placeholder="${cab?'ör. dağıtım kabini modeli':'ör. StarCharge'}" aria-label="Marka / model">${u.info?`<small class="uinfo">${esc(u.info)}${u.src?` · <a href="${esc(u.src)}" target="_blank" rel="noopener">ürün sayfası</a>`:''}</small>`:''}</td>
+    <td>${cab?`<input data-uf="model" value="${esc(u.model)}" placeholder="ör. dağıtım kabini modeli" aria-label="Marka / model">`:catSelectHtml(u)}${u.info?`<small class="uinfo">${esc(u.info)}${u.src?` · <a href="${esc(u.src)}" target="_blank" rel="noopener">ürün sayfası</a>`:''}</small>`:''}</td>
     <td class="num" data-utotal>${cab?'—':nf.format((+u.kw||0)*(+u.qty||0))}</td>
     <td><button class="ghost" data-del="${u.id}" aria-label="Üniteyi sil">Sil</button></td></tr>`;
 }
@@ -1602,9 +1602,16 @@ $('view').addEventListener('input',e=>{
   if(el.dataset.att){s.att[el.dataset.att]=el.value;touched(s);updateDerived();return;}
   if(el.dataset.sign){s.sign[el.dataset.sign]=el.value;touched(s);return;}
   if(el.dataset.note){const k=el.dataset.note;s.dd[k]=s.dd[k]||{};s.dd[k].note=el.value;touched(s);return;}
-  if(el.dataset.uf){const tr=el.closest('[data-u]'),u=s.units.find(x=>x.id===tr.dataset.u);let v=el.value;
+  if('ucat' in el.dataset){const tr=el.closest('[data-u]'),u=s.units.find(x=>x.id===tr.dataset.u);
+    if(el.value==='__other'){u.other=true;if(catIndexOf(u)>=0)u.model='';u.info='';u.src='';}
+    else if(el.value===''){u.other=false;u.model='';u.info='';u.src='';}
+    else{const rr=catFlat()[+el.value];if(rr){const p=rr.p;u.other=false;u.model=catLabel(rr);u.kw=rr.kw==null?0:rr.kw;u.sockets=p.sockets;
+      u.info=[p.conn,[p.volt,p.amp].filter(Boolean).join(' · '),p.ip,p.form].filter(Boolean).join(' · ');u.src=p.url;
+      if(rr.kw==null)toast('Bu modelin gücü bağlı güç kabinine göre belirlenir; kW değerini elle girin.');}}
+    $('unitBody').innerHTML=s.units.map(unitRow).join('');applyEditState();touched(s);updateDerived();return;}
+  if(el.dataset.uf){const tr=el.closest('[data-u]'),u=s.units.find(x=>x.id===tr.dataset.u);let v=el.value;const prevKind=u.kind;
     if(el.type==='number')v=Math.max(0,+v||0);u[el.dataset.uf]=v;
-    if(el.dataset.uf==='kind'){if(v!=='CAB'&&!(+u.kw)&&!(+u.sockets)){u.kw=v==='DC'?120:22;u.sockets=v==='DC'?2:1;}$('unitBody').innerHTML=s.units.map(unitRow).join('');applyEditState();touched(s);updateDerived();return;}
+    if(el.dataset.uf==='kind'){if(catIndexOf(u,prevKind)>=0){u.model='';u.info='';u.src='';u.other=false;}if(v!=='CAB'&&!(+u.kw)&&!(+u.sockets)){u.kw=v==='DC'?120:22;u.sockets=v==='DC'?2:1;}$('unitBody').innerHTML=s.units.map(unitRow).join('');applyEditState();touched(s);updateDerived();return;}
     if(u.kind!=='CAB')tr.querySelector('[data-utotal]').textContent=nf.format((+u.kw||0)*(+u.qty||0));touched(s);updateDerived();}
 });
 
@@ -2136,6 +2143,14 @@ document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.close
 
 /* ---------- StarCharge ürün kataloğu ---------- */
 let catType='',catList=[];
+const catLabel=r=>r.p.brand+' '+r.p.model+(r.kw!=null&&r.p.kws.length>1?' '+df.format(r.kw)+' kW':'');
+function catIndexOf(u,kind=u.kind){const rows=catFlat();return rows.findIndex(r=>r.p.type===kind&&catLabel(r)===u.model);}
+function catSelectHtml(u){
+  const rows=catFlat(),mi=catIndexOf(u),other=mi<0&&(u.model||u.other);
+  const groups=new Map();rows.forEach((r,i)=>{if(r.p.type!==u.kind)return;if(!groups.has(r.p.form))groups.set(r.p.form,[]);groups.get(r.p.form).push([i,r]);});
+  return `<select data-ucat aria-label="Marka / model"><option value="">Seçin…</option>${[...groups].map(([f,l])=>`<optgroup label="${esc(f)}">${l.map(([i,r])=>`<option value="${i}" ${i===mi?'selected':''}>${esc(catLabel(r))}</option>`).join('')}</optgroup>`).join('')}<option value="__other" ${other?'selected':''}>Diğer (elle yaz)</option></select>
+    <input data-uf="model" value="${esc(u.model)}" placeholder="ör. marka / model" aria-label="Marka / model (elle)" ${other?'':'hidden'} style="margin-top:6px">`;
+}
 function catFlat(){
   const rows=[];(window.SC_CATALOG||[]).forEach(p=>p.kws.forEach(kw=>rows.push({p,kw})));return rows;
 }
@@ -2143,14 +2158,14 @@ function paintCat(){
   const q=norm($('catQ').value),rows=catFlat().filter(r=>(!catType||r.p.type===catType)&&(!q||norm(r.p.brand+' '+r.p.model+' '+r.p.form).includes(q)));
   catList=rows;
   $('catRows').innerHTML=rows.length?rows.map((r,i)=>`<tr><td><b>${esc(r.p.brand+' '+r.p.model)}</b><span class="sub">${esc(r.p.form)}</span></td><td><span class="badge stg">${r.p.type}</span></td>
-    <td class="num">${r.kw==null?'<span title="Güç kabinine göre">—</span>':nf.format(r.kw)}</td><td class="num">${r.p.sockets||'—'}</td><td>${esc(r.p.conn||'—')}</td><td>${esc([r.p.volt,r.p.amp].filter(Boolean).join(' · ')||'—')}</td><td>${esc(r.p.ip||'—')}</td>
+    <td class="num">${r.kw==null?'<span title="Güç kabinine göre">—</span>':df.format(r.kw)}</td><td class="num">${r.p.sockets||'—'}</td><td>${esc(r.p.conn||'—')}</td><td>${esc([r.p.volt,r.p.amp].filter(Boolean).join(' · ')||'—')}</td><td>${esc(r.p.ip||'—')}</td>
     <td><button type="button" class="primary" data-catpick="${i}">Ekle</button></td></tr>`).join(''):'<tr><td colspan="8" class="note" style="padding:20px;text-align:center">Eşleşen ürün yok.</td></tr>';
 }
 function openCat(){$('catQ').value='';catType='';document.querySelectorAll('#catType [data-ct]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ct==='')));paintCat();$('catDlg').showModal();}
 function pickCat(i){
   const r=catList[i],s=cur();if(!r||!s||!siteEdit)return;
-  const p=r.p,model=p.brand+' '+p.model+(r.kw!=null&&p.kws.length>1?' '+nf.format(r.kw)+' kW':'');
-  const u=unit(p.type,r.kw==null?0:r.kw,p.sockets,1,model);
+  const p=r.p,model=catLabel(r);
+  const u=unit(p.type,r.kw==null?0:r.kw,p.sockets,1,model);u.other=false;
   u.info=[p.conn,[p.volt,p.amp].filter(Boolean).join(' · '),p.ip,p.form].filter(Boolean).join(' · ');u.src=p.url;
   s.units.push(u);touched(s);renderSite();
   toast(model+' eklendi'+(r.kw==null?'; gücü (kW) elle girin.':'.'));

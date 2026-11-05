@@ -17,5 +17,6 @@ window.SC_CATALOG=[
  {brand:'StarCharge',model:'Halo (V2G çift yönlü)',type:'DC',form:'Çift yönlü DC wallbox (V2G)',kws:[7.4,11],sockets:1,conn:'',volt:'',amp:'',ip:'',url:'https://www.starcharge.com/products/ev-charging/v2g/93'},
  {brand:'StarCharge',model:'Artemis V2',type:'AC',form:'AC wallbox',kws:[7.4,11,22],sockets:1,conn:'1 × Tip 2',volt:'230/400 Vac',amp:'',ip:'IP65',url:'https://www.starcharge.com/products/ev-charging/ac-charger/82'},
  {brand:'StarCharge',model:'Arc V1',type:'AC',form:'AC şarj ünitesi',kws:[7,11,22],sockets:1,conn:'1 × Tip 2',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/19'},
- {brand:'StarCharge',model:'Saturn',type:'AC',form:'AC çift soketli',kws:[44],sockets:2,conn:'2 × Tip 2 (2 × 22 kW)',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/18'}
+ {brand:'StarCharge',model:'Saturn',type:'AC',form:'AC çift soketli',kws:[44],sockets:2,conn:'2 × Tip 2 (2 × 22 kW)',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/18'},
+ {brand:'StarCharge',model:'Juno',type:'AC',form:'AC wallbox',kws:[9.6,12],sockets:1,conn:'1 × Tip 1 (J1772) / NACS',volt:'208/240 Vac, 1 faz',amp:'9,6 kW: 40 A · 12 kW: 50 A',ip:'NEMA Tip 4',url:'https://www.starcharge.com/products/ev-charging/ac-charger/17'}
 ];

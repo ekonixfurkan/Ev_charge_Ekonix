@@ -298,6 +298,8 @@
     'Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)': 'This file type is not supported (Excel, PDF, Word, JPG, PNG)', 'Yüklenen dosya bulunamadı': 'Uploaded file not found',
     'Dosya 25 MB sınırını aşıyor': 'File exceeds the 25 MB limit', 'Dosyayı yalnızca yükleyen veya yönetici silebilir': 'Only the uploader or an administrator can delete a file',
     'Varsayılan klasör silinemez': 'A default folder cannot be deleted', 'Klasörde dosya var; önce dosyaları silin': 'The folder has files; delete them first', 'Dosyalar işlenemedi': 'Could not process files',
+
+    'Seçin…': 'Select…', 'Diğer (elle yaz)': 'Other (type manually)', 'ör. marka / model': 'e.g. brand / model', 'Marka / model (elle)': 'Brand / model (manual)', 'AC wallbox': 'AC wallbox',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
@@ -401,7 +403,7 @@
   };
   I18N.t = tr;
 
-  var ATTRS = ['placeholder', 'title', 'aria-label', 'alt', 'data-tip'];
+  var ATTRS = ['placeholder', 'title', 'aria-label', 'alt', 'data-tip', 'label'];
   var SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, CODE: 1 };
   function skip(el) {
     for (; el && el.nodeType === 1; el = el.parentElement) {
