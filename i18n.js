@@ -285,6 +285,19 @@
     'Proje': 'Project', 'Filtreyi Temizle': 'Clear Filter', 'Bu projede bildirim yok.': 'No notifications for this project.',
 
     'Gelir Modeli’ndeki Elektrik maliyetinden gelir; orada girilir': 'Comes from the Electricity cost in the Revenue Model; enter it there',
+
+    /* dosyalar */
+    'Dosyalar': 'Files', 'Dosya': 'File', 'Boyut': 'Size', 'Yükleyen': 'Uploaded By', 'Yükle': 'Upload', 'İndir': 'Download', '+ Yeni Klasör': '+ New Folder', 'Klasör adı': 'Folder name',
+    'Sözleşme': 'Contract', 'Teklifler': 'Proposals', 'Sunumlar': 'Presentations', 'Toplantı Notları': 'Meeting Notes', 'Saha Fotoğrafları': 'Site Photos', 'Elektrik / Trafo': 'Electrical / Transformer',
+    'Rakip Analizi (TomTom)': 'Competitor Analysis (TomTom)', 'İzinler ': 'Permits ',
+    'Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.': 'Excel, PDF, Word, JPG and PNG; up to 25 MB per file. You can drag a file onto a folder or use the “Upload” button on the folder.',
+    'Dosyalar için sunucu bağlantısı gerekli.': 'A server connection is required for files.', 'Klasör adı gerekli.': 'Folder name is required.', 'Dosya silindi.': 'File deleted.',
+    'Bu dosya türü desteklenmiyor': 'This file type is not supported', '25 MB sınırını aşıyor': 'Exceeds the 25 MB limit', 'Yükleme bileşeni yüklenemedi; sayfayı yenileyin': 'Upload component failed to load; refresh the page',
+    'Dosya Eklendi': 'File Added', 'Dosya Silindi': 'File Deleted', 'Dosya eklendi': 'File added', 'Dosya silindi': 'File deleted', 'Dosyayı sil': 'Delete file',
+    'Dosyalar için veritabanı gerekli': 'A database is required for files', 'Dosya bulunamadı': 'File not found', 'Dosya deposu yapılandırılmamış': 'File storage is not configured',
+    'Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)': 'This file type is not supported (Excel, PDF, Word, JPG, PNG)', 'Yüklenen dosya bulunamadı': 'Uploaded file not found',
+    'Dosya 25 MB sınırını aşıyor': 'File exceeds the 25 MB limit', 'Dosyayı yalnızca yükleyen veya yönetici silebilir': 'Only the uploader or an administrator can delete a file',
+    'Varsayılan klasör silinemez': 'A default folder cannot be deleted', 'Klasörde dosya var; önce dosyaları silin': 'The folder has files; delete them first', 'Dosyalar işlenemedi': 'Could not process files',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
@@ -311,6 +324,8 @@
     [/^(\d+) yıl, nominal USD$/, function (m) { return m[1] + ' years, nominal USD'; }],
     [/^(\d+) lokasyon, (\d+) yıl, nominal USD$/, function (m) { return m[1] + (m[1] === '1' ? ' location, ' : ' locations, ') + m[2] + ' years, nominal USD'; }],
     [/^(\d+) \/ (\d+) lokasyon$/, function (m) { return m[1] + ' / ' + m[2] + ' locations'; }],
+    [/^(\d+) dosya$/, function (m) { return m[1] + (m[1] === '1' ? ' file' : ' files'); }],
+    [/^(\d+) dosya yüklendi\.$/, function (m) { return m[1] + ' file' + (m[1] === '1' ? '' : 's') + ' uploaded.'; }],
     [/^(\d+) lokasyon$/, function (m) { return m[1] + (m[1] === '1' ? ' location' : ' locations'); }],
     [/^(\d+) hesap$/, function (m) { return m[1] + (m[1] === '1' ? ' account' : ' accounts'); }],
     [/^(\d+) kalem$/, function (m) { return m[1] + (m[1] === '1' ? ' item' : ' items'); }],

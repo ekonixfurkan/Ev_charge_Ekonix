@@ -4,6 +4,7 @@ import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
 import { seedOnce } from '../lib/seed.js';
 import { nextCode, backfillCodes } from '../lib/codes.js';
+import { _deps as _filesDeps } from '../lib/files.js';
 
 export default async function handler(req, res) {
   try {
@@ -54,6 +55,13 @@ export default async function handler(req, res) {
       const prev = await s`SELECT data FROM sites WHERE id = ${id}`;
       await s`DELETE FROM sites WHERE id = ${id}`;
       try { await s`DELETE FROM site_notes WHERE site_id = ${id}`; } catch { /* not tablosu henüz yoksa */ }
+      try {
+        // Lokasyonun dosyaları da silinir (Blob + kayıtlar).
+        const files = await s`SELECT pathname FROM site_files WHERE site_id = ${id}`;
+        if (files.length) await _filesDeps.del(files.map((f) => f.pathname));
+        await s`DELETE FROM site_files WHERE site_id = ${id}`;
+        await s`DELETE FROM site_folders WHERE site_id = ${id}`;
+      } catch { /* dosya tabloları henüz yoksa */ }
       await logActivity({ actor: user.email, action: 'sil', entity: 'lokasyon', entityId: id, entityName: prev[0]?.data?.name || id, summary: 'Lokasyon silindi' });
       return res.status(204).end();
     }

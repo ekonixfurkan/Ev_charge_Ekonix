@@ -5,6 +5,7 @@
 <title>Saha Değerlendirme Aracı</title>
 <meta name="robots" content="noindex,nofollow">
 <script src="/i18n.js"></script>
+<script defer src="/vendor/vercel-blob-client.js"></script>
 <style>html.pending body{visibility:hidden}</style>
 <script>document.documentElement.classList.add("pending")</script>
 <style>
@@ -232,6 +233,26 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 #notifRows tr.unread td{background:var(--teal-soft)}
 #notifRows tr.unread.grp-first td:first-child{box-shadow:inset 3px 0 0 var(--teal)}
 #notifRows tr:not(.grp-first) td:first-child{padding-left:8px;border-left:0}
+.fl-folder{border:1px solid var(--hair);border-radius:var(--radius);margin:0 0 10px;background:var(--card)}
+.fl-folder.over{border-color:var(--teal);background:var(--teal-soft)}
+.fl-head{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--soft)}
+.fl-head strong{font-size:13px}.fl-head small{color:var(--muted);margin-right:auto}
+.fl-folder.empty .fl-head{background:transparent}
+.fl-folder .ct-tg{padding:2px 6px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.fl-folder .ct-tg[aria-expanded=false] svg{transform:rotate(-90deg)}
+.yearly.fl-tbl{width:100%;table-layout:fixed;min-width:0}
+.yearly.fl-tbl th,.yearly.fl-tbl td{padding:8px 12px;text-align:left;white-space:normal;word-break:break-word}
+.yearly.fl-tbl th.num,.yearly.fl-tbl td.num{text-align:right;white-space:nowrap}
+.fl-tbl th:nth-child(1){width:44%}.fl-tbl th:nth-child(2){width:10%}.fl-tbl th:nth-child(3){width:18%}.fl-tbl th:nth-child(4){width:15%}
+.fl-tbl a{color:var(--navy);font-weight:600;text-decoration:none}.fl-tbl a:hover{text-decoration:underline}
+.fl-ico{display:inline-block;min-width:34px;margin-right:8px;padding:1px 5px;border:1px solid var(--hair-strong);border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.04em;text-align:center;color:var(--muted)}
+.fl-act{white-space:nowrap;text-align:right}.fl-act .btn-link{margin-right:6px;font-weight:500}
+.fl-bar-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.fl-bar-top .note{margin:0}.fl-new{display:flex;gap:6px;align-items:center}
+.fl-up{display:flex;align-items:center;gap:10px;font-size:12.5px;margin-bottom:6px}
+.fl-up .fl-bar{flex:0 0 160px;height:6px;border-radius:3px;background:var(--hair);overflow:hidden}
+.fl-up .fl-bar i{display:block;height:100%;background:var(--teal)}
+.fl-up.bad small{color:var(--no)}
 .whoami{display:block;padding:0 8px 8px;font-size:12px;color:var(--side-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logout{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;border:1px solid rgba(255,140,130,.35);border-radius:var(--radius);background:transparent;color:#ff9a8f;font-size:12.5px;font-weight:600;text-align:left}
 .logout:hover{background:rgba(255,120,110,.12);color:#ffb8b0;border-color:rgba(255,140,130,.6)}
@@ -255,7 +276,8 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
   #view[data-sub="units"] [data-tab]:not([data-tab="units"]),
   #view[data-sub="infra"] [data-tab]:not([data-tab="infra"]),
   #view[data-sub="credit"] [data-tab]:not([data-tab="credit"]),
-  #view[data-sub="check"] [data-tab]:not([data-tab="check"]){display:none}
+  #view[data-sub="check"] [data-tab]:not([data-tab="check"]),
+  #view[data-sub="files"] [data-tab]:not([data-tab="files"]){display:none}
   #view[data-fsub="ozet"] [data-fsub]:not([data-fsub="ozet"]),
   #view[data-fsub="gelir"] [data-fsub]:not([data-fsub="gelir"]),
   #view[data-fsub="yapi"] [data-fsub]:not([data-fsub="yapi"]),
@@ -1241,7 +1263,7 @@ function applyEditState(){
   const v=$('view');if(view!=='site')return;
   v.classList.toggle('ro',!siteEdit);
   v.querySelectorAll('input,select,textarea').forEach(el=>{
-    if(el.closest('.subtabs')||el.closest('.edit-actions'))return;
+    if(el.closest('.subtabs')||el.closest('.edit-actions')||el.closest('.files-box'))return;
     if(el.hasAttribute('data-locked')){el.disabled=false;el.readOnly=true;return;}
     el.disabled=!siteEdit||(el.hasAttribute('data-needs-city')&&!cur().city);
   });
@@ -1419,6 +1441,11 @@ function renderSite(){
     <label class="span4">Diğer katılımcılar<input data-sign="others" value="${esc(s.sign.others)}"></label></div></details>
   </section>
 
+  <section class="box files-box" data-tab="files"><h3>Dosyalar<small id="flSummary"></small></h3>
+    <div id="flBody"><p class="note">Yükleniyor…</p></div>
+    <input type="file" id="flPick" multiple hidden accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.jpg,.jpeg,.png">
+  </section>
+
   <section class="box" data-tab="info"><h3>Genel Notlar</h3><textarea data-f="notes" rows="4" aria-label="Genel notlar" placeholder="Saha ziyareti, finansör geri bildirimi, açık sorular">${esc(s.notes)}</textarea>
   <p style="font-size:12px;color:var(--muted)">Son güncelleme: <span id="upd"></span></p></section>`;
   $('view').innerHTML=h;
@@ -1426,6 +1453,7 @@ function renderSite(){
   updateDerived();
   applyEditState();
   paintNotesBadge();if(mode==='cloud'&&notesFor!==activeId)loadNotes(activeId);
+  initFiles();
 }
 function unitRow(u){
   const cab=u.kind==='CAB',cls=u.kind==='DC'?'kind-dc':cab?'kind-cab':'kind-ac';
@@ -1584,8 +1612,8 @@ $('view').addEventListener('input',e=>{
 let sub='ovw',fsub='ozet',psub='ozet';
 const PORT_TABS=[['ozet','Özet'],['sonuc','Detaylı Sonuçlar ve Notlar']];
 const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yapısı'],['sonuc','Detaylı Sonuçlar']];
-const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port'];
-const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Skor Hesaplama']];
+const SITE_SUBS=['info','units','infra','credit','check','files'],PORT_SUBS=['ovw','port'];
+const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
   const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
@@ -1708,7 +1736,7 @@ document.addEventListener('click',async e=>{
 
 /* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
 let actF={q:'',actor:'',entity:'',site:''},actRows=[],actMore=false,actActors=[];
-const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none']};
+const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none'],'dosya-ekle':['Dosya Eklendi','stg'],'dosya-sil':['Dosya Silindi','lo']};
 const ENT_LABEL={lokasyon:'Lokasyon',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
 // Proje filtresi: proje kodu · ad (kod sırasıyla)
 const siteOptions=sel=>[...db.sites].sort((a,b)=>String(a.code||'~').localeCompare(String(b.code||'~'),'tr',{numeric:true})).map(x=>`<option value="${esc(x.id)}" ${x.id===sel?'selected':''}>${esc((x.code||'—')+' · '+(x.name||'Adsız Lokasyon'))}</option>`).join('');
@@ -1902,6 +1930,98 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#ctDlgRows [data-ctpick]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const c=ct.rows.find(x=>x.id===r.dataset.ctpick);if(c)ctPickSet(c);}});
 
+/* ---------- Proje dosyaları (Excel, PDF, Word, JPG, PNG) ---------- */
+const FL_TYPES={pdf:'application/pdf',xls:'application/vnd.ms-excel',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',csv:'text/csv',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png'};
+const FL_MAX=25*1024*1024;
+let fl={site:null,folders:[],files:[],me:'',admin:false,loaded:false,collapsed:{},uploading:[],target:'',newOpen:false,err:''};
+async function flApi(method,qs,body){
+  const r=await fetch('/api/files'+(qs||''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
+  return d;
+}
+const flSize=n=>n>=1048576?df.format(n/1048576)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+const flExt=n=>(/\.([A-Za-z0-9]+)$/.exec(n)||[])[1]?.toLowerCase()||'';
+const flBadge=n=>{const e=flExt(n);return e==='pdf'?'PDF':/^xls|csv/.test(e)?'XLS':/^doc/.test(e)?'DOC':'IMG';};
+function initFiles(){
+  if(view!=='site'||!$('flBody'))return;
+  if(mode!=='cloud'){$('flBody').innerHTML='<p class="note">Dosyalar için sunucu bağlantısı gerekli.</p>';return;}
+  if(fl.site!==activeId){fl={...fl,site:activeId,folders:[],files:[],loaded:false,collapsed:{},uploading:[],newOpen:false,err:''};}
+  paintFiles();
+  if(!fl.loaded||(sub==='files'&&Date.now()-(fl.at||0)>20000))loadFiles();
+}
+async function loadFiles(){
+  const id=activeId;
+  try{const d=await flApi('GET','?site='+encodeURIComponent(id));if(id!==activeId)return;
+    fl.folders=d.folders||[];fl.files=d.files||[];fl.me=d.me;fl.admin=!!d.admin;fl.loaded=true;fl.err='';fl.at=Date.now();}
+  catch(e){fl.err=e.message;}
+  paintFiles();
+}
+function flRowHtml(f){
+  const can=f.uploadedBy===fl.me||fl.admin,view_=/^(pdf|jpg|jpeg|png)$/.test(flExt(f.name));
+  return `<tr data-flid="${esc(f.id)}"><td><span class="fl-ico">${flBadge(f.name)}</span>${view_?`<a href="/api/files?download=${esc(f.id)}&inline=1" target="_blank" rel="noopener">${esc(f.name)}</a>`:`<a href="/api/files?download=${esc(f.id)}">${esc(f.name)}</a>`}</td>
+    <td class="num">${esc(flSize(f.size))}</td><td>${esc(f.uploadedByName||f.uploadedBy||'—')}</td><td class="num">${esc(fmtTs(f.uploadedAt))}</td>
+    <td class="fl-act"><a class="btn-link" href="/api/files?download=${esc(f.id)}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></td></tr>`;
+}
+function paintUploads(){
+  const u=$('flUploads');if(!u)return;
+  u.innerHTML=fl.uploading.map(x=>`<div class="fl-up${x.err?' bad':''}"><span>${esc(x.name)}</span><span class="fl-bar"><i style="width:${Math.round(x.pct||0)}%"></i></span><small>${x.err?esc(x.err):Math.round(x.pct||0)+'%'}</small></div>`).join('');
+}
+function paintFiles(){
+  const b=$('flBody');if(!b||view!=='site')return;
+  const n=fl.files.length;$('flSummary').textContent=n?n+' dosya':'';
+  if(fl.err&&!fl.loaded){b.innerHTML='<p class="note">'+esc(fl.err)+'</p>';return;}
+  const by={};fl.files.forEach(f=>{(by[f.folder]=by[f.folder]||[]).push(f);});
+  b.innerHTML=`<div class="fl-bar-top no-print"><p class="note">Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.</p>
+    <div class="fl-new">${fl.newOpen?`<input id="flNewName" maxlength="60" placeholder="Klasör adı" aria-label="Klasör adı"><button type="button" class="primary" id="flNewOk">Ekle</button><button type="button" id="flNewCancel">Vazgeç</button>`:'<button type="button" id="flNewOpen">+ Yeni Klasör</button>'}</div></div>
+    <div id="flUploads"></div>
+    ${fl.folders.map(name=>{const list=by[name]||[],open=fl.collapsed[name]===undefined?list.length>0:!fl.collapsed[name];
+      return `<div class="fl-folder${list.length?'':' empty'}" data-flfolder="${esc(name)}"><div class="fl-head"><button type="button" class="ct-tg" data-fltg="${esc(name)}" aria-expanded="${open}" aria-label="${esc(name)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><strong>${esc(name)}</strong><small>${list.length} dosya</small><button type="button" class="ghost pick-btn" data-flup="${esc(name)}">Yükle</button></div>
+      ${open&&list.length?`<div class="scroll"><table class="yearly fl-tbl"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${list.map(flRowHtml).join('')}</tbody></table></div>`:''}</div>`;}).join('')}`;
+  paintUploads();
+}
+async function flUploadFiles(folder,fileList){
+  const s=cur();if(!s||!fileList.length)return;const site=s.id;let ok=0;
+  for(const file of [...fileList]){
+    const ext=flExt(file.name),item={name:file.name,pct:0,err:''};fl.uploading.push(item);paintUploads();
+    try{
+      if(!FL_TYPES[ext])throw new Error('Bu dosya türü desteklenmiyor');
+      if(file.size>FL_MAX)throw new Error('25 MB sınırını aşıyor');
+      if(!window.VercelBlobClient)throw new Error('Yükleme bileşeni yüklenemedi; sayfayı yenileyin');
+      const safe=file.name.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._() -]+/g,'_').slice(-120);
+      const pathname=`sites/${site}/${uid()}-${safe}`;
+      const blob=await VercelBlobClient.upload(pathname,file,{access:'private',handleUploadUrl:'/api/file-upload',contentType:FL_TYPES[ext],multipart:file.size>8*1048576,onUploadProgress:p=>{item.pct=p.percentage;paintUploads();}});
+      await flApi('POST','',{action:'register',site,folder,name:file.name,pathname:blob.pathname});
+      item.pct=100;ok++;
+    }catch(e){item.err=e.message;paintUploads();}
+  }
+  fl.uploading=fl.uploading.filter(x=>x.err);
+  if(ok)toast(ok+' dosya yüklendi.');
+  await loadFiles();
+}
+document.addEventListener('click',async e=>{
+  const up=e.target.closest('[data-flup]');if(up){fl.target=up.dataset.flup;$('flPick').value='';$('flPick').click();return;}
+  const tg=e.target.closest('[data-fltg]');if(tg){const k=tg.dataset.fltg,list=fl.files.filter(f=>f.folder===k),open=fl.collapsed[k]===undefined?list.length>0:!fl.collapsed[k];fl.collapsed[k]=open;paintFiles();return;}
+  if(e.target.closest('#flNewOpen')){fl.newOpen=true;paintFiles();const i=$('flNewName');if(i)i.focus();return;}
+  if(e.target.closest('#flNewCancel')){fl.newOpen=false;paintFiles();return;}
+  if(e.target.closest('#flNewOk')){
+    const name=($('flNewName').value||'').trim();if(!name){toast('Klasör adı gerekli.');return;}
+    try{await flApi('POST','',{action:'folder',site:activeId,name});fl.newOpen=false;await loadFiles();}catch(x){toast(x.message);}return;}
+  const del=e.target.closest('[data-fldel]');
+  if(del&&!del.disabled){const id=del.dataset.fldel,f=fl.files.find(x=>x.id===id);
+    ask((f?f.name:'Bu dosya')+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Dosyayı sil').then(async ok=>{if(!ok)return;
+      try{await flApi('DELETE','?id='+id);toast('Dosya silindi.');await loadFiles();}catch(x){toast(x.message);}});return;}
+});
+document.addEventListener('change',e=>{if(e.target.id==='flPick'&&e.target.files.length)flUploadFiles(fl.target,e.target.files);});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='flNewName'){e.preventDefault();$('flNewOk').click();}});
+['dragenter','dragover'].forEach(t=>document.addEventListener(t,e=>{const f=e.target.closest&&e.target.closest('.fl-folder');if(!f)return;e.preventDefault();f.classList.add('over');}));
+document.addEventListener('dragleave',e=>{const f=e.target.closest&&e.target.closest('.fl-folder');if(f&&!f.contains(e.relatedTarget))f.classList.remove('over');});
+document.addEventListener('drop',e=>{const f=e.target.closest&&e.target.closest('.fl-folder');if(!f)return;e.preventDefault();f.classList.remove('over');
+  if(e.dataTransfer&&e.dataTransfer.files.length)flUploadFiles(f.dataset.flfolder,e.dataTransfer.files);});
+window.addEventListener('dragover',e=>{if(!(e.target.closest&&e.target.closest('.fl-folder')))e.preventDefault();});
+window.addEventListener('drop',e=>{if(!(e.target.closest&&e.target.closest('.fl-folder')))e.preventDefault();});
+
 /* ---------- Şirket içi bilgilendirme (lokasyon notları) ---------- */
 const notesBy={};let notesOpen=false,notesFor=null;
 async function notesApi(method,qs,body){
@@ -1951,7 +2071,7 @@ function paintBell(){
   const c=$('bellCount');if(c){c.textContent=bell.unread>99?'99+':bell.unread;c.hidden=!bell.unread;}
   if(view==='notifs')paintNotifRows();
 }
-const NOTIF_MSG={olustur:'Yeni lokasyon eklendi',sil:'Lokasyon silindi','not-ekle':'Şirket içi not eklendi'};
+const NOTIF_MSG={olustur:'Yeni lokasyon eklendi',sil:'Lokasyon silindi','not-ekle':'Şirket içi not eklendi','dosya-ekle':'Dosya eklendi','dosya-sil':'Dosya silindi'};
 // Güncelleme: her değişen alan ayrı satır (Alan · Eski Değer · Yeni Değer); diğer işlemler tek satır.
 function notifChanges(n){
   if(n.action!=='guncelle')return null;
@@ -1963,7 +2083,7 @@ function notifGroupHtml(n){
   const ch=notifChanges(n),k=ch?ch.length:1,cls=(n.unread||bell.newIds.has(n.id))?' unread':'';
   const attrs=`data-bellent="${esc(n.entity||'lokasyon')}" data-bellsite="${esc(n.entity_id||'')}" data-bellact="${esc(n.action)}" tabindex="0"`;
   const head=`<td rowspan="${k}" style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td rowspan="${k}">${actWho(n)}</td><td rowspan="${k}" class="c-code">${esc(n.site_code||'—')}</td><td rowspan="${k}"><span class="p1">${esc(n.entity_name||'—')}</span></td>`;
-  if(!ch)return `<tr class="grp-first${cls}" ${attrs}>${head}<td colspan="3">${esc(NOTIF_MSG[n.action]||n.summary||'')}</td></tr>`;
+  if(!ch)return `<tr class="grp-first${cls}" ${attrs}>${head}<td colspan="3">${esc((NOTIF_MSG[n.action]||n.summary||'')+(n.action.startsWith('dosya-')&&n.summary?': '+n.summary:''))}</td></tr>`;
   return ch.map((c,i)=>`<tr class="${i?'':'grp-first'}${cls}" ${attrs}>${i?'':head}<td>${esc(c.alan)}</td><td class="nv-old">${esc(c.eski)}</td><td class="nv-new">${esc(c.yeni)}</td></tr>`).join('');
 }
 function paintNotifRows(){

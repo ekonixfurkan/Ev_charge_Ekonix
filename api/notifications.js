@@ -16,7 +16,7 @@ function ensureSeen() {
   return _ready;
 }
 
-const ACTIONS = ['olustur', 'guncelle', 'sil', 'not-ekle'];
+const ACTIONS = ['olustur', 'guncelle', 'sil', 'not-ekle', 'dosya-ekle', 'dosya-sil'];
 const ENTITIES = ['lokasyon'];
 
 export default async function handler(req, res) {
