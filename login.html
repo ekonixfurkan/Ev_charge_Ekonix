@@ -44,8 +44,9 @@ button.go:hover{background:var(--navy-d);border-color:var(--navy-d)}
 button.go:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 button.go:disabled{opacity:.6;cursor:wait}
 .lang-sw{position:absolute;top:12px;right:12px;display:flex;border:1px solid var(--hair-strong);border-radius:6px;overflow:hidden}
-.lang-sw button{padding:5px 10px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer}
+.lang-sw button{display:flex;align-items:center;gap:6px;padding:5px 10px;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;letter-spacing:.04em;cursor:pointer}
 .lang-sw button+button{border-left:1px solid var(--hair-strong)}
+.lang-sw .flag{display:block;flex:none;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
 .lang-sw button:hover{color:var(--ink)}
 .lang-sw button[aria-pressed=true]{background:var(--navy);color:#fff}
 .lang-sw button:focus-visible{outline:2px solid var(--navy);outline-offset:-2px}
@@ -54,7 +55,7 @@ button.go:disabled{opacity:.6;cursor:wait}
 </head>
 <body>
 <main class="card">
-  <div class="lang-sw" translate="no" role="group" aria-label="Dil / Language"><button type="button" data-lang="tr" aria-pressed="true">TR</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+  <div class="lang-sw" translate="no" role="group" aria-label="Dil / Language"><button type="button" data-lang="tr" aria-pressed="true" title="Türkçe"><svg class="flag" viewBox="0 0 30 20" width="18" height="12" aria-hidden="true"><rect width="30" height="20" fill="#e30a17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#e30a17"/><polygon points="19.30,10.00 17.49,10.65 17.43,12.57 16.26,11.05 14.42,11.59 15.50,10.00 14.42,8.41 16.26,8.95 17.43,7.43 17.49,9.35" fill="#fff"/></svg><span>TR</span></button><button type="button" data-lang="en" aria-pressed="false" title="English"><svg class="flag" viewBox="0 0 60 30" width="18" height="12" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#c8102e" stroke-width="2.5"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#c8102e" stroke-width="6"/></svg><span>EN</span></button></div>
   <div class="logo"><span><img src="/ekonix-logo.jpeg" alt="Ekonix Logo" width="289" height="93"></span></div>
   <h1>Saha Değerlendirme Portalı</h1>
   <p class="sub">Hesabınıza erişmek için e-posta ve şifrenizi girin.</p>

@@ -245,7 +245,7 @@
     'Bu şifre bir daha gösterilmez; kopyalayın.': 'This password will not be shown again; copy it.',
 
     /* contact rehberi */
-    'Contact': 'Contacts', 'Şirket': 'Company', 'Ad': 'First Name', 'Soyad': 'Last Name', 'Unvan': 'Job Title', 'Ad Soyad': 'Full Name', 'Kişi': 'Contact',
+    'Contact': 'Contacts', 'Kişiler': 'Contacts', 'Kişiler rehberi için sunucu bağlantısı gerekli.': 'A server connection is required for the contacts directory.', 'Listede yoksa Kişiler sayfasından ekleyin.': 'If not listed, add it on the Contacts page.', 'Kişiler için veritabanı gerekli': 'A database is required for Contacts', 'Kişiler işlenemedi': 'Could not process Contacts', 'Şirket': 'Company', 'Ad': 'First Name', 'Soyad': 'Last Name', 'Unvan': 'Job Title', 'Ad Soyad': 'Full Name', 'Kişi': 'Contact',
     'Şirket, kişi ve telefon rehberi': 'Company, people and phone directory', 'Şirket, kişi veya telefon…': 'Company, person or phone…',
     'Şirkete Göre Grupla': 'Group by Company', '+ Yeni Kişi': '+ New Contact', 'Şirket Belirtilmemiş': 'No Company', '+ Kişi Ekle': '+ Add Contact',
     'Kişiyi sil': 'Delete contact', 'Kişi silindi.': 'Contact deleted.', 'Eşleşen kişi yok.': 'No matching contacts.',
@@ -268,6 +268,8 @@
   var P = [
     [/^(.+) hesabı silinsin mi\? Bu geri alınamaz\.$/, function (m) { return 'Delete the account ' + m[1] + '? This cannot be undone.'; }],
     [/^(\d+) kişi$/, function (m) { return m[1] + (m[1] === '1' ? ' person' : ' people'); }],
+    [/^Kişi eklendi(?:: (.+))?$/, function (m) { return 'Contact added' + (m[1] ? ': ' + m[1] : ''); }],
+    [/^Kişi silindi(?:: (.+))?$/, function (m) { return 'Contact deleted' + (m[1] ? ': ' + m[1] : ''); }],
     [/^Contact eklendi(?:: (.+))?$/, function (m) { return 'Contact added' + (m[1] ? ': ' + m[1] : ''); }],
     [/^Contact silindi(?:: (.+))?$/, function (m) { return 'Contact deleted' + (m[1] ? ': ' + m[1] : ''); }],
     [/^Kaydedildi · (.+)$/, function (m) { return 'Saved · ' + m[1]; }],

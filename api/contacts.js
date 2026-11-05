@@ -1,4 +1,4 @@
-// /api/contacts — Contact rehberi (şirket · ad · soyad · telefon · e-posta · unvan). Giriş yapan herkes okur/ekler/düzenler.
+// /api/contacts — Kişiler rehberi (şirket · ad · soyad · telefon · e-posta · unvan). Giriş yapan herkes okur/ekler/düzenler.
 // GET · POST { alanlar } · PATCH ?id { değişen alanlar } · DELETE ?id (yalnızca ekleyen veya yönetici)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
   try {
     const user = await requireAuth(req, res);
     if (!user) return;
-    if (!process.env.DATABASE_URL) return res.status(503).json({ error: 'Contact için veritabanı gerekli' });
+    if (!process.env.DATABASE_URL) return res.status(503).json({ error: 'Kişiler için veritabanı gerekli' });
     await ensureContacts();
     const s = sql();
 
@@ -74,7 +74,7 @@ export default async function handler(req, res) {
         RETURNING *`;
       const row = r[0];
       const filled = Object.keys(v).some((k) => v[k]);
-      if (filled) await logActivity({ actor: user.email, action: 'olustur', entity: 'kisi', entityId: String(row.id), entityName: label(row), summary: 'Contact eklendi' + (row.company ? ': ' + row.company : '') });
+      if (filled) await logActivity({ actor: user.email, action: 'olustur', entity: 'kisi', entityId: String(row.id), entityName: label(row), summary: 'Kişi eklendi' + (row.company ? ': ' + row.company : '') });
       return res.status(201).json({ contact: shape(row) });
     }
 
@@ -101,13 +101,13 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE') {
       if (old[0].created_by !== user.email && user.role !== 'admin') return res.status(403).json({ error: 'Kişiyi yalnızca ekleyen veya yönetici silebilir' });
       await s`DELETE FROM contacts WHERE id = ${id}::bigint`;
-      await logActivity({ actor: user.email, action: 'sil', entity: 'kisi', entityId: id, entityName: label(old[0]), summary: 'Contact silindi' + (old[0].company ? ': ' + old[0].company : '') });
+      await logActivity({ actor: user.email, action: 'sil', entity: 'kisi', entityId: id, entityName: label(old[0]), summary: 'Kişi silindi' + (old[0].company ? ': ' + old[0].company : '') });
       return res.status(200).json({ ok: true });
     }
 
     res.setHeader('allow', 'GET, POST, PATCH, DELETE');
     return res.status(405).json({ error: 'Yöntem desteklenmiyor' });
   } catch (e) {
-    return res.status(500).json({ error: 'Contact işlenemedi' });
+    return res.status(500).json({ error: 'Kişiler işlenemedi' });
   }
 }
