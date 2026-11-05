@@ -51,7 +51,7 @@
     'Sorumlu': 'Owner', 'Sorumlu / Ortak': 'Owner / Partner', 'Yerel Ortak': 'Local Partner', 'Yerel ortak': 'Local partner',
     'Sıradaki İş': 'Next Action', 'Sıradaki iş': 'Next action', 'Sıradaki İş Tarihi': 'Next Action Date', 'Sıradaki iş tarihi': 'Next action date',
     'Engel': 'Blocker', 'Engel / Risk': 'Blocker / Risk', 'Güncellendi': 'Updated', 'Son Güncelleme': 'Last Updated', 'Son güncelleme:': 'Last updated:',
-    'Ada Göre (A–Z)': 'By Name (A–Z)', 'Aşamaya Göre': 'By Stage', 'Skora Göre (Yüksek–Düşük)': 'By Score (High–Low)',
+    'Ada Göre (A–Z)': 'By Name (A–Z)', 'Liste Sırası': 'List Order', 'Sayfalar': 'Pages', 'Önceki Sayfa': 'Previous page', 'Sonraki Sayfa': 'Next page', 'Aşamaya Göre': 'By Stage', 'Skora Göre (Yüksek–Düşük)': 'By Score (High–Low)',
     'Sadece Engelli': 'Blocked Only', 'Satıra tıklayarak detayı açın': 'Click a row to open details',
     'Lokasyonlar Yükleniyor': 'Loading Locations', 'Kayıtlı lokasyonlar buluttan getiriliyor.': 'Fetching saved locations from the cloud.',
     'İlk Lokasyonu Ekleyin': 'Add Your First Location',
