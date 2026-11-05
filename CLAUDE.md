@@ -19,5 +19,5 @@ Bu depoda değişiklik yaparken (insan ya da yapay zekâ) şunlara uy.
 - Tek dosyalı uygulama: `index.html` (+ `login.html`), Vercel Functions `api/`, Neon Postgres.
 - Hesaplar Neon `users` tablosunda; şifreler yalnızca hash. Şifreyi düz metin saklama/gösterme.
 - Sahip hesabı (`furkan.kece@ekonix.com.tr`) korumalıdır; kodda kaldırma/zayıflatma.
-- Proje dosyaları Vercel Blob'da (private mağaza `ekonix-files`, `BLOB_READ_WRITE_TOKEN`); yükleme tarayıcıdan doğrudan Blob'a gider (`/api/file-upload` jeton verir), kayıt `/api/files` ile yazılır. `vendor/vercel-blob-client.js`, `@vercel/blob/client`ın esbuild ile paketlenmiş halidir (CDN kullanılmaz).
+- Proje dosyaları Vercel Blob'da (private mağaza `ekonix-files`, `BLOB_READ_WRITE_TOKEN`); yükleme tarayıcıdan doğrudan Blob'a gider (`/api/files` jeton verir ve kaydı yazar; Hobby planda en fazla 12 Vercel işlevi olduğu için ayrı dosya açma). `vendor/vercel-blob-client.js`, `@vercel/blob/client`ın esbuild ile paketlenmiş halidir (CDN kullanılmaz).
 - Her değişiklik `main`'e commit + push edilir, Vercel otomatik yayınlar.

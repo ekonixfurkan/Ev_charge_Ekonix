@@ -1991,7 +1991,7 @@ async function flUploadFiles(folder,fileList){
       if(!window.VercelBlobClient)throw new Error('Yükleme bileşeni yüklenemedi; sayfayı yenileyin');
       const safe=file.name.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._() -]+/g,'_').slice(-120);
       const pathname=`sites/${site}/${uid()}-${safe}`;
-      const blob=await VercelBlobClient.upload(pathname,file,{access:'private',handleUploadUrl:'/api/file-upload',contentType:FL_TYPES[ext],multipart:file.size>8*1048576,onUploadProgress:p=>{item.pct=p.percentage;paintUploads();}});
+      const blob=await VercelBlobClient.upload(pathname,file,{access:'private',handleUploadUrl:'/api/files',contentType:FL_TYPES[ext],multipart:file.size>8*1048576,onUploadProgress:p=>{item.pct=p.percentage;paintUploads();}});
       await flApi('POST','',{action:'register',site,folder,name:file.name,pathname:blob.pathname});
       item.pct=100;ok++;
     }catch(e){item.err=e.message;paintUploads();}

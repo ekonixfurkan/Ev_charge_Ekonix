@@ -1,6 +1,7 @@
 // /api/files — proje dosyaları.
 //   GET ?site=ID                     klasörler + dosyalar
 //   GET ?download=ID[&inline=1]      dosyayı indir/aç (giriş şart; imzalı adrese yönlendirir)
+//   POST {type:'blob.generate-client-token', payload}         tarayıcıdan doğrudan Blob'a yükleme için kısa ömürlü jeton (Hobby planda işlev sayısı sınırlı olduğu için burada)
 //   POST {action:'register', site, folder, name, pathname}   istemci yüklemesi bitince kaydı yazar
 //   POST {action:'folder', site, name}                        yeni klasör
 //   DELETE ?id=ID                    dosyayı sil (yükleyen veya yönetici)
@@ -9,7 +10,7 @@ import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
 import { logActivity } from '../lib/activity.js';
-import { _deps, MAX_BYTES, DEFAULT_FOLDERS, TYPES, cleanName, cleanFolder, extOf, isAllowedName, signedGetUrl } from '../lib/files.js';
+import { _deps, MAX_BYTES, ALLOWED_TYPES, DEFAULT_FOLDERS, TYPES, cleanName, cleanFolder, extOf, isAllowedName, signedGetUrl } from '../lib/files.js';
 
 let _ready = null;
 export function ensureFiles() {
@@ -100,6 +101,25 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       const b = (await readJson(req)) || {};
+      if (typeof b.type === 'string' && b.type.startsWith('blob.')) {
+        if (!process.env.BLOB_READ_WRITE_TOKEN) return res.status(503).json({ error: 'Dosya deposu yapılandırılmamış' });
+        try {
+          const json = await _deps.handleUpload({
+            body: b,
+            request: req,
+            onBeforeGenerateToken: async (pathname) => {
+              // yol biçimi: sites/{lokasyon id}/{rastgele}-{dosya adı}
+              const m = /^sites\/([^/]+)\/([^/]+)$/.exec(pathname);
+              if (!m || !isAllowedName(m[2])) throw new Error('Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)');
+              if ((await siteName(s, m[1])) == null) throw new Error('Lokasyon bulunamadı');
+              return { allowedContentTypes: ALLOWED_TYPES, maximumSizeInBytes: MAX_BYTES, addRandomSuffix: false, allowOverwrite: false, tokenPayload: JSON.stringify({ by: user.email }) };
+            },
+          });
+          return res.status(200).json(json);
+        } catch (e) {
+          return res.status(400).json({ error: String(e && e.message ? e.message : 'Yükleme başlatılamadı') });
+        }
+      }
       const site = typeof b.site === 'string' ? b.site : '';
       const name = await siteName(s, site);
       if (name == null) return res.status(404).json({ error: 'Lokasyon bulunamadı' });
