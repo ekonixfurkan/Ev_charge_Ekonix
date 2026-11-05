@@ -761,7 +761,7 @@ const statusOf=k=>STATUSES.find(s=>s.k===k)||STATUSES[0];
 
 /* ---------- revenue & financing model ---------- */
 const YEARS=7;
-const FIN_DEFAULT={initial:15,growth:2,sale:14.49,cost:5.454,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:0,ekoShare:0,fundShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
+const FIN_DEFAULT={initial:15,growth:2,sale:0.29,cost:0.11,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:0,ekoShare:0,fundShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
 const FIN_LIMITS={initial:[0,100],growth:[-20,20],sale:[0,1000],cost:[0,1000],saleGrowth:[-100,200],costGrowth:[-100,200],share:[0,100],entShare:[0,100],starShare:[0,100],ekoShare:[0,100],fundShare:[0,100],commission:[0,100],opex:[0,1e10],opexGrowth:[0,200]};
 const PARTIES=[
   {k:'owner',t:'Yer Sağlayıcı',sh:'Yer Sağlayıcı',c:'var(--p-owner)',share:'share'},
@@ -775,7 +775,7 @@ const ITEMS=['Donanım','Saha işleri (EPC)','Şebeke bağlantısı','Diğer'];
 const party=k=>PARTIES.find(p=>p.k===k)||PARTIES[0];
 const pName=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).t;
 const pShort=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).sh;
-const money=v=>nf.format(v)+' TL';
+const money=v=>(v<0?'−':'')+'$'+nf.format(Math.abs(v));
 const df=new Intl.NumberFormat(LOC,{maximumFractionDigits:1});
 const shareTotal=v=>v.share+v.entShare+v.starShare+v.ekoShare+(v.fundShare||0);
 function tranche(item,fin='star'){return {id:uid(),item,amount:0,fin,mode:'share'};}
@@ -854,15 +854,15 @@ function chartSvg(P,s){
 }
 function partyTable(P,s){
   const ps=PARTIES.filter(p=>involved(P[p.k]));if(!ps.length)return '<p class="note">Henüz pay veya finansman girilmedi.</p>';
-  return `<div class="scroll"><table class="yearly"><thead><tr><th>Taraf</th><th class="num">Yatırım TL</th><th class="num">${YEARS} Yıl Nakit Girişi TL</th><th class="num">${YEARS} Yıl Net TL</th><th class="num">Geri Dönüş</th><th class="num">İç Verim (${YEARS} Yıl)</th></tr></thead><tbody>${ps.map(p=>{const x=P[p.k],inflow=x.flows.slice(1).reduce((a,b)=>a+b,0),r=irr(x.flows);
+  return `<div class="scroll"><table class="yearly"><thead><tr><th>Taraf</th><th class="num">Yatırım USD</th><th class="num">${YEARS} Yıl Nakit Girişi USD</th><th class="num">${YEARS} Yıl Net USD</th><th class="num">Geri Dönüş</th><th class="num">İç Verim (${YEARS} Yıl)</th></tr></thead><tbody>${ps.map(p=>{const x=P[p.k],inflow=x.flows.slice(1).reduce((a,b)=>a+b,0),r=irr(x.flows);
     return `<tr><th><span class="chip" style="--c:${p.c}">${esc(pName(p.k,s))}</span></th><td>${x.invest?nf.format(x.invest):'—'}</td><td>${nf.format(inflow)}</td><td>${nf.format(inflow-x.invest)}</td><td>${paybackOf(x.flows)}</td><td>${r==null?'—':'%'+df.format(r*100)}</td></tr>`;}).join('')}</tbody></table></div>
   <p class="note">Nakit girişi: gelir payı (Co-CPO için komisyon ve işletme gideri düşülmüş). İç verim yalnız ${YEARS} yıllık nakde dayanır; ekipmanın kalan değeri ve sözleşme sonrası gelir dahil değildir.</p>`;
 }
 function yearlyTable(rows){
   const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),R=rows;
-  const cols=[['energy','Enerji kWh'],['revenue','Hasılat TL'],['margin','Elektrik Sonrası TL'],['owner','Yer Sağlayıcı TL'],['ent','Co-CPO Payı TL'],['star','StarCharge TL'],['eko','EKONİX TL'],...(hasFon?[['fon','Diğer Fon TL']]:[]),['remaining','Dağıtılmayan TL'],['fee','Komisyon TL'],['opex','İşletme Gideri TL']];
+  const cols=[['energy','Enerji kWh'],['revenue','Hasılat USD'],['margin','Elektrik Sonrası USD'],['owner','Yer Sağlayıcı USD'],['ent','Co-CPO Payı USD'],['star','StarCharge USD'],['eko','EKONİX USD'],...(hasFon?[['fon','Diğer Fon USD']]:[]),['remaining','Dağıtılmayan USD'],['fee','Komisyon USD'],['opex','İşletme Gideri USD']];
   const sum=k=>R.reduce((t,r)=>t+r[k],0);
-  return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar TL. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
+  return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar USD. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
 }
 function resultsHtml(rows,f,s,tf,mode='all'){
   const k=(l,val,sub)=>`<div class="kpi"><span>${l}</span><strong>${val}</strong><small>${sub}</small></div>`;
@@ -900,7 +900,10 @@ function migrateSite(s){
   for(const k of ['phone','nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
   if(s.score==null||!Number.isFinite(+s.score)||s.score==='')s.score='';
   s.fx=s.fx||{};
-  s.fin={...FIN_DEFAULT,...(s.fin||{})};s.units=Array.isArray(s.units)?s.units:[];s.dd=s.dd||{};
+  s.fin={...FIN_DEFAULT,...(s.fin||{})};
+  // Eski TL varsayılanları (14,49 / 5,454) dolar varsayılanlarına çevrilir.
+  if(s.fin.sale===14.49&&s.fin.cost===5.454){s.fin.sale=FIN_DEFAULT.sale;s.fin.cost=FIN_DEFAULT.cost;}
+  s.units=Array.isArray(s.units)?s.units:[];s.dd=s.dd||{};
   if(!Array.isArray(s.tranches)){s.tranches=defaultTranches();if(s.fin.investment>0){s.tranches[1].fin='ent';s.tranches[1].amount=s.fin.investment;}}
   s.tranches.forEach(t=>{t.mode='share';delete t.term;delete t.rate;delete t.payer;});
   s.createdAt=s.createdAt||s.updatedAt||now();s.survey=s.survey||{};s.amg=s.amg||{scores:{},notes:{}};s.amg.scores=s.amg.scores||{};s.amg.notes=s.amg.notes||{};s.att=s.att||{};s.sign=s.sign||{};return s;}
@@ -1150,8 +1153,8 @@ function renderPortfolio(){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
     const warn=invalid.length?`<div class="alert">Pay toplamı %100'ü aşan lokasyonlar toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:'';
     h+=`<div class="viewbar subtabs fin-sub no-print" data-tab="port" role="tablist" aria-label="Portföy bölümleri">${PORT_TABS.map(([k,t])=>`<button type="button" data-ps="${k}" aria-pressed="${psub===k}">${t}</button>`).join('')}</div>
-    <section class="box" data-tab="port" data-psub="ozet"><h3>Portföy Özeti<small>${valid.length} lokasyon, ${YEARS} yıl, nominal TL</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'kpi'):''}</section>
-    <section class="box" data-tab="port" data-psub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'detail'):''}</section>`;
+    <section class="box" data-tab="port" data-psub="ozet"><h3>Portföy Özeti<small>${valid.length} lokasyon, ${YEARS} yıl, nominal USD</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'kpi'):''}</section>
+    <section class="box" data-tab="port" data-psub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal USD</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'detail'):''}</section>`;
   }
   h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Hesaplama Esasları</summary><p class="note">Enerji = lokasyondaki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). Finansör yatırımını kendi gelir payından geri alır; Gelir Paylaşım Oranı, Paylaşım bölümündeki finansör payıdır. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
   h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Skor Nasıl Hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Karar kılavuzu (Excel takip dosyasıyla aynı): 85 ve üzeri ilerlet, 75–84 eksikleri gider, 75 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
@@ -1197,7 +1200,7 @@ function finField(k,label,unitTxt){const [lo,hi]=FIN_LIMITS[k];return `<label>${
 function trRow(t){
   const opt=sel=>PARTIES.map(p=>`<option value="${p.k}" ${p.k===sel?'selected':''}>${esc(p.t)}</option>`).join('');
   return `<tr data-t="${t.id}"><td><input data-tf="item" list="itemList" value="${esc(t.item)}" aria-label="Kalem"></td>
-  <td style="min-width:120px"><input data-tf="amount" type="number" min="0" step="any" inputmode="decimal" value="${t.amount}" aria-label="Tutar TL"></td>
+  <td style="min-width:120px"><input data-tf="amount" type="number" min="0" step="any" inputmode="decimal" value="${t.amount}" aria-label="Tutar USD"></td>
   <td><select data-tf="fin" aria-label="Finansör">${opt(t.fin)}</select></td>
   <td class="num" data-tshare>—</td><td><button class="ghost" data-deltr="${t.id}" aria-label="Kalemi sil">Sil</button></td></tr>`;
 }
@@ -1344,10 +1347,9 @@ function renderSite(){
     ${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
     ${chk('access','Erişim ve yol durumu')}${chk('pave','Zemin / inşaat işleri')}
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}
-    ${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sv('tariff','Elektrik tarifesi (TL/kWh)','number')}${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
+    ${sv('cableM','İstasyona kablo mesafesi (m)','number')}<label>Elektrik tarifesi ($/kWh)<input id="tariffBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Gelir Modeli’ndeki Elektrik maliyetinden gelir; orada girilir"></label>${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
     ${chk('lay','Kablo döşeme')}${chk('pvpot','PV potansiyeli')}
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
-    ${sv('compSites','3 km içindeki hızlı şarj sahası','number')}${sv('compConn','Rakip konnektör sayısı','number')}${sv('compNotes','Rakip fiyat / hizmet / kullanım notları','text',' class="span2"')}
     <label class="span4">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label>
   </div><p class="note" id="evPotential"></p></details>
   </section>
@@ -1368,20 +1370,20 @@ function renderSite(){
   </div></section>
 
   <div class="viewbar subtabs fin-sub no-print" data-tab="credit" role="tablist" aria-label="Finansman bölümleri">${FIN_TABS.map(([k,t])=>`<button type="button" data-fs="${k}" aria-pressed="${fsub===k}">${t}</button>`).join('')}</div>
-  <section class="box" data-tab="credit" data-fsub="ozet"><h3>Finansman Özeti<small>${YEARS} yıl, nominal TL</small></h3><div id="finKpis"></div></section>
+  <section class="box" data-tab="credit" data-fsub="ozet"><h3>Finansman Özeti<small>${YEARS} yıl, nominal USD</small></h3><div id="finKpis"></div></section>
 
-  <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal TL; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
+  <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal USD; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
   <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
   <div class="shareinfo" id="shareStatus"></div>
-  <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','TL/kWh')}${finField('cost','Elektrik maliyeti','TL/kWh')}</div>
+  <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','$/kWh')}${finField('cost','Elektrik maliyeti','$/kWh')}</div>
   <details><summary>Fiyat Artışları ve İşletme Gideri</summary>
-    <div class="grid subgrid">${finField('saleGrowth','Satış fiyatı yıllık artışı','%')}${finField('costGrowth','Elektrik maliyeti yıllık artışı','%')}${finField('commission','Co-CPO ödeme komisyonu','hasılatın %')}${finField('opex','İlk yıl işletme gideri','TL')}${finField('opexGrowth','İşletme gideri yıllık artışı','%')}</div>
+    <div class="grid subgrid">${finField('saleGrowth','Satış fiyatı yıllık artışı','%')}${finField('costGrowth','Elektrik maliyeti yıllık artışı','%')}${finField('commission','Co-CPO ödeme komisyonu','hasılatın %')}${finField('opex','İlk yıl işletme gideri','USD')}${finField('opexGrowth','İşletme gideri yıllık artışı','%')}</div>
     <p class="note">Komisyon ve işletme gideri Co-CPO payından düşülür. Varsayılan fiyatlar örnektir, tarife teklifi değildir.</p>
   </details></section>
 
   <section class="box" data-tab="credit" data-fsub="yapi"><h3>Finansman Yapısı<small id="finSummary"></small></h3>
   <div class="presets no-print"><span class="note">Hazır yapı:</span><button data-preset="star">Tamamı StarCharge (AMG)</button><button data-preset="split">Donanım StarCharge, saha işleri Co-CPO</button></div>
-  <div class="scroll"><table class="units tranches"><thead><tr><th>Kalem</th><th class="num">Tutar TL</th><th>Finansör</th><th class="num">Gelir Paylaşım Oranı %</th><th></th></tr></thead><tbody id="trBody"></tbody></table></div>
+  <div class="scroll"><table class="units tranches"><thead><tr><th>Kalem</th><th class="num">Tutar USD</th><th>Finansör</th><th class="num">Gelir Paylaşım Oranı %</th><th></th></tr></thead><tbody id="trBody"></tbody></table></div>
   <datalist id="itemList">${ITEMS.map(i=>`<option value="${esc(i)}">`).join('')}</datalist>
   <div class="unit-actions"><button id="addTr">+ Finansman kalemi</button></div>
   <div class="grid subgrid"><label class="span2">Diğer fonun adı<input data-fin-text="fundName" value="${esc(s.fin.fundName)}" placeholder="ör. yerli banka, yatırım fonu" maxlength="60"></label></div>
@@ -1392,7 +1394,7 @@ function renderSite(){
     <button id="applyAll">Uygula</button></div>
   </section>
 
-  <section class="box" data-tab="credit" data-fsub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal TL</small></h3><div id="finResults"></div></section>
+  <section class="box" data-tab="credit" data-fsub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal USD</small></h3><div id="finResults"></div></section>
 
   <section class="box" data-tab="check"><h3>Skor Hesaplama<small id="ddProgress"></small></h3>
   <div class="scoretotal"><strong id="amgTotal"></strong><span id="amgDec"></span></div>
@@ -1446,6 +1448,7 @@ function updateDerived(){
   const attDone=ATTACH.filter(a=>s.att[a.k]).length;$('attProgress').textContent=`${attDone}/${ATTACH.length} ek işaretlendi`;
   $('evPotential').textContent=t.kw?`Şarj potansiyeli ünite tablosundan alınır: ${s.units.filter(u=>u.kind!=='CAB').map(u=>`${u.kind} ${nf.format(u.kw)} kW × ${u.qty}`).join(', ')}.`:'Şarj potansiyeli ünite tablosundan alınır.';
   $('vKw').textContent=nf.format(t.kw)+' kW';
+  const tb=$('tariffBox');if(tb)tb.value=s.fin.cost;
   $('unitSummary').textContent=`${t.dcUnits} DC (${t.dcSock} soket) · ${t.acUnits} AC (${t.acSock} soket)`+(t.cabs?` · ${t.cabs} Dağıtım Kabini`:'');
   $('unitFoot').innerHTML=s.units.length?`<tr><td colspan="5">DC ${nf.format(t.dcKw)} kW + AC ${nf.format(t.acKw)} kW</td><td class="num">${nf.format(t.kw)}</td><td></td></tr>`:'';
   const cr=capRef(s),g=cr?cr.v:0,bar=$('capbar'),note=$('capnote');
