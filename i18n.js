@@ -268,6 +268,12 @@
     'Nakit girişi: gelir payı (Co-CPO için komisyon ve işletme gideri düşülmüş). İç verim yalnız 7 yıllık nakde dayanır; ekipmanın kalan değeri ve sözleşme sonrası gelir dahil değildir.': 'Cash inflow: revenue share (commission and operating cost deducted for Co-CPO). IRR is based only on 7-year cash; residual equipment value and post-contract revenue are not included.',
     'İletişim kişisi *': 'Contact person *', 'Telefon *': 'Phone *', 'İletişim kişisi zorunlu.': 'Contact person is required.',
     'Telefon numarasını +90 (5xx) xxx xx xx biçiminde eksiksiz girin.': 'Enter the full phone number as +90 (5xx) xxx xx xx.',
+
+    /* bildirimler sayfası */
+    'Lokasyonlardaki ve Kişiler’deki son işlemler': 'Latest actions on Locations and Contacts', 'Tümünü Okundu Say': 'Mark All as Read',
+    'Henüz bildirim yok. Lokasyonlarda ve Kişiler’de işlem yapıldıkça burada görünür.': 'No notifications yet. They appear here as actions are made on Locations and Contacts.',
+    'Satıra tıklayınca ilgili lokasyon ya da kişi açılır. Kendi işlemlerin de listelenir ama okunmamış sayılmaz.': 'Click a row to open the related location or contact. Your own actions are listed too but not counted as unread.',
+    'Bu kayıt silinmiş.': 'This record has been deleted.',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'

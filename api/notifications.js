@@ -1,4 +1,4 @@
-// /api/notifications — başkalarının lokasyonlardaki işlemleri. GET: okunmamış sayısı + son 30 kayıt · POST: tümünü okundu say
+// /api/notifications — lokasyon ve kişi işlemleri. Kendi işlemlerin listelenir ama okunmamış sayılmaz. GET: okunmamış sayısı + son 100 kayıt · POST: tümünü okundu say
 import { sql } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureActivity } from '../lib/activity.js';
@@ -17,6 +17,7 @@ function ensureSeen() {
 }
 
 const ACTIONS = ['olustur', 'guncelle', 'sil', 'not-ekle'];
+const ENTITIES = ['lokasyon', 'kisi'];
 
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'no-store');
@@ -35,14 +36,14 @@ export default async function handler(req, res) {
                        ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING last_id`;
       }
       const last = String(seen[0].last_id);
-      const items = await s`SELECT a.id, a.at, a.actor, a.action, a.entity_id, a.entity_name, a.summary, NULLIF(u.name, '') AS actor_name,
-          (a.id > ${last}::bigint) AS unread
+      const items = await s`SELECT a.id, a.at, a.actor, a.action, a.entity, a.entity_id, a.entity_name, a.summary, NULLIF(u.name, '') AS actor_name,
+          (a.id > ${last}::bigint AND a.actor <> ${user.email}) AS unread
         FROM activity_log a LEFT JOIN users u ON u.email = a.actor
-        WHERE a.entity = 'lokasyon' AND a.action = ANY(${ACTIONS}) AND a.actor <> ${user.email} AND a.actor <> 'Sistem'
-        ORDER BY a.id DESC LIMIT 30`;
+        WHERE a.entity = ANY(${ENTITIES}) AND a.action = ANY(${ACTIONS}) AND a.actor <> 'Sistem'
+        ORDER BY a.id DESC LIMIT 100`;
       const unread = items.filter((x) => x.unread).length;
       const more = await s`SELECT count(*)::int AS n FROM activity_log
-        WHERE id > ${last}::bigint AND entity = 'lokasyon' AND action = ANY(${ACTIONS}) AND actor <> ${user.email} AND actor <> 'Sistem'`;
+        WHERE id > ${last}::bigint AND entity = ANY(${ENTITIES}) AND action = ANY(${ACTIONS}) AND actor <> ${user.email} AND actor <> 'Sistem'`;
       return res.status(200).json({ unread: more[0].n, shown: unread, items });
     }
 
