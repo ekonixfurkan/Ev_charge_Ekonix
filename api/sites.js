@@ -3,6 +3,7 @@ import { sql, ensureSchema, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
 import { seedOnce } from '../lib/seed.js';
+import { nextCode, backfillCodes } from '../lib/codes.js';
 
 export default async function handler(req, res) {
   try {
@@ -13,6 +14,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       try { await seedOnce(s); } catch { /* başlangıç listesi eklenemezse okuma bozulmasın */ }
+      try { await backfillCodes(s); } catch { /* kod verilemezse okuma bozulmasın */ }
       const rows = await s`SELECT data FROM sites ORDER BY updated_at`;
       const cfg = await s`SELECT data FROM config WHERE key = 'team'`;
       const team = cfg[0]?.data?.names;
@@ -29,6 +31,8 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Geçersiz lokasyon' });
       }
       const prev = await s`SELECT data FROM sites WHERE id = ${site.id}`;
+      // Proje kodu yalnızca sunucudan gelir: varsa korunur, yoksa sıradaki numara verilir (istemcinin gönderdiği değer yok sayılır).
+      site.code = prev[0]?.data?.code || (await nextCode(s));
       await s`INSERT INTO sites (id, data, updated_at)
               VALUES (${site.id}, ${JSON.stringify(site)}::jsonb, now())
               ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`;
@@ -39,7 +43,7 @@ export default async function handler(req, res) {
         const changes = diffSite(old, site);
         if (changes.length) await logActivity({ actor: user.email, action: 'guncelle', entity: 'lokasyon', entityId: site.id, entityName: site.name, summary: summarize(changes), changes });
       }
-      return res.status(200).json({ ok: true });
+      return res.status(200).json({ ok: true, code: site.code });
     }
 
     if (req.method === 'DELETE') {

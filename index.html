@@ -111,10 +111,17 @@ header h1{font-size:20px;font-weight:700}
 .ovw-grid .box{margin-bottom:0}
 .kpi-col{display:grid;gap:12px;align-content:start}
 .ovwtbl{width:100%}
-/* Sayı ve durum sütunları içeriği kadar yer tutar; artan genişliği Lokasyon, Aşama ve Sorumlu alır. */
-.ovwtbl th:nth-child(n+3),.ovwtbl td:nth-child(n+3){white-space:nowrap}
-.ovwtbl th:nth-child(n+4),.ovwtbl td:nth-child(n+4){width:1%;padding-left:14px;padding-right:14px}
-.ovwtbl th:last-child,.ovwtbl td:last-child{padding-right:16px}
+/* Kod, Lokasyon ve Aşama solda; Sorumlu ile sayılar sağda. Aradaki boş alan (.sp) ileride kullanılmak üzere ayrıldı. */
+table.portfolio.ovwtbl :is(th,td){white-space:nowrap;width:1%;min-width:0;padding-left:12px;padding-right:12px}
+table.portfolio.ovwtbl :is(th,td):first-child{padding-left:16px}
+table.portfolio.ovwtbl :is(th,td):last-child{padding-right:16px}
+table.portfolio.ovwtbl .sp{width:auto;padding:0}
+.ovwtbl td.c-name .p1{max-width:340px;overflow:hidden;text-overflow:ellipsis}
+.ovwtbl td.c-code,.loctbl td.c-code{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.portfolio.act-tbl{width:100%;table-layout:fixed}
+table.portfolio.act-tbl :is(th,td){min-width:0}
+.act-tbl th:nth-child(1){width:13%}.act-tbl th:nth-child(2){width:19%}.act-tbl th:nth-child(3){width:11%}.act-tbl th:nth-child(4){width:21%}
+.act-tbl td{white-space:normal;word-break:break-word;vertical-align:top}
 .mk{background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:12px 16px}
 .mk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .mk strong{display:block;margin-top:3px;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -335,8 +342,8 @@ table.yearly{width:auto;min-width:min(100%,640px)}
 .portfolio tfoot td .p2{font-weight:400}
 .loctbl th,.loctbl td{padding:12px 8px}
 .loctbl .p1,.loctbl td{font-size:13px}
-.loctbl td:nth-child(6){max-width:230px}
-.loctbl td:nth-child(7){max-width:210px}
+.loctbl td:nth-child(7){max-width:230px}
+.loctbl td:nth-child(8){max-width:210px}
 .loctbl tr.closed td{opacity:.6}
 
 /* Mühür (seal) rozetleri: 1.5px çerçeve + nokta */
@@ -588,7 +595,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
     <nav class="nav" aria-label="Ana gezinme">
       <section class="nav-group" data-group="main">
         <button type="button" class="nav-head" aria-expanded="true">Ana menü<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Genel Bakış / Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="activity"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button><button type="button" class="nav-item" data-nav="activity"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>İşlem Geçmişi</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="activity"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button><button type="button" class="nav-item" data-nav="activity"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>İşlem Geçmişi</span></button></div>
       </section>
       <section class="nav-group" data-group="site">
         <button type="button" class="nav-head" aria-expanded="true">Saha &amp; Lokasyon Yönetimi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -874,7 +881,7 @@ function resultsHtml(rows,f,s,tf,mode='all'){
 
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
 function blankSite(name){
-  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',contact:'',contactCompany:'',phone:'',contractBase:'',contractExt:'',
+  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',code:'',contact:'',contactCompany:'',phone:'',contractBase:'',contractExt:'',
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
@@ -890,6 +897,7 @@ function migrateSite(s){
   if(s.contractBase===undefined)s.contractBase=(+s.contractYears>0)?+s.contractYears:'';
   if(s.contractExt===undefined)s.contractExt='';
   if(s.contactCompany===undefined)s.contactCompany='';
+  if(s.code===undefined)s.code='';
   s.nextAction=nextStageOf(s);
   if(s.amg&&s.amg.scores){const dn=amgScore(s);if(dn.complete){s.score=dn.total;s.scoreSrc='amg';}}
   for(const k of ['phone','nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
@@ -946,7 +954,7 @@ async function flush(){
   for(const [id,p] of [...pending]){
     const site=db.sites.find(x=>x.id===id);
     try{if(p.op==='delete'||!site)await api('/sites?id='+encodeURIComponent(id),{method:'DELETE'});
-      else await api('/sites',{method:'PUT',body:JSON.stringify(site)});
+      else{const r=await api('/sites',{method:'PUT',body:JSON.stringify(site)});if(r&&r.code&&site.code!==r.code){site.code=r.code;if(view==='site'&&activeId===id){setPageTitle();const cb=$('codeBox');if(cb)cb.value=r.code;}}}
       if(pending.get(id)?.v===p.v)pending.delete(id);}
     catch(e){failed=e;break;}
   }
@@ -1019,7 +1027,7 @@ function matchesF(s){
   if(F.owner&&(s.survey.lead||'')!==F.owner)return false;
   if(F.partner&&(s.survey.partner||'')!==F.partner)return false;
   if(F.blocked&&!(s.blocker||s.blockerTr))return false;
-  if(F.q){const hay=norm([s.name,s.city,s.district,s.survey.partner,s.survey.lead,nextStageOf(s),s.blockerTr,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
+  if(F.q){const hay=norm([s.code,s.name,s.city,s.district,s.survey.partner,s.survey.lead,nextStageOf(s),s.blockerTr,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
   return true;
 }
 const SORTS={order:['Liste Sırası',byCreated],updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
@@ -1061,7 +1069,7 @@ function legendHtml(){
 }
 // Üst başlık: lokasyon sayfasında lokasyon adı (altında il/ilçe), diğer sayfalarda uygulama adı.
 function setPageTitle(){
-  const x=view==='site'?cur():null,sub2=x?[x.district,x.city].filter(Boolean).join(', '):'';
+  const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
   $('pageTitle').textContent=x?(x.name||'Adsız Lokasyon'):'Saha Değerlendirme';
   $('pageSub').textContent=sub2;$('pageSub').hidden=!sub2;
   document.title=x?(x.name||'Lokasyon')+' · Saha Değerlendirme':'Saha Değerlendirme Aracı';
@@ -1070,7 +1078,7 @@ function renderPipe(){$('pipeLegend').innerHTML=legendHtml();}
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
 function locRowsHtml(list){
   return list.map(s=>{const st=statusOf(s.status),sc=scoreOf(s),bl=s.blockerTr||s.blocker||'';
-    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.city,typeLabel(s.type)].filter(Boolean).join(' · '))}</span></td>
+    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.city,typeLabel(s.type)].filter(Boolean).join(' · '))}</span></td>
     <td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
     <td class="num"><span class="amgscore ${sc.cls}">${sc.label}</span></td>
     <td>${esc(s.survey.lead||'—')}${s.survey.partner?`<span class="p2">${esc(s.survey.partner)}</span>`:''}</td>
@@ -1081,7 +1089,7 @@ function locRowsHtml(list){
 const fmtDate=v=>{if(!v)return '';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
   const list=visibleSites(),pi=pageOf(list,'loc');
-  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="8" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan lokasyon yok.</td></tr>';
+  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="9" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan lokasyon yok.</td></tr>';
   $('locCount').textContent=list.length+' / '+db.sites.length+' lokasyon';
   $('locPager').innerHTML=pagerHtml('loc',pi);
   $('locClear').hidden=!hasFilter();
@@ -1104,7 +1112,7 @@ function renderLocations(){
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div><div id="locPager"></div></section>`;
+    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div><div id="locPager"></div></section>`;
   paintLocRows();
 }
 function render(){
@@ -1130,13 +1138,13 @@ function renderPortfolio(){
   const tot=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
   const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
   let h=`<div class="ovw-grid" data-tab="ovw"><section class="box"><h3>Lokasyonlar<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio ovwtbl"><thead><tr>
-    <th>Lokasyon</th><th>Aşama</th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">Skor</th><th>Durum</th></tr></thead><tbody>`+
+    <th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">AC Ünite</th><th class="num">Skor</th><th>Durum</th></tr></thead><tbody>`+
     pi.rows.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
-      return `<tr data-open="${s.id}" tabindex="0"><td><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.survey.lead)||'—'}</td>
+      return `<tr data-open="${s.id}" tabindex="0"><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num"><span class="p1">${t.acUnits}</span></td>
       <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
       <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td></tr>`;}).join('')+
-    `</tbody><tfoot><tr><td>Toplam</td><td></td><td></td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td></td><td></td></tr></tfoot></table></div>${pagerHtml('ovw',pi)}</section>
+    `</tbody><tfoot><tr><td colspan="2">Toplam</td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${T.acU}</td><td></td><td></td></tr></tfoot></table></div>${pagerHtml('ovw',pi)}</section>
     <div class="kpi-col">${legendHtml()}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div></div>`;
   if(list.length){
     const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
@@ -1296,7 +1304,8 @@ function renderSite(){
   <div class="info-pair" data-tab="info">
   <section class="box"><h3>Lokasyon Bilgileri${siteEdit&&mode==='cloud'?'<button type="button" class="ghost pick-btn no-print" id="pickContact">Kişilerden Seç</button>':''}</h3>
   <div class="grid infogrid">
-    ${field('name','Lokasyon adı','text',' class="span4"')}
+    ${field('name','Lokasyon adı')}
+    <label>Proje kodu<input id="codeBox" data-locked readonly tabindex="-1" value="${esc(s.code||'—')}" title="Sunucu tarafından verilir; değiştirilemez"></label>
     ${field('contact','İletişim kişisi')}
     <label>Telefon<input data-f="phone" data-phone type="tel" inputmode="tel" placeholder="+90 (5__) ___ __ __" value="${esc(s.phone)}"></label>
     <label>Saha tipi<select data-f="type">${TYPES.map(([k,t])=>`<option value="${esc(k)}" ${k===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
@@ -1564,7 +1573,7 @@ const SITE_SUBS=['info','units','infra','credit','check'],PORT_SUBS=['ovw','port
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Skor Hesaplama']];
 function paintNav(){
   const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
-  document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key&&b.id!=='bellBtn';b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
   if(!db.sites.length){toast('Önce bir lokasyon ekleyin.');return;}
@@ -1702,7 +1711,7 @@ function actRowsHtml(){
   return actRows.map(x=>{const [lab,cls]=ACT_LABEL[x.action]||[x.action,'none'];
     return `<tr data-act="${x.id}" tabindex="0"><td style="white-space:nowrap">${esc(fmtTs(x.at))}</td><td>${actWho(x)}</td>
     <td><span class="badge ${cls}">${esc(lab)}</span></td><td><span class="p1">${esc(x.entity_user_name||x.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[x.entity]||x.entity)}${x.entity_user_name?' · '+esc(x.entity_name):''}</span></td>
-    <td style="max-width:420px">${esc(x.summary||'')}</td></tr>`;}).join('');
+    <td>${esc(x.summary||'')}</td></tr>`;}).join('');
 }
 function paintActivity(){
   $('actRows').innerHTML=actRowsHtml();
@@ -1721,7 +1730,7 @@ async function renderActivity(){
       ${me&&me.role==='admin'?`<label class="lf">Tür<select id="actEntity"><option value="">Tümü</option>${Object.entries(ENT_LABEL).map(([k,t])=>opt(k,actF.entity,t)).join('')}</select></label>`:''}
       <button type="button" id="actClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
+    <div class="scroll"><table class="portfolio loctbl act-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
     <div class="row-actions"><button type="button" id="actMore" hidden>Daha Fazla Yükle</button></div>
     <p class="note">Günlük sunucuda tutulur; kayıtlar arayüzden silinemez veya düzenlenemez.${me&&me.role==='admin'?'':' Bu sayfada lokasyon işlemleri görünür.'}</p></section>`;
   paintActivity();
