@@ -26,12 +26,12 @@ export default async function handler(req, res) {
       res.setHeader('allow', 'GET, POST');
       return res.status(405).json({ error: 'Yöntem desteklenmiyor' });
     }
-    const { limit, before, actor, q } = req.query || {};
+    const { limit, before, actor, q, site } = req.query || {};
     // Giriş/çıkış ve kullanıcı yönetimi kayıtları yalnızca yöneticiye açık.
     const entity = user.role === 'admin' ? (req.query || {}).entity : 'lokasyon';
     const beforeId = before && /^\d+$/.test(String(before)) ? String(before) : null;
     const [list, actors] = await Promise.all([
-      listActivity({ limit, before: beforeId, actor: String(actor || ''), entity: String(entity || ''), q: String(q || '').slice(0, 100) }),
+      listActivity({ limit, before: beforeId, actor: String(actor || ''), entity: String(entity || ''), q: String(q || '').slice(0, 100), site: String(site || '').slice(0, 80) }),
       activityActors(),
     ]);
     return res.status(200).json({ ...list, actors });

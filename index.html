@@ -120,7 +120,7 @@ table.portfolio.ovwtbl .sp{width:auto;padding:0}
 .ovwtbl td.c-code,.loctbl td.c-code{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
 .portfolio.act-tbl{width:100%;table-layout:fixed}
 table.portfolio.act-tbl :is(th,td){min-width:0}
-.act-tbl th:nth-child(1){width:13%}.act-tbl th:nth-child(2){width:19%}.act-tbl th:nth-child(3){width:11%}.act-tbl th:nth-child(4){width:21%}
+.act-tbl th:nth-child(1){width:12%}.act-tbl th:nth-child(2){width:17%}.act-tbl th:nth-child(3){width:10%}.act-tbl th:nth-child(4){width:9%}.act-tbl th:nth-child(5){width:19%}
 .act-tbl td{white-space:normal;word-break:break-word;vertical-align:top}
 .mk{background:var(--card);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:12px 16px}
 .mk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
@@ -223,7 +223,7 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 #notifRows tr{cursor:pointer}
 .portfolio.notif-tbl{width:100%;table-layout:fixed}
 table.portfolio.notif-tbl :is(th,td){min-width:0}
-.notif-tbl th:nth-child(1){width:12%}.notif-tbl th:nth-child(2){width:16%}.notif-tbl th:nth-child(3){width:19%}.notif-tbl th:nth-child(4){width:15%}
+.notif-tbl th:nth-child(1){width:11%}.notif-tbl th:nth-child(2){width:15%}.notif-tbl th:nth-child(3){width:9%}.notif-tbl th:nth-child(4){width:17%}.notif-tbl th:nth-child(5){width:14%}
 .notif-tbl td{white-space:normal;word-break:break-word;vertical-align:top}
 #notifRows tr.grp-first td{border-top:1px solid var(--hair-strong)}
 #notifRows .nv-old{color:var(--muted)}
@@ -1704,14 +1704,16 @@ document.addEventListener('click',async e=>{
 });
 
 /* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
-let actF={q:'',actor:'',entity:''},actRows=[],actMore=false,actActors=[];
+let actF={q:'',actor:'',entity:'',site:''},actRows=[],actMore=false,actActors=[];
 const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none']};
 const ENT_LABEL={lokasyon:'Lokasyon',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
+// Proje filtresi: proje kodu · ad (kod sırasıyla)
+const siteOptions=sel=>[...db.sites].sort((a,b)=>String(a.code||'~').localeCompare(String(b.code||'~'),'tr',{numeric:true})).map(x=>`<option value="${esc(x.id)}" ${x.id===sel?'selected':''}>${esc((x.code||'—')+' · '+(x.name||'Adsız Lokasyon'))}</option>`).join('');
 const fmtTs=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleString(LOC,{dateStyle:'short',timeStyle:'short'});};
 async function fetchActivity(reset){
   const qs=new URLSearchParams({limit:'50'});
   if(!reset&&actRows.length)qs.set('before',String(actRows[actRows.length-1].id));
-  for(const k of ['q','actor','entity'])if(actF[k])qs.set(k,actF[k]);
+  for(const k of ['q','actor','entity','site'])if(actF[k])qs.set(k,actF[k]);
   const r=await fetch('/api/activity?'+qs,{credentials:'same-origin'});
   if(r.status===401){location.replace('/login.html');throw new Error('401');}
   const d=await r.json().catch(()=>({}));
@@ -1720,16 +1722,16 @@ async function fetchActivity(reset){
 }
 const actWho=x=>x.actor_name?`<span class="p1" style="font-weight:600">${esc(x.actor_name)}</span><span class="p2" style="display:block;color:var(--muted);font-size:12px">${esc(x.actor)}</span>`:esc(x.actor||'—');
 function actRowsHtml(){
-  if(!actRows.length)return '<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Kayıt yok.</td></tr>';
+  if(!actRows.length)return '<tr><td colspan="6" class="note" style="padding:24px;text-align:center">Kayıt yok.</td></tr>';
   return actRows.map(x=>{const [lab,cls]=ACT_LABEL[x.action]||[x.action,'none'];
     return `<tr data-act="${x.id}" tabindex="0"><td style="white-space:nowrap">${esc(fmtTs(x.at))}</td><td>${actWho(x)}</td>
-    <td><span class="badge ${cls}">${esc(lab)}</span></td><td><span class="p1">${esc(x.entity_user_name||x.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[x.entity]||x.entity)}${x.entity_user_name?' · '+esc(x.entity_name):''}</span></td>
+    <td><span class="badge ${cls}">${esc(lab)}</span></td><td class="c-code">${esc(x.site_code||'—')}</td><td><span class="p1">${esc(x.entity_user_name||x.entity_name||'—')}</span><span class="p2">${esc(ENT_LABEL[x.entity]||x.entity)}${x.entity_user_name?' · '+esc(x.entity_name):''}</span></td>
     <td>${esc(x.summary||'')}</td></tr>`;}).join('');
 }
 function paintActivity(){
   $('actRows').innerHTML=actRowsHtml();
   $('actMore').hidden=!actMore;
-  $('actClear').hidden=!(actF.q||actF.actor||actF.entity);
+  $('actClear').hidden=!(actF.q||actF.actor||actF.entity||actF.site);
 }
 async function renderActivity(){
   $('view').innerHTML='<section class="box"><h3>İşlem Geçmişi<small>Yükleniyor…</small></h3></section>';
@@ -1739,11 +1741,12 @@ async function renderActivity(){
   $('view').innerHTML=`<section class="box"><h3>İşlem Geçmişi<small>Kim, ne zaman, neyi değiştirdi</small></h3>
     <div class="locbar no-print">
       <label class="lf lq">Ara<input type="search" id="actQ" value="${esc(actF.q)}" placeholder="Lokasyon, kullanıcı veya özet…" autocomplete="off"></label>
+      <label class="lf">Proje<select id="actSite"><option value="">Tümü</option>${siteOptions(actF.site)}</select></label>
       <label class="lf">Kullanıcı<select id="actActor"><option value="">Tümü</option>${actActors.map(a=>opt(a.email,actF.actor,a.name||a.email)).join('')}</select></label>
       ${me&&me.role==='admin'?`<label class="lf">Tür<select id="actEntity"><option value="">Tümü</option>${Object.entries(ENT_LABEL).map(([k,t])=>opt(k,actF.entity,t)).join('')}</select></label>`:''}
       <button type="button" id="actClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl act-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
+    <div class="scroll"><table class="portfolio loctbl act-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Proje Kodu</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
     <div class="row-actions"><button type="button" id="actMore" hidden>Daha Fazla Yükle</button></div>
     <p class="note">Günlük sunucuda tutulur; kayıtlar arayüzden silinemez veya düzenlenemez.${me&&me.role==='admin'?'':' Bu sayfada lokasyon işlemleri görünür.'}</p></section>`;
   paintActivity();
@@ -1769,11 +1772,11 @@ document.addEventListener('click',e=>{
 let actT=null;
 document.addEventListener('input',e=>{if(e.target.id!=='actQ')return;actF.q=e.target.value;clearTimeout(actT);actT=setTimeout(async()=>{try{await fetchActivity(true);paintActivity();}catch(x){toast(x.message);}},300);});
 document.addEventListener('change',async e=>{
-  if(e.target.id==='actActor')actF.actor=e.target.value;else if(e.target.id==='actEntity')actF.entity=e.target.value;else return;
+  if(e.target.id==='actActor')actF.actor=e.target.value;else if(e.target.id==='actEntity')actF.entity=e.target.value;else if(e.target.id==='actSite')actF.site=e.target.value;else return;
   try{await fetchActivity(true);paintActivity();}catch(x){toast(x.message);}
 });
 document.addEventListener('click',async e=>{
-  if(e.target.id==='actClear'){actF={q:'',actor:'',entity:''};renderActivity();return;}
+  if(e.target.id==='actClear'){actF={q:'',actor:'',entity:'',site:''};renderActivity();return;}
   if(e.target.id==='actMore'){try{await fetchActivity(false);paintActivity();}catch(x){toast(x.message);}return;}
   if(e.target.id==='actClose'){$('actDlg').close();return;}
   const tr=e.target.closest('#actRows tr[data-act]');if(tr)actDetail(tr.dataset.act);
@@ -1940,7 +1943,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ---------- Bildirimler (başkalarının lokasyonlardaki işlemleri) ---------- */
-let bell={unread:0,items:[]},bellInit=false,bellT=null;
+let bell={unread:0,items:[],newIds:new Set(),site:''},bellInit=false,bellT=null;
 function paintBell(){
   const c=$('bellCount');if(c){c.textContent=bell.unread>99?'99+':bell.unread;c.hidden=!bell.unread;}
   if(view==='notifs')paintNotifRows();
@@ -1954,33 +1957,38 @@ function notifChanges(n){
   return parts.length&&parts.every(Boolean)?parts.map(m=>({alan:m[1],eski:m[2],yeni:m[3]})):null;
 }
 function notifGroupHtml(n){
-  const ch=notifChanges(n),k=ch?ch.length:1,cls=n.unread?' unread':'';
+  const ch=notifChanges(n),k=ch?ch.length:1,cls=(n.unread||bell.newIds.has(n.id))?' unread':'';
   const attrs=`data-bellent="${esc(n.entity||'lokasyon')}" data-bellsite="${esc(n.entity_id||'')}" data-bellact="${esc(n.action)}" tabindex="0"`;
-  const head=`<td rowspan="${k}" style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td rowspan="${k}">${actWho(n)}</td><td rowspan="${k}"><span class="p1">${esc(n.entity_name||'—')}</span></td>`;
+  const head=`<td rowspan="${k}" style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td rowspan="${k}">${actWho(n)}</td><td rowspan="${k}" class="c-code">${esc(n.site_code||'—')}</td><td rowspan="${k}"><span class="p1">${esc(n.entity_name||'—')}</span></td>`;
   if(!ch)return `<tr class="grp-first${cls}" ${attrs}>${head}<td colspan="3">${esc(NOTIF_MSG[n.action]||n.summary||'')}</td></tr>`;
   return ch.map((c,i)=>`<tr class="${i?'':'grp-first'}${cls}" ${attrs}>${i?'':head}<td>${esc(c.alan)}</td><td class="nv-old">${esc(c.eski)}</td><td class="nv-new">${esc(c.yeni)}</td></tr>`).join('');
 }
 function paintNotifRows(){
   const t=$('notifRows');if(!t)return;
   t.innerHTML=bell.items.length?bell.items.map(notifGroupHtml).join('')
-    :'<tr><td colspan="6" class="note" style="padding:24px;text-align:center">Henüz bildirim yok. Diğer kullanıcılar lokasyonlarda güncelleme yaptıkça burada görünür.</td></tr>';
+    :`<tr><td colspan="7" class="note" style="padding:24px;text-align:center">${bell.site?'Bu projede bildirim yok.':'Henüz bildirim yok. Diğer kullanıcılar lokasyonlarda güncelleme yaptıkça burada görünür.'}</td></tr>`;
   const r=$('bellRead');if(r)r.hidden=!bell.unread;
 }
 async function renderNotifs(){
+  bell.site='';bell.newIds=new Set(bell.items.filter(n=>n.unread).map(n=>n.id));
   $('view').innerHTML=`<section class="box"><h3>Bildirimler<small>Diğer kullanıcıların lokasyonlardaki güncellemeleri</small></h3>
-    <div class="scroll"><table class="portfolio loctbl notif-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Lokasyon</th><th>Alan</th><th>Eski Değer</th><th>Yeni Değer</th></tr></thead><tbody id="notifRows"><tr><td colspan="6" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <div class="locbar no-print">
+      <label class="lf">Proje<select id="ntSite"><option value="">Tümü</option>${siteOptions('')}</select></label>
+      <button type="button" id="ntClear" class="ghost" hidden>Filtreyi Temizle</button>
+    </div>
+    <div class="scroll"><table class="portfolio loctbl notif-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Proje Kodu</th><th>Lokasyon</th><th>Alan</th><th>Eski Değer</th><th>Yeni Değer</th></tr></thead><tbody id="notifRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
     <div class="row-actions"><button type="button" id="bellRead" hidden>Tümünü Okundu Say</button></div>
     <p class="note">Satıra tıklayınca ilgili lokasyon açılır. Giriş ve sayfa görüntüleme gibi hareketler İşlem Geçmişi’nde görünür.</p></section>`;
   paintNotifRows();
   await pollBell(true);
   if(view==='notifs'&&bell.unread)await markBellRead(true);
 }
-async function bellApi(method){const r=await fetch('/api/notifications',{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:method==='POST'?'{}':undefined});if(r.status===401){location.replace('/login.html');throw new Error('401');}if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+async function bellApi(method){const r=await fetch('/api/notifications'+(method==='GET'&&bell.site&&view==='notifs'?'?site='+encodeURIComponent(bell.site):''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:method==='POST'?'{}':undefined});if(r.status===401){location.replace('/login.html');throw new Error('401');}if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 async function pollBell(force){
   if(mode!=='cloud'||(document.hidden&&!force))return;
   try{const d=await bellApi('GET');
     if(bellInit&&d.unread>bell.unread&&view!=='notifs')toast((d.unread-bell.unread)+' yeni işlem · Bildirimler');
-    bell.unread=d.unread;bell.items=d.items||[];bellInit=true;paintBell();
+    bell.unread=d.unread;bell.items=d.items||[];bell.items.forEach(n=>{if(n.unread)bell.newIds.add(n.id);});bellInit=true;paintBell();
     if(view==='notifs'&&bell.unread&&!force)await markBellRead(true);}catch(e){}
 }
 async function markBellRead(keepMarks){try{await bellApi('POST');bell.unread=0;if(!keepMarks)bell.items.forEach(n=>{n.unread=false;});const c=$('bellCount');if(c)c.hidden=true;const r=$('bellRead');if(r)r.hidden=true;}catch(e){}}
@@ -1992,6 +2000,14 @@ document.addEventListener('click',e=>{
     if(id&&act!=='sil'&&db.sites.some(x=>x.id===id)){openSite(id);if(act==='not-ekle')setTimeout(()=>{if(view==='site'&&activeId===id)openNotes();},250);}
     else if(act==='sil')toast('Bu kayıt silinmiş.');
     else toast('Lokasyon bulunamadı.');}
+});
+document.addEventListener('change',async e=>{
+  if(e.target.id!=='ntSite')return;
+  bell.site=e.target.value;const c=$('ntClear');if(c)c.hidden=!bell.site;await pollBell(true);
+});
+document.addEventListener('click',async e=>{
+  if(!e.target.closest('#ntClear'))return;
+  bell.site='';const sel=$('ntSite');if(sel)sel.value='';$('ntClear').hidden=true;await pollBell(true);
 });
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#notifRows [data-bellact]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click();}});
 
