@@ -421,10 +421,10 @@ table.yearly{width:auto;min-width:min(100%,640px)}
 .loctbl .p1,.loctbl td{font-size:13px}
 .loctbl td:nth-child(7){max-width:230px}
 .loctbl td:nth-child(8){max-width:210px}
-/* Lokasyon Listesi tam genişliğe yayılır: kod, aşama, durum, skor ve tarih sütunları içerik kadar; artan alanı metin sütunları alır. */
+/* Lokasyon Listesi tam genişliğe yayılır: kod, aşama, durum ve skor sütunları içerik kadar; artan alanı metin sütunları alır. */
 table.portfolio.loclist{width:100%}
-table.portfolio.loclist :is(th,td):is(:nth-child(1),:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(9),:nth-child(10)){width:1%;white-space:nowrap}
-table.portfolio.loclist td:nth-child(7),table.portfolio.loclist td:nth-child(8){max-width:none}
+table.portfolio.loclist :is(th,td):is(:nth-child(1),:nth-child(3),:nth-child(4),:nth-child(5)){width:1%;white-space:nowrap}
+table.portfolio.loclist td:nth-child(7){max-width:none}
 .loctbl tr.closed td{opacity:.6}
 
 /* Mühür (seal) rozetleri: 1.5px çerçeve + nokta */
@@ -949,7 +949,7 @@ function blankSite(name){
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
-let db={version:1,sites:[]},activeId=null,view='portfolio',F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false},sortKey='order',loaded=false,mode='none',canWrite=true,me={email:'',role:''};
+let db={version:1,sites:[]},activeId=null,view='portfolio',F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:''},sortKey='order',loaded=false,mode='none',canWrite=true,me={email:'',role:''};
 const API='/api';
 const pending=new Map();let ver=0,flushTimer=null,flushing=false,pollTimer=null;
 function status(t,err=false){$('saveStatus').textContent=t;$('saveStatus').classList.toggle('err',err);}
@@ -1120,7 +1120,6 @@ function matchesF(s){
   if(F.type&&s.type!==F.type)return false;
   if(F.owner&&(s.survey.lead||'')!==F.owner)return false;
   if(F.partner&&(s.survey.partner||'')!==F.partner)return false;
-  if(F.blocked&&!(s.blocker||s.blockerTr))return false;
   if(F.q){const hay=norm([s.code,s.name,s.city,s.district,s.survey.partner,s.survey.lead,nextStageOf(s),s.blockerTr,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
   return true;
 }
@@ -1151,7 +1150,7 @@ document.addEventListener('click',e=>{
 });
 function visibleSites(){return db.sites.filter(matchesF).sort(SORTS[sortKey][1]);}
 function filterText(){
-  const t=[];if(F.act)t.push(F.act==='active'?'Aktif':'Pasif');if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.blocked)t.push('Engelli');if(F.q)t.push('“'+F.q+'”');
+  const t=[];if(F.act)t.push(F.act==='active'?'Aktif':'Pasif');if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.q)t.push('“'+F.q+'”');
   return t.join(' · ');
 }
 function legendHtml(){
@@ -1171,20 +1170,18 @@ function setPageTitle(){
 function renderPipe(){$('pipeLegend').innerHTML=legendHtml();}
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Lokasyonu Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini lokasyon detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Lokasyon ekle</button></div>`;
 function locRowsHtml(list){
-  return list.map(s=>{const st=statusOf(s.status),sc=scoreOf(s),bl=s.blockerTr||s.blocker||'';
+  return list.map(s=>{const st=statusOf(s.status),sc=scoreOf(s);
     return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.city,typeLabel(s.type)].filter(Boolean).join(' · '))}</span></td>
     <td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
     <td class="num"><span class="amgscore ${sc.cls}">${sc.label}</span></td>
     <td>${esc(s.survey.lead||'—')}${s.survey.partner?`<span class="p2">${esc(s.survey.partner)}</span>`:''}</td>
     <td style="min-width:170px"><span class="p1" style="font-weight:500">${esc(nextStageOf(s))}</span>${s.nextActionDate?`<span class="p2">${esc(fmtDate(s.nextActionDate))}</span>`:''}</td>
-    <td style="min-width:150px">${bl?`<span class="p2 bad" style="margin:0">${esc(bl)}</span>`:'<span class="p2" style="margin:0">—</span>'}</td>
-    <td class="num"><span class="p2" style="margin:0">${esc(fmtDate(s.recordDate))}</span></td>
-    <td class="num"><span class="p2" style="margin:0">${esc(fmtDate(s.updatedAt))}</span></td></tr>`;}).join('');
+</tr>`;}).join('');
 }
 const fmtDate=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)),d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
   const list=visibleSites(),pi=pageOf(list,'loc');
-  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="10" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan lokasyon yok.</td></tr>';
+  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="7" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan lokasyon yok.</td></tr>';
   $('locCount').textContent=list.length+' / '+db.sites.length+' lokasyon';
   $('locPager').innerHTML=pagerHtml('loc',pi);
   $('locClear').hidden=!hasFilter();
@@ -1203,11 +1200,10 @@ function renderLocations(){
       ${selF('lfType','Saha Tipi','type',TYPES.filter(t=>db.sites.some(s=>s.type===t[0])))}
       ${selF('lfOwner','Sorumlu','owner',uniq(s=>s.survey.lead).map(x=>[x,x]))}
       ${selF('lfPartner','Yerel Ortak','partner',uniq(s=>s.survey.partner).map(x=>[x,x]))}
-      <label class="lf lchk"><input type="checkbox" id="lfBlocked" data-lf="blocked" ${F.blocked?'checked':''}>Sadece Engelli</label>
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl loclist"><thead><tr><th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Kayıt Tarihi</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div><div id="locPager"></div></section>`;
+    <div class="scroll"><table class="portfolio loctbl loclist"><thead><tr><th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th></tr></thead><tbody id="locRows"></tbody></table></div><div id="locPager"></div></section>`;
   paintLocRows();
 }
 function render(){
@@ -1639,7 +1635,7 @@ $('view').addEventListener('input',e=>{const el=e.target;if(view!=='locations'||
 $('view').addEventListener('change',e=>{const el=e.target;if(view!=='locations')return;
   if(el.dataset.lf){F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();}
   else if(el.id==='lfSort'){sortKey=el.value;paintLocRows();}});
-$('view').addEventListener('click',e=>{if(e.target.id==='locClear'){F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:'',blocked:false};renderLocations();}});
+$('view').addEventListener('click',e=>{if(e.target.id==='locClear'){F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:''};renderLocations();}});
 $('view').addEventListener('keydown',e=>{const row=e.target.closest('[data-open]');if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSite(row.dataset.open);}});
 $('view').addEventListener('input',e=>{
   const s=cur();if(!s||view!=='site')return;const el=e.target;
