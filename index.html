@@ -258,6 +258,16 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .fl-up .fl-bar{flex:0 0 160px;height:6px;border-radius:3px;background:var(--hair);overflow:hidden}
 .fl-up .fl-bar i{display:block;height:100%;background:var(--teal)}
 .fl-up.bad small{color:var(--no)}
+.portfolio.pl-tbl{table-layout:fixed;width:100%}
+.pl-tbl th{padding-left:14px}.pl-tbl td{padding:3px 4px;vertical-align:middle}
+.pl-tbl th:nth-child(1),.pl-tbl td.pl-chk{width:42px;text-align:center}
+.pl-tbl th:nth-child(3){width:22%}.pl-tbl th:nth-child(4){width:16%}.pl-tbl th:nth-child(5){width:44px}
+.pl-chk input{width:16px;height:16px;min-height:0;margin:0;cursor:pointer;accent-color:var(--navy)}
+#plRows tr.done [data-ptf=title]{text-decoration:line-through;color:var(--muted)}
+#plRows tr.done td{opacity:.7}
+#plRows tr.late [data-ptf=due]{color:var(--no);font-weight:600}
+#plRows tr.soon [data-ptf=due]{font-weight:600;color:var(--ink)}
+#plState{font-size:12px;color:var(--muted)}#plState.err{color:var(--no)}
 .whoami{display:block;padding:0 8px 8px;font-size:12px;color:var(--side-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logout{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;border:1px solid rgba(255,140,130,.35);border-radius:var(--radius);background:transparent;color:#ff9a8f;font-size:12.5px;font-weight:600;text-align:left}
 .logout:hover{background:rgba(255,120,110,.12);color:#ffb8b0;border-color:rgba(255,140,130,.6)}
@@ -638,7 +648,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
       </section>
       <section class="nav-group" data-group="site">
         <button type="button" class="nav-head" aria-expanded="true">Saha &amp; Lokasyon Yönetimi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="port"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>Portföy Özeti</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Lokasyon Listesi</span></button><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Lokasyon Ekle</span></button><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Kişiler</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="port"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg><span>Portföy Özeti</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Lokasyon Listesi</span></button><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Lokasyon Ekle</span></button><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Kişiler</span></button><button type="button" class="nav-item" data-nav="planner"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><span>Planlayıcı</span></button></div>
       </section>
       <section class="nav-group" data-group="admin" id="adminGroup" hidden>
         <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -970,7 +980,7 @@ async function poll(){
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs')render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -1148,12 +1158,12 @@ function renderLocations(){
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();
+  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   setPageTitle();
   if(view!=='site'&&notesOpen)closeNotes();
@@ -1627,7 +1637,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','credit','check','files'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
-  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -1649,6 +1659,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(k==='activity'){view='activity';render();window.scrollTo(0,0);}
     else if(k==='contacts'){view='contacts';render();window.scrollTo(0,0);}
     else if(k==='notifs'){view='notifs';render();window.scrollTo(0,0);}
+    else if(k==='planner'){view='planner';render();window.scrollTo(0,0);}
     else if(SITE_SUBS.includes(k))goSite(k);
   });
 });
@@ -1760,7 +1771,7 @@ document.addEventListener('click',async e=>{
 
 /* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
 let actF={q:'',actor:'',entity:'',site:''},actRows=[],actMore=false,actActors=[];
-const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none'],'dosya-ekle':['Dosya Eklendi','stg'],'dosya-sil':['Dosya Silindi','lo']};
+const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none'],'dosya-ekle':['Dosya Eklendi','stg'],'dosya-sil':['Dosya Silindi','lo'],'gorev-ekle':['Görev Eklendi','stg'],'gorev-tamam':['Görev Tamamlandı','hi'],'gorev-ata':['Görev Atandı','stg'],'gorev-sil':['Görev Silindi','lo']};
 const ENT_LABEL={lokasyon:'Lokasyon',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
 // Proje filtresi: proje kodu · ad (kod sırasıyla)
 const siteOptions=sel=>[...db.sites].sort((a,b)=>String(a.code||'~').localeCompare(String(b.code||'~'),'tr',{numeric:true})).map(x=>`<option value="${esc(x.id)}" ${x.id===sel?'selected':''}>${esc((x.code||'—')+' · '+(x.name||'Adsız Lokasyon'))}</option>`).join('');
@@ -1836,6 +1847,128 @@ document.addEventListener('click',async e=>{
   if(e.target.id==='actClose'){$('actDlg').close();return;}
   const tr=e.target.closest('#actRows tr[data-act]');if(tr)actDetail(tr.dataset.act);
 });
+
+/* ---------- Planlayıcı (lokasyon başına görevler) ---------- */
+let pl={tasks:[],loaded:false,me:'',admin:false,f:{assignee:'',status:'open',range:'',site:''},collapsed:{},regroup:false},plQueue={},plTimer={};
+async function plApi(method,qs,body){
+  const r=await fetch('/api/tasks'+(qs||''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||('HTTP '+r.status));
+  return d;
+}
+async function loadTasks(){const d=await plApi('GET');pl.tasks=d.tasks||[];pl.me=d.me;pl.admin=!!d.admin;pl.loaded=true;}
+const plAddDays=(str,n)=>{const d=new Date(str+'T00:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const plLate=t=>!t.done&&t.due&&t.due<todayStr();
+function plMatch(t){
+  const f=pl.f,today=todayStr();
+  if(f.assignee&&t.assignee!==f.assignee)return false;
+  if(f.status==='open'&&t.done)return false;
+  if(f.status==='done'&&!t.done)return false;
+  if(f.range==='late'&&!plLate(t))return false;
+  if(f.range==='week'&&!(t.due&&t.due>=today&&t.due<=plAddDays(today,7)))return false;
+  if(f.range==='month'&&!(t.due&&t.due.slice(0,7)===today.slice(0,7)))return false;
+  if(f.range==='none'&&t.due)return false;
+  return true;
+}
+const plSort=(a,b)=>(a.done-b.done)||((a.due||'9999')<(b.due||'9999')?-1:(a.due||'9999')>(b.due||'9999')?1:0)||(+a.id)-(+b.id);
+function plAssigneeOptions(sel){
+  const list=people.map(x=>[x.email,x.name||x.email]);
+  if(sel&&!list.some(x=>x[0]===sel)){const t=pl.tasks.find(x=>x.assignee===sel);list.push([sel,(t&&t.assigneeName)||sel]);}
+  return list.map(([v,n])=>`<option value="${esc(v)}" ${v===sel?'selected':''}>${esc(n)}</option>`).join('');
+}
+function plRowHtml(t){
+  const can=t.createdBy===pl.me||pl.admin,soon=t.due&&!t.done&&t.due>=todayStr()&&t.due<=plAddDays(todayStr(),7);
+  return `<tr data-pt="${esc(t.id)}" class="${t.done?'done':''}${plLate(t)?' late':''}${soon?' soon':''}">
+    <td class="pl-chk"><input type="checkbox" data-ptdone ${t.done?'checked':''} aria-label="Tamamlandı"></td>
+    <td><input class="ct-in" data-ptf="title" value="${esc(t.title)}" maxlength="200" placeholder="Görev (ör. Cumaya kadar teklif iletilecek)" aria-label="Görev" autocomplete="off"></td>
+    <td><select class="ct-in" data-ptf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(t.assignee)}</select></td>
+    <td><input class="ct-in" type="date" data-ptf="due" value="${esc(t.due)}" aria-label="Termin"></td>
+    <td class="ct-act"><button type="button" class="ghost" data-ptdel="${esc(t.id)}" aria-label="Görevi sil" title="Görevi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></td></tr>`;
+}
+function paintPlanner(){
+  const tb=$('plRows');if(!tb)return;
+  const f=pl.f,filtering=!!(f.assignee||f.range),openN=pl.tasks.filter(t=>!t.done).length,lateN=pl.tasks.filter(plLate).length;
+  const c=$('plCount');if(c)c.textContent=openN+' açık görev · '+lateN+' gecikmiş';
+  const sites=[...db.sites].filter(x=>!f.site||x.id===f.site).sort((a,b)=>String(a.code||'~').localeCompare(String(b.code||'~'),'tr',{numeric:true}));
+  let h='',shown=0;
+  for(const x of sites){
+    const all=pl.tasks.filter(t=>t.siteId===x.id),list=all.filter(plMatch).sort(plSort);
+    if(!list.length&&filtering)continue;
+    const open=pl.collapsed[x.id]===undefined?list.length>0:!pl.collapsed[x.id];
+    const o=all.filter(t=>!t.done).length,l=all.filter(plLate).length;shown++;
+    h+=`<tr class="ct-grp"><td colspan="5"><button type="button" class="ct-tg" data-pltg="${esc(x.id)}" aria-expanded="${open}" aria-label="${esc(x.name)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><span class="c-code" style="font-weight:600;color:var(--muted)">${esc(x.code||'—')}</span> <strong>${esc(x.name||'Adsız Lokasyon')}</strong><small>${o} açık${l?` · <b style="color:var(--no)">${l} gecikmiş</b>`:''}</small><button type="button" class="ghost pick-btn" data-pladd="${esc(x.id)}">+ Görev</button></td></tr>`;
+    if(open)h+=list.map(plRowHtml).join('');
+  }
+  tb.innerHTML=h||'<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</td></tr>';
+}
+async function renderPlanner(){
+  if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Planlayıcı</h3><p class="note">Planlayıcı için sunucu bağlantısı gerekli.</p></section>';return;}
+  if(!people.length)loadPeople();
+  const f=pl.f,opt=(v,c,t)=>`<option value="${esc(v)}" ${v===c?'selected':''}>${esc(t)}</option>`;
+  $('view').innerHTML=`<section class="box"><h3>Planlayıcı<small id="plCount"></small></h3>
+    <div class="locbar no-print">
+      <label class="lf">Sorumlu<select id="plAssignee"><option value="">Tümü</option>${opt(pl.me||me.email,f.assignee,'Bana atananlar')}${people.filter(x=>x.email!==(pl.me||me.email)).map(x=>opt(x.email,f.assignee,x.name||x.email)).join('')}</select></label>
+      <label class="lf">Durum<select id="plStatus">${opt('open',f.status,'Açık')}${opt('done',f.status,'Tamamlandı')}${opt('all',f.status,'Tümü')}</select></label>
+      <label class="lf">Termin<select id="plRange">${opt('',f.range,'Tümü')}${opt('late',f.range,'Gecikmiş')}${opt('week',f.range,'Bu hafta')}${opt('month',f.range,'Bu ay')}${opt('none',f.range,'Tarihsiz')}</select></label>
+      <label class="lf">Proje<select id="plSite"><option value="">Tümü</option>${siteOptions(f.site)}</select></label>
+      <button type="button" id="plClear" class="ghost" ${(f.assignee||f.range||f.site||f.status!=='open')?'':'hidden'}>Filtreleri Temizle</button><span id="plState" role="status"></span>
+    </div>
+    <div class="scroll"><table class="portfolio pl-tbl"><thead><tr><th></th><th>Görev</th><th>Sorumlu</th><th>Termin</th><th></th></tr></thead><tbody id="plRows"><tr><td colspan="5" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <p class="note">Projenin yanındaki “+ Görev” ile görev ekleyin; hücreye tıklayıp yazın, değişiklikler kendiliğinden kaydedilir. Kutuyu işaretlemek görevi tamamlar.</p></section>`;
+  if(pl.loaded)paintPlanner();
+  try{await loadTasks();}catch(e){if(view==='planner')plState(e.message,true);return;}
+  if(view==='planner')paintPlanner();
+}
+function plState(t,err){const e=$('plState');if(!e)return;e.textContent=t||'';e.className=err?'err':'';}
+function plSave(id,k,v){const t=pl.tasks.find(x=>x.id===id);if(t)t[k]=v;(plQueue[id]=plQueue[id]||{})[k]=v;clearTimeout(plTimer[id]);plTimer[id]=setTimeout(()=>plFlush(id),k==='title'?600:50);plState('Kaydediliyor…');}
+async function plFlush(id){
+  clearTimeout(plTimer[id]);const b=plQueue[id];if(!b)return;delete plQueue[id];
+  try{const d=await plApi('PATCH','?id='+id,b);const i=pl.tasks.findIndex(x=>x.id===id);if(i>=0)pl.tasks[i]=d.task;plState('Kaydedildi · '+clock());const c=$('plCount');if(c){const o=pl.tasks.filter(t=>!t.done).length,l=pl.tasks.filter(plLate).length;c.textContent=o+' açık görev · '+l+' gecikmiş';}}
+  catch(e){plState('Kaydedilemedi',true);toast(e.message);}
+}
+async function plAdd(siteId){
+  try{const d=await plApi('POST','',{site:siteId});pl.tasks.push(d.task);pl.collapsed[siteId]=false;paintPlanner();
+    const i=document.querySelector(`#plRows tr[data-pt="${d.task.id}"] [data-ptf="title"]`);if(i){i.focus();i.scrollIntoView({block:'nearest'});}plState('');}
+  catch(e){toast(e.message);}
+}
+document.addEventListener('input',e=>{
+  const el=e.target;if(!el.closest)return;const f=el.closest('#plRows [data-ptf]');if(!f)return;
+  const id=f.closest('tr').dataset.pt;
+  if(f.tagName==='SELECT')return;               // sorumlu: change olayında kaydedilir
+  plSave(id,f.dataset.ptf,f.value.trim());
+  if(f.dataset.ptf==='due')pl.regroup=true;
+});
+document.addEventListener('change',e=>{
+  const el=e.target;if(!el.closest)return;
+  if(el.id==='plAssignee'){pl.f.assignee=el.value;renderPlannerKeep();return;}
+  if(el.id==='plStatus'){pl.f.status=el.value;renderPlannerKeep();return;}
+  if(el.id==='plRange'){pl.f.range=el.value;renderPlannerKeep();return;}
+  if(el.id==='plSite'){pl.f.site=el.value;renderPlannerKeep();return;}
+  const cb=el.closest('#plRows [data-ptdone]');
+  if(cb){const id=cb.closest('tr').dataset.pt;plSave(id,'done',cb.checked);plFlush(id).then(()=>paintPlanner());return;}
+  const f=el.closest('#plRows [data-ptf]');
+  if(f){const id=f.closest('tr').dataset.pt;if(f.tagName==='SELECT')plSave(id,'assignee',f.value);plFlush(id);if(f.dataset.ptf==='due')paintPlanner();}
+});
+function renderPlannerKeep(){const c=$('plClear');paintPlanner();if(c)c.hidden=!(pl.f.assignee||pl.f.range||pl.f.site||pl.f.status!=='open');}
+document.addEventListener('focusout',e=>{
+  if(!e.target.closest||!e.target.closest('#plRows'))return;
+  setTimeout(()=>{if(pl.regroup&&view==='planner'&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#plRows'))){pl.regroup=false;paintPlanner();}},0);
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('#plClear')){pl.f={assignee:'',status:'open',range:'',site:''};renderPlanner();return;}
+  const ad=e.target.closest('[data-pladd]');if(ad){plAdd(ad.dataset.pladd);return;}
+  const tg=e.target.closest('[data-pltg]');if(tg){const k=tg.dataset.pltg,open=tg.getAttribute('aria-expanded')==='true';pl.collapsed[k]=open;paintPlanner();return;}
+  const dl=e.target.closest('[data-ptdel]');
+  if(dl&&!dl.disabled){const id=dl.dataset.ptdel,t=pl.tasks.find(x=>x.id===id);
+    ask((t&&t.title?'“'+t.title+'”':'Bu görev')+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Görevi sil').then(async ok=>{if(!ok)return;
+      try{await plApi('DELETE','?id='+id);pl.tasks=pl.tasks.filter(x=>x.id!==id);paintPlanner();toast('Görev silindi.');}catch(x){toast(x.message);}});return;}
+});
+setInterval(async()=>{
+  if(view!=='planner'||document.hidden||Object.keys(plQueue).length)return;
+  const a=document.activeElement;if(a&&a.closest&&a.closest('#plRows'))return;
+  try{await loadTasks();paintPlanner();}catch(e){}
+},20000);
 
 /* ---------- Kişiler rehberi (şirket · kişi · telefon) ---------- */
 let ct={rows:[],loaded:false,q:'',group:true,collapsed:{},admin:false,me:'',regroup:false},ctQueue={},ctTimer={},ctPickCb=null;
@@ -2095,7 +2228,7 @@ function paintBell(){
   const c=$('bellCount');if(c){c.textContent=bell.unread>99?'99+':bell.unread;c.hidden=!bell.unread;}
   if(view==='notifs')paintNotifRows();
 }
-const NOTIF_MSG={olustur:'Yeni lokasyon eklendi',sil:'Lokasyon silindi','not-ekle':'Şirket içi not eklendi','dosya-ekle':'Dosya eklendi','dosya-sil':'Dosya silindi'};
+const NOTIF_MSG={olustur:'Yeni lokasyon eklendi',sil:'Lokasyon silindi','not-ekle':'Şirket içi not eklendi','dosya-ekle':'Dosya eklendi','dosya-sil':'Dosya silindi','gorev-ekle':'Görev eklendi','gorev-tamam':'Görev tamamlandı','gorev-ata':'Görev atandı','gorev-sil':'Görev silindi'};
 // Güncelleme: her değişen alan ayrı satır (Alan · Eski Değer · Yeni Değer); diğer işlemler tek satır.
 function notifChanges(n){
   if(n.action!=='guncelle')return null;
@@ -2107,7 +2240,7 @@ function notifGroupHtml(n){
   const ch=notifChanges(n),k=ch?ch.length:1,cls=(n.unread||bell.newIds.has(n.id))?' unread':'';
   const attrs=`data-bellent="${esc(n.entity||'lokasyon')}" data-bellsite="${esc(n.entity_id||'')}" data-bellact="${esc(n.action)}" tabindex="0"`;
   const head=`<td rowspan="${k}" style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td rowspan="${k}">${actWho(n)}</td><td rowspan="${k}" class="c-code">${esc(n.site_code||'—')}</td><td rowspan="${k}"><span class="p1">${esc(n.entity_name||'—')}</span></td>`;
-  if(!ch)return `<tr class="grp-first${cls}" ${attrs}>${head}<td colspan="3">${esc((NOTIF_MSG[n.action]||n.summary||'')+(n.action.startsWith('dosya-')&&n.summary?': '+n.summary:''))}</td></tr>`;
+  if(!ch)return `<tr class="grp-first${cls}" ${attrs}>${head}<td colspan="3">${esc((NOTIF_MSG[n.action]||n.summary||'')+(/^(dosya|gorev)-/.test(n.action)&&n.summary?': '+n.summary:''))}</td></tr>`;
   return ch.map((c,i)=>`<tr class="${i?'':'grp-first'}${cls}" ${attrs}>${i?'':head}<td>${esc(c.alan)}</td><td class="nv-old">${esc(c.eski)}</td><td class="nv-new">${esc(c.yeni)}</td></tr>`).join('');
 }
 function paintNotifRows(){

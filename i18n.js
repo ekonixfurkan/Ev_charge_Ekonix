@@ -300,6 +300,17 @@
     'Varsayılan klasör silinemez': 'A default folder cannot be deleted', 'Klasörde dosya var; önce dosyaları silin': 'The folder has files; delete them first', 'Dosyalar işlenemedi': 'Could not process files',
 
     'Seçin…': 'Select…', 'Diğer (elle yaz)': 'Other (type manually)', 'ör. marka / model': 'e.g. brand / model', 'Marka / model (elle)': 'Brand / model (manual)', 'AC wallbox': 'AC wallbox',
+
+    /* planlayıcı */
+    'Planlayıcı': 'Planner', 'Görev': 'Task', 'Sorumlu seçin': 'Select owner', 'Termin': 'Due Date', 'Bana atananlar': 'Assigned to Me', 'Açık': 'Open', 'Tamamlandı': 'Completed',
+    'Gecikmiş': 'Overdue', 'Bu hafta': 'This Week', 'Bu ay': 'This Month', 'Tarihsiz': 'No Date', '+ Görev': '+ Task',
+    'Görev (ör. Cumaya kadar teklif iletilecek)': 'Task (e.g. Send the proposal by Friday)', 'Görevi sil': 'Delete task', 'Görev silindi.': 'Task deleted.',
+    'Eşleşen görev yok.': 'No matching tasks.', 'Planlayıcı için sunucu bağlantısı gerekli.': 'A server connection is required for the Planner.',
+    'Projenin yanındaki “+ Görev” ile görev ekleyin; hücreye tıklayıp yazın, değişiklikler kendiliğinden kaydedilir. Kutuyu işaretlemek görevi tamamlar.': 'Add a task with “+ Task” next to a project; click a cell and type, changes are saved automatically. Ticking the box completes the task.',
+    'Görev Eklendi': 'Task Added', 'Görev Tamamlandı': 'Task Completed', 'Görev Atandı': 'Task Assigned', 'Görev Silindi': 'Task Deleted',
+    'Görev eklendi': 'Task added', 'Görev tamamlandı': 'Task completed', 'Görev atandı': 'Task assigned', 'Görev silindi': 'Task deleted',
+    'Planlayıcı için veritabanı gerekli': 'A database is required for the Planner', 'Görev bulunamadı': 'Task not found', 'Planlayıcı işlenemedi': 'Could not process the Planner',
+    'Sorumlu geçerli bir kullanıcı olmalı': 'Owner must be a valid user', 'Görevi yalnızca ekleyen veya yönetici silebilir': 'Only the person who added the task or an administrator can delete it',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
@@ -328,6 +339,10 @@
     [/^(\d+) \/ (\d+) lokasyon$/, function (m) { return m[1] + ' / ' + m[2] + ' locations'; }],
     [/^(\d+) dosya$/, function (m) { return m[1] + (m[1] === '1' ? ' file' : ' files'); }],
     [/^(\d+) dosya yüklendi\.$/, function (m) { return m[1] + ' file' + (m[1] === '1' ? '' : 's') + ' uploaded.'; }],
+    [/^(\d+) açık görev · (\d+) gecikmiş$/, function (m) { return m[1] + ' open task' + (m[1] === '1' ? '' : 's') + ' · ' + m[2] + ' overdue'; }],
+    [/^(\d+) açık$/, function (m) { return m[1] + ' open'; }],
+    [/^(\d+) gecikmiş$/, function (m) { return m[1] + ' overdue'; }],
+    [/^“(.+)” silinsin mi\? Bu işlem herkes için geçerli olur ve geri alınamaz\.$/, function (m) { return 'Delete “' + m[1] + '”? This applies to everyone and cannot be undone.'; }],
     [/^(\d+) lokasyon$/, function (m) { return m[1] + (m[1] === '1' ? ' location' : ' locations'); }],
     [/^(\d+) hesap$/, function (m) { return m[1] + (m[1] === '1' ? ' account' : ' accounts'); }],
     [/^(\d+) kalem$/, function (m) { return m[1] + (m[1] === '1' ? ' item' : ' items'); }],

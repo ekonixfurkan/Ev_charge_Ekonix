@@ -8,7 +8,7 @@ EV şarj sahası değerlendirme, AMG/StarCharge saha keşif skorlaması ve 7 yı
 index.html        Uygulama (UI + tüm hesap motoru). Senkron katmanı /api'ye konuşur.
 login.html        Giriş ekranı
 api/sites.js      GET tüm lokasyon + ekip · PUT lokasyon upsert · DELETE ?id=
-api/team.js       GET/PUT ekip üyesi listesi
+api/tasks.js      Planlayıcı görevleri (GET/POST/PATCH/DELETE)
 lib/db.js         Neon bağlantısı (lazy), şema bootstrap, JSON gövde okuma
 schema.sql        Referans şema (API otomatik kurar)
 ```
@@ -48,7 +48,7 @@ Artifact sürümündeki kayıtları taşımak için: artifact'te **Yedek indir**
 
 ## Kimlik doğrulama
 
-E-posta + şifre ile giriş. **Kayıt formu yok**: hesapları siz tanımlarsınız. `/api/sites` ve `/api/team` oturum çerezi olmadan 401 döner; `login.html` ve `/api/auth/*` dışında her şey korumalıdır.
+E-posta + şifre ile giriş. **Kayıt formu yok**: hesapları siz tanımlarsınız. `/api/sites` ve `/api/tasks` oturum çerezi olmadan 401 döner; `login.html` ve `/api/auth/*` dışında her şey korumalıdır.
 
 ```
 login.html            Giriş ekranı (/login adresi de çalışır)
