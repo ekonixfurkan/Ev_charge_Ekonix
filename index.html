@@ -258,15 +258,28 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .fl-up .fl-bar{flex:0 0 160px;height:6px;border-radius:3px;background:var(--hair);overflow:hidden}
 .fl-up .fl-bar i{display:block;height:100%;background:var(--teal)}
 .fl-up.bad small{color:var(--no)}
-.portfolio.pl-tbl{table-layout:fixed;width:100%}
-.pl-tbl th{padding-left:14px}.pl-tbl td{padding:3px 4px;vertical-align:middle}
-.pl-tbl th:nth-child(1),.pl-tbl td.pl-chk{width:42px;text-align:center}
-.pl-tbl th:nth-child(3){width:22%}.pl-tbl th:nth-child(4){width:16%}.pl-tbl th:nth-child(5){width:44px}
-.pl-chk input{width:16px;height:16px;min-height:0;margin:0;cursor:pointer;accent-color:var(--navy)}
-#plRows tr.done [data-ptf=title]{text-decoration:line-through;color:var(--muted)}
-#plRows tr.done td{opacity:.7}
-#plRows tr.late [data-ptf=due]{color:var(--no);font-weight:600}
-#plRows tr.soon [data-ptf=due]{font-weight:600;color:var(--ink)}
+.pl-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;align-items:start;margin-top:4px}
+.pl-proj{border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);overflow:hidden}
+.pl-proj>header{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:10px 12px;background:var(--soft);border-bottom:1px solid var(--hair)}
+.pl-proj.empty>header{border-bottom:0}
+.pl-proj>header .c-code{font-weight:600;color:var(--muted);font-size:12px}
+.pl-proj>header strong{font-size:13px;flex:1 1 100%;order:3;line-height:1.3}
+.pl-proj>header small{color:var(--muted);margin-right:auto}
+.pl-tasks{display:grid;gap:8px;padding:10px}
+.pl-task{border:1px solid var(--hair);border-left:3px solid var(--hair-strong);border-radius:var(--radius);padding:8px 10px;background:var(--card)}
+.pl-task.late{border-left-color:var(--no)}.pl-task.soon{border-left-color:var(--teal)}
+.pl-task.done{opacity:.65;border-left-color:var(--hair)}
+.pl-top{display:flex;gap:8px;align-items:flex-start}
+.pl-chk{margin:4px 0 0}.pl-chk input{width:16px;height:16px;min-height:0;margin:0;cursor:pointer;accent-color:var(--navy)}
+.pl-title{flex:1;width:100%;min-height:0;padding:3px 6px;border:1px solid transparent;border-radius:var(--radius);background:transparent;font:inherit;font-size:13px;line-height:1.35;color:var(--ink);resize:none}
+.pl-title:hover{border-color:var(--hair-strong)}.pl-title:focus{background:var(--card);border-color:var(--navy);outline:none}
+.pl-task.done .pl-title{text-decoration:line-through;color:var(--muted)}
+.pl-meta{display:flex;align-items:center;gap:6px;margin-top:6px}
+.pl-meta select,.pl-meta input[type=date]{min-height:28px;padding:2px 6px;font-size:12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);color:var(--ink);flex:1 1 0;min-width:0}
+.pl-meta input[type=date]{flex:0 0 118px}
+.pl-task.late .pl-meta input[type=date]{color:var(--no);font-weight:600}
+.pl-task.soon .pl-meta input[type=date]{font-weight:600}
+.pl-meta button{padding:3px 6px}
 #plState{font-size:12px;color:var(--muted)}#plState.err{color:var(--no)}
 .whoami{display:block;padding:0 8px 8px;font-size:12px;color:var(--side-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .logout{display:flex;align-items:center;gap:12px;width:100%;padding:9px 14px;border:1px solid rgba(255,140,130,.35);border-radius:var(--radius);background:transparent;color:#ff9a8f;font-size:12.5px;font-weight:600;text-align:left}
@@ -1849,7 +1862,7 @@ document.addEventListener('click',async e=>{
 });
 
 /* ---------- Planlayıcı (lokasyon başına görevler) ---------- */
-let pl={tasks:[],loaded:false,me:'',admin:false,f:{assignee:'',status:'open',range:'',site:''},collapsed:{},regroup:false},plQueue={},plTimer={};
+let pl={tasks:[],loaded:false,me:'',admin:false,f:{assignee:'',status:'open',range:'',site:'',hideEmpty:false},regroup:false},plQueue={},plTimer={};
 async function plApi(method,qs,body){
   const r=await fetch('/api/tasks'+(qs||''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
   if(r.status===401){location.replace('/login.html');throw new Error('401');}
@@ -1877,30 +1890,29 @@ function plAssigneeOptions(sel){
   if(sel&&!list.some(x=>x[0]===sel)){const t=pl.tasks.find(x=>x.assignee===sel);list.push([sel,(t&&t.assigneeName)||sel]);}
   return list.map(([v,n])=>`<option value="${esc(v)}" ${v===sel?'selected':''}>${esc(n)}</option>`).join('');
 }
-function plRowHtml(t){
+function plTaskHtml(t){
   const can=t.createdBy===pl.me||pl.admin,soon=t.due&&!t.done&&t.due>=todayStr()&&t.due<=plAddDays(todayStr(),7);
-  return `<tr data-pt="${esc(t.id)}" class="${t.done?'done':''}${plLate(t)?' late':''}${soon?' soon':''}">
-    <td class="pl-chk"><input type="checkbox" data-ptdone ${t.done?'checked':''} aria-label="Tamamlandı"></td>
-    <td><input class="ct-in" data-ptf="title" value="${esc(t.title)}" maxlength="200" placeholder="Görev (ör. Cumaya kadar teklif iletilecek)" aria-label="Görev" autocomplete="off"></td>
-    <td><select class="ct-in" data-ptf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(t.assignee)}</select></td>
-    <td><input class="ct-in" type="date" data-ptf="due" value="${esc(t.due)}" aria-label="Termin"></td>
-    <td class="ct-act"><button type="button" class="ghost" data-ptdel="${esc(t.id)}" aria-label="Görevi sil" title="Görevi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></td></tr>`;
+  return `<div class="pl-task${t.done?' done':''}${plLate(t)?' late':''}${soon?' soon':''}" data-pt="${esc(t.id)}">
+    <div class="pl-top"><label class="pl-chk"><input type="checkbox" data-ptdone ${t.done?'checked':''} aria-label="Tamamlandı"></label>
+      <textarea class="pl-title" data-ptf="title" rows="2" maxlength="200" placeholder="Görev (ör. Cumaya kadar teklif iletilecek)" aria-label="Görev">${esc(t.title)}</textarea></div>
+    <div class="pl-meta"><select data-ptf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(t.assignee)}</select>
+      <input type="date" data-ptf="due" value="${esc(t.due)}" aria-label="Termin">
+      <button type="button" class="ghost" data-ptdel="${esc(t.id)}" aria-label="Görevi sil" title="Görevi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></div></div>`;
 }
 function paintPlanner(){
-  const tb=$('plRows');if(!tb)return;
+  const box=$('plRows');if(!box)return;
   const f=pl.f,filtering=!!(f.assignee||f.range),openN=pl.tasks.filter(t=>!t.done).length,lateN=pl.tasks.filter(plLate).length;
   const c=$('plCount');if(c)c.textContent=openN+' açık görev · '+lateN+' gecikmiş';
   const sites=[...db.sites].filter(x=>!f.site||x.id===f.site).sort((a,b)=>String(a.code||'~').localeCompare(String(b.code||'~'),'tr',{numeric:true}));
-  let h='',shown=0;
+  const withTasks=[],empty=[];
   for(const x of sites){
     const all=pl.tasks.filter(t=>t.siteId===x.id),list=all.filter(plMatch).sort(plSort);
-    if(!list.length&&filtering)continue;
-    const open=pl.collapsed[x.id]===undefined?list.length>0:!pl.collapsed[x.id];
-    const o=all.filter(t=>!t.done).length,l=all.filter(plLate).length;shown++;
-    h+=`<tr class="ct-grp"><td colspan="5"><button type="button" class="ct-tg" data-pltg="${esc(x.id)}" aria-expanded="${open}" aria-label="${esc(x.name)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><span class="c-code" style="font-weight:600;color:var(--muted)">${esc(x.code||'—')}</span> <strong>${esc(x.name||'Adsız Lokasyon')}</strong><small>${o} açık${l?` · <b style="color:var(--no)">${l} gecikmiş</b>`:''}</small><button type="button" class="ghost pick-btn" data-pladd="${esc(x.id)}">+ Görev</button></td></tr>`;
-    if(open)h+=list.map(plRowHtml).join('');
+    if(list.length)withTasks.push([x,all,list]);
+    else if(!filtering&&!f.hideEmpty)empty.push([x,all,list]);
   }
-  tb.innerHTML=h||'<tr><td colspan="5" class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</td></tr>';
+  const card=([x,all,list])=>{const o=all.filter(t=>!t.done).length,l=all.filter(plLate).length;
+    return `<section class="pl-proj${list.length?'':' empty'}"><header><span class="c-code">${esc(x.code||'—')}</span><strong>${esc(x.name||'Adsız Lokasyon')}</strong><small>${o} açık${l?` · <b style="color:var(--no)">${l} gecikmiş</b>`:''}</small><button type="button" class="ghost pick-btn" data-pladd="${esc(x.id)}">+ Görev</button></header>${list.length?`<div class="pl-tasks">${list.map(plTaskHtml).join('')}</div>`:''}</section>`;};
+  box.innerHTML=[...withTasks,...empty].map(card).join('')||'<p class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</p>';
 }
 async function renderPlanner(){
   if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Planlayıcı</h3><p class="note">Planlayıcı için sunucu bağlantısı gerekli.</p></section>';return;}
@@ -1912,10 +1924,11 @@ async function renderPlanner(){
       <label class="lf">Durum<select id="plStatus">${opt('open',f.status,'Açık')}${opt('done',f.status,'Tamamlandı')}${opt('all',f.status,'Tümü')}</select></label>
       <label class="lf">Termin<select id="plRange">${opt('',f.range,'Tümü')}${opt('late',f.range,'Gecikmiş')}${opt('week',f.range,'Bu hafta')}${opt('month',f.range,'Bu ay')}${opt('none',f.range,'Tarihsiz')}</select></label>
       <label class="lf">Proje<select id="plSite"><option value="">Tümü</option>${siteOptions(f.site)}</select></label>
-      <button type="button" id="plClear" class="ghost" ${(f.assignee||f.range||f.site||f.status!=='open')?'':'hidden'}>Filtreleri Temizle</button><span id="plState" role="status"></span>
+      <label class="lf lchk"><input type="checkbox" id="plHideEmpty" ${f.hideEmpty?'checked':''}>Görevsiz projeleri gizle</label>
+      <button type="button" id="plClear" class="ghost" ${(f.assignee||f.range||f.site||f.status!=='open'||f.hideEmpty)?'':'hidden'}>Filtreleri Temizle</button><span id="plState" role="status"></span>
     </div>
-    <div class="scroll"><table class="portfolio pl-tbl"><thead><tr><th></th><th>Görev</th><th>Sorumlu</th><th>Termin</th><th></th></tr></thead><tbody id="plRows"><tr><td colspan="5" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
-    <p class="note">Projenin yanındaki “+ Görev” ile görev ekleyin; hücreye tıklayıp yazın, değişiklikler kendiliğinden kaydedilir. Kutuyu işaretlemek görevi tamamlar.</p></section>`;
+    <div id="plRows" class="pl-board"><p class="note" style="padding:24px;text-align:center">Yükleniyor…</p></div>
+    <p class="note">Projenin yanındaki “+ Görev” ile görev ekleyin; kutucuğa tıklayıp yazın, değişiklikler kendiliğinden kaydedilir. Kutuyu işaretlemek görevi tamamlar.</p></section>`;
   if(pl.loaded)paintPlanner();
   try{await loadTasks();}catch(e){if(view==='planner')plState(e.message,true);return;}
   if(view==='planner')paintPlanner();
@@ -1928,14 +1941,14 @@ async function plFlush(id){
   catch(e){plState('Kaydedilemedi',true);toast(e.message);}
 }
 async function plAdd(siteId){
-  try{const d=await plApi('POST','',{site:siteId});pl.tasks.push(d.task);pl.collapsed[siteId]=false;paintPlanner();
-    const i=document.querySelector(`#plRows tr[data-pt="${d.task.id}"] [data-ptf="title"]`);if(i){i.focus();i.scrollIntoView({block:'nearest'});}plState('');}
+  try{const d=await plApi('POST','',{site:siteId});pl.tasks.push(d.task);paintPlanner();
+    const i=document.querySelector(`#plRows [data-pt="${d.task.id}"] [data-ptf="title"]`);if(i){i.focus();i.scrollIntoView({block:'nearest'});}plState('');}
   catch(e){toast(e.message);}
 }
+const plField=el=>el.closest&&el.closest('#plRows [data-ptf]');
 document.addEventListener('input',e=>{
-  const el=e.target;if(!el.closest)return;const f=el.closest('#plRows [data-ptf]');if(!f)return;
-  const id=f.closest('tr').dataset.pt;
-  if(f.tagName==='SELECT')return;               // sorumlu: change olayında kaydedilir
+  const f=plField(e.target);if(!f||f.tagName==='SELECT')return;           // sorumlu: change olayında kaydedilir
+  const id=f.closest('[data-pt]').dataset.pt;
   plSave(id,f.dataset.ptf,f.value.trim());
   if(f.dataset.ptf==='due')pl.regroup=true;
 });
@@ -1945,20 +1958,20 @@ document.addEventListener('change',e=>{
   if(el.id==='plStatus'){pl.f.status=el.value;renderPlannerKeep();return;}
   if(el.id==='plRange'){pl.f.range=el.value;renderPlannerKeep();return;}
   if(el.id==='plSite'){pl.f.site=el.value;renderPlannerKeep();return;}
+  if(el.id==='plHideEmpty'){pl.f.hideEmpty=el.checked;renderPlannerKeep();return;}
   const cb=el.closest('#plRows [data-ptdone]');
-  if(cb){const id=cb.closest('tr').dataset.pt;plSave(id,'done',cb.checked);plFlush(id).then(()=>paintPlanner());return;}
-  const f=el.closest('#plRows [data-ptf]');
-  if(f){const id=f.closest('tr').dataset.pt;if(f.tagName==='SELECT')plSave(id,'assignee',f.value);plFlush(id);if(f.dataset.ptf==='due')paintPlanner();}
+  if(cb){const id=cb.closest('[data-pt]').dataset.pt;plSave(id,'done',cb.checked);plFlush(id).then(()=>paintPlanner());return;}
+  const f=plField(el);
+  if(f){const id=f.closest('[data-pt]').dataset.pt;if(f.tagName==='SELECT')plSave(id,'assignee',f.value);plFlush(id);if(f.dataset.ptf==='due')paintPlanner();}
 });
-function renderPlannerKeep(){const c=$('plClear');paintPlanner();if(c)c.hidden=!(pl.f.assignee||pl.f.range||pl.f.site||pl.f.status!=='open');}
+function renderPlannerKeep(){const c=$('plClear');paintPlanner();if(c)c.hidden=!(pl.f.assignee||pl.f.range||pl.f.site||pl.f.status!=='open'||pl.f.hideEmpty);}
 document.addEventListener('focusout',e=>{
   if(!e.target.closest||!e.target.closest('#plRows'))return;
   setTimeout(()=>{if(pl.regroup&&view==='planner'&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#plRows'))){pl.regroup=false;paintPlanner();}},0);
 });
 document.addEventListener('click',e=>{
-  if(e.target.closest('#plClear')){pl.f={assignee:'',status:'open',range:'',site:''};renderPlanner();return;}
+  if(e.target.closest('#plClear')){pl.f={assignee:'',status:'open',range:'',site:'',hideEmpty:false};renderPlanner();return;}
   const ad=e.target.closest('[data-pladd]');if(ad){plAdd(ad.dataset.pladd);return;}
-  const tg=e.target.closest('[data-pltg]');if(tg){const k=tg.dataset.pltg,open=tg.getAttribute('aria-expanded')==='true';pl.collapsed[k]=open;paintPlanner();return;}
   const dl=e.target.closest('[data-ptdel]');
   if(dl&&!dl.disabled){const id=dl.dataset.ptdel,t=pl.tasks.find(x=>x.id===id);
     ask((t&&t.title?'“'+t.title+'”':'Bu görev')+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Görevi sil').then(async ok=>{if(!ok)return;

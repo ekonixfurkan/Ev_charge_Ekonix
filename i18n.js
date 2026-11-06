@@ -311,6 +311,9 @@
     'Görev eklendi': 'Task added', 'Görev tamamlandı': 'Task completed', 'Görev atandı': 'Task assigned', 'Görev silindi': 'Task deleted',
     'Planlayıcı için veritabanı gerekli': 'A database is required for the Planner', 'Görev bulunamadı': 'Task not found', 'Planlayıcı işlenemedi': 'Could not process the Planner',
     'Sorumlu geçerli bir kullanıcı olmalı': 'Owner must be a valid user', 'Görevi yalnızca ekleyen veya yönetici silebilir': 'Only the person who added the task or an administrator can delete it',
+
+    'Görevsiz projeleri gizle': 'Hide projects without tasks',
+    'Projenin yanındaki “+ Görev” ile görev ekleyin; kutucuğa tıklayıp yazın, değişiklikler kendiliğinden kaydedilir. Kutuyu işaretlemek görevi tamamlar.': 'Add a task with “+ Task” next to a project; click a card and type, changes are saved automatically. Ticking the box completes the task.',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
