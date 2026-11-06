@@ -317,6 +317,23 @@
 
     'Görevi yazın, Enter ile kaydedin (ör. Cumaya kadar teklif iletilecek)': 'Type the task and press Enter to save (e.g. Send the proposal by Friday)', 'Yeni görev': 'New task', 'Kaydet': 'Save',
     'Görev metni boş olamaz.': 'The task text cannot be empty.', 'Görev kaydedildi.': 'Task saved.', '✓ Kaydedildi': '✓ Saved', 'Kaydedilemedi': 'Could not save', 'Kaydediliyor…': 'Saving…',
+    'İş Takibi': 'Business Tracker',
+
+    /* toplantı notları */
+    '+ Yeni Toplantı Notu': '+ New Meeting Note', 'Ara: konu, proje, katılımcı, not…': 'Search: subject, project, participant, note…', 'Tüm projeler': 'All projects', 'Yeni projeler': 'New projects',
+    'Yeni Proje': 'New Project', 'Mevcut Proje': 'Existing Project', 'Proje seçin': 'Select project', 'Yeni projenin adını yazın': 'Type the new project’s name', 'Proje türü': 'Project type', 'Proje süz': 'Filter by project',
+    'Konu': 'Subject', 'Notlar': 'Notes', 'Katılımcılar': 'Participants', 'Katılımcı ekle': 'Add participant', 'Başka katılımcı…': 'Another participant…', 'İsim yazıp Enter’a basın': 'Type a name and press Enter',
+    'ör. Teklif görüşmesi': 'e.g. Proposal meeting', 'Görüşülen konular, alınan kararlar, yapılacaklar…': 'Topics discussed, decisions made, to-dos…', 'Kaldır': 'Remove',
+    'Toplantı Notunu Düzenle': 'Edit Meeting Note', 'Yeni Toplantı Notu': 'New Meeting Note', 'Henüz toplantı notu yok.': 'No meeting notes yet.', 'Eşleşen toplantı notu yok.': 'No matching meeting notes.',
+    'Bir toplantı notu seçin': 'Select a meeting note', 'İlk toplantı notunu yazın': 'Write the first meeting note', 'Proje, tarih, katılımcılar ve alınan notlar burada tutulur.': 'Project, date, participants and notes are kept here.',
+    'Katılımcı girilmemiş.': 'No participants entered.', 'Not girilmemiş.': 'No notes entered.', 'Silinmiş proje': 'Deleted project', 'Lokasyonu aç': 'Open location', 'Henüz sistemde lokasyon olarak yok': 'Not yet in the system as a location',
+    'Notu sil': 'Delete note', 'Toplantı notu kaydedildi.': 'Meeting note saved.', 'Toplantı notu silindi.': 'Meeting note deleted.', 'Toplantı Notu Eklendi': 'Meeting Note Added', 'Toplantı Notu Silindi': 'Meeting Note Deleted',
+    'Toplantı notu eklendi': 'Meeting note added', 'Toplantı notu silindi': 'Meeting note deleted', 'Toplantı': 'Meeting', 'Proje': 'Project', 'Yeni Proje · ': 'New Project · ',
+    'Bir proje seçin ya da “Yeni Proje” ile adını yazın.': 'Select a project or type its name with “New Project”.', 'Yeni projenin adını yazın.': 'Type the new project’s name.', 'Tarih seçin.': 'Select a date.', 'Konu veya not girin.': 'Enter a subject or a note.',
+    'Toplantı notları için sunucu bağlantısı gerekli.': 'A server connection is required for meeting notes.', 'Toplantı notu': 'Meeting note', 'Not': 'Note',
+    'Bir proje seçin ya da yeni projenin adını yazın': 'Select a project or type the new project’s name', 'Konu veya not girin': 'Enter a subject or a note', 'Geçerli bir tarih girin': 'Enter a valid date',
+    'Notlar en fazla 20.000 karakter olabilir': 'Notes can be at most 20,000 characters', 'Toplantı notu bulunamadı': 'Meeting note not found', 'Toplantı notunu yalnızca yazan kişi veya yönetici silebilir': 'Only the author or an administrator can delete a meeting note',
+    'not': 'notes',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
