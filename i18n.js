@@ -314,6 +314,9 @@
 
     'Görevsiz projeleri gizle': 'Hide projects without tasks',
     'Projenin yanındaki “+ Görev” ile görev ekleyin; kutucuğa tıklayıp yazın, değişiklikler kendiliğinden kaydedilir. Kutuyu işaretlemek görevi tamamlar.': 'Add a task with “+ Task” next to a project; click a card and type, changes are saved automatically. Ticking the box completes the task.',
+
+    'Görevi yazın, Enter ile kaydedin (ör. Cumaya kadar teklif iletilecek)': 'Type the task and press Enter to save (e.g. Send the proposal by Friday)', 'Yeni görev': 'New task', 'Kaydet': 'Save',
+    'Görev metni boş olamaz.': 'The task text cannot be empty.', 'Görev kaydedildi.': 'Task saved.', '✓ Kaydedildi': '✓ Saved', 'Kaydedilemedi': 'Could not save', 'Kaydediliyor…': 'Saving…',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'

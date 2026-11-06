@@ -270,6 +270,12 @@ button.pl-add:hover{background:var(--ok);color:#fff;border-color:var(--ok)}
 button.pl-add:focus-visible{outline:2px solid var(--ok);outline-offset:2px}
 .pl-tasks{display:grid;gap:8px;padding:10px}
 .pl-task{border:1px solid var(--hair);border-left:3px solid var(--hair-strong);border-radius:var(--radius);padding:8px 10px;background:var(--card)}
+.pl-task{position:relative}
+.pl-flag{position:absolute;top:3px;right:8px;font-size:11px;font-weight:600;color:var(--muted)}
+.pl-flag.ok{color:var(--ok)}.pl-flag.bad{color:var(--no)}
+.pl-task.draft{border-left-color:var(--ok);background:var(--ok-soft)}
+.pl-draft-act{display:flex;align-items:center;gap:8px;margin-top:8px}
+.pl-err{font-size:12px;color:var(--no);font-weight:600}
 .pl-task.late{border-left-color:var(--no)}.pl-task.soon{border-left-color:var(--teal)}
 .pl-task.done{opacity:.65;border-left-color:var(--hair)}
 .pl-top{display:flex;gap:8px;align-items:flex-start}
@@ -1865,7 +1871,7 @@ document.addEventListener('click',async e=>{
 });
 
 /* ---------- Planlayıcı (lokasyon başına görevler) ---------- */
-let pl={tasks:[],loaded:false,me:'',admin:false,f:{assignee:'',status:'open',range:'',site:'',hideEmpty:false},regroup:false},plQueue={},plTimer={};
+let pl={tasks:[],loaded:false,me:'',admin:false,f:{assignee:'',status:'open',range:'',site:'',hideEmpty:false},regroup:false,draft:null},plQueue={},plTimer={},plFlagT={};
 async function plApi(method,qs,body){
   const r=await fetch('/api/tasks'+(qs||''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
   if(r.status===401){location.replace('/login.html');throw new Error('401');}
@@ -1895,12 +1901,17 @@ function plAssigneeOptions(sel){
 }
 function plTaskHtml(t){
   const can=t.createdBy===pl.me||pl.admin,soon=t.due&&!t.done&&t.due>=todayStr()&&t.due<=plAddDays(todayStr(),7);
-  return `<div class="pl-task${t.done?' done':''}${plLate(t)?' late':''}${soon?' soon':''}" data-pt="${esc(t.id)}">
+  return `<div class="pl-task${t.done?' done':''}${plLate(t)?' late':''}${soon?' soon':''}" data-pt="${esc(t.id)}"><span class="pl-flag" role="status"></span>
     <div class="pl-top"><label class="pl-chk"><input type="checkbox" data-ptdone ${t.done?'checked':''} aria-label="Tamamlandı"></label>
       <textarea class="pl-title" data-ptf="title" rows="2" maxlength="200" placeholder="Görev (ör. Cumaya kadar teklif iletilecek)" aria-label="Görev">${esc(t.title)}</textarea></div>
     <div class="pl-meta"><select data-ptf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(t.assignee)}</select>
       <input type="date" data-ptf="due" value="${esc(t.due)}" aria-label="Termin">
       <button type="button" class="ghost" data-ptdel="${esc(t.id)}" aria-label="Görevi sil" title="Görevi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></div></div>`;
+}
+function plDraftHtml(d){
+  return `<div class="pl-task draft" data-pdraft><div class="pl-top"><textarea class="pl-title" data-pdf="title" rows="2" maxlength="200" placeholder="Görevi yazın, Enter ile kaydedin (ör. Cumaya kadar teklif iletilecek)" aria-label="Yeni görev">${esc(d.title)}</textarea></div>
+    <div class="pl-meta"><select data-pdf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(d.assignee)}</select><input type="date" data-pdf="due" value="${esc(d.due)}" aria-label="Termin"></div>
+    <div class="pl-draft-act"><button type="button" class="pl-add" data-pdsave>Kaydet</button><button type="button" class="ghost" data-pdcancel>Vazgeç</button><span class="pl-err" id="plDraftErr" role="alert"></span></div></div>`;
 }
 function paintPlanner(){
   const box=$('plRows');if(!box)return;
@@ -1914,7 +1925,7 @@ function paintPlanner(){
     else if(!filtering&&!f.hideEmpty)empty.push([x,all,list]);
   }
   const card=([x,all,list])=>{const o=all.filter(t=>!t.done).length,l=all.filter(plLate).length;
-    return `<section class="pl-proj${list.length?'':' empty'}"><header><span class="c-code">${esc(x.code||'—')}</span><strong>${esc(x.name||'Adsız Lokasyon')}</strong><small>${o} açık${l?` · <b style="color:var(--no)">${l} gecikmiş</b>`:''}</small><button type="button" class="pl-add" data-pladd="${esc(x.id)}">+ Görev</button></header>${list.length?`<div class="pl-tasks">${list.map(plTaskHtml).join('')}</div>`:''}</section>`;};
+    return `<section class="pl-proj${list.length?'':' empty'}"><header><span class="c-code">${esc(x.code||'—')}</span><strong>${esc(x.name||'Adsız Lokasyon')}</strong><small>${o} açık${l?` · <b style="color:var(--no)">${l} gecikmiş</b>`:''}</small><button type="button" class="pl-add" data-pladd="${esc(x.id)}">+ Görev</button></header>${(list.length||(pl.draft&&pl.draft.site===x.id))?`<div class="pl-tasks">${pl.draft&&pl.draft.site===x.id?plDraftHtml(pl.draft):''}${list.map(plTaskHtml).join('')}</div>`:''}</section>`;};
   box.innerHTML=[...withTasks,...empty].map(card).join('')||'<p class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</p>';
 }
 async function renderPlanner(){
@@ -1937,18 +1948,45 @@ async function renderPlanner(){
   if(view==='planner')paintPlanner();
 }
 function plState(t,err){const e=$('plState');if(!e)return;e.textContent=t||'';e.className=err?'err':'';}
-function plSave(id,k,v){const t=pl.tasks.find(x=>x.id===id);if(t)t[k]=v;(plQueue[id]=plQueue[id]||{})[k]=v;clearTimeout(plTimer[id]);plTimer[id]=setTimeout(()=>plFlush(id),k==='title'?600:50);plState('Kaydediliyor…');}
+function plSave(id,k,v){const t=pl.tasks.find(x=>x.id===id);if(t)t[k]=v;(plQueue[id]=plQueue[id]||{})[k]=v;clearTimeout(plTimer[id]);plTimer[id]=setTimeout(()=>plFlush(id),k==='title'?600:50);plState('Kaydediliyor…');plFlag(id,'Kaydediliyor…');}
 async function plFlush(id){
   clearTimeout(plTimer[id]);const b=plQueue[id];if(!b)return;delete plQueue[id];
-  try{const d=await plApi('PATCH','?id='+id,b);const i=pl.tasks.findIndex(x=>x.id===id);if(i>=0)pl.tasks[i]=d.task;plState('Kaydedildi · '+clock());const c=$('plCount');if(c){const o=pl.tasks.filter(t=>!t.done).length,l=pl.tasks.filter(plLate).length;c.textContent=o+' açık görev · '+l+' gecikmiş';}}
-  catch(e){plState('Kaydedilemedi',true);toast(e.message);}
+  try{const d=await plApi('PATCH','?id='+id,b);const i=pl.tasks.findIndex(x=>x.id===id);if(i>=0)pl.tasks[i]=d.task;plState('Kaydedildi · '+clock());plFlag(id,'✓ Kaydedildi',3000);const c=$('plCount');if(c){const o=pl.tasks.filter(t=>!t.done).length,l=pl.tasks.filter(plLate).length;c.textContent=o+' açık görev · '+l+' gecikmiş';}}
+  catch(e){plState('Kaydedilemedi',true);plFlag(id,'Kaydedilemedi',4000,true);toast(e.message);}
 }
-async function plAdd(siteId){
-  try{const d=await plApi('POST','',{site:siteId});pl.tasks.push(d.task);paintPlanner();
-    const i=document.querySelector(`#plRows [data-pt="${d.task.id}"] [data-ptf="title"]`);if(i){i.focus();i.scrollIntoView({block:'nearest'});}plState('');}
-  catch(e){toast(e.message);}
+function plFlag(id,text,clearMs,bad){
+  const el=document.querySelector(`#plRows [data-pt="${id}"] .pl-flag`);if(!el)return;
+  clearTimeout(plFlagT[id]);el.textContent=text;el.className='pl-flag'+(bad?' bad':text.startsWith('✓')?' ok':'');
+  if(clearMs)plFlagT[id]=setTimeout(()=>{el.textContent='';el.className='pl-flag';},clearMs);
+}
+// "+ Görev": önce kartta boş bir taslak açılır (sunucuya bir şey yazılmaz, kart yerinden oynamaz); Kaydet / Enter ile kaydedilir.
+function plAdd(siteId){
+  pl.draft={site:siteId,title:'',assignee:'',due:''};paintPlanner();
+  const i=document.querySelector('#plRows [data-pdraft] [data-pdf="title"]');if(i){i.focus();i.scrollIntoView({block:'nearest'});}
+}
+async function plDraftSave(){
+  const d=pl.draft;if(!d)return;const err=$('plDraftErr');
+  if(!d.title.trim()){if(err)err.textContent='Görev metni boş olamaz.';const i=document.querySelector('#plRows [data-pdraft] [data-pdf="title"]');if(i)i.focus();return;}
+  const btn=document.querySelector('#plRows [data-pdsave]');if(btn)btn.disabled=true;
+  try{const r=await plApi('POST','',{site:d.site,title:d.title.trim(),assignee:d.assignee,due:d.due});
+    pl.tasks.push(r.task);pl.draft=null;paintPlanner();toast('Görev kaydedildi.');
+    plFlag(r.task.id,'✓ Kaydedildi',2500);
+    const el=document.querySelector(`#plRows [data-pt="${r.task.id}"]`);if(el)el.scrollIntoView({block:'nearest'});}
+  catch(e){if(btn)btn.disabled=false;if($('plDraftErr'))$('plDraftErr').textContent=e.message;}
 }
 const plField=el=>el.closest&&el.closest('#plRows [data-ptf]');
+document.addEventListener('input',e=>{
+  const f=e.target.closest&&e.target.closest('#plRows [data-pdf]');if(!f||!pl.draft)return;
+  pl.draft[f.dataset.pdf]=f.value;const er=$('plDraftErr');if(er)er.textContent='';
+});
+document.addEventListener('change',e=>{const f=e.target.closest&&e.target.closest('#plRows [data-pdf]');if(f&&pl.draft)pl.draft[f.dataset.pdf]=f.value;});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||e.shiftKey||e.isComposing)return;
+  const t=e.target;if(!t.closest)return;
+  if(t.matches('#plRows [data-pdf="title"]')){e.preventDefault();pl.draft.title=t.value;plDraftSave();return;}
+  const f=t.closest('#plRows [data-ptf="title"]');
+  if(f){e.preventDefault();const id=f.closest('[data-pt]').dataset.pt;plSave(id,'title',f.value.trim());plFlush(id);f.blur();}
+});
 document.addEventListener('input',e=>{
   const f=plField(e.target);if(!f||f.tagName==='SELECT')return;           // sorumlu: change olayında kaydedilir
   const id=f.closest('[data-pt]').dataset.pt;
@@ -1975,6 +2013,8 @@ document.addEventListener('focusout',e=>{
 document.addEventListener('click',e=>{
   if(e.target.closest('#plClear')){pl.f={assignee:'',status:'open',range:'',site:'',hideEmpty:false};renderPlanner();return;}
   const ad=e.target.closest('[data-pladd]');if(ad){plAdd(ad.dataset.pladd);return;}
+  if(e.target.closest('[data-pdsave]')){plDraftSave();return;}
+  if(e.target.closest('[data-pdcancel]')){pl.draft=null;paintPlanner();return;}
   const dl=e.target.closest('[data-ptdel]');
   if(dl&&!dl.disabled){const id=dl.dataset.ptdel,t=pl.tasks.find(x=>x.id===id);
     ask((t&&t.title?'“'+t.title+'”':'Bu görev')+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Görevi sil').then(async ok=>{if(!ok)return;
