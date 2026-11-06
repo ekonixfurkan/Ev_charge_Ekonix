@@ -1,4 +1,4 @@
-// /api/notes — lokasyon başına şirket içi notlar. GET ?site=ID · POST { site, body } · DELETE ?id=
+// /api/notes — proje başına şirket içi notlar. GET ?site=ID · POST { site, body } · DELETE ?id=
 // Toplantı notları da burada (Hobby planda işlev sayısı sınırlı): ?meeting=list (GET) · ?meeting=new (POST) · ?meeting=ID (PATCH, DELETE)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
@@ -44,7 +44,7 @@ const meetOne = (s, id) => s`SELECT m.id, m.site_id, m.project_name, to_char(m.m
     NULLIF(u.name, '') AS created_by_name FROM meetings m LEFT JOIN users u ON u.email = m.created_by WHERE m.id = ${id}::bigint`;
 const oneLine = (v, max) => (typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : undefined);
 
-// Toplantı notları: proje ya mevcut bir lokasyondur (siteId) ya da henüz sistemde olmayan yeni bir projedir (projectName).
+// Toplantı notları: proje ya mevcut bir projedir (siteId) ya da henüz sistemde olmayan yeni bir projedir (projectName).
 async function meetingHandler(req, res, user, s) {
   const key = String(req.query.meeting);
   if (req.method === 'GET') {
@@ -60,7 +60,7 @@ async function meetingHandler(req, res, user, s) {
     if (siteId !== undefined) {
       if (siteId) {
         const f = await s`SELECT 1 FROM sites WHERE id = ${siteId}`;
-        if (!f.length) throw Object.assign(new Error('Lokasyon bulunamadı'), { code: 404 });
+        if (!f.length) throw Object.assign(new Error('Proje bulunamadı'), { code: 404 });
       }
       out.siteId = siteId;
     }
@@ -162,7 +162,7 @@ export default async function handler(req, res) {
       if (!site) return res.status(400).json({ error: 'site gerekli' });
       if (!body || body.length > 2000) return res.status(400).json({ error: 'Not 1–2000 karakter olmalı' });
       const found = await s`SELECT data->>'name' AS name FROM sites WHERE id = ${site}`;
-      if (!found.length) return res.status(404).json({ error: 'Lokasyon bulunamadı' });
+      if (!found.length) return res.status(404).json({ error: 'Proje bulunamadı' });
       const r = await s`INSERT INTO site_notes (site_id, author, body) VALUES (${site}, ${user.email}, ${body}) RETURNING id`;
       await logActivity({ actor: user.email, action: 'not-ekle', entity: 'lokasyon', entityId: site, entityName: found[0].name, summary: 'Şirket içi not eklendi' });
       return res.status(201).json({ ok: true, id: r[0].id });

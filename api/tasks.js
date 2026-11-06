@@ -1,4 +1,4 @@
-// /api/tasks — Planlayıcı: lokasyon başına görevler (görev · sorumlu · termin · durum). Giriş yapan herkes okur/ekler/düzenler.
+// /api/tasks — Planlayıcı: proje başına görevler (görev · sorumlu · termin · durum). Giriş yapan herkes okur/ekler/düzenler.
 //   GET                      tüm görevler
 //   POST {site, title?, assignee?, due?}   görev ekle
 //   PATCH ?id {title?, assignee?, due?, done?}
@@ -70,7 +70,7 @@ export default async function handler(req, res) {
       const b = (await readJson(req)) || {};
       const site = typeof b.site === 'string' ? b.site : '';
       const name = await siteName(s, site);
-      if (name == null) return res.status(404).json({ error: 'Lokasyon bulunamadı' });
+      if (name == null) return res.status(404).json({ error: 'Proje bulunamadı' });
       const title = cleanTitle(b.title) || '';
       const due = cleanDue(b.due);
       let assignee = typeof b.assignee === 'string' ? b.assignee : '';

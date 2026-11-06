@@ -108,10 +108,10 @@ export default async function handler(req, res) {
             body: b,
             request: req,
             onBeforeGenerateToken: async (pathname) => {
-              // yol biçimi: sites/{lokasyon id}/{rastgele}-{dosya adı}
+              // yol biçimi: sites/{proje id}/{rastgele}-{dosya adı}
               const m = /^sites\/([^/]+)\/([^/]+)$/.exec(pathname);
               if (!m || !isAllowedName(m[2])) throw new Error('Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)');
-              if ((await siteName(s, m[1])) == null) throw new Error('Lokasyon bulunamadı');
+              if ((await siteName(s, m[1])) == null) throw new Error('Proje bulunamadı');
               return { allowedContentTypes: ALLOWED_TYPES, maximumSizeInBytes: MAX_BYTES, addRandomSuffix: false, allowOverwrite: false, tokenPayload: JSON.stringify({ by: user.email }) };
             },
           });
@@ -122,7 +122,7 @@ export default async function handler(req, res) {
       }
       const site = typeof b.site === 'string' ? b.site : '';
       const name = await siteName(s, site);
-      if (name == null) return res.status(404).json({ error: 'Lokasyon bulunamadı' });
+      if (name == null) return res.status(404).json({ error: 'Proje bulunamadı' });
 
       if (b.action === 'folder') {
         const folder = cleanFolder(b.name);

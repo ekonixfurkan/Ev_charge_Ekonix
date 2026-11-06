@@ -1,4 +1,4 @@
-// /api/notifications — başkalarının lokasyonlardaki güncellemeleri (oluşturma, güncelleme, silme, şirket içi not). Giriş, görüntüleme gibi işlemler yalnız işlem geçmişindedir. GET: okunmamış sayısı + son 100 kayıt · POST: tümünü okundu say
+// /api/notifications — başkalarının projelerdeki güncellemeleri (oluşturma, güncelleme, silme, şirket içi not). Giriş, görüntüleme gibi işlemler yalnız işlem geçmişindedir. GET: okunmamış sayısı + son 100 kayıt · POST: tümünü okundu say
 import { sql } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureActivity } from '../lib/activity.js';
