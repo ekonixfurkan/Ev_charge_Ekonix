@@ -421,6 +421,10 @@ table.yearly{width:auto;min-width:min(100%,640px)}
 .loctbl .p1,.loctbl td{font-size:13px}
 .loctbl td:nth-child(7){max-width:230px}
 .loctbl td:nth-child(8){max-width:210px}
+/* Lokasyon Listesi tam genişliğe yayılır: kod, aşama, durum, skor ve tarih sütunları içerik kadar; artan alanı metin sütunları alır. */
+table.portfolio.loclist{width:100%}
+table.portfolio.loclist :is(th,td):is(:nth-child(1),:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(9),:nth-child(10)){width:1%;white-space:nowrap}
+table.portfolio.loclist td:nth-child(7),table.portfolio.loclist td:nth-child(8){max-width:none}
 .loctbl tr.closed td{opacity:.6}
 
 /* Mühür (seal) rozetleri: 1.5px çerçeve + nokta */
@@ -1203,7 +1207,7 @@ function renderLocations(){
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl"><thead><tr><th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Kayıt Tarihi</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div><div id="locPager"></div></section>`;
+    <div class="scroll"><table class="portfolio loctbl loclist"><thead><tr><th>Proje Kodu</th><th>Lokasyon</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th><th>Engel / Risk</th><th class="num">Kayıt Tarihi</th><th class="num">Güncellendi</th></tr></thead><tbody id="locRows"></tbody></table></div><div id="locPager"></div></section>`;
   paintLocRows();
 }
 function render(){
