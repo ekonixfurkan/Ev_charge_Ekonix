@@ -214,9 +214,16 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .ct-grp strong{font-size:13px}.ct-grp small{margin:0 8px;color:var(--muted)}
 .ct-grp .ct-tg{padding:2px 6px;border:0;background:transparent;color:var(--muted);cursor:pointer}
 .ct-grp .ct-tg[aria-expanded=false] svg{transform:rotate(-90deg)}
-.ct-act{width:44px;text-align:center}
+.ct-act{width:120px;text-align:right;white-space:nowrap}
 .ct-act button{padding:4px 7px}
 #ctState{font-size:12px;color:var(--muted)}#ctState.err{color:var(--no)}
+.ct-tools{display:flex;align-items:center;gap:14px;flex-wrap:nowrap;font-weight:400}
+.ct-tools input[type=search]{width:260px;margin:0;min-height:34px;padding:5px 10px;font-size:13px}
+.ct-tools .lchk{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;white-space:nowrap;color:var(--ink);cursor:pointer}
+.ct-tools .lchk input{width:auto;min-height:0;height:auto}
+.ct-tools .primary{margin:0;padding:7px 14px;font-size:13px;white-space:nowrap}
+.ct-flag{display:inline-block;min-width:0;margin-right:4px;font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap}
+.ct-flag.ok{color:var(--ok)}.ct-flag.bad{color:var(--no)}
 #ctDlg{width:min(900px,96vw);max-width:none;max-height:92vh;overflow:auto}
 #ctDlgRows tr{cursor:pointer}#ctDlgRows tr:hover td{background:var(--navy-soft)}
 .pick-btn{font-size:12px;padding:5px 10px}
@@ -2322,7 +2329,7 @@ function ctSort(a,b){
 }
 function ctRowHtml(c){
   const can=c.createdBy===ct.me||ct.admin;
-  return `<tr data-ct="${esc(c.id)}">${CT_COLS.map(([k,l,t,m])=>`<td><input class="ct-in" data-ctf="${k}" type="${t}" value="${esc(c[k])}" placeholder="${l}" aria-label="${l}" maxlength="${m}" autocomplete="off"${k==='phone'?' data-phone inputmode="tel"':''}></td>`).join('')}<td class="ct-act"><button type="button" class="ghost" data-ctdel="${esc(c.id)}" aria-label="Kişiyi sil" title="Kişiyi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></td></tr>`;
+  return `<tr data-ct="${esc(c.id)}">${CT_COLS.map(([k,l,t,m])=>`<td><input class="ct-in" data-ctf="${k}" type="${t}" value="${esc(c[k])}" placeholder="${l}" aria-label="${l}" maxlength="${m}" autocomplete="off"${k==='phone'?' data-phone inputmode="tel"':''}></td>`).join('')}<td class="ct-act"><span class="ct-flag" role="status"></span><button type="button" class="ghost" data-ctdel="${esc(c.id)}" aria-label="Kişiyi sil" title="Kişiyi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></td></tr>`;
 }
 function paintContacts(){
   const t=$('ctRows');if(!t)return;
@@ -2337,25 +2344,28 @@ function paintContacts(){
     if(open)h+=rows.map(ctRowHtml).join('');});
   t.innerHTML=h;
 }
+const ctFlagT={};
+function ctFlag(id,text,ms,bad){
+  const el=document.querySelector(`#ctRows tr[data-ct="${id}"] .ct-flag`);if(!el)return;
+  clearTimeout(ctFlagT[id]);el.textContent=text;el.className='ct-flag'+(bad?' bad':' ok');
+  if(ms)ctFlagT[id]=setTimeout(()=>{el.textContent='';el.className='ct-flag';},ms);
+}
 function ctState(t,err){const e=$('ctState');if(!e)return;e.textContent=t||'';e.className=err?'err':'';}
 async function renderContacts(){
   if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Müşteri Bilgileri</h3><p class="note">Müşteri Bilgileri için sunucu bağlantısı gerekli.</p></section>';return;}
-  $('view').innerHTML=`<section class="box"><h3>Müşteri Bilgileri<small><span>Şirket, kişi ve telefon rehberi</span> · <span id="ctCount"></span></small></h3>
-    <div class="locbar no-print">
-      <label class="lf lq">Ara<input type="search" id="ctQ" value="${esc(ct.q)}" placeholder="Şirket, kişi veya telefon…" autocomplete="off"></label>
-      <label class="lf lchk"><input type="checkbox" id="ctGroup" ${ct.group?'checked':''}>Şirkete Göre Grupla</label>
-      <button type="button" class="primary" id="ctAdd">+ Yeni Kişi</button><span id="ctState" role="status"></span>
-    </div>
-    <div class="scroll"><table class="portfolio ct-tbl"><thead><tr>${CT_COLS.map(([k,l])=>`<th>${l}</th>`).join('')}<th></th></tr></thead><tbody id="ctRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
-    <p class="note">Hücreye tıklayıp yazın; değişiklikler kendiliğinden kaydedilir. Bu kişiler proje girişinde “Kişilerden Seç” ile kullanılabilir.</p></section>`;
+  $('view').innerHTML=`<section class="box"><h3>Müşteri Bilgileri<span class="ct-tools no-print">
+      <input type="search" id="ctQ" value="${esc(ct.q)}" placeholder="Ara: şirket, kişi veya telefon…" aria-label="Ara" autocomplete="off">
+      <label class="lchk"><input type="checkbox" id="ctGroup" ${ct.group?'checked':''}>Şirkete Göre Grupla</label>
+      <button type="button" class="primary" id="ctAdd">+ Yeni Kişi</button><span id="ctState" role="status"></span></span></h3>
+    <div class="scroll"><table class="portfolio ct-tbl"><thead><tr>${CT_COLS.map(([k,l])=>`<th>${l}</th>`).join('')}<th></th></tr></thead><tbody id="ctRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div></section>`;
   if(ct.loaded)paintContacts();
   try{await loadContacts();}catch(e){if(view==='contacts')ctState(e.message,true);return;}
   if(view==='contacts')paintContacts();
 }
-function ctSave(id,k,v){const c=ct.rows.find(x=>x.id===id);if(c)c[k]=v;(ctQueue[id]=ctQueue[id]||{})[k]=v;clearTimeout(ctTimer[id]);ctTimer[id]=setTimeout(()=>ctFlush(id),600);ctState('Kaydediliyor…');}
+function ctSave(id,k,v){const c=ct.rows.find(x=>x.id===id);if(c)c[k]=v;(ctQueue[id]=ctQueue[id]||{})[k]=v;clearTimeout(ctTimer[id]);ctTimer[id]=setTimeout(()=>ctFlush(id),600);}
 async function ctFlush(id){
   clearTimeout(ctTimer[id]);const b=ctQueue[id];if(!b)return;delete ctQueue[id];
-  try{await ctApi('PATCH','?id='+id,b);ctState('Kaydedildi · '+clock());}catch(e){ctState('Kaydedilemedi',true);toast(e.message);}
+  try{await ctApi('PATCH','?id='+id,b);ctFlag(id,'✓ Kaydedildi',2500);}catch(e){ctFlag(id,'Kaydedilemedi',4000,true);toast(e.message);}
 }
 async function ctAdd(company){
   try{const d=await ctApi('POST','',company?{company}:{});ct.rows.push(d.contact);ct.q='';const q=$('ctQ');if(q)q.value='';ct.collapsed[company||'']=false;paintContacts();
