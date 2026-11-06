@@ -258,6 +258,12 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .fl-up .fl-bar{flex:0 0 160px;height:6px;border-radius:3px;background:var(--hair);overflow:hidden}
 .fl-up .fl-bar i{display:block;height:100%;background:var(--teal)}
 .fl-up.bad small{color:var(--no)}
+.pl-chips{display:flex;gap:8px;flex-wrap:wrap}
+.pl-chip{display:inline-flex;align-items:baseline;gap:6px;padding:4px 12px;border:1px solid var(--hair);border-radius:999px;background:var(--soft);font-size:12px;font-weight:500;color:var(--muted)}
+.pl-chip b{font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.pl-chip.open{border-color:var(--navy);background:var(--navy-soft)}.pl-chip.open b{color:var(--navy)}
+.pl-chip.week b{color:var(--teal)}
+.pl-chip.late.on{border-color:var(--no);background:var(--no-soft);color:var(--no)}.pl-chip.late.on b{color:var(--no)}
 .pl-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;align-items:start;margin-top:4px}
 .pl-proj{border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);overflow:hidden}
 .pl-proj>header{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:10px 12px;background:var(--soft);border-bottom:1px solid var(--hair)}
@@ -1913,10 +1919,16 @@ function plDraftHtml(d){
     <div class="pl-meta"><select data-pdf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(d.assignee)}</select><input type="date" data-pdf="due" value="${esc(d.due)}" aria-label="Termin"></div>
     <div class="pl-draft-act"><button type="button" class="pl-add" data-pdsave>Kaydet</button><button type="button" class="ghost" data-pdcancel>Vazgeç</button><span class="pl-err" id="plDraftErr" role="alert"></span></div></div>`;
 }
+// Üst özet: Açık · Bu hafta · Gecikmiş (rozet)
+function plCountHtml(){
+  const today=todayStr(),end=plAddDays(today,7),open=pl.tasks.filter(t=>!t.done),late=open.filter(plLate).length,week=open.filter(t=>t.due&&t.due>=today&&t.due<=end).length;
+  const chip=(cls,n,l)=>`<span class="pl-chip ${cls}"><b>${n}</b><span>${l}</span></span>`;
+  return chip('open',open.length,'Açık')+chip('week',week,'Bu hafta')+chip('late'+(late?' on':''),late,'Gecikmiş');
+}
 function paintPlanner(){
   const box=$('plRows');if(!box)return;
-  const f=pl.f,filtering=!!(f.assignee||f.range),openN=pl.tasks.filter(t=>!t.done).length,lateN=pl.tasks.filter(plLate).length;
-  const c=$('plCount');if(c)c.textContent=openN+' açık görev · '+lateN+' gecikmiş';
+  const f=pl.f,filtering=!!(f.assignee||f.range);
+  const c=$('plCount');if(c)c.innerHTML=plCountHtml();
   const sites=[...db.sites].filter(x=>!f.site||x.id===f.site).sort((a,b)=>String(a.code||'~').localeCompare(String(b.code||'~'),'tr',{numeric:true}));
   const withTasks=[],empty=[];
   for(const x of sites){
@@ -1932,7 +1944,7 @@ async function renderPlanner(){
   if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Planlayıcı</h3><p class="note">Planlayıcı için sunucu bağlantısı gerekli.</p></section>';return;}
   if(!people.length)loadPeople();
   const f=pl.f,opt=(v,c,t)=>`<option value="${esc(v)}" ${v===c?'selected':''}>${esc(t)}</option>`;
-  $('view').innerHTML=`<section class="box"><h3>Planlayıcı<small id="plCount"></small></h3>
+  $('view').innerHTML=`<section class="box"><h3>Planlayıcı<span id="plCount" class="pl-chips"></span></h3>
     <div class="locbar no-print">
       <label class="lf">Sorumlu<select id="plAssignee"><option value="">Tümü</option>${opt(pl.me||me.email,f.assignee,'Bana atananlar')}${people.filter(x=>x.email!==(pl.me||me.email)).map(x=>opt(x.email,f.assignee,x.name||x.email)).join('')}</select></label>
       <label class="lf">Durum<select id="plStatus">${opt('open',f.status,'Açık')}${opt('done',f.status,'Tamamlandı')}${opt('all',f.status,'Tümü')}</select></label>
@@ -1942,16 +1954,16 @@ async function renderPlanner(){
       <button type="button" id="plClear" class="ghost" ${(f.assignee||f.range||f.site||f.status!=='open'||f.hideEmpty)?'':'hidden'}>Filtreleri Temizle</button><span id="plState" role="status"></span>
     </div>
     <div id="plRows" class="pl-board"><p class="note" style="padding:24px;text-align:center">Yükleniyor…</p></div>
-    <p class="note">Projenin yanındaki “+ Görev” ile görev ekleyin; kutucuğa tıklayıp yazın, değişiklikler kendiliğinden kaydedilir. Kutuyu işaretlemek görevi tamamlar.</p></section>`;
+    </section>`;
   if(pl.loaded)paintPlanner();
   try{await loadTasks();}catch(e){if(view==='planner')plState(e.message,true);return;}
   if(view==='planner')paintPlanner();
 }
 function plState(t,err){const e=$('plState');if(!e)return;e.textContent=t||'';e.className=err?'err':'';}
-function plSave(id,k,v){const t=pl.tasks.find(x=>x.id===id);if(t)t[k]=v;(plQueue[id]=plQueue[id]||{})[k]=v;clearTimeout(plTimer[id]);plTimer[id]=setTimeout(()=>plFlush(id),k==='title'?600:50);plState('Kaydediliyor…');plFlag(id,'Kaydediliyor…');}
+function plSave(id,k,v){const t=pl.tasks.find(x=>x.id===id);if(t)t[k]=v;(plQueue[id]=plQueue[id]||{})[k]=v;clearTimeout(plTimer[id]);plTimer[id]=setTimeout(()=>plFlush(id),k==='title'?600:50);plFlag(id,'Kaydediliyor…');}
 async function plFlush(id){
   clearTimeout(plTimer[id]);const b=plQueue[id];if(!b)return;delete plQueue[id];
-  try{const d=await plApi('PATCH','?id='+id,b);const i=pl.tasks.findIndex(x=>x.id===id);if(i>=0)pl.tasks[i]=d.task;plState('Kaydedildi · '+clock());plFlag(id,'✓ Kaydedildi',3000);const c=$('plCount');if(c){const o=pl.tasks.filter(t=>!t.done).length,l=pl.tasks.filter(plLate).length;c.textContent=o+' açık görev · '+l+' gecikmiş';}}
+  try{const d=await plApi('PATCH','?id='+id,b);const i=pl.tasks.findIndex(x=>x.id===id);if(i>=0)pl.tasks[i]=d.task;plState('');plFlag(id,'✓ Kaydedildi',3000);const c=$('plCount');if(c)c.innerHTML=plCountHtml();}
   catch(e){plState('Kaydedilemedi',true);plFlag(id,'Kaydedilemedi',4000,true);toast(e.message);}
 }
 function plFlag(id,text,clearMs,bad){
