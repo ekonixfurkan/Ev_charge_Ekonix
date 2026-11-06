@@ -349,6 +349,8 @@
     [/^(\d+) açık$/, function (m) { return m[1] + ' open'; }],
     [/^(\d+) gecikmiş$/, function (m) { return m[1] + ' overdue'; }],
     [/^“(.+)” silinsin mi\? Bu işlem herkes için geçerli olur ve geri alınamaz\.$/, function (m) { return 'Delete “' + m[1] + '”? This applies to everyone and cannot be undone.'; }],
+    [/^“(.+)” silinsin mi\? Bu işlem herkes için geçerli olur ve geri alınamaz\.$/, function (m) { return 'Delete “' + m[1] + '”? This applies to everyone and cannot be undone.'; }],
+    [/^Yazan: (.+)$/, function (m) { return 'Written by: ' + m[1]; }],
     [/^(\d+) lokasyon$/, function (m) { return m[1] + (m[1] === '1' ? ' location' : ' locations'); }],
     [/^(\d+) hesap$/, function (m) { return m[1] + (m[1] === '1' ? ' account' : ' accounts'); }],
     [/^(\d+) kalem$/, function (m) { return m[1] + (m[1] === '1' ? ' item' : ' items'); }],
