@@ -980,18 +980,41 @@ async function api(path,opts){
   if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e;}
   return r.status===204?null:r.json();
 }
+/* ---------- Sayfa adresi: yenileyince aynı sayfada kalmak için #/… ---------- */
+let routeOn=false;
+const ROUTE_VIEWS=['locations','users','activity','contacts','notifs','planner'];
+const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner'};
+function routeHash(){
+  if(view==='portfolio')return '#/'+sub;
+  if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
+  return '#/'+(ROUTE_NAMES[view]||'ovw');
+}
+function saveRoute(){
+  if(!routeOn||!loaded)return;
+  const h=routeHash();if(location.hash===h)return;
+  try{history.replaceState(null,'',location.pathname+location.search+h);}catch(e){}
+}
+function restoreRoute(){
+  routeOn=true;
+  const parts=location.hash.replace(/^#\/?/,'').split('/').map(x=>{try{return decodeURIComponent(x);}catch(e){return x;}});
+  const [a,b,c]=parts;if(!a)return;
+  if(a==='ovw'||a==='port'){view='portfolio';sub=a;return;}
+  const name=Object.keys(ROUTE_NAMES).find(k=>ROUTE_NAMES[k]===a);
+  if(name){view=name;return;}
+  if(a==='site'&&b&&db.sites.some(x=>x.id===b)){view='site';activeId=b;sub=SITE_SUBS.includes(c)?c:'info';}
+}
 async function load(){
   try{
     const data=await api('/sites');
     if(Array.isArray(data.sites))db.sites=data.sites.map(migrateSite);
     if(Array.isArray(data.team)&&data.team.length)team=data.team;
     db.sites.sort(byCreated);mode='cloud';loaded=true;
-    status('Sunucuda kayıtlı · '+clock());render();startPoll();return;
+    status('Sunucuda kayıtlı · '+clock());restoreRoute();render();startPoll();return;
   }catch(e){/* API/DB yok → bu tarayıcıya kaydet */}
   try{const v=localStorage.getItem(KEY);if(v){const d=JSON.parse(v);if(Array.isArray(d.sites))db.sites=d.sites.map(migrateSite);if(Array.isArray(d.team)&&d.team.length)team=d.team;}db.sites.sort(byCreated);mode='local';
     status('Sunucuya bağlanılamadı · bu tarayıcıya kaydediliyor',true);}
   catch(e){mode='none';status('Kayıt yapılamıyor',true);}
-  loaded=true;render();
+  loaded=true;restoreRoute();render();
 }
 function editingNow(){const a=document.activeElement;return a&&$('view').contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName);}
 function startPoll(){clearInterval(pollTimer);pollTimer=setInterval(poll,4000);clearInterval(bellT);bellT=setInterval(pollBell,30000);pollBell();loadPeople();}
@@ -1194,6 +1217,7 @@ function render(){
   if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   setPageTitle();
+  saveRoute();
   if(view!=='site'&&notesOpen)closeNotes();
 }
 
