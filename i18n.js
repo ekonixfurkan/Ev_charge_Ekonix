@@ -334,6 +334,10 @@
     'Bir proje seçin ya da yeni projenin adını yazın': 'Select a project or type the new project’s name', 'Konu veya not girin': 'Enter a subject or a note', 'Geçerli bir tarih girin': 'Enter a valid date',
     'Notlar en fazla 20.000 karakter olabilir': 'Notes can be at most 20,000 characters', 'Toplantı notu bulunamadı': 'Meeting note not found', 'Toplantı notunu yalnızca yazan kişi veya yönetici silebilir': 'Only the author or an administrator can delete a meeting note',
     'not': 'notes',
+
+    'Proje Listesi': 'Project List', 'Yeni Proje Ekle': 'Add New Project', 'Müşteri Bilgileri': 'Customer Information', 'Proje Görev Listesi': 'Project Task List', 'Yeni Proje': 'New Project', 'Projeyi ekle': 'Add project',
+    'Listede yoksa Müşteri Bilgileri sayfasından ekleyin.': 'If not listed, add it on the Customer Information page.',
+    'Müşteri Bilgileri için sunucu bağlantısı gerekli.': 'A server connection is required for Customer Information.', 'Proje Görev Listesi için sunucu bağlantısı gerekli.': 'A server connection is required for the Project Task List.',
     /* yazdırma / diğer */
     'Lokasyon Raporu': 'Location Report', 'Girilmesi gereken bölümler': 'Sections to complete',
     'Pay toplamı %100\'ü aşan lokasyonlar toplama dahil edilmedi': 'Locations whose share total exceeds 100% were excluded from the sum'
