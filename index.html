@@ -183,6 +183,7 @@ table.portfolio.ovwtbl :is(th,td):first-child{padding-left:16px}
 table.portfolio.ovwtbl :is(th,td):last-child{padding-right:16px}
 table.portfolio.ovwtbl .sp{width:auto;padding:0}
 .ovwtbl td.c-name .p1{max-width:340px;overflow:hidden;text-overflow:ellipsis}
+.ovwtbl td.c-cust{max-width:200px;overflow:hidden;text-overflow:ellipsis}
 .ovwtbl td.c-code,.loctbl td.c-code{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
 .portfolio.act-tbl{width:100%;table-layout:fixed}
 table.portfolio.act-tbl :is(th,td){min-width:0}
@@ -1326,16 +1327,19 @@ const mkTile=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>
 function kpiTilesHtml(T,n){return (n!=null?mkTile('Proje Sayısı',n):'')+mkTile('DC Ünite',T.dcU)+mkTile('AC Ünite',T.acU)+mkTile('Toplam Ünite',T.dcU+T.acU)+mkTile('Toplam Soket',T.sock)+mkTile('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW');}
 function locRowsHtml(list){
   return list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status);
-    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.city)||'—'}</td><td>${esc(s.district)||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
-      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td>
+    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td class="c-cust">${esc(s.contactCompany)||'—'}</td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.city)||'—'}</td><td>${esc(s.district)||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
+      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td><td class="num">${t.sockets}</td>
       <td class="num"><span class="amgscore ${d.cls}">${d.label}</span></td>
-      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td></tr>`;}).join('');
+      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td><td title="${esc(fmtTs(s.updatedAt))}">${esc(agoText(s.updatedAt))}</td></tr>`;}).join('');
 }
-function locFootHtml(T){return `<tr><td colspan="2">Toplam</td><td></td><td></td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td></tr>`;}
+function locFootHtml(T){return `<tr><td colspan="3">Toplam</td><td></td><td></td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td><td></td></tr>`;}
+// "Bugün", "Dün", "3 gün önce"; 30 günden eskiyse tarih.
+function agoText(v){const t=new Date(v);if(!v||isNaN(t))return '—';const a=new Date(),d0=new Date(a.getFullYear(),a.getMonth(),a.getDate()),d1=new Date(t.getFullYear(),t.getMonth(),t.getDate()),n=Math.round((d0-d1)/864e5);
+  return n<=0?'Bugün':n===1?'Dün':n<=30?n+' gün önce':t.toLocaleDateString(LOC);}
 const fmtDate=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)),d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
   const list=visibleSites(),pi=pageOf(list,'loc');
-  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="14" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
+  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="17" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
   const T=sumOf(list);$('locFoot').innerHTML=locFootHtml(T);$('locKpi').innerHTML=legendHtml()+kpiTilesHtml(T);
   $('locCount').textContent=list.length+' / '+db.sites.length+' proje';
   $('locPager').innerHTML=pagerHtml('loc',pi);
@@ -1358,7 +1362,7 @@ function renderLocations(){
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>İl</th><th>İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
+    <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Müşteri</th><th>Aşama</th><th>İl</th><th>İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Toplam Soket</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th><th>Son Güncelleme</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
   paintLocRows();
 }
 function render(){
