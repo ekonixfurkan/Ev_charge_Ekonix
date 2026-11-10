@@ -1085,7 +1085,7 @@ function blankSite(name){
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
-let db={version:1,sites:[]},activeId=null,view='portfolio',F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:''},sortKey='order',loaded=false,mode='none',canWrite=true,me={email:'',role:''};
+let db={version:1,sites:[]},activeId=null,view='portfolio',F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:''},sortKey='stage',loaded=false,mode='none',canWrite=true,me={email:'',role:''};
 const API='/api';
 const pending=new Map();let ver=0,flushTimer=null,flushing=false,pollTimer=null;
 function status(t,err=false){$('saveStatus').textContent=t;$('saveStatus').classList.toggle('err',err);}
@@ -1268,7 +1268,7 @@ function matchesF(s){
   if(F.q){const hay=norm([s.code,s.name,s.city,s.district,s.survey.partner,s.survey.lead,nextStageOf(s),s.blockerTr,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
   return true;
 }
-const SORTS={order:['Liste Sırası',byCreated],updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
+const SORTS={order:['Liste Sırası',byCreated],updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))||byCreated(a,b)],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
 /* ---------- Sayfalama: bir sayfada 15 proje ---------- */
 const PAGE_SIZE=15,pg={ovw:1,loc:1,pl:1},pgSig={};
 function pageOf(list,key,size=PAGE_SIZE,sigSrc){
