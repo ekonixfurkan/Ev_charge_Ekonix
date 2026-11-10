@@ -274,7 +274,7 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .pl-chip.late.on{border-color:var(--no);background:var(--no-soft);color:var(--no)}.pl-chip.late.on b{color:var(--no)}
 .pl-pager .pager{margin:8px 0}
 .pl-pager:empty{display:none}
-.pl-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;align-items:start;margin-top:4px}
+.pl-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;align-items:start;margin-top:4px}
 .pl-proj{border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);overflow:hidden}
 .pl-proj>header{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:10px 12px;background:var(--soft);border-bottom:1px solid var(--hair)}
 .pl-proj.empty>header{border-bottom:0}
@@ -284,24 +284,25 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 button.pl-add{padding:4px 12px;font-size:12px;font-weight:600;border:1px solid var(--ok);border-radius:var(--radius);background:var(--ok-soft);color:var(--ok);cursor:pointer;transition:background .12s,color .12s}
 button.pl-add:hover{background:var(--ok);color:#fff;border-color:var(--ok)}
 button.pl-add:focus-visible{outline:2px solid var(--ok);outline-offset:2px}
-.pl-tasks{display:grid;gap:8px;padding:10px}
-.pl-task{border:1px solid var(--hair);border-left:3px solid var(--hair-strong);border-radius:var(--radius);padding:8px 10px;background:var(--card)}
+.pl-tasks{display:grid;gap:12px;padding:14px}
+.pl-task{border:1px solid var(--hair);border-left:3px solid var(--hair-strong);border-radius:var(--radius);padding:12px 14px 22px;background:var(--card)}
 .pl-task{position:relative}
-.pl-flag{position:absolute;top:3px;right:8px;font-size:11px;font-weight:600;color:var(--muted)}
+.pl-flag{position:absolute;bottom:5px;right:12px;font-size:11px;font-weight:600;color:var(--muted)}
 .pl-flag.ok{color:var(--ok)}.pl-flag.bad{color:var(--no)}
-.pl-task.draft{border-left-color:var(--ok);background:var(--ok-soft)}
+.pl-task.draft{border-left-color:var(--ok);background:var(--ok-soft);padding-bottom:12px}
 .pl-draft-act{display:flex;align-items:center;gap:8px;margin-top:8px}
 .pl-err{font-size:12px;color:var(--no);font-weight:600}
 .pl-task.late{border-left-color:var(--no)}.pl-task.soon{border-left-color:var(--teal)}
 .pl-task.done{opacity:.65;border-left-color:var(--hair)}
 .pl-top{display:flex;gap:8px;align-items:flex-start}
-.pl-chk{margin:4px 0 0}.pl-chk input{width:16px;height:16px;min-height:0;margin:0;cursor:pointer;accent-color:var(--navy)}
-.pl-title{flex:1;width:100%;min-height:0;padding:3px 6px;border:1px solid transparent;border-radius:var(--radius);background:transparent;font:inherit;font-size:13px;line-height:1.35;color:var(--ink);resize:none}
-.pl-title:hover{border-color:var(--hair-strong)}.pl-title:focus{background:var(--card);border-color:var(--navy);outline:none}
+.pl-chk{margin:0;display:inline-flex}.pl-chk input{width:16px;height:16px;min-height:0;margin:0;cursor:pointer;accent-color:var(--navy)}
+.pl-title{display:block;width:100%;min-height:84px;margin-top:10px;padding:9px 11px;border:1px solid var(--hair-strong);border-radius:var(--radius);background:var(--card);font:inherit;font-size:14px;line-height:1.5;color:var(--ink);resize:vertical}
+.pl-title:hover{border-color:var(--muted)}.pl-title:focus{border-color:var(--navy);outline:2px solid var(--navy);outline-offset:-1px}
 .pl-task.done .pl-title{text-decoration:line-through;color:var(--muted)}
-.pl-meta{display:flex;align-items:center;gap:6px;margin-top:6px}
-.pl-meta select,.pl-meta input[type=date]{min-height:28px;padding:2px 6px;font-size:12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);color:var(--ink);flex:1 1 0;min-width:0}
-.pl-meta input[type=date]{flex:0 0 118px}
+.pl-meta{display:flex;align-items:center;gap:6px}.pl-meta .ghost{padding:4px 6px;flex:0 0 auto}
+.pl-meta select,.pl-meta input[type=date]{min-height:32px;padding:3px 8px;font-size:13px;font-weight:600;border:1px solid var(--hair);border-radius:var(--radius);background:var(--soft);color:var(--ink);min-width:0}
+.pl-meta select{flex:1 1 0}
+.pl-meta input[type=date]{flex:0 0 124px}
 .pl-task.late .pl-meta input[type=date]{color:var(--no);font-weight:600}
 .pl-task.soon .pl-meta input[type=date]{font-weight:600}
 .pl-meta button{padding:3px 6px}
@@ -2181,16 +2182,18 @@ function plAssigneeOptions(sel){
 }
 function plTaskHtml(t){
   const can=t.createdBy===pl.me||pl.admin,soon=t.due&&!t.done&&t.due>=todayStr()&&t.due<=plAddDays(todayStr(),7);
-  return `<div class="pl-task${t.done?' done':''}${plLate(t)?' late':''}${soon?' soon':''}" data-pt="${esc(t.id)}"><span class="pl-flag" role="status"></span>
-    <div class="pl-top"><label class="pl-chk"><input type="checkbox" data-ptdone ${t.done?'checked':''} aria-label="Tamamlandı"></label>
-      <textarea class="pl-title" data-ptf="title" rows="2" maxlength="200" placeholder="Görev (ör. Cumaya kadar teklif iletilecek)" aria-label="Görev">${esc(t.title)}</textarea></div>
-    <div class="pl-meta"><select data-ptf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(t.assignee)}</select>
+  return `<div class="pl-task${t.done?' done':''}${plLate(t)?' late':''}${soon?' soon':''}" data-pt="${esc(t.id)}">
+    <div class="pl-meta"><label class="pl-chk"><input type="checkbox" data-ptdone ${t.done?'checked':''} aria-label="Tamamlandı"></label>
+      <select data-ptf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(t.assignee)}</select>
       <input type="date" data-ptf="due" value="${esc(t.due)}" aria-label="Termin">
-      <button type="button" class="ghost" data-ptdel="${esc(t.id)}" aria-label="Görevi sil" title="Görevi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></div></div>`;
+      <button type="button" class="ghost" data-ptdel="${esc(t.id)}" aria-label="Görevi sil" title="Görevi sil" ${can?'':'disabled'}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/></svg></button></div>
+    <textarea class="pl-title" data-ptf="title" rows="3" maxlength="200" placeholder="Görev (ör. Cumaya kadar teklif iletilecek)" aria-label="Görev">${esc(t.title)}</textarea>
+    <span class="pl-flag" role="status"></span></div>`;
 }
 function plDraftHtml(d){
-  return `<div class="pl-task draft" data-pdraft><div class="pl-top"><textarea class="pl-title" data-pdf="title" rows="2" maxlength="200" placeholder="Görevi yazın, Enter ile kaydedin (ör. Cumaya kadar teklif iletilecek)" aria-label="Yeni görev">${esc(d.title)}</textarea></div>
+  return `<div class="pl-task draft" data-pdraft>
     <div class="pl-meta"><select data-pdf="assignee" aria-label="Sorumlu"><option value="">Sorumlu seçin</option>${plAssigneeOptions(d.assignee)}</select><input type="date" data-pdf="due" value="${esc(d.due)}" aria-label="Termin"></div>
+    <textarea class="pl-title" data-pdf="title" rows="3" maxlength="200" placeholder="Görevi yazın, Enter ile kaydedin (ör. Cumaya kadar teklif iletilecek)" aria-label="Yeni görev">${esc(d.title)}</textarea>
     <div class="pl-draft-act"><button type="button" class="pl-add" data-pdsave>Kaydet</button><button type="button" class="ghost" data-pdcancel>Vazgeç</button><span class="pl-err" id="plDraftErr" role="alert"></span></div></div>`;
 }
 // Üst özet: Açık · Bu hafta · Gecikmiş (rozet)
@@ -2216,7 +2219,7 @@ function paintPlanner(){
   const ordered=[...withTasks,...empty];
   const pi=pageOf(ordered,'pl',PL_PAGE,[f,db.sites.length]);
   box.innerHTML=pi.rows.map(card).join('')||'<p class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</p>';
-  const pager=pagerHtml('pl',pi);['plPagerTop','plPagerBottom'].forEach(id=>{const e=$(id);if(e)e.innerHTML=pager;});
+  const e=$('plPagerTop');if(e)e.innerHTML=pagerHtml('pl',pi);
   paintPlanner.last=ordered.map(([x])=>x.id);
 }
 async function renderPlanner(){
@@ -2234,7 +2237,6 @@ async function renderPlanner(){
     </div>
     <div id="plPagerTop" class="pl-pager"></div>
     <div id="plRows" class="pl-board"><p class="note" style="padding:24px;text-align:center">Yükleniyor…</p></div>
-    <div id="plPagerBottom" class="pl-pager"></div>
     </section>`;
   if(pl.loaded)paintPlanner();
   try{await loadTasks();}catch(e){if(view==='planner')plState(e.message,true);return;}
