@@ -1341,7 +1341,6 @@ function paintLocRows(){
   const list=visibleSites(),pi=pageOf(list,'loc');
   $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="17" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
   const T=sumOf(list);$('locFoot').innerHTML=locFootHtml(T);$('locKpi').innerHTML=legendHtml()+kpiTilesHtml(T);
-  $('locCount').textContent=list.length+' / '+db.sites.length+' proje';
   $('locPager').innerHTML=pagerHtml('loc',pi);
   $('locClear').hidden=!hasFilter();
 }
@@ -1350,7 +1349,7 @@ function renderLocations(){
   const uniq=f=>[...new Set(db.sites.map(f).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'tr'));
   const opt=(v,cur,t)=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(t??v)}</option>`;
   const selF=(id,label,key,items)=>`<label class="lf">${label}<select data-lf="${key}" id="${id}"><option value="">Tümü</option>${items.map(([v,t])=>opt(v,F[key],t)).join('')}</select></label>`;
-  $('view').innerHTML=`<section class="box"><h3>Proje Listesi<small id="locCount"></small></h3>
+  $('view').innerHTML=`<section class="box">
     <div class="locbar no-print">
       <label class="lf lq">Ara<input type="search" id="locQ" data-lf="q" value="${esc(F.q)}" placeholder="Ad, şehir, mal sahibi, ortak, sıradaki iş…" autocomplete="off"></label>
       ${selF('lfStage','Aşama','stage',STAGES.map(([k,t])=>[k,k+' '+t]))}
