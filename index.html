@@ -1323,7 +1323,7 @@ function sumOf(list){
   return T;
 }
 const mkTile=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
-function kpiTilesHtml(T,n){return (n!=null?mkTile('Proje Sayısı',n):'')+mkTile('DC Ünite',T.dcU)+mkTile('AC Ünite',T.acU)+mkTile('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')+mkTile('Şarj Noktası',T.sock);}
+function kpiTilesHtml(T,n){return (n!=null?mkTile('Proje Sayısı',n):'')+mkTile('DC Ünite',T.dcU)+mkTile('AC Ünite',T.acU)+mkTile('Toplam Ünite',T.dcU+T.acU)+mkTile('Toplam Soket',T.sock)+mkTile('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW');}
 function locRowsHtml(list){
   return list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status);
     return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.city)||'—'}</td><td>${esc(s.district)||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
