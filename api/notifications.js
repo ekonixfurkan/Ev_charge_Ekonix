@@ -37,10 +37,11 @@ export default async function handler(req, res) {
       }
       const last = String(seen[0].last_id);
       const site = String(req.query?.site || '').slice(0, 80);
+      const own = req.query?.own === '1'; // true: kendi işlemlerim de listelenir (okunmamış sayılmaz)
       const items = await s`SELECT a.id, a.at, a.actor, a.action, a.entity, a.entity_id, a.entity_name, a.summary, a.changes, NULLIF(u.name, '') AS actor_name, st.data->>'code' AS site_code,
-          (a.id > ${last}::bigint) AS unread
+          (a.id > ${last}::bigint AND a.actor <> ${user.email}) AS unread
         FROM activity_log a LEFT JOIN users u ON u.email = a.actor LEFT JOIN sites st ON st.id = a.entity_id
-        WHERE (${site} = '' OR a.entity_id = ${site}) AND a.entity = ANY(${ENTITIES}) AND a.action = ANY(${ACTIONS}) AND a.actor <> ${user.email} AND a.actor <> 'Sistem'
+        WHERE (${site} = '' OR a.entity_id = ${site}) AND a.entity = ANY(${ENTITIES}) AND a.action = ANY(${ACTIONS}) AND (${own}::boolean OR a.actor <> ${user.email}) AND a.actor <> 'Sistem'
         ORDER BY a.id DESC LIMIT 100`;
       const unread = items.filter((x) => x.unread).length;
       const more = await s`SELECT count(*)::int AS n FROM activity_log

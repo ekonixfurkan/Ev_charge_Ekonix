@@ -2674,7 +2674,7 @@ document.addEventListener('keydown',e=>{
 });
 
 /* ---------- Bildirimler (başkalarının projelerdeki işlemleri) ---------- */
-let bell={unread:0,items:[],newIds:new Set(),site:''},bellInit=false,bellT=null;
+let bell={unread:0,items:[],newIds:new Set(),site:'',own:false},bellInit=false,bellT=null;
 function paintBell(){
   const c=$('bellCount');if(c){c.textContent=bell.unread>99?'99+':bell.unread;c.hidden=!bell.unread;}
   if(view==='notifs')paintNotifRows();
@@ -2697,12 +2697,13 @@ function notifGroupHtml(n){
 function paintNotifRows(){
   const t=$('notifRows');if(!t)return;
   t.innerHTML=bell.items.length?bell.items.map(notifGroupHtml).join('')
-    :`<tr><td colspan="7" class="note" style="padding:24px;text-align:center">${bell.site?'Bu projede bildirim yok.':'Henüz bildirim yok. Diğer kullanıcılar projelerde güncelleme yaptıkça burada görünür.'}</td></tr>`;
+    :`<tr><td colspan="7" class="note" style="padding:24px;text-align:center">${bell.site?'Bu projede bildirim yok.':bell.own?'Henüz güncelleme yok.':'Henüz bildirim yok. Diğer kullanıcılar projelerde güncelleme yaptıkça burada görünür.'}</td></tr>`;
   const r=$('bellRead');if(r)r.hidden=!bell.unread;
 }
 async function renderNotifs(){
   bell.site='';bell.newIds=new Set(bell.items.filter(n=>n.unread).map(n=>n.id));
   $('view').innerHTML=`<section class="box"><h3>Bildirimler<span class="ct-tools no-print">
+      <label class="lchk nt-own"><input type="checkbox" id="ntOwn" ${bell.own?'checked':''}>Kendi güncellemelerimi göster</label>
       <select id="ntSite" aria-label="Proje"><option value="">Tüm projeler</option>${siteOptions('')}</select>
       <button type="button" id="ntClear" class="ghost" hidden>Filtreyi Temizle</button></span></h3>
     <div class="scroll"><table class="portfolio loctbl notif-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Proje Kodu</th><th>Proje</th><th>Alan</th><th>Eski Değer</th><th>Yeni Değer</th></tr></thead><tbody id="notifRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
@@ -2711,7 +2712,7 @@ async function renderNotifs(){
   await pollBell(true);
   if(view==='notifs'&&bell.unread)await markBellRead(true);
 }
-async function bellApi(method){const r=await fetch('/api/notifications'+(method==='GET'&&bell.site&&view==='notifs'?'?site='+encodeURIComponent(bell.site):''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:method==='POST'?'{}':undefined});if(r.status===401){location.replace('/login.html');throw new Error('401');}if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+async function bellApi(method){const r=await fetch('/api/notifications'+(method==='GET'&&view==='notifs'?'?'+new URLSearchParams({...(bell.site?{site:bell.site}:{}),...(bell.own?{own:'1'}:{})}).toString():''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:method==='POST'?'{}':undefined});if(r.status===401){location.replace('/login.html');throw new Error('401');}if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 async function pollBell(force){
   if(mode!=='cloud'||(document.hidden&&!force))return;
   try{const d=await bellApi('GET');
@@ -2730,6 +2731,7 @@ document.addEventListener('click',e=>{
     else toast('Proje bulunamadı.');}
 });
 document.addEventListener('change',async e=>{
+  if(e.target.id==='ntOwn'){bell.own=e.target.checked;await pollBell(true);return;}
   if(e.target.id!=='ntSite')return;
   bell.site=e.target.value;const c=$('ntClear');if(c)c.hidden=!bell.site;await pollBell(true);
 });
