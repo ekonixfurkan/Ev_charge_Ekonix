@@ -111,40 +111,47 @@ header h1{font-size:20px;font-weight:700}
 .ovw-grid{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px;align-items:start}
 .ovw-grid .box{margin-bottom:0}
 .kpi-col{display:grid;gap:12px;align-content:start}
-/* Ana Sayfa raporu */
-.dash{display:grid;gap:16px}
-.dash .box{margin-bottom:0}
-.dash-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-.dk{background:var(--card);border:1px solid var(--hair);border-top:3px solid var(--navy);border-radius:var(--radius);padding:14px 16px}
-.dk:nth-child(2){border-top-color:var(--dc)}.dk:nth-child(3){border-top-color:var(--ac)}.dk:nth-child(4){border-top-color:var(--teal)}.dk:nth-child(5){border-top-color:var(--info)}.dk:nth-child(6){border-top-color:var(--stg-08)}
-.dk span{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-.dk strong{display:block;margin-top:4px;font-size:30px;font-weight:700;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
-.dk strong small{font-size:14px;font-weight:500;color:var(--muted);margin-left:5px}
-.dk em{display:block;margin-top:6px;font-size:12px;font-style:normal;color:var(--muted)}
-.dash-row{display:grid;gap:16px;align-items:start}
-.dash-row.r-main{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
-.dash-row.r-two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-.hbars{display:grid;gap:9px;padding-top:4px}
-.hb{display:grid;grid-template-columns:minmax(150px,230px) minmax(0,1fr) 110px;gap:10px;align-items:center;font-size:13px;color:var(--ink2);border-radius:var(--radius);padding:2px 4px}
+/* Ana Sayfa raporu: 3 × 2 eşit kutu, %75 yakınlaştırmada tek ekrana sığar */
+.dash{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:16px;height:calc(100vh - 160px);min-height:560px}
+.dash .box.dcard{margin:0;display:flex;flex-direction:column;min-height:0;padding:16px 18px}
+.dcard>h3{flex:0 0 auto;margin:0 0 12px}
+.dbody{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column}
+.dk-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:10px}
+.dk{background:var(--soft);border:1px solid var(--hair);border-left:3px solid var(--navy);border-radius:var(--radius);padding:10px 14px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.dk:nth-child(2){border-left-color:var(--dc)}.dk:nth-child(3){border-left-color:var(--ac)}.dk:nth-child(4){border-left-color:var(--teal)}.dk:nth-child(5){border-left-color:var(--info)}.dk:nth-child(6){border-left-color:var(--stg-08)}
+.dk span{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.dk strong{margin-top:2px;font-size:26px;font-weight:700;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.dk strong small{font-size:13px;font-weight:500;color:var(--muted);margin-left:5px}
+.dk em{margin-top:3px;font-size:12px;font-style:normal;color:var(--muted)}
+.sr-wrap{flex:1;display:flex;flex-direction:column;min-height:0}
+.sr-body{flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
+.sr{display:grid;grid-template-columns:minmax(120px,1.5fr) minmax(40px,1fr) 38px 38px 38px 58px;gap:8px;align-items:center;font-size:12.5px;color:var(--ink2);padding:3px 4px;border-radius:var(--radius)}
+.sr[data-dgo]{cursor:pointer}.sr[data-dgo]:hover,.sr[data-dgo]:focus-visible{background:var(--soft)}
+.sr .num{text-align:right;font-variant-numeric:tabular-nums}
+.sr-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sr-l b{color:var(--muted);font-weight:600;margin-right:3px}
+.sr.z{color:var(--muted)}
+.sr-h{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--hair);padding-bottom:6px;margin-bottom:4px;border-radius:0}
+.sr-f{font-weight:700;color:var(--ink);border-top:1px solid var(--hair-strong);padding-top:6px;margin-top:4px;border-radius:0}
+.hbars{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:6px}
+.hb{display:grid;grid-template-columns:minmax(70px,110px) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px;color:var(--ink2);border-radius:var(--radius);padding:2px 4px}
 .hb[data-dgo]{cursor:pointer}.hb[data-dgo]:hover,.hb[data-dgo]:focus-visible{background:var(--soft)}
-.hb-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hb-l b{color:var(--muted);font-weight:600;margin-right:4px}
-.hb-t{height:14px;background:var(--soft);border-radius:7px;overflow:hidden}.hb-t i{display:block;height:100%;border-radius:7px}
+.hb-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb-t{height:12px;background:var(--soft);border-radius:6px;overflow:hidden}.hb-t i{display:block;height:100%;border-radius:6px}
 .hb-v{text-align:right;font-weight:700;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}.hb-v small{margin-left:6px;font-size:11px;font-weight:500;color:var(--muted)}
-.don-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding-top:4px}
-.donut{width:170px;height:170px;flex:0 0 auto}
+.don-wrap{flex:1;display:flex;align-items:center;justify-content:center;gap:20px;min-height:0}
+.donut{height:min(100%,230px);width:auto;aspect-ratio:1;flex:0 1 auto;min-height:0}
 .dn-seg{fill:none;stroke-width:5.5}.dn-n{font-size:9px;font-weight:700;fill:var(--ink);font-family:var(--font)}
-.don-leg{list-style:none;margin:0;padding:0;display:grid;gap:4px;flex:1 1 150px;min-width:150px}
+.don-leg{list-style:none;margin:0;padding:0;display:grid;gap:4px;flex:1 1 130px;min-width:120px}
 .don-leg li{display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:center;font-size:13px;padding:4px 6px;border-radius:var(--radius)}
 .don-leg li[data-dgo]{cursor:pointer}.don-leg li:hover{background:var(--soft)}
 .don-leg i{width:10px;height:10px;border-radius:50%}.don-leg b{font-variant-numeric:tabular-nums}
-.sp2s{display:grid;gap:18px;padding-top:4px}
+.sp2s{flex:1;display:flex;flex-direction:column;justify-content:space-around}
 .sp2-h{display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);margin-bottom:6px}.sp2-h b{color:var(--ink);font-size:15px}
 .sp2-bar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:var(--soft)}.sp2-bar i{display:block;height:100%}
 .sp2-l{display:flex;gap:18px;margin-top:6px;font-size:12px;color:var(--muted)}.sp2-l i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}.sp2-l b{color:var(--ink)}
-.dtbl,table.portfolio.dtbl{width:100%}.dtbl :is(th,td){white-space:nowrap;padding:9px 12px}
+.dtbl,table.portfolio.dtbl{width:100%}.dtbl :is(th,td){white-space:nowrap;padding:8px 12px}
 .dtbl tbody tr[data-dgo]{cursor:pointer}.dtbl tbody tr[data-dgo]:hover td{background:var(--soft)}
-.dtbl .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}
-@media (max-width:1100px){.dash-row.r-main,.dash-row.r-two{grid-template-columns:1fr}.hb{grid-template-columns:minmax(110px,170px) minmax(0,1fr) 90px}}
+@media (max-width:1100px){.dash{grid-template-columns:1fr;grid-template-rows:none;height:auto}.dash .box.dcard{min-height:340px}}
 .ovw-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .ovwtbl{width:100%}
 /* Kod, Proje ve Aşama solda; Sorumlu ile sayılar sağda. Aradaki boş alan (.sp) ileride kullanılmak üzere ayrıldı. */
@@ -1354,8 +1361,6 @@ function renderPortfolio(){
   if(!all.length){$('view').innerHTML=emptyHtml();return;}
   const T=sumOf(all),n=all.length,act=all.filter(isOpen).length,kw=T.dcKw+T.acKw;
   const tt=all.map(x=>[x,totals(x)]);
-  const tile=(l,v,u,sub)=>`<div class="dk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
-  const kpis=tile('Proje Sayısı',n,'',`${act} aktif · ${n-act} pasif`)+tile('DC Ünite',T.dcU,'',`${nf.format(T.dcKw)} kW`)+tile('AC Ünite',T.acU,'',`${nf.format(T.acKw)} kW`)+tile('Toplam Güç',nf.format(kw),'kW',`ortalama ${nf.format(kw/n)} kW / proje`)+tile('Şarj Noktası',T.sock,'',`${T.dcU+T.acU} ünite`)+tile('Ortalama Skor',(()=>{const v=all.map(x=>scoreOf(x).v).filter(x=>x!=null);return v.length?nf.format(v.reduce((a,b)=>a+b,0)/v.length):'—';})(),'',`${all.filter(x=>scoreOf(x).v!=null).length} projede skor var`);
   // Aşama
   const byStage=STAGES.map(([k,t])=>{const rows=tt.filter(([x])=>x.stage===k);return {k,t,n:rows.length,dcU:rows.reduce((a,[,q])=>a+q.dcUnits,0),dcKw:rows.reduce((a,[,q])=>a+q.dcKw,0),acU:rows.reduce((a,[,q])=>a+q.acUnits,0),acKw:rows.reduce((a,[,q])=>a+q.acKw,0)};});
   const maxS=Math.max(...byStage.map(x=>x.n),1);
@@ -1376,20 +1381,17 @@ function renderPortfolio(){
   const owners=[...om].sort((a,b)=>b[1].n-a[1].n||b[1].kw-a[1].kw);
   const stageTbl=byStage.map(x=>`<tr${x.n?` data-dgo="stage:${x.k}"`:''}><td><span class="dot" style="background:var(--stg-${x.k})"></span>${x.k} ${esc(x.t)}</td><td class="num">${x.n||'—'}</td><td class="num">${x.dcU||'—'}</td><td class="num">${x.dcKw?df.format(x.dcKw):'—'}</td><td class="num">${x.acU||'—'}</td><td class="num">${x.acKw?df.format(x.acKw):'—'}</td><td class="num"><b>${x.dcKw+x.acKw?df.format(x.dcKw+x.acKw):'—'}</b></td></tr>`).join('');
   const ownTbl=owners.map(([c,o])=>`<tr${c==='Atanmamış'?'':` data-dgo="owner:${esc(c)}"`}><td>${esc(c)}</td><td class="num">${o.n}</td><td class="num">${o.dc||'—'}</td><td class="num">${o.ac||'—'}</td><td class="num"><b>${df.format(o.kw)}</b></td></tr>`).join('');
-  $('view').innerHTML=`<div class="dash" data-tab="ovw">
-    <div class="dash-kpis">${kpis}</div>
-    <div class="dash-row r-main">
-      <section class="box"><h3>Aşamalara Göre Projeler<small>Çubuğa tıklayınca liste açılır</small></h3><div class="hbars">${stageBars}</div></section>
-      <section class="box"><h3>Durum Dağılımı</h3><div class="don-wrap">${donStat}<ul class="don-leg">${statLeg}</ul></div></section>
-    </div>
-    <div class="dash-row r-two">
-      <section class="box"><h3>DC ve AC Dağılımı</h3><div class="sp2s">${dcac}</div></section>
-      <section class="box"><h3>İllere Göre Projeler<small>İlk ${cities.length} il</small></h3><div class="hbars">${cityBars}</div></section>
-    </div>
-    <div class="dash-row r-main">
-      <section class="box"><h3>Aşama Özeti</h3><div class="scroll"><table class="portfolio dtbl"><thead><tr><th>Aşama</th><th class="num">Proje</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Toplam kW</th></tr></thead><tbody>${stageTbl}</tbody><tfoot><tr><td>Toplam</td><td class="num">${n}</td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${df.format(kw)}</td></tr></tfoot></table></div></section>
-      <section class="box"><h3>Sorumluya Göre</h3><div class="scroll"><table class="portfolio dtbl"><thead><tr><th>Sorumlu</th><th class="num">Proje</th><th class="num">DC</th><th class="num">AC</th><th class="num">Toplam kW</th></tr></thead><tbody>${ownTbl}</tbody></table></div></section>
-    </div></div>`;
+  const avg=(()=>{const v=all.map(x=>scoreOf(x).v).filter(x=>x!=null);return v.length?nf.format(v.reduce((a,b)=>a+b,0)/v.length):'—';})();
+  const card=(t,sm,body)=>`<section class="box dcard"><h3>${t}${sm?`<small>${sm}</small>`:''}</h3><div class="dbody">${body}</div></section>`;
+  const sTile=(l,v,u,sub)=>`<div class="dk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
+  const c1=`<div class="dk-grid">${sTile('Proje Sayısı',n,'',`${act} aktif · ${n-act} pasif`)}${sTile('DC Ünite',T.dcU,'',`${nf.format(T.dcKw)} kW`)}${sTile('AC Ünite',T.acU,'',`${nf.format(T.acKw)} kW`)}${sTile('Toplam Güç',nf.format(kw),'kW',`ortalama ${nf.format(kw/n)} kW / proje`)}${sTile('Şarj Noktası',T.sock,'',`${T.dcU+T.acU} ünite`)}${sTile('Ortalama Skor',avg,'',`${all.filter(x=>scoreOf(x).v!=null).length} projede skor var`)}</div>`;
+  const stRows=byStage.map(x=>`<div class="sr${x.n?'':' z'}"${x.n?` data-dgo="stage:${x.k}" role="button" tabindex="0"`:''}><span class="sr-l"><b>${x.k}</b> ${esc(x.t)}</span><span class="hb-t"><i style="width:${x.n/maxS*100}%;background:var(--stg-${x.k})"></i></span><span class="num">${x.n||'—'}</span><span class="num">${x.dcU||'—'}</span><span class="num">${x.acU||'—'}</span><span class="num">${x.dcKw+x.acKw?nf.format(x.dcKw+x.acKw):'—'}</span></div>`).join('');
+  const c2=`<div class="sr-wrap"><div class="sr sr-h"><span>Aşama</span><span></span><span class="num">Proje</span><span class="num">DC</span><span class="num">AC</span><span class="num">kW</span></div><div class="sr-body">${stRows}</div><div class="sr sr-f"><span>Toplam</span><span></span><span class="num">${n}</span><span class="num">${T.dcU}</span><span class="num">${T.acU}</span><span class="num">${nf.format(kw)}</span></div></div>`;
+  const c3=`<div class="don-wrap">${donStat}<ul class="don-leg">${statLeg}</ul></div>`;
+  const c4=`<div class="sp2s">${dcac}</div>`;
+  const c5=`<div class="hbars">${cityBars}</div>`;
+  const c6=`<table class="portfolio dtbl"><thead><tr><th>Sorumlu</th><th class="num">Proje</th><th class="num">DC</th><th class="num">AC</th><th class="num">Toplam kW</th></tr></thead><tbody>${ownTbl}</tbody></table>`;
+  $('view').innerHTML=`<div class="dash" data-tab="ovw">${card('Genel Özet','',c1)}${card('Aşamalara Göre Projeler','Satıra tıklayınca liste açılır',c2)}${card('Durum Dağılımı','',c3)}${card('DC ve AC Dağılımı','',c4)}${card('İllere Göre Projeler',`İlk ${cities.length} il`,c5)}${card('Sorumluya Göre','',c6)}</div>`;
 }
 document.addEventListener('click',e=>{const g=e.target.closest('[data-dgo]');if(!g||view!=='portfolio')return;dashGo(g.dataset.dgo);});
 document.addEventListener('keydown',e=>{const g=e.target.closest('[data-dgo]');if(g&&view==='portfolio'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();dashGo(g.dataset.dgo);}});
