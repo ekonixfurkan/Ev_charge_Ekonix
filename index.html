@@ -131,13 +131,20 @@ header h1{font-size:20px;font-weight:700}
 .dk strong{margin-top:2px;font-size:26px;font-weight:700;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
 .dk strong small{font-size:13px;font-weight:500;color:var(--muted);margin-left:5px}
 .dk em{margin-top:3px;font-size:12px;font-style:normal;color:var(--muted)}
-.sr-wrap{flex:1;display:flex;flex-direction:column;min-height:0}
+.sr-wrap{flex:1;display:flex;flex-direction:column;min-height:0;gap:12px}
+.sr-halves{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:28px;min-height:0}
+.sr-half{display:flex;flex-direction:column;min-height:0}
+.sr-f2{flex:0 0 auto;display:flex;justify-content:space-around;gap:12px;padding:10px 12px;background:var(--soft);border-radius:var(--radius);font-size:13px;color:var(--ink2)}
+.sr-f2 b{color:var(--ink);font-size:15px;margin-right:3px}
 .sr-body{flex:1;display:flex;flex-direction:column;justify-content:space-between;min-height:0}
-.sr{display:grid;grid-template-columns:minmax(120px,1.5fr) minmax(40px,1fr) 38px 38px 38px 58px;gap:8px;align-items:center;font-size:12.5px;color:var(--ink2);padding:3px 4px;border-radius:var(--radius)}
+.sr{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(30px,1fr) 30px 54px;gap:10px;align-items:center;font-size:15px;color:var(--ink2);padding:3px 4px;border-radius:var(--radius)}
 .sr[data-dgo]{cursor:pointer}.sr[data-dgo]:hover,.sr[data-dgo]:focus-visible{background:var(--soft)}
 .sr .num{text-align:right;font-variant-numeric:tabular-nums}
 .sr-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sr-l b{color:var(--muted);font-weight:600;margin-right:3px}
 .sr.z{color:var(--muted)}
+.sr-body .sr{flex:1;border-bottom:1px solid var(--hair);border-radius:0}.sr-body .sr:last-child{border-bottom:0}
+.sr-half .hb-t{height:14px;border-radius:7px}.sr-half .hb-t i{border-radius:7px}
+.sr-half .sr .num{font-weight:600;color:var(--ink)}
 .sr-h{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--hair);padding-bottom:6px;margin-bottom:4px;border-radius:0}
 .sr-f{font-weight:700;color:var(--ink);border-top:1px solid var(--hair-strong);padding-top:6px;margin-top:4px;border-radius:0}
 .hbars{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:6px}
@@ -1399,8 +1406,9 @@ function renderPortfolio(){
   const sTile=(l,v,u,sub)=>`<div class="dk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
   const part=(l,v,u,sub,c)=>`<div class="dk-part"${c?` style="--dkc:${c}"`:''}><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong>${sub?`<em>${sub}</em>`:''}</div>`;
   const c1=`<div class="dk-grid"><div class="dk dk-split s4" style="--dkc:var(--navy)">${part('Toplam Proje',n)}${part('Aktif',act,'','','var(--ok)')}${part('Pasif',n-act,'','','var(--no)')}${part('Toplam Güç',nf.format(kw),'kW')}</div><div class="dk dk-split s4" style="--dkc:var(--dc)">${part('DC Ünite',T.dcU,'',`${nf.format(T.dcKw)} kW`,'var(--dc)')}${part('AC Ünite',T.acU,'',`${nf.format(T.acKw)} kW`,'var(--ac)')}${part('Toplam Ünite',T.dcU+T.acU)}${part('Toplam Soket',T.sock)}</div></div>`;
-  const stRows=byStage.map(x=>`<div class="sr${x.n?'':' z'}"${x.n?` data-dgo="stage:${x.k}" role="button" tabindex="0"`:''}><span class="sr-l"><b>${x.k}</b> ${esc(x.t)}</span><span class="hb-t"><i style="width:${x.n/maxS*100}%;background:var(--stg-${x.k})"></i></span><span class="num">${x.n||'—'}</span><span class="num">${x.dcU||'—'}</span><span class="num">${x.acU||'—'}</span><span class="num">${x.dcKw+x.acKw?nf.format(x.dcKw+x.acKw):'—'}</span></div>`).join('');
-  const c2=`<div class="sr-wrap"><div class="sr sr-h"><span>Aşama</span><span></span><span class="num">Proje</span><span class="num">DC</span><span class="num">AC</span><span class="num">kW</span></div><div class="sr-body">${stRows}</div><div class="sr sr-f"><span>Toplam</span><span></span><span class="num">${n}</span><span class="num">${T.dcU}</span><span class="num">${T.acU}</span><span class="num">${nf.format(kw)}</span></div></div>`;
+  const stRow=x=>`<div class="sr${x.n?'':' z'}"${x.n?` data-dgo="stage:${x.k}" role="button" tabindex="0"`:''}><span class="sr-l"><b>${x.k}</b> ${esc(x.t)}</span><span class="hb-t"><i style="width:${x.n/maxS*100}%;background:var(--stg-${x.k})"></i></span><span class="num">${x.n||'—'}</span><span class="num">${x.dcKw+x.acKw?nf.format(x.dcKw+x.acKw):'—'}</span></div>`;
+  const stHalf=list=>`<div class="sr-half"><div class="sr sr-h"><span>Aşama</span><span></span><span class="num">Proje</span><span class="num">kW</span></div><div class="sr-body">${list.map(stRow).join('')}</div></div>`;
+  const c2=`<div class="sr-wrap"><div class="sr-halves">${stHalf(byStage.slice(0,5))}${stHalf(byStage.slice(5))}</div><div class="sr-f2"><span>Toplam</span><span><b>${n}</b> proje</span><span><b>${T.dcU}</b> DC ünite</span><span><b>${T.acU}</b> AC ünite</span><span><b>${nf.format(kw)}</b> kW</span></div></div>`;
   const maxSt=Math.max(...byStat.map(x=>x.n),1);
   const c3=`<div class="vcols">${byStat.map(x=>{const q=tt.filter(([y])=>statusOf(y.status).k===x.k).reduce((a,[,t])=>a+t.kw,0);return `<div class="vc" data-dgo="status:${x.k}" role="button" tabindex="0" title="${esc(x.t)}: ${x.n} proje"><span class="vc-n">${x.n}</span><span class="vc-kw">${x.n?nf.format(q)+' kW':'—'}</span><span class="vc-bar"><i style="height:${x.n?Math.max(4,x.n/maxSt*100):0}%;background:${x.c}"></i></span><span class="vc-l">${esc(x.t)}</span></div>`;}).join('')}</div>`;
   const c5=`<div class="hbars">${cityBars}</div>`;
