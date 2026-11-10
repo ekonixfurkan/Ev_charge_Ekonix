@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       }
       const prev = await s`SELECT data FROM sites WHERE id = ${site.id}`;
       // Proje kodu yalnızca sunucudan gelir: varsa korunur, yoksa sıradaki numara verilir (istemcinin gönderdiği değer yok sayılır).
-      site.code = prev[0]?.data?.code || (await nextCode(s));
+      site.code = prev[0]?.data?.code || (await nextCode(s, site));
       await s`INSERT INTO sites (id, data, updated_at)
               VALUES (${site.id}, ${JSON.stringify(site)}::jsonb, now())
               ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`;

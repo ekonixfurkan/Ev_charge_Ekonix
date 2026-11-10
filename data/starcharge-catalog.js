@@ -1,7 +1,8 @@
 // StarCharge ürün kataloğu. Kaynak: https://www.starcharge.com/products/ev-charging (ürün sayfaları, Kasım 2026).
 // Yalnızca sitede yazan değerler alınmıştır. kw: null ise sitede güç yazmaz (dispenser'ın gücü bağlı olduğu güç kabinine göre belirlenir).
-// type: DC | AC · form: ürün türü · sockets: ünite başına soket/konnektör sayısı (0 = soket yok, güç kabini)
+// type: DC | AC | CAB (dağıtım kabini) · form: ürün türü · sockets: ünite başına soket/konnektör sayısı (0 = soket yok, güç kabini)
 window.SC_CATALOG=[
+ {brand:'StarCharge',model:'Neptune',type:'DC',form:'Tek gövde',kws:[120],sockets:2,conn:'',volt:'',amp:'',ip:'',url:''},
  {brand:'StarCharge',model:'Venus V3',type:'DC',form:'Tek gövde (duvar/ayaklı)',kws:[20,30],sockets:1,conn:'1 × CCS2',volt:'150–1000 Vdc',amp:'20 kW: 80 A · 30 kW: 100 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/81'},
  {brand:'StarCharge',model:'Jupiter V5',type:'DC',form:'Tek gövde',kws:[60,80,120],sockets:2,conn:'CCS2 + CCS2 / CCS2 + GBT',volt:'150–1000 Vdc',amp:'CCS2 200–250 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/11'},
  {brand:'StarCharge',model:'Titan V4',type:'DC',form:'Tek gövde',kws:[240,320],sockets:2,conn:'CCS2 + CCS2 (eş zamanlı)',volt:'150–1000 Vdc',amp:'300 A (500 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/10'},
@@ -18,5 +19,6 @@ window.SC_CATALOG=[
  {brand:'StarCharge',model:'Artemis V2',type:'AC',form:'AC wallbox',kws:[7.4,11,22],sockets:1,conn:'1 × Tip 2',volt:'230/400 Vac',amp:'',ip:'IP65',url:'https://www.starcharge.com/products/ev-charging/ac-charger/82'},
  {brand:'StarCharge',model:'Arc V1',type:'AC',form:'AC şarj ünitesi',kws:[7,11,22],sockets:1,conn:'1 × Tip 2',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/19'},
  {brand:'StarCharge',model:'Saturn',type:'AC',form:'AC çift soketli',kws:[44],sockets:2,conn:'2 × Tip 2 (2 × 22 kW)',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/18'},
- {brand:'StarCharge',model:'Juno',type:'AC',form:'AC wallbox',kws:[9.6,12],sockets:1,conn:'1 × Tip 1 (J1772) / NACS',volt:'208/240 Vac, 1 faz',amp:'9,6 kW: 40 A · 12 kW: 50 A',ip:'NEMA Tip 4',url:'https://www.starcharge.com/products/ev-charging/ac-charger/17'}
+ {brand:'StarCharge',model:'Juno',type:'AC',form:'AC wallbox',kws:[9.6,12],sockets:1,conn:'1 × Tip 1 (J1772) / NACS',volt:'208/240 Vac, 1 faz',amp:'9,6 kW: 40 A · 12 kW: 50 A',ip:'NEMA Tip 4',url:'https://www.starcharge.com/products/ev-charging/ac-charger/17'},
+ {brand:'StarCharge',model:'Nova V5',type:'CAB',form:'Dağıtım kabini',kws:[360],sockets:0,conn:'',volt:'',amp:'',ip:'',url:''}
 ];

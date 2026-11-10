@@ -850,7 +850,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 </dialog>
 <dialog id="catDlg">
   <div class="cat-head"><div><h2>StarCharge Ürün Kataloğu</h2><p class="dsub">Satıra "Ekle" diyerek ünite listesine direkt ekleyin; marka/model, tip, güç ve soket sayısı otomatik dolar.</p></div><button type="button" id="catClose" class="ghost" aria-label="Kapat">✕</button></div>
-  <div class="cat-bar"><div class="viewbar" id="catType"><button type="button" data-ct="" aria-pressed="true">Tümü</button><button type="button" data-ct="DC" aria-pressed="false">DC</button><button type="button" data-ct="AC" aria-pressed="false">AC</button></div><input type="search" id="catQ" placeholder="Model ara…" autocomplete="off"></div>
+  <div class="cat-bar"><div class="viewbar" id="catType"><button type="button" data-ct="" aria-pressed="true">Tümü</button><button type="button" data-ct="DC" aria-pressed="false">DC</button><button type="button" data-ct="AC" aria-pressed="false">AC</button><button type="button" data-ct="CAB" aria-pressed="false">Dağıtım Kabini</button></div><input type="search" id="catQ" placeholder="Model ara…" autocomplete="off"></div>
   <div class="scroll"><table class="cat-tbl"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
   <p class="note">Kaynak: starcharge.com ürün sayfaları. Güç yazmayan dispenser modellerinde (Hydrus, Aries, Triton) güç, bağlı güç kabinine göre belirlenir; kW elle girilir.</p>
 </dialog>
@@ -874,11 +874,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
       <label>İl<select id="dlgCity"></select></label>
       <label>İlçe<select id="dlgDistrict" disabled></select></label>
       <label class="span2">Adres<textarea id="dlgAddress" rows="2" maxlength="300"></textarea></label>
-      <div class="trio">
-        <label>Enlem<input id="dlgLat" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="41.0082"></label>
-        <label>Boylam<input id="dlgLng" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="28.9784"></label>
-        <label>Tarih<input id="dlgDate" type="date"></label>
-      </div>
+      <label>Tarih<input id="dlgDate" type="date"></label>
       <label class="span2">Genel notlar<textarea id="dlgNotes" rows="3" maxlength="2000"></textarea></label>
     </div>
     <p class="alert" id="dlgErr" role="alert" hidden></p>
@@ -942,7 +938,7 @@ const CHK={
   scope:[['ev','EV şarj'],['pv','PV'],['bess','BESS'],['pvbessev','PV-BESS-EV'],['other','Diğer']],
   access:[['road','Ana yoldan görünür'],['turn','Kolay giriş'],['restricted','Kısıtlı giriş']],
   pave:[['concrete','Beton'],['asphalt','Asfalt'],['pavers','Kilitli taş'],['soil','Toprak / yeşil alan'],['roof','Çatı / kanopi']],
-  lay:[['trench','Kanal (hendek)'],['tray','Kablo tavası'],['duct','Boru'],['wall','Duvar'],['road','Yol geçişi']],
+  lay:[['trench','Kanal (hendek)'],['tray','Kablo tavası'],['duct','Boru'],['wall','Duvar']],
   pvpot:[['carport','Otopark kanopisi'],['roof','Çatı'],['retrofit','Mevcut yapıya ek'],['na','Uygun değil']],
   exist:[['light','Aydınlatma'],['cctv','CCTV'],['fire','Yangın ekipmanı'],['sec','Güvenlik personeli']]
 };
@@ -1225,6 +1221,9 @@ function totals(s){
     else{acKw+=q*(+u.kw||0);acSock+=q*(+u.sockets||0);acUnits+=q;}}
   return {dcKw,acKw,dcSock,acSock,dcUnits,acUnits,cabs,kw:dcKw+acKw,sockets:dcSock+acSock};
 }
+// Başlıkta ve Takip alanında: 8 kriterin hepsi puanlanmadıysa şimdiye kadarki ön puan (ör. 15/37) gösterilir; kesin skor (liste, rapor) tamamlanınca oluşur.
+function scoreShown(s){const sc=scoreOf(s);if(sc.v!=null)return {label:sc.label,cls:sc.cls,text:sc.text};const d=amgScore(s);
+  return d.done?{label:`${d.total}/${d.max}`,cls:'',text:`Ön puan · ${d.done}/${AMG.length} kriter`}:{label:'—',cls:'none',text:''};}
 function amgScore(s){
   const sc=s.amg?.scores||{};let total=0,done=0,max=0;
   for(const c of AMG){const v=sc[c.k];if(v===''||v==null||!Number.isFinite(+v))continue;done++;total+=+v;max+=c.w;}
@@ -1249,7 +1248,7 @@ function syncScore(s){
     s.score='';s.scoreSrc='';
     if(s.autoClosed&&s.status==='ddfailed'){s.status='active';s.autoClosed=false;}
   }
-  const b=$('scoreBox');if(b&&s===cur())b.value=scoreOf(s).label;
+  const b=$('scoreBox');if(b&&s===cur())b.value=scoreShown(s).label;
 }
 const capRef=s=>{const a=+s.survey?.availKw||0;return a>0?{v:a,u:'kW kullanılabilir'}:(+s.gridKva>0?{v:+s.gridKva,u:'kVA trafo'}:null);};
 
@@ -1574,18 +1573,14 @@ function renderSite(){
     <label>İl<select data-f="city">${ilOptions(s.city)}</select></label>
     <label>İlçe<select data-f="district" data-needs-city ${s.city?'':'disabled'}>${ilceOptions(s.city,s.district)}</select></label>
     ${field('address','Adres','text',' class="span4"')}
-    <div class="trio">
-      <label>Enlem<input data-f="lat" type="number" min="-90" max="90" step="any" inputmode="decimal" placeholder="41.0082" value="${esc(s.lat)}"></label>
-      <label>Boylam<input data-f="lng" type="number" min="-180" max="180" step="any" inputmode="decimal" placeholder="28.9784" value="${esc(s.lng)}"></label>
-      <label>Kayıt tarihi<input data-f="recordDate" type="date" value="${esc(s.recordDate)}"></label>
-    </div>
+    <label>Kayıt tarihi<input data-f="recordDate" type="date" value="${esc(s.recordDate)}"></label>
   </div></section>
 
   <section class="box"><h3>Takip ve Durum</h3>
   <div class="grid infogrid">
     <label>Aşama<select data-f="stage">${STAGES.map(([k,t])=>`<option value="${k}" ${k===s.stage?'selected':''}>${esc(k+' '+t)}</option>`).join('')}</select></label>
     <label>Durum<select data-f="status">${STATUSES.map(st=>`<option value="${st.k}" ${st.k===s.status?'selected':''}>${esc(st.t)}</option>`).join('')}</select></label>
-    <label>Skor<input id="scoreBox" data-locked readonly tabindex="-1" value="${esc(scoreOf(s).label)}" title="Skor Hesaplama sekmesindeki 8 kriterin toplamından gelir; elle değiştirilemez"></label>
+    <label>Skor<input id="scoreBox" data-locked readonly tabindex="-1" value="${esc(scoreShown(s).label)}" title="Skor Hesaplama sekmesindeki 8 kriterin toplamından gelir; elle değiştirilemez"></label>
     ${leadField()}
     <label class="span4">Sıradaki iş<input id="nextActionBox" data-locked readonly tabindex="-1" value="${esc(nextStageOf(s))}" title="Bir sonraki aşama; aşama değişince kendiliğinden güncellenir"></label>
     ${field('nextActionDate','Sıradaki iş tarihi','date')}
@@ -1607,6 +1602,7 @@ function renderSite(){
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}
     ${sv('cableM','İstasyona kablo mesafesi (m)','number')}<label>Elektrik tarifesi ($/kWh)<input id="tariffBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Gelir Modeli’ndeki Elektrik maliyetinden gelir; orada girilir"></label>${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
     ${chk('lay','Kablo döşeme')}${chk('pvpot','PV potansiyeli')}
+    ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
     <label class="span4">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label>
   </div><p class="note" id="evPotential"></p></details>
@@ -1695,16 +1691,16 @@ function unitRow(u){
   const cab=u.kind==='CAB',cls=u.kind==='DC'?'kind-dc':cab?'kind-cab':'kind-ac';
   return `<tr data-u="${u.id}" class="${cls}">
     <td class="w-kind"><select data-uf="kind" aria-label="Tip"><option value="DC" ${u.kind==='DC'?'selected':''}>DC</option><option value="AC" ${u.kind==='AC'?'selected':''}>AC</option><option value="CAB" ${cab?'selected':''}>Dağıtım Kabini</option></select></td>
-    <td class="w-n"><input data-uf="kw" type="number" min="0" step="any" inputmode="decimal" value="${cab?'':u.kw}" ${cab?'disabled placeholder="—"':''} aria-label="Ünite gücü kW"></td>
-    <td class="w-n"><input data-uf="sockets" type="number" min="1" step="1" inputmode="numeric" value="${cab?'':u.sockets}" ${cab?'disabled placeholder="—"':''} aria-label="Soket"></td>
+    <td class="w-n"><input data-uf="kw" type="number" min="0" step="any" inputmode="decimal" value="${cab&&!(+u.kw)?'':u.kw}" aria-label="Ünite gücü kW"></td>
+    <td class="w-n"><input data-uf="sockets" type="number" min="1" step="1" inputmode="numeric" value="${cab?'':u.sockets}" ${cab?'data-locked readonly tabindex="-1" placeholder="—"':''} aria-label="Soket"></td>
     <td class="w-n"><input data-uf="qty" type="number" min="1" step="1" inputmode="numeric" value="${u.qty}" aria-label="Adet"></td>
-    <td>${cab?`<input data-uf="model" value="${esc(u.model)}" placeholder="ör. dağıtım kabini modeli" aria-label="Marka / model">`:catSelectHtml(u)}${u.info?`<small class="uinfo">${esc(u.info)}${u.src?` · <a href="${esc(u.src)}" target="_blank" rel="noopener">ürün sayfası</a>`:''}</small>`:''}</td>
+    <td>${catSelectHtml(u)}${u.info?`<small class="uinfo">${esc(u.info)}${u.src?` · <a href="${esc(u.src)}" target="_blank" rel="noopener">ürün sayfası</a>`:''}</small>`:''}</td>
     <td class="num" data-utotal>${cab?'—':nf.format((+u.kw||0)*(+u.qty||0))}</td>
     <td><button class="ghost" data-del="${u.id}" aria-label="Üniteyi sil">Sil</button></td></tr>`;
 }
 function updateDerived(){
   const s=cur();if(!s)return;const t=totals(s),d=amgScore(s),sc=scoreOf(s);
-  $('vScore').textContent=sc.label;$('vScore').className='score '+sc.cls;$('vDec').textContent=sc.v==null?'':sc.text;$('vDec').className='score '+sc.cls;
+  const sh=scoreShown(s);$('vScore').textContent=sh.label;$('vScore').className='score '+sh.cls;$('vDec').textContent=sh.text;$('vDec').className='score '+sh.cls;const sb=$('scoreBox');if(sb)sb.value=sh.label;
   $('vStage').textContent=stageLabel(s.stage);$('vStatus').textContent=statusOf(s.status).t;
   $('amgTotal').textContent=d.done?d.label:'Puanlanmadı';$('amgTotal').className='score '+d.cls;
   $('amgDec').textContent=d.complete?'Karar: '+d.dec.t+' ('+d.dec.en+')':d.done?`${AMG.length-d.done} kriter daha puanlanınca karar gösterilir`:'Her kriteri 0 ile ağırlığı arasında puanlayın';
@@ -1775,7 +1771,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   const s=blankSite(name);
   const base=$('dlgBase').value===''?'':Math.max(0,+$('dlgBase').value||0),ext=$('dlgExt').value===''?'':Math.max(0,+$('dlgExt').value||0);
   Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractBase:base,contractExt:ext,contractYears:(+base||0)+(+ext||0),
-    address:v('dlgAddress'),contact:v('dlgContact'),contactCompany:v('dlgCompany'),lat:$('dlgLat').value===''?'':+$('dlgLat').value,lng:$('dlgLng').value===''?'':+$('dlgLng').value,recordDate:$('dlgDate').value||todayStr(),phone:v('dlgPhone'),notes:v('dlgNotes')});
+    address:v('dlgAddress'),contact:v('dlgContact'),contactCompany:v('dlgCompany'),recordDate:$('dlgDate').value||todayStr(),phone:v('dlgPhone'),notes:v('dlgNotes')});
   db.sites.push(s);$('dlg').close();touched(s);
   activeId=s.id;view='site';sub='info';render();window.scrollTo({top:0});toast(name+' eklendi.');};
 $('view').addEventListener('click',e=>{const fb=e.target.closest('.fin-sub [data-fs]');if(fb){fsub=fb.dataset.fs;render();return;}const pb=e.target.closest('.fin-sub [data-ps]');if(pb){psub=pb.dataset.ps;render();return;}const st=e.target.closest('.subtabs [data-sub]');if(st){sub=st.dataset.sub;render();window.scrollTo(0,0);return;}const b=e.target.closest('.loc-row[data-id]');if(b)openSite(b.dataset.id);});
@@ -1847,7 +1843,7 @@ $('view').addEventListener('input',e=>{
     $('unitBody').innerHTML=s.units.map(unitRow).join('');applyEditState();touched(s);updateDerived();return;}
   if(el.dataset.uf){const tr=el.closest('[data-u]'),u=s.units.find(x=>x.id===tr.dataset.u);let v=el.value;const prevKind=u.kind;
     if(el.type==='number')v=Math.max(0,+v||0);u[el.dataset.uf]=v;
-    if(el.dataset.uf==='kind'){if(catIndexOf(u,prevKind)>=0){u.model='';u.info='';u.src='';u.other=false;}if(v!=='CAB'&&!(+u.kw)&&!(+u.sockets)){u.kw=v==='DC'?120:22;u.sockets=v==='DC'?2:1;}$('unitBody').innerHTML=s.units.map(unitRow).join('');applyEditState();touched(s);updateDerived();return;}
+    if(el.dataset.uf==='kind'){if(catIndexOf(u,prevKind)>=0){u.model='';u.info='';u.src='';u.other=false;}if(v==='CAB'){u.kw=0;u.sockets=0;}else if(!(+u.kw)&&!(+u.sockets)){u.kw=v==='DC'?120:22;u.sockets=v==='DC'?2:1;}$('unitBody').innerHTML=s.units.map(unitRow).join('');applyEditState();touched(s);updateDerived();return;}
     if(u.kind!=='CAB')tr.querySelector('[data-utotal]').textContent=nf.format((+u.kw||0)*(+u.qty||0));touched(s);updateDerived();}
 });
 
