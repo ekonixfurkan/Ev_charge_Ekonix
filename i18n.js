@@ -317,7 +317,7 @@
 
     'Görevi yazın, Enter ile kaydedin (ör. Cumaya kadar teklif iletilecek)': 'Type the task and press Enter to save (e.g. Send the proposal by Friday)', 'Yeni görev': 'New task', 'Kaydet': 'Save',
     'Görev metni boş olamaz.': 'The task text cannot be empty.', 'Görev kaydedildi.': 'Task saved.', '✓ Kaydedildi': '✓ Saved', 'Kaydedilemedi': 'Could not save', 'Kaydediliyor…': 'Saving…',
-    'İş Takibi': 'Business Tracker', 'Kayıtlar': 'Records', 'Genel Özet': 'Overview', 'Proje Sayısı': 'Projects', "Projelere Proje Listesi'nden ulaşın": 'Open projects from the Project List',
+    'İş Takibi': 'Business Tracker', 'Kayıtlar': 'Records', 'Aşamalara Göre Projeler': 'Projects by Stage', 'Çubuğa tıklayınca liste açılır': 'Click a bar to open the list', 'Durum Dağılımı': 'Status Breakdown', 'DC ve AC Dağılımı': 'DC and AC Breakdown', 'Ünite Sayısı': 'Unit Count', 'Güç': 'Power', 'İllere Göre Projeler': 'Projects by Province', 'Aşama Özeti': 'Stage Summary', 'Sorumluya Göre': 'By Owner', 'Ortalama Skor': 'Average Score', 'Belirtilmemiş': 'Not Specified', 'Atanmamış': 'Unassigned', 'DC': 'DC', 'AC': 'AC', 'Toplam kW': 'Total kW', 'Genel Özet': 'Overview', 'Proje Sayısı': 'Projects', "Projelere Proje Listesi'nden ulaşın": 'Open projects from the Project List',
 
     /* toplantı notları */
     '+ Yeni Toplantı Notu': '+ New Meeting Note', 'Ara: konu, proje, katılımcı, not…': 'Search: subject, project, participant, note…', 'Tüm projeler': 'All projects', 'Yeni projeler': 'New projects',
@@ -352,6 +352,11 @@
   function sub(s) { return tr(String(s).trim()); }
   var P = [
     [/^(.+) hesabı silinsin mi\? Bu geri alınamaz\.$/, function (m) { return 'Delete the account ' + m[1] + '? This cannot be undone.'; }],
+    [/^(\d+) aktif · (\d+) pasif$/, function (m) { return m[1] + ' active · ' + m[2] + ' inactive'; }],
+    [/^ortalama (.+) kW \/ proje$/, function (m) { return 'avg ' + m[1] + ' kW / project'; }],
+    [/^(\d+) ünite$/, function (m) { return m[1] + ' units'; }],
+    [/^(\d+) projede skor var$/, function (m) { return m[1] + ' projects scored'; }],
+    [/^İlk (\d+) il$/, function (m) { return 'Top ' + m[1] + ' provinces'; }],
     [/^(\d+) kişi$/, function (m) { return m[1] + (m[1] === '1' ? ' person' : ' people'); }],
     [/^Kişi eklendi(?:: (.+))?$/, function (m) { return 'Contact added' + (m[1] ? ': ' + m[1] : ''); }],
     [/^Kişi silindi(?:: (.+))?$/, function (m) { return 'Contact deleted' + (m[1] ? ': ' + m[1] : ''); }],
