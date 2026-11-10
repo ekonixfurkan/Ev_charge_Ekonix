@@ -272,7 +272,7 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .pl-chip.open{border-color:var(--navy);background:var(--navy-soft)}.pl-chip.open b{color:var(--navy)}
 .pl-chip.week b{color:var(--teal)}
 .pl-chip.late.on{border-color:var(--no);background:var(--no-soft);color:var(--no)}.pl-chip.late.on b{color:var(--no)}
-.pl-pager .pager{margin:8px 0}
+.pl-pager .pager{margin:0}.pl-pager .pg-info{display:none}.pl-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .pl-pager:empty{display:none}
 .pl-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;align-items:start;margin-top:4px}
 .pl-proj{border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);overflow:hidden}
@@ -2226,7 +2226,7 @@ async function renderPlanner(){
   if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Proje Görev Listesi</h3><p class="note">Proje Görev Listesi için sunucu bağlantısı gerekli.</p></section>';return;}
   if(!people.length)loadPeople();
   const f=pl.f,opt=(v,c,t)=>`<option value="${esc(v)}" ${v===c?'selected':''}>${esc(t)}</option>`;
-  $('view').innerHTML=`<section class="box"><h3>Proje Görev Listesi<span id="plCount" class="pl-chips"></span></h3>
+  $('view').innerHTML=`<section class="box">
     <div class="locbar no-print">
       <label class="lf">Sorumlu<select id="plAssignee"><option value="">Tümü</option>${opt(pl.me||me.email,f.assignee,'Bana atananlar')}${people.filter(x=>x.email!==(pl.me||me.email)).map(x=>opt(x.email,f.assignee,x.name||x.email)).join('')}</select></label>
       <label class="lf">Durum<select id="plStatus">${opt('open',f.status,'Açık')}${opt('done',f.status,'Tamamlandı')}${opt('all',f.status,'Tümü')}</select></label>
@@ -2234,8 +2234,8 @@ async function renderPlanner(){
       <label class="lf">Proje<select id="plSite"><option value="">Tümü</option>${siteOptions(f.site)}</select></label>
       <label class="lf lchk"><input type="checkbox" id="plHideEmpty" ${f.hideEmpty?'checked':''}>Görevsiz projeleri gizle</label>
       <button type="button" id="plClear" class="ghost" ${(f.assignee||f.range||f.site||f.status!=='open'||f.hideEmpty)?'':'hidden'}>Filtreleri Temizle</button><span id="plState" role="status"></span>
+      <span class="pl-right"><span id="plCount" class="pl-chips"></span><span id="plPagerTop" class="pl-pager"></span></span>
     </div>
-    <div id="plPagerTop" class="pl-pager"></div>
     <div id="plRows" class="pl-board"><p class="note" style="padding:24px;text-align:center">Yükleniyor…</p></div>
     </section>`;
   if(pl.loaded)paintPlanner();
