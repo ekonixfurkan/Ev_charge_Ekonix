@@ -272,6 +272,8 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .pl-chip.open{border-color:var(--navy);background:var(--navy-soft)}.pl-chip.open b{color:var(--navy)}
 .pl-chip.week b{color:var(--teal)}
 .pl-chip.late.on{border-color:var(--no);background:var(--no-soft);color:var(--no)}.pl-chip.late.on b{color:var(--no)}
+.pl-pager .pager{margin:8px 0}
+.pl-pager:empty{display:none}
 .pl-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;align-items:start;margin-top:4px}
 .pl-proj{border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);overflow:hidden}
 .pl-proj>header{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:10px 12px;background:var(--soft);border-bottom:1px solid var(--hair)}
@@ -1193,16 +1195,16 @@ function matchesF(s){
 }
 const SORTS={order:['Liste Sırası',byCreated],updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
 /* ---------- Sayfalama: bir sayfada 15 proje ---------- */
-const PAGE_SIZE=15,pg={ovw:1,loc:1},pgSig={};
-function pageOf(list,key){
-  const sig=JSON.stringify([F,sortKey]);if(pgSig[key]!==sig){pgSig[key]=sig;pg[key]=1;}
-  const pages=Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+const PAGE_SIZE=15,pg={ovw:1,loc:1,pl:1},pgSig={};
+function pageOf(list,key,size=PAGE_SIZE,sigSrc){
+  const sig=JSON.stringify(sigSrc||[F,sortKey]);if(pgSig[key]!==sig){pgSig[key]=sig;pg[key]=1;}
+  const pages=Math.max(1,Math.ceil(list.length/size));
   if(pg[key]>pages)pg[key]=pages;if(pg[key]<1)pg[key]=1;
-  const from=(pg[key]-1)*PAGE_SIZE;
-  return {rows:list.slice(from,from+PAGE_SIZE),page:pg[key],pages,total:list.length,from};
+  const from=(pg[key]-1)*size;
+  return {rows:list.slice(from,from+size),page:pg[key],pages,total:list.length,from,size};
 }
 function pagerHtml(key,info){
-  if(info.total<=PAGE_SIZE)return '';
+  if(info.total<=(info.size||PAGE_SIZE))return '';
   const {page,pages}=info,set=new Set([1,pages,page-1,page,page+1]);
   const nums=[...set].filter(n=>n>=1&&n<=pages).sort((a,b)=>a-b);
   let btns='',last=0;
@@ -1214,7 +1216,7 @@ function pagerHtml(key,info){
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-pg]');if(!b||b.disabled)return;
   pg[b.dataset.pg]=+b.dataset.to;
-  if(b.dataset.pg==='loc')paintLocRows();else render();
+  if(b.dataset.pg==='loc')paintLocRows();else if(b.dataset.pg==='pl')paintPlanner();else render();
 });
 function visibleSites(){return db.sites.filter(matchesF).sort(SORTS[sortKey][1]);}
 function filterText(){
@@ -2197,6 +2199,7 @@ function plCountHtml(){
   const chip=(cls,n,l)=>`<span class="pl-chip ${cls}"><b>${n}</b><span>${l}</span></span>`;
   return chip('open',open.length,'Açık')+chip('week',week,'Bu hafta')+chip('late'+(late?' on':''),late,'Gecikmiş');
 }
+const PL_PAGE=5;
 function paintPlanner(){
   const box=$('plRows');if(!box)return;
   const f=pl.f,filtering=!!(f.assignee||f.range);
@@ -2210,7 +2213,11 @@ function paintPlanner(){
   }
   const card=([x,all,list])=>{const o=all.filter(t=>!t.done).length,l=all.filter(plLate).length;
     return `<section class="pl-proj${list.length?'':' empty'}"><header><span class="c-code">${esc(x.code||'—')}</span><strong>${esc(x.name||'Adsız Proje')}</strong><small>${o} açık${l?` · <b style="color:var(--no)">${l} gecikmiş</b>`:''}</small><button type="button" class="pl-add" data-pladd="${esc(x.id)}">+ Görev</button></header>${(list.length||(pl.draft&&pl.draft.site===x.id))?`<div class="pl-tasks">${pl.draft&&pl.draft.site===x.id?plDraftHtml(pl.draft):''}${list.map(plTaskHtml).join('')}</div>`:''}</section>`;};
-  box.innerHTML=[...withTasks,...empty].map(card).join('')||'<p class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</p>';
+  const ordered=[...withTasks,...empty];
+  const pi=pageOf(ordered,'pl',PL_PAGE,[f,db.sites.length]);
+  box.innerHTML=pi.rows.map(card).join('')||'<p class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</p>';
+  const pager=pagerHtml('pl',pi);['plPagerTop','plPagerBottom'].forEach(id=>{const e=$(id);if(e)e.innerHTML=pager;});
+  paintPlanner.last=ordered.map(([x])=>x.id);
 }
 async function renderPlanner(){
   if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Proje Görev Listesi</h3><p class="note">Proje Görev Listesi için sunucu bağlantısı gerekli.</p></section>';return;}
@@ -2225,7 +2232,9 @@ async function renderPlanner(){
       <label class="lf lchk"><input type="checkbox" id="plHideEmpty" ${f.hideEmpty?'checked':''}>Görevsiz projeleri gizle</label>
       <button type="button" id="plClear" class="ghost" ${(f.assignee||f.range||f.site||f.status!=='open'||f.hideEmpty)?'':'hidden'}>Filtreleri Temizle</button><span id="plState" role="status"></span>
     </div>
+    <div id="plPagerTop" class="pl-pager"></div>
     <div id="plRows" class="pl-board"><p class="note" style="padding:24px;text-align:center">Yükleniyor…</p></div>
+    <div id="plPagerBottom" class="pl-pager"></div>
     </section>`;
   if(pl.loaded)paintPlanner();
   try{await loadTasks();}catch(e){if(view==='planner')plState(e.message,true);return;}
@@ -2253,7 +2262,9 @@ async function plDraftSave(){
   if(!d.title.trim()){if(err)err.textContent='Görev metni boş olamaz.';const i=document.querySelector('#plRows [data-pdraft] [data-pdf="title"]');if(i)i.focus();return;}
   const btn=document.querySelector('#plRows [data-pdsave]');if(btn)btn.disabled=true;
   try{const r=await plApi('POST','',{site:d.site,title:d.title.trim(),assignee:d.assignee,due:d.due});
-    pl.tasks.push(r.task);pl.draft=null;paintPlanner();toast('Görev kaydedildi.');
+    pl.tasks.push(r.task);pl.draft=null;paintPlanner();
+    const idx=(paintPlanner.last||[]).indexOf(r.task.siteId);if(idx>=0&&Math.floor(idx/PL_PAGE)+1!==pg.pl){pg.pl=Math.floor(idx/PL_PAGE)+1;paintPlanner();}
+    toast('Görev kaydedildi.');
     plFlag(r.task.id,'✓ Kaydedildi',2500);
     const el=document.querySelector(`#plRows [data-pt="${r.task.id}"]`);if(el)el.scrollIntoView({block:'nearest'});}
   catch(e){if(btn)btn.disabled=false;if($('plDraftErr'))$('plDraftErr').textContent=e.message;}
