@@ -2065,10 +2065,10 @@ async function renderMeetings(){
   if(!people.length)loadPeople();
   $('view').innerHTML=`<section class="box"><h3>Toplantı Notları<span class="pl-chips"><span class="pl-chip open"><b id="mtCount">${mt.rows.length}</b><span>not</span></span></span></h3>
     <div class="mt-grid">
-      <aside class="mt-list"><div class="mt-tools"><button type="button" class="pl-add mt-new" data-mtnew>+ Yeni Toplantı Notu</button>
+      <div class="mt-list"><div class="mt-tools"><button type="button" class="pl-add mt-new" data-mtnew>+ Yeni Toplantı Notu</button>
         <input type="search" id="mtQ" value="${esc(mt.q)}" placeholder="Ara: konu, proje, katılımcı, not…" aria-label="Ara">
         <select id="mtSite" aria-label="Proje süz"><option value="">Tüm projeler</option><option value="__new" ${mt.site==='__new'?'selected':''}>Yeni projeler</option>${siteOptions(mt.site)}</select></div>
-        <div id="mtItems"></div></aside>
+        <div id="mtItems"></div></div>
       <article class="mt-detail" id="mtDetail"></article></div></section>`;
   const dd=$('mtDetail');dd.dataset.rendered='';
   if(mt.loaded)paintMeetings();
