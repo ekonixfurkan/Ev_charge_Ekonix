@@ -50,7 +50,7 @@ async function meetingHandler(req, res, user, s) {
   if (req.method === 'GET') {
     const rows = await s`SELECT m.id, m.site_id, m.project_name, to_char(m.meeting_date, 'YYYY-MM-DD') AS d, m.title, m.participants, m.body, m.created_by, m.updated_at,
         NULLIF(u.name, '') AS created_by_name FROM meetings m LEFT JOIN users u ON u.email = m.created_by ORDER BY m.meeting_date DESC, m.id DESC`;
-    return res.status(200).json({ meetings: rows.map(meetShape), me: user.email, admin: user.role === 'admin' });
+    return res.status(200).json({ meetings: rows.map(meetShape), me: user.email, owner: Boolean(user.owner) });
   }
 
   const readFields = async (b, partial) => {
@@ -122,7 +122,7 @@ async function meetingHandler(req, res, user, s) {
     }
 
     if (req.method === 'DELETE') {
-      if (o.created_by !== user.email && user.role !== 'admin') return res.status(403).json({ error: 'Toplantı notunu yalnızca yazan kişi veya yönetici silebilir' });
+      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
       await s`DELETE FROM meetings WHERE id = ${key}::bigint`;
       const l = await label(o.site_id, o.project_name, o.title);
       await logActivity({ actor: user.email, action: 'toplanti-sil', entity: l.entity, entityId: l.id, entityName: l.name, summary: o.title || 'Toplantı notu' });
@@ -173,7 +173,7 @@ export default async function handler(req, res) {
       if (!/^\d+$/.test(id)) return res.status(400).json({ error: 'id gerekli' });
       const r = await s`SELECT n.author, n.site_id, (SELECT data->>'name' FROM sites WHERE id = n.site_id) AS name FROM site_notes n WHERE n.id = ${id}::bigint`;
       if (!r.length) return res.status(404).json({ error: 'Not bulunamadı' });
-      if (r[0].author !== user.email && user.role !== 'admin') return res.status(403).json({ error: 'Notu yalnızca yazan kişi veya yönetici silebilir' });
+      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
       await s`DELETE FROM site_notes WHERE id = ${id}::bigint`;
       await logActivity({ actor: user.email, action: 'not-sil', entity: 'lokasyon', entityId: r[0].site_id, entityName: r[0].name || r[0].site_id, summary: 'Şirket içi not silindi' });
       return res.status(200).json({ ok: true });

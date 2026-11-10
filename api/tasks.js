@@ -2,7 +2,7 @@
 //   GET                      tüm görevler
 //   POST {site, title?, assignee?, due?}   görev ekle
 //   PATCH ?id {title?, assignee?, due?, done?}
-//   DELETE ?id               (ekleyen veya yönetici)
+//   DELETE ?id               (yalnızca sahip hesap)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       const rows = await s`SELECT t.id, t.site_id, t.title, t.assignee, to_char(t.due, 'YYYY-MM-DD') AS due, t.done, t.done_at, t.created_by,
           NULLIF(u.name, '') AS assignee_name FROM site_tasks t LEFT JOIN users u ON u.email = t.assignee ORDER BY t.id`;
-      return res.status(200).json({ tasks: rows.map(shape), me: user.email, admin: user.role === 'admin' });
+      return res.status(200).json({ tasks: rows.map(shape), me: user.email, owner: Boolean(user.owner) });
     }
 
     if (req.method === 'POST') {
@@ -121,7 +121,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
-      if (o.created_by !== user.email && user.role !== 'admin') return res.status(403).json({ error: 'Görevi yalnızca ekleyen veya yönetici silebilir' });
+      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
       await s`DELETE FROM site_tasks WHERE id = ${id}::bigint`;
       if (o.title) await logActivity({ actor: user.email, action: 'gorev-sil', entity: 'lokasyon', entityId: o.site_id, entityName: name, summary: o.title });
       return res.status(200).json({ ok: true });

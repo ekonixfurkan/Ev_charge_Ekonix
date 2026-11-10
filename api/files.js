@@ -4,7 +4,7 @@
 //   POST {type:'blob.generate-client-token', payload}         tarayıcıdan doğrudan Blob'a yükleme için kısa ömürlü jeton (Hobby planda işlev sayısı sınırlı olduğu için burada)
 //   POST {action:'register', site, folder, name, pathname}   istemci yüklemesi bitince kaydı yazar
 //   POST {action:'folder', site, name}                        yeni klasör
-//   DELETE ?id=ID                    dosyayı sil (yükleyen veya yönetici)
+//   DELETE ?id=ID                    dosyayı sil (yalnızca sahip hesap)
 //   DELETE ?site=ID&folder=AD        boş özel klasörü sil
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
@@ -96,7 +96,7 @@ export default async function handler(req, res) {
       const folders = [...DEFAULT_FOLDERS];
       for (const c of custom) if (!folders.includes(c.name)) folders.push(c.name);
       for (const f of files) if (!folders.includes(f.folder)) folders.push(f.folder);
-      return res.status(200).json({ folders, defaults: DEFAULT_FOLDERS, files: files.map(shape), max: MAX_BYTES, me: user.email, admin: user.role === 'admin' });
+      return res.status(200).json({ folders, defaults: DEFAULT_FOLDERS, files: files.map(shape), max: MAX_BYTES, me: user.email, owner: Boolean(user.owner) });
     }
 
     if (req.method === 'POST') {
@@ -156,13 +156,13 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
+      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
       if (q.id) {
         const id = String(q.id);
         if (!/^\d+$/.test(id)) return res.status(400).json({ error: 'id gerekli' });
         const r = await s`SELECT * FROM site_files WHERE id = ${id}::bigint`;
         if (!r.length) return res.status(404).json({ error: 'Dosya bulunamadı' });
         const f = r[0];
-        if (f.uploaded_by !== user.email && user.role !== 'admin') return res.status(403).json({ error: 'Dosyayı yalnızca yükleyen veya yönetici silebilir' });
         try { await _deps.del(f.pathname); } catch { /* Blob'da yoksa kayıt yine de silinir */ }
         await s`DELETE FROM site_files WHERE id = ${id}::bigint`;
         const name = (await siteName(s, f.site_id)) || f.site_id;

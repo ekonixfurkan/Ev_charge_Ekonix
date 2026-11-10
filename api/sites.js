@@ -52,7 +52,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'DELETE') {
       // Excel'deki kural: kayıt silinmez, Durum ile kapatılır. Silme yalnızca yönetici.
-      if (user.role !== 'admin') return res.status(403).json({ error: 'Silme için yönetici yetkisi gerekli' });
+      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
       const id = req.query?.id;
       if (!id) return res.status(400).json({ error: 'id gerekli' });
       const prev = await s`SELECT data FROM sites WHERE id = ${id}`;

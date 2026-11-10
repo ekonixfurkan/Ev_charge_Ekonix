@@ -1,5 +1,5 @@
 // /api/contacts — Kişiler rehberi (şirket · ad · soyad · telefon · e-posta · unvan). Giriş yapan herkes okur/ekler/düzenler.
-// GET · POST { alanlar } · PATCH ?id { değişen alanlar } · DELETE ?id (yalnızca ekleyen veya yönetici)
+// GET · POST { alanlar } · PATCH ?id { değişen alanlar } · DELETE ?id (yalnızca sahip hesap)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       const rows = await s`SELECT * FROM contacts ORDER BY lower(company), lower(first_name), lower(last_name), id`;
-      return res.status(200).json({ contacts: rows.map(shape), me: user.email, admin: user.role === 'admin' });
+      return res.status(200).json({ contacts: rows.map(shape), me: user.email, owner: Boolean(user.owner) });
     }
 
     if (req.method === 'POST') {
@@ -99,7 +99,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
-      if (old[0].created_by !== user.email && user.role !== 'admin') return res.status(403).json({ error: 'Kişiyi yalnızca ekleyen veya yönetici silebilir' });
+      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
       await s`DELETE FROM contacts WHERE id = ${id}::bigint`;
       await logActivity({ actor: user.email, action: 'sil', entity: 'kisi', entityId: id, entityName: label(old[0]), summary: 'Kişi silindi' + (old[0].company ? ': ' + old[0].company : '') });
       return res.status(200).json({ ok: true });
