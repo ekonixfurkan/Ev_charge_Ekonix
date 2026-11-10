@@ -146,6 +146,14 @@ header h1{font-size:20px;font-weight:700}
 .hb-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hb-t{height:12px;background:var(--soft);border-radius:6px;overflow:hidden}.hb-t i{display:block;height:100%;border-radius:6px}
 .hb-v{text-align:right;font-weight:700;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}.hb-v small{margin-left:6px;font-size:11px;font-weight:500;color:var(--muted)}
+.vcols{flex:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;min-height:0}
+.vc{display:flex;flex-direction:column;align-items:center;min-height:0;cursor:pointer;border-radius:var(--radius);padding:6px 4px}
+.vc:hover,.vc:focus-visible{background:var(--soft)}
+.vc-n{font-size:30px;font-weight:700;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.vc-kw{font-size:11px;color:var(--muted);margin:2px 0 10px;white-space:nowrap}
+.vc-bar{flex:1;width:100%;max-width:70px;min-height:40px;display:flex;align-items:flex-end;background:var(--soft);border-radius:var(--radius) var(--radius) 0 0;overflow:hidden}
+.vc-bar i{display:block;width:100%;border-radius:var(--radius) var(--radius) 0 0}
+.vc-l{margin-top:10px;font-size:12.5px;font-weight:600;color:var(--ink2);text-align:center}
 .don-wrap{flex:1;display:flex;align-items:center;justify-content:center;gap:20px;min-height:0}
 .donut{height:min(100%,230px);width:auto;aspect-ratio:1;flex:0 1 auto;min-height:0}
 .dn-seg{fill:none;stroke-width:5.5}.dn-n{font-size:9px;font-weight:700;fill:var(--ink);font-family:var(--font)}
@@ -1393,7 +1401,8 @@ function renderPortfolio(){
   const c1=`<div class="dk-grid"><div class="dk dk-split s4" style="--dkc:var(--navy)">${part('Toplam Proje',n)}${part('Aktif',act)}${part('Pasif',n-act)}${part('Toplam Güç',nf.format(kw),'kW')}</div><div class="dk dk-split s4" style="--dkc:var(--dc)">${part('DC Ünite',T.dcU,'',`${nf.format(T.dcKw)} kW`,'var(--dc)')}${part('AC Ünite',T.acU,'',`${nf.format(T.acKw)} kW`,'var(--ac)')}${part('Toplam Ünite',T.dcU+T.acU)}${part('Toplam Soket',T.sock)}</div></div>`;
   const stRows=byStage.map(x=>`<div class="sr${x.n?'':' z'}"${x.n?` data-dgo="stage:${x.k}" role="button" tabindex="0"`:''}><span class="sr-l"><b>${x.k}</b> ${esc(x.t)}</span><span class="hb-t"><i style="width:${x.n/maxS*100}%;background:var(--stg-${x.k})"></i></span><span class="num">${x.n||'—'}</span><span class="num">${x.dcU||'—'}</span><span class="num">${x.acU||'—'}</span><span class="num">${x.dcKw+x.acKw?nf.format(x.dcKw+x.acKw):'—'}</span></div>`).join('');
   const c2=`<div class="sr-wrap"><div class="sr sr-h"><span>Aşama</span><span></span><span class="num">Proje</span><span class="num">DC</span><span class="num">AC</span><span class="num">kW</span></div><div class="sr-body">${stRows}</div><div class="sr sr-f"><span>Toplam</span><span></span><span class="num">${n}</span><span class="num">${T.dcU}</span><span class="num">${T.acU}</span><span class="num">${nf.format(kw)}</span></div></div>`;
-  const c3=`<div class="don-wrap">${donStat}<ul class="don-leg">${statLeg}</ul></div>`;
+  const maxSt=Math.max(...byStat.map(x=>x.n),1);
+  const c3=`<div class="vcols">${byStat.map(x=>{const q=tt.filter(([y])=>statusOf(y.status).k===x.k).reduce((a,[,t])=>a+t.kw,0);return `<div class="vc" data-dgo="status:${x.k}" role="button" tabindex="0" title="${esc(x.t)}: ${x.n} proje"><span class="vc-n">${x.n}</span><span class="vc-kw">${x.n?nf.format(q)+' kW':'—'}</span><span class="vc-bar"><i style="height:${x.n?Math.max(4,x.n/maxSt*100):0}%;background:${x.c}"></i></span><span class="vc-l">${esc(x.t)}</span></div>`;}).join('')}</div>`;
   const c5=`<div class="hbars">${cityBars}</div>`;
   $('view').innerHTML=`<div class="dash" data-tab="ovw">${card('Genel Özet','',c1)}${card('Aşamalara Göre Projeler','Satıra tıklayınca liste açılır',c2)}${card('Durum Dağılımı','',c3)}${card('İllere Göre Projeler',`İlk ${cities.length} il`,c5)}</div>`;
 }
