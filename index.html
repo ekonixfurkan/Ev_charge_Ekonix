@@ -1112,9 +1112,15 @@ function routeHash(){
 }
 function saveRoute(){
   if(!routeOn||!loaded)return;
-  const h=routeHash();if(location.hash===h)return;
-  try{history.replaceState(null,'',location.pathname+location.search+h);}catch(e){}
+  const h=routeHash(),first=!routeSeeded;routeSeeded=true;if(location.hash===h)return;
+  // İlk açılışta mevcut kayıt güncellenir; sonraki sayfa geçişleri geçmişe eklenir (geri tuşu bir önceki sayfaya döner).
+  try{history[first?'replaceState':'pushState'](null,'',location.pathname+location.search+h);}catch(e){}
 }
+let routeSeeded=false;
+window.addEventListener('popstate',()=>{
+  if(!routeOn||!loaded)return;
+  view='portfolio';sub='ovw';restoreRoute();render();window.scrollTo(0,0);
+});
 function restoreRoute(){
   routeOn=true;
   const parts=location.hash.replace(/^#\/?/,'').split('/').map(x=>{try{return decodeURIComponent(x);}catch(e){return x;}});
