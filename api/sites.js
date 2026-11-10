@@ -4,7 +4,7 @@ import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
 import { seedOnce } from '../lib/seed.js';
 import { nextCode, backfillCodes } from '../lib/codes.js';
-import { reorderOnce } from '../lib/reorder.js';
+import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
 
 export default async function handler(req, res) {
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
       try { await seedOnce(s); } catch { /* başlangıç listesi eklenemezse okuma bozulmasın */ }
       try { await backfillCodes(s); } catch { /* kod verilemezse okuma bozulmasın */ }
       try { await reorderOnce(s); } catch { /* sıra değişmezse okuma bozulmasın */ }
+      try { await swapCodesOnce(s); } catch { /* kodlar değişmezse okuma bozulmasın */ }
       const rows = await s`SELECT data FROM sites ORDER BY updated_at`;
       const cfg = await s`SELECT data FROM config WHERE key = 'team'`;
       const team = cfg[0]?.data?.names;
