@@ -110,7 +110,7 @@ header h1{font-size:20px;font-weight:700}
 .pipe-legend{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:0}
 .ovw-grid{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px;align-items:start}
 .ovw-grid .box{margin-bottom:0}
-.kpi-col{display:grid;gap:12px;align-content:start}
+.kpi-col{display:grid;gap:12px;align-content:start}.ovw-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .ovwtbl{width:100%}
 /* Kod, Proje ve Aşama solda; Sorumlu ile sayılar sağda. Aradaki boş alan (.sp) ileride kullanılmak üzere ayrıldı. */
 table.portfolio.ovwtbl :is(th,td){white-space:nowrap;width:1%;min-width:0;padding-left:12px;padding-right:12px}
@@ -1247,19 +1247,26 @@ function setPageTitle(){
 }
 function renderPipe(){$('pipeLegend').innerHTML=legendHtml();}
 const emptyHtml=()=>`<div class="emptystate"><div class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div><h2>İlk Projeyi Ekleyin</h2><p>Gelen saha tekliflerini buraya kaydedin; üniteleri ve kontrol listesini proje detayında doldurun.</p><button class="primary" onclick="openAdd()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>Proje ekle</button></div>`;
-function locRowsHtml(list){
-  return list.map(s=>{const st=statusOf(s.status),sc=scoreOf(s);
-    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td><span class="p1">${esc(s.name)}</span><span class="p2">${esc([s.city,typeLabel(s.type)].filter(Boolean).join(' · '))}</span></td>
-    <td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td>
-    <td class="num"><span class="amgscore ${sc.cls}">${sc.label}</span></td>
-    <td>${esc(s.survey.lead||'—')}${s.survey.partner?`<span class="p2">${esc(s.survey.partner)}</span>`:''}</td>
-    <td style="min-width:170px"><span class="p1" style="font-weight:500">${esc(nextStageOf(s))}</span>${s.nextActionDate?`<span class="p2">${esc(fmtDate(s.nextActionDate))}</span>`:''}</td>
-</tr>`;}).join('');
+function sumOf(list){
+  const T={dcU:0,acU:0,dcKw:0,acKw:0,sock:0};
+  list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
+  return T;
 }
+const mkTile=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
+function kpiTilesHtml(T,n){return (n!=null?mkTile('Proje Sayısı',n):'')+mkTile('DC Ünite',T.dcU)+mkTile('AC Ünite',T.acU)+mkTile('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')+mkTile('Şarj Noktası',T.sock);}
+function locRowsHtml(list){
+  return list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status);
+    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.city)||'—'}</td><td>${esc(s.district)||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
+      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td>
+      <td class="num"><span class="amgscore ${d.cls}">${d.label}</span></td>
+      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td></tr>`;}).join('');
+}
+function locFootHtml(T){return `<tr><td colspan="2">Toplam</td><td></td><td></td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td></tr>`;}
 const fmtDate=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)),d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
   const list=visibleSites(),pi=pageOf(list,'loc');
-  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="7" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
+  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="14" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
+  const T=sumOf(list);$('locFoot').innerHTML=locFootHtml(T);$('locKpi').innerHTML=legendHtml()+kpiTilesHtml(T);
   $('locCount').textContent=list.length+' / '+db.sites.length+' proje';
   $('locPager').innerHTML=pagerHtml('loc',pi);
   $('locClear').hidden=!hasFilter();
@@ -1281,7 +1288,7 @@ function renderLocations(){
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl loclist"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>Durum</th><th class="num">Skor</th><th>Sorumlu / Ortak</th><th>Sıradaki İş</th></tr></thead><tbody id="locRows"></tbody></table></div><div id="locPager"></div></section>`;
+    <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>İl</th><th>İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
   paintLocRows();
 }
 function render(){
@@ -1291,7 +1298,7 @@ function render(){
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='site'||(view==='portfolio'&&sub==='ovw');
   if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   setPageTitle();
@@ -1300,32 +1307,10 @@ function render(){
 }
 
 function renderPortfolio(){
-  const list=visibleSites(),pi=pageOf(list,'ovw');
   if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Projeler Yükleniyor</h2><p>Kayıtlı projeler buluttan getiriliyor.</p></div>';return;}
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
-  let T={dcU:0,acU:0,dcKw:0,acKw:0,sock:0};
-  list.forEach(s=>{const t=totals(s);T.dcU+=t.dcUnits;T.acU+=t.acUnits;T.dcKw+=t.dcKw;T.acKw+=t.acKw;T.sock+=t.sockets;});
-  const tot=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
-  const rows=aggregate(list),invalid=list.filter(s=>shareTotal(s.fin)>100),valid=list.filter(s=>shareTotal(s.fin)<=100),vrows=aggregate(valid);
-  let h=`<div class="ovw-grid" data-tab="ovw"><section class="box"><h3>Projeler<small>${hasFilter()?esc(filterText())+' filtresi uygulanıyor':'Satıra tıklayarak detayı açın'}</small></h3><div class="scroll"><table class="portfolio ovwtbl"><thead><tr>
-    <th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>İl</th><th>İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th></tr></thead><tbody>`+
-    pi.rows.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status),sc=d.cls;
-      return `<tr data-open="${s.id}" tabindex="0"><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc(s.city)||'—'}</td><td>${esc(s.district)||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
-      <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td>
-      <td class="num"><span class="amgscore ${sc}">${d.label}</span></td>
-      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td></tr>`;}).join('')+
-    `</tbody><tfoot><tr><td colspan="2">Toplam</td><td></td><td></td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td></tr></tfoot></table></div>${pagerHtml('ovw',pi)}</section>
-    <div class="kpi-col">${legendHtml()}${tot('DC Ünite',T.dcU)}${tot('AC Ünite',T.acU)}${tot('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW')}${tot('Şarj Noktası',T.sock)}</div></div>`;
-  if(list.length){
-    const f=aggFinance(valid),tf=valid.reduce((a,s)=>a+totalFin(s),0);
-    const warn=invalid.length?`<div class="alert">Pay toplamı %100'ü aşan projeler toplama dahil edilmedi: ${esc(invalid.map(s=>s.name).join(', '))}.</div>`:'';
-    h+=`<div class="viewbar subtabs fin-sub no-print" data-tab="port" role="tablist" aria-label="Portföy bölümleri">${PORT_TABS.map(([k,t])=>`<button type="button" data-ps="${k}" aria-pressed="${psub===k}">${t}</button>`).join('')}</div>
-    <section class="box" data-tab="port" data-psub="ozet"><h3>Portföy Özeti<small>${valid.length} proje, ${YEARS} yıl, nominal USD</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'kpi'):''}</section>
-    <section class="box" data-tab="port" data-psub="sonuc"><h3>Detaylı Sonuçlar<small>${YEARS} yıl, nominal USD</small></h3>${warn}${valid.length?resultsHtml(vrows,f,null,tf,'detail'):''}</section>`;
-  }
-  h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Hesaplama Esasları</summary><p class="note">Enerji = projedeki tüm ünitelerin toplam gücü (ünite kW × adet) × 8.760 saat × kapasite kullanımı. Soket sayısı enerjiyi çarpmaz. DC ve AC için ortak kullanım oranı uygulanır; kullanım her yıl girilen puan kadar artar ve %0–100 ile sınırlanır. Satış ve elektrik fiyatı artışları ayrı ayrı bileşik uygulanır.</p><p class="note">Paylaşım tabanı = hasılat − elektrik maliyeti. Yer sağlayıcı, Co-CPO, StarCharge, EKONİX ve diğer fon oranları aynı tabana uygulanır. Komisyon toplam hasılattan hesaplanır; komisyon ve işletme gideri yalnız Co-CPO payından düşülür.</p><p class="note">Finansman kalem kalem girilir (donanım, saha işleri, şebeke bağlantısı). Finansör yatırımını kendi gelir payından geri alır; Gelir Paylaşım Oranı, Paylaşım bölümündeki finansör payıdır. İç verim ve geri dönüş süresi her tarafın kendi nakit akışından, iskontosuz ve 7 yıl ile sınırlı hesaplanır. Vergi, finansman, amortisman ve enerji kayıpları hesaba girmez; sonuçlar gelir garantisi değildir.</p></details>`;
-  h+=`<details class="box" data-tab="port" data-psub="sonuc"><summary style="cursor:pointer;font-weight:600">Skor Nasıl Hesaplanır</summary><p class="note">Skorlama, AMG / StarCharge saha keşif ve yeterlilik formundaki 8 kriteri ve ağırlıkları birebir kullanır: konum 15, rekabet 10, mülkiyet 12, ticari koşullar 12, güç 14, inşaat 12, PV/BESS 10, işletme kontrolü 15; toplam 100. Her kriter 0 ile ağırlığı arasında puanlanır. Karar kılavuzu (Excel takip dosyasıyla aynı): 85 ve üzeri ilerlet, 75–84 eksikleri gider, 75 altı öncelik dışı. Karar yalnızca 8 kriterin tamamı puanlanınca gösterilir. İzinler ve EPDK ayrıca işaretlenir; “Uygun değil” olanlar engel olarak görünür. Durum alanını (Aday → Kredilendirilebilir) siz belirlersiniz.</p></details>`;
-  $('view').innerHTML=h;
+  const T=sumOf(db.sites);
+  $('view').innerHTML=`<section class="box" data-tab="ovw"><h3>Genel Özet<small>Projelere Proje Listesi'nden ulaşın</small></h3><div class="ovw-kpis">${kpiTilesHtml(T,db.sites.length)}</div></section>`;
 }
 
 function field(key,label,type='text',extra=''){

@@ -317,7 +317,7 @@
 
     'Görevi yazın, Enter ile kaydedin (ör. Cumaya kadar teklif iletilecek)': 'Type the task and press Enter to save (e.g. Send the proposal by Friday)', 'Yeni görev': 'New task', 'Kaydet': 'Save',
     'Görev metni boş olamaz.': 'The task text cannot be empty.', 'Görev kaydedildi.': 'Task saved.', '✓ Kaydedildi': '✓ Saved', 'Kaydedilemedi': 'Could not save', 'Kaydediliyor…': 'Saving…',
-    'İş Takibi': 'Business Tracker', 'Kayıtlar': 'Records',
+    'İş Takibi': 'Business Tracker', 'Kayıtlar': 'Records', 'Genel Özet': 'Overview', 'Proje Sayısı': 'Projects', "Projelere Proje Listesi'nden ulaşın": 'Open projects from the Project List',
 
     /* toplantı notları */
     '+ Yeni Toplantı Notu': '+ New Meeting Note', 'Ara: konu, proje, katılımcı, not…': 'Search: subject, project, participant, note…', 'Tüm projeler': 'All projects', 'Yeni projeler': 'New projects',
