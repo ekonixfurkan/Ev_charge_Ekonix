@@ -1715,10 +1715,10 @@ function renderSite(){
     ${chk('scope','Ana kapsam',' class="span4"')}
   </div></details>
   <details open><summary>Saha Koşulları ve Teknik Yapılabilirlik</summary><div class="grid subgrid">
-    ${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
+    ${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}${sel('parkType','Otopark türü',[['closed','Kapalı'],['open','Açık']])}
     ${chk('access','Erişim ve yol durumu')}${chk('pave','Zemin / inşaat işleri')}
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}${sel('trafoInvest','Trafo yatırımı gerekiyor mu?',[['y','Evet'],['n','Hayır']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}
-    ${sv('connPoint','Bağlantı noktası yeri')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}${sv('parkFee','Park ücreti kuralı')}${sv('rentTl','Aylık araç başı kiralama bedeli (₺) (KDV dahildir)','number')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
+    ${sv('connPoint','Bağlantı noktası yeri')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}${sv('parkFee','Park ücreti kuralı')}${sv('rentTl','Aylık araç başı kiralama bedeli (₺) (KDV dahildir)','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
     ${chk('lay','Kablo döşeme')}${chk('pvpot','PV potansiyeli')}
     ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}<label class="span2">Yol geçişi detayı<input data-sv="roadNote" type="text" value="${esc(s.survey.roadNote??'')}" placeholder="Geçiş güzergâhı, mülk sahibi, Karayolları"></label>
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
