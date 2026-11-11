@@ -300,6 +300,7 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .ct-in:hover{border-color:var(--hair-strong)}
 .ct-in:focus{background:var(--card);border-color:var(--navy);outline:none}
 .ct-in::placeholder{color:var(--muted);opacity:.55}
+#view input[data-sv]::placeholder{color:var(--muted);opacity:.55}
 .ct-grp td{background:var(--soft);border-top:1px solid var(--hair);padding:7px 10px}
 .ct-grp strong{font-size:13px}.ct-grp small{margin:0 8px;color:var(--muted)}
 .ct-grp .ct-tg{padding:2px 6px;border:0;background:transparent;color:var(--muted);cursor:pointer}
@@ -1719,7 +1720,7 @@ function renderSite(){
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}${sel('trafoInvest','Trafo yatırımı gerekiyor mu?',[['y','Evet'],['n','Hayır']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}
     ${sv('connPoint','Bağlantı noktası yeri')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}${sv('parkFee','Park ücreti kuralı')}${sv('rentTl','Aylık araç başı kiralama bedeli (₺) (KDV dahildir)','number')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
     ${chk('lay','Kablo döşeme')}${chk('pvpot','PV potansiyeli')}
-    ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}
+    ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}<label class="span2">Yol geçişi detayı<input data-sv="roadNote" type="text" value="${esc(s.survey.roadNote??'')}" placeholder="Geçiş güzergâhı, mülk sahibi, Karayolları"></label>
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
     <label class="span4">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label>
   </div><p class="note" id="evPotential"></p></details>
