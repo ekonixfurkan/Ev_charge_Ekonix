@@ -1994,7 +1994,7 @@ document.addEventListener('click',async e=>{
 });
 
 /* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
-let actF={q:'',actor:'',entity:'',site:''},actRows=[],actMore=false,actActors=[];
+let actOwn=false,actF={q:'',actor:'',entity:'',site:''},actRows=[],actMore=false,actActors=[];
 const ACT_LABEL={olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none'],'dosya-ekle':['Dosya Eklendi','stg'],'dosya-sil':['Dosya Silindi','lo'],'gorev-ekle':['Görev Eklendi','stg'],'gorev-tamam':['Görev Tamamlandı','hi'],'gorev-ata':['Görev Atandı','stg'],'gorev-sil':['Görev Silindi','lo'],'toplanti-ekle':['Toplantı Notu Eklendi','stg'],'toplanti-sil':['Toplantı Notu Silindi','lo']};
 const ENT_LABEL={lokasyon:'Proje',toplanti:'Toplantı',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
 // Proje filtresi: proje kodu · ad (kod sırasıyla)
@@ -2004,6 +2004,7 @@ async function fetchActivity(reset){
   const qs=new URLSearchParams({limit:'50'});
   if(!reset&&actRows.length)qs.set('before',String(actRows[actRows.length-1].id));
   for(const k of ['q','actor','entity','site'])if(actF[k])qs.set(k,actF[k]);
+  if(actOwn)qs.set('own','1');
   const r=await fetch('/api/activity?'+qs,{credentials:'same-origin'});
   if(r.status===401){location.replace('/login.html');throw new Error('401');}
   const d=await r.json().catch(()=>({}));
@@ -2034,6 +2035,7 @@ async function renderActivity(){
       <label class="lf">Proje<select id="actSite"><option value="">Tümü</option>${siteOptions(actF.site)}</select></label>
       <label class="lf">Kullanıcı<select id="actActor"><option value="">Tümü</option>${actActors.map(a=>opt(a.email,actF.actor,a.name||a.email)).join('')}</select></label>
       ${me&&me.role==='admin'?`<label class="lf">Tür<select id="actEntity"><option value="">Tümü</option>${Object.entries(ENT_LABEL).map(([k,t])=>opt(k,actF.entity,t)).join('')}</select></label>`:''}
+      <label class="lf lchk"><input type="checkbox" id="actOwn" ${actOwn?'checked':''}>Kendi güncellemelerimi göster</label>
       <button type="button" id="actClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
     <div class="scroll"><table class="portfolio loctbl act-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Proje Kodu</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
@@ -2062,7 +2064,7 @@ document.addEventListener('click',e=>{
 let actT=null;
 document.addEventListener('input',e=>{if(e.target.id!=='actQ')return;actF.q=e.target.value;clearTimeout(actT);actT=setTimeout(async()=>{try{await fetchActivity(true);paintActivity();}catch(x){toast(x.message);}},300);});
 document.addEventListener('change',async e=>{
-  if(e.target.id==='actActor')actF.actor=e.target.value;else if(e.target.id==='actEntity')actF.entity=e.target.value;else if(e.target.id==='actSite')actF.site=e.target.value;else return;
+  if(e.target.id==='actActor')actF.actor=e.target.value;else if(e.target.id==='actEntity')actF.entity=e.target.value;else if(e.target.id==='actSite')actF.site=e.target.value;else if(e.target.id==='actOwn')actOwn=e.target.checked;else return;
   try{await fetchActivity(true);paintActivity();}catch(x){toast(x.message);}
 });
 document.addEventListener('click',async e=>{
