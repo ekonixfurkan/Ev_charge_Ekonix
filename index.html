@@ -254,12 +254,13 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .brand{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;background:var(--side-d);border-bottom:1px solid rgba(255,255,255,.08)}
 /* Sayfa geçiş perdesi */
 #pgFx{position:fixed;top:0;right:0;bottom:0;left:0;z-index:25;display:none;align-items:center;justify-content:center;background:var(--paper);pointer-events:none}
-#pgFx.run{display:flex;animation:pgfx .62s ease-out both}
-#pgFx .logobox{padding:14px 22px;box-shadow:0 10px 30px rgba(8,26,48,.12)}
-#pgFx.run .logobox{animation:pgfxlogo .62s ease-out both}
-#pgFx img{height:64px}
-@keyframes pgfx{0%,45%{opacity:1}100%{opacity:0;visibility:hidden}}
-@keyframes pgfxlogo{0%{transform:scale(.9);opacity:0}25%,55%{transform:scale(1);opacity:1}100%{transform:scale(1.04);opacity:0}}
+#pgFx.run{display:flex;animation:pgfx .8s ease-out both}
+#pgFx .logobox{padding:22px 34px;box-shadow:0 10px 30px rgba(8,26,48,.12)}
+#pgFx.run .logobox{animation:pgfxlogo .8s cubic-bezier(.22,.8,.3,1) both}
+#pgFx img{height:112px}
+@keyframes pgfx{0%,55%{opacity:1}100%{opacity:0;visibility:hidden}}
+/* Logo her geçişte saat yönünde sıradaki yönden (K, KD, D, GD, G, GB, B, KB) kayarak gelir, karşı yöne doğru çıkar. */
+@keyframes pgfxlogo{0%{transform:translate(var(--dx,0),var(--dy,0)) scale(.92);opacity:0}35%,60%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(calc(var(--dx,0)*-.6),calc(var(--dy,0)*-.6)) scale(1.03);opacity:0}}
 @media (prefers-reduced-motion:reduce){#pgFx.run{display:none;animation:none}}
 @media print{#pgFx{display:none!important}}
 .logobox{display:inline-flex;align-items:center;padding:6px 10px;background:#fff;border-radius:var(--radius);min-width:0}
@@ -1171,8 +1172,11 @@ function saveRoute(){
 function pageFx(){
   const el=$('pgFx'),m=document.querySelector('main');if(!el||!m)return;
   el.style.left=Math.max(0,m.getBoundingClientRect().left)+'px';
+  const [x,y]=FX_DIRS[fxN++%FX_DIRS.length];el.style.setProperty('--dx',x*200+'px');el.style.setProperty('--dy',y*200+'px');
   el.classList.remove('run');void el.offsetWidth;el.classList.add('run');
 }
+// Saat yönünde: kuzey, kuzeydoğu, doğu, güneydoğu, güney, güneybatı, batı, kuzeybatı
+const FX_DIRS=[[0,-1],[.7,-.7],[1,0],[.7,.7],[0,1],[-.7,.7],[-1,0],[-.7,-.7]];let fxN=0;
 let routeSeeded=false;
 window.addEventListener('popstate',()=>{
   if(!routeOn||!loaded)return;
