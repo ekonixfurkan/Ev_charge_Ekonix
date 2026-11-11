@@ -184,6 +184,18 @@ table.portfolio.ovwtbl :is(th,td):first-child{padding-left:16px}
 table.portfolio.ovwtbl :is(th,td):last-child{padding-right:16px}
 table.portfolio.ovwtbl .sp{width:auto;padding:0}
 .ovwtbl td.c-name .p1{max-width:340px;overflow:hidden;text-overflow:ellipsis}
+/* Proje grupları */
+table.portfolio.loclist tr.grp-head td{background:var(--navy-soft);font-weight:700;color:var(--ink);border-top:2px solid var(--navy);cursor:pointer}
+.grp-head .grp-chev{display:inline-block;width:16px;color:var(--navy)}.grp-head .grp-name{font-size:14px}.grp-head small{margin-left:10px;font-weight:500;color:var(--muted)}
+.grp-head .grp-x{padding:2px 8px;font-size:12px}
+table.portfolio.loclist tr.grp-row td:first-child{box-shadow:inset 3px 0 0 var(--navy)}
+table.portfolio.loclist tr.sel td{background:var(--ok-soft)}
+.grp-cb{width:auto;min-height:0;height:auto;margin:0 6px 0 0;vertical-align:middle;pointer-events:none}
+#grpToggle[aria-pressed=true]{background:var(--navy-soft);border-color:var(--navy);color:var(--navy);font-weight:600}
+.locbar #grpToggle,.locbar #grpGo{height:36px;white-space:nowrap}
+.grp-go{animation:grpblink 1.1s ease-in-out infinite}
+@keyframes grpblink{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.grp-go{animation:none}}
 .ovwtbl td.c-cust{max-width:200px;overflow:hidden;text-overflow:ellipsis}
 .ovwtbl td.c-code,.loctbl td.c-code{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
 .portfolio.act-tbl{width:100%;table-layout:fixed}
@@ -858,6 +870,10 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   <div class="scroll"><table class="cat-tbl"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
   <p class="note">Kaynak: starcharge.com ürün sayfaları. Güç yazmayan dispenser modellerinde (Hydrus, Aries, Triton) güç, bağlı güç kabinine göre belirlenir; kW elle girilir.</p>
 </dialog>
+<dialog id="grpDlg"><h3 style="margin:0 0 6px">Projeleri Gruplandır</h3><p id="grpInfo" class="note" style="margin:0 0 10px"></p>
+  <label>Grup başlığı<input id="grpName" list="grpNames" maxlength="60" autocomplete="off" placeholder="ör. IKEA Lokasyonları"></label><datalist id="grpNames"></datalist>
+  <p class="alert" id="grpErr" role="alert" hidden></p>
+  <div class="row"><button type="button" id="grpCancel">Vazgeç</button><button type="button" class="save" id="grpSave">Gruplandır</button></div></dialog>
 <dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:15px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
 <dialog id="dlg">
   <form id="dlgForm">
@@ -1101,7 +1117,7 @@ function migrateSite(s){
   if(s.contractBase===undefined)s.contractBase=(+s.contractYears>0)?+s.contractYears:'';
   if(s.contractExt===undefined)s.contractExt='';
   if(s.contactCompany===undefined)s.contactCompany='';
-  if(s.code===undefined)s.code='';
+  if(s.code===undefined)s.code='';if(s.group==null)s.group='';
   if(s.lat===undefined)s.lat='';if(s.lng===undefined)s.lng='';
   if(!s.recordDate)s.recordDate=String(s.createdAt||'').slice(0,10);
   s.nextAction=nextStageOf(s);
@@ -1335,24 +1351,85 @@ function sumOf(list){
 }
 const mkTile=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
 function kpiTilesHtml(T,n){return (n!=null?mkTile('Proje Sayısı',n):'')+mkTile('DC Ünite',T.dcU)+mkTile('AC Ünite',T.acU)+mkTile('Toplam Ünite',T.dcU+T.acU)+mkTile('Toplam Soket',T.sock)+mkTile('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW');}
-function locRowsHtml(list){
-  return list.map(s=>{const t=totals(s),d=scoreOf(s),st=statusOf(s.status);
-    return `<tr data-open="${s.id}" tabindex="0"${isOpen(s)?'':' class="closed"'}><td class="c-code">${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc([s.city,s.district].filter(Boolean).join(' / '))||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
+/* ---------- Proje grupları: seçilen projeler bir başlık altında listelenir (s.group); başlık satırında grubun toplamları ---------- */
+let grp={on:false,sel:new Set(),closed:new Set()};
+const grpOf=s=>String(s.group||'').trim();
+// Gruplu projeler, sıralamada ilk üyenin bulunduğu yerde art arda dizilir.
+function arrangeGroups(list){
+  const out=[],seen=new Set();
+  for(const s of list){const g=grpOf(s);if(!g){out.push(s);continue;}if(seen.has(g))continue;seen.add(g);out.push(...list.filter(x=>grpOf(x)===g));}
+  return out;
+}
+function grpHeadHtml(g,all){
+  const m=all.filter(x=>grpOf(x)===g),T=sumOf(m),open=!grp.closed.has(g);
+  return `<tr class="grp-head" data-grp="${esc(g)}" tabindex="0" aria-expanded="${open}"><td colspan="6"><span class="grp-chev" aria-hidden="true">${open?'▾':'▸'}</span><span class="grp-name">${esc(g)}</span><small>${m.length} proje</small></td>
+    <td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td>
+    <td><button type="button" class="ghost grp-x" data-grpdel="${esc(g)}" title="Grubu dağıt (projeler silinmez)">Grubu Dağıt</button></td></tr>`;
+}
+function locRowsHtml(rows,all=rows){
+  let prev=null,h='';
+  for(const s of rows){
+    const g=grpOf(s);
+    if(g&&g!==prev)h+=grpHeadHtml(g,all);
+    prev=g;
+    if(g&&grp.closed.has(g))continue;
+    const t=totals(s),d=scoreOf(s),st=statusOf(s.status),on=grp.sel.has(s.id);
+    h+=`<tr ${grp.on?`data-gsel="${s.id}" aria-selected="${on}"`:`data-open="${s.id}"`} tabindex="0" class="${isOpen(s)?'':'closed'}${g?' grp-row':''}${on?' sel':''}"><td class="c-code">${grp.on?`<input type="checkbox" class="grp-cb" tabindex="-1" ${on?'checked':''} aria-label="Seç"> `:''}${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc([s.city,s.district].filter(Boolean).join(' / '))||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td><td class="num">${t.sockets}</td>
       <td class="num"><span class="amgscore ${d.cls}">${d.label}</span></td>
-      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td><td title="${esc(fmtTs(s.updatedAt))}">${esc(agoText(s.updatedAt))}</td></tr>`;}).join('');
+      <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td><td title="${esc(fmtTs(s.updatedAt))}">${esc(agoText(s.updatedAt))}</td></tr>`;
+  }
+  return h;
 }
+function paintGrpBar(){
+  const t=$('grpToggle'),go=$('grpGo');if(!t||!go)return;
+  t.setAttribute('aria-pressed',String(grp.on));t.textContent=grp.on?'Seçimi Kapat':'Gruplandır';
+  go.hidden=!(grp.on&&grp.sel.size>0);go.textContent=`Seçilenleri Gruplandır (${grp.sel.size})`;
+}
+function openGrpDlg(){
+  const names=[...new Set(db.sites.map(grpOf).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));
+  $('grpNames').innerHTML=names.map(n=>`<option value="${esc(n)}">`).join('');
+  $('grpName').value='';$('grpErr').hidden=true;$('grpInfo').textContent=`${grp.sel.size} proje seçildi. Grup başlığını yazın; var olan bir başlığı yazarsanız projeler o gruba eklenir.`;
+  $('grpDlg').showModal();$('grpName').focus();
+}
+function saveGrp(){
+  const name=$('grpName').value.replace(/\s+/g,' ').trim().slice(0,60);
+  if(!name){$('grpErr').textContent='Grup başlığı gerekli.';$('grpErr').hidden=false;return;}
+  let n=0;db.sites.forEach(s=>{if(grp.sel.has(s.id)&&grpOf(s)!==name){s.group=name;touched(s);n++;}});
+  $('grpDlg').close();grp.sel.clear();grp.on=false;grp.closed.delete(name);
+  paintLocRows();paintGrpBar();toast(n?`${n} proje "${name}" grubuna alındı.`:'Seçilen projeler zaten bu grupta.');
+}
+document.addEventListener('click',async e=>{
+  if(view!=='locations')return;
+  if(e.target.closest('#grpToggle')){grp.on=!grp.on;if(!grp.on)grp.sel.clear();paintLocRows();paintGrpBar();return;}
+  if(e.target.closest('#grpGo')){if(grp.sel.size)openGrpDlg();return;}
+  if(e.target.closest('#grpSave')){saveGrp();return;}
+  if(e.target.closest('#grpCancel')){$('grpDlg').close();return;}
+  const del=e.target.closest('[data-grpdel]');
+  if(del){const g=del.dataset.grpdel;if(!await ask(`"${g}" grubu dağıtılsın mı? Projeler silinmez, yalnızca gruptan çıkar.`,'Grubu Dağıt'))return;
+    db.sites.forEach(s=>{if(grpOf(s)===g){s.group='';touched(s);}});grp.closed.delete(g);paintLocRows();toast('Grup dağıtıldı.');return;}
+  const row=e.target.closest('#locRows [data-gsel]');
+  if(row){const id=row.dataset.gsel;if(grp.sel.has(id))grp.sel.delete(id);else grp.sel.add(id);paintLocRows();paintGrpBar();return;}
+  const hd=e.target.closest('#locRows .grp-head');
+  if(hd){const g=hd.dataset.grp;if(grp.closed.has(g))grp.closed.delete(g);else grp.closed.add(g);paintLocRows();}
+});
+document.addEventListener('keydown',e=>{
+  if(view!=='locations')return;
+  if(e.target.id==='grpName'&&e.key==='Enter'){e.preventDefault();saveGrp();return;}
+  const r=e.target.closest&&e.target.closest('#locRows [data-gsel],#locRows .grp-head');
+  if(r&&e.target===r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click();}
+});
 function locFootHtml(T){return `<tr><td colspan="2">Toplam</td><td></td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td><td></td></tr>`;}
 // "Bugün", "Dün", "3 gün önce"; 30 günden eskiyse tarih.
 function agoText(v){const t=new Date(v);if(!v||isNaN(t))return '—';const a=new Date(),d0=new Date(a.getFullYear(),a.getMonth(),a.getDate()),d1=new Date(t.getFullYear(),t.getMonth(),t.getDate()),n=Math.round((d0-d1)/864e5);
   return n<=0?'Bugün':n===1?'Dün':n<=30?n+' gün önce':t.toLocaleDateString(LOC);}
 const fmtDate=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)),d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
-  const list=visibleSites(),pi=pageOf(list,'loc');
-  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows):'<tr><td colspan="15" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
+  const list=arrangeGroups(visibleSites()),pi=pageOf(list,'loc');
+  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows,list):'<tr><td colspan="15" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
   const T=sumOf(list);$('locFoot').innerHTML=locFootHtml(T);$('locKpi').innerHTML=legendHtml()+kpiTilesHtml(T);
   $('locPager').innerHTML=pagerHtml('loc',pi);
-  $('locClear').hidden=!hasFilter();
+  $('locClear').hidden=!hasFilter();paintGrpBar();
 }
 function renderLocations(){
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
@@ -1369,6 +1446,8 @@ function renderLocations(){
       ${selF('lfOwner','Sorumlu','owner',uniq(s=>s.survey.lead).map(x=>[x,x]))}
       ${selF('lfPartner','Yerel Ortak','partner',uniq(s=>s.survey.partner).map(x=>[x,x]))}
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
+      <button type="button" id="grpToggle" aria-pressed="false">Gruplandır</button>
+      <button type="button" id="grpGo" class="save grp-go" hidden>Seçilenleri Gruplandır</button>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
     <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl loclist"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>İl / İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th><th>Güncelleme</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
