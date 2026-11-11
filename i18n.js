@@ -76,7 +76,7 @@
 
     /* proje detay sekmeleri ve başlıklar */
     'Genel': 'General', 'Şarj Üniteleri': 'Charging Units', 'Altyapı & Güç': 'Infrastructure & Power', 'Finansman': 'Financing', 'Skor Hesaplama': 'Score Calculation',
-    'Proje Bilgileri': 'Project Details', 'Takip ve Durum': 'Tracking & Status', 'Keşif Bilgileri': 'Survey Details', 'Saha Keşfi': 'Site Survey', 'Teknik Yapılabilirlik': 'Technical Feasibility',
+    'Proje Bilgileri': 'Project Details', 'Takip ve Durum': 'Tracking & Status', 'Keşif Bilgileri': 'Survey Details', 'Saha Keşfi': 'Site Survey', 'Teknik Yapılabilirlik': 'Technical Feasibility', 'Otopark Bilgileri': 'Parking Details',
     'Saha Koşulları ve Teknik Yapılabilirlik': 'Site Conditions & Technical Feasibility', 'İmza ve Katılımcılar': 'Signatures & Participants',
     'Ek Kontroller': 'Additional Checks', 'Ekler ve Onay': 'Attachments & Approval', 'Şebeke Kapasitesi': 'Grid Capacity', 'Hesaplama Esasları': 'Calculation Basis',
     'Skor Nasıl Hesaplanır': 'How the Score Is Calculated', 'Şirket İçi Bilgilendirme': 'Internal Notes', 'Şirket İçi': 'Internal',

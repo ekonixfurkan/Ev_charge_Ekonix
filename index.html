@@ -508,6 +508,7 @@ button.mt-chip.link{cursor:pointer;font-family:inherit}button.mt-chip.link:hover
 .grid.infogrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .info-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;margin-bottom:16px}
 .info-pair .box{margin-bottom:0}
+.info-col{display:flex;flex-direction:column;gap:16px;min-width:0}
 @media (max-width:1100px){.info-pair{grid-template-columns:minmax(0,1fr)}.info-pair .box{margin-bottom:16px}}
 .trio{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 input[data-locked]{background:var(--soft);color:var(--ink2);border-style:dashed;cursor:not-allowed}
@@ -1716,6 +1717,7 @@ function renderSite(){
   </div>
 
   <div class="info-pair" data-tab="infra">
+  <div class="info-col">
   <section class="box"><h3>Keşif Bilgileri</h3>
   <div class="grid infogrid">
     ${sv('date','Keşif tarihi','date')}${sv('biz','İşletme sahibi')}
@@ -1723,17 +1725,22 @@ function renderSite(){
     ${chk('scope','Ana kapsam',' class="span4"')}
   </div></section>
 
-  <section class="box"><h3>Saha Koşulları ve Teknik Yapılabilirlik</h3>
+  <section class="box"><h3>Otopark Bilgileri</h3>
   <div class="grid infogrid">
     ${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}
     ${sv('parkShared','Park yeri, ortak','number')}${sel('parkType','Otopark türü',[['closed','Kapalı'],['open','Açık']])}
+    ${sv('parkFee','Park ücreti kuralı')}${sv('rentTl','Aylık araç başı kiralama bedeli (₺) (KDV dahildir)','number')}
+  </div></section>
+  </div>
+
+  <section class="box"><h3>Saha Koşulları ve Teknik Yapılabilirlik</h3>
+  <div class="grid infogrid">
     ${chk('access','Erişim ve yol durumu',' class="span4"')}${chk('pave','Zemin / inşaat işleri',' class="span4"')}
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}
     ${sel('trafoInvest','Trafo yatırımı gerekiyor mu?',[['y','Evet'],['n','Hayır']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}
     ${sv('voltage','Gerilim (V)','number')}${sv('connPoint','Bağlantı noktası yeri')}
     ${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
     ${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}
-    ${sv('parkFee','Park ücreti kuralı')}${sv('rentTl','Aylık araç başı kiralama bedeli (₺) (KDV dahildir)','number')}
     ${chk('lay','Kablo döşeme',' class="span4"')}${chk('pvpot','PV potansiyeli',' class="span4"')}
     ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}<label>Yol geçişi detayı<input data-sv="roadNote" type="text" value="${esc(s.survey.roadNote??'')}" placeholder="Geçiş güzergâhı, mülk sahibi, Karayolları"></label>
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
