@@ -1142,6 +1142,13 @@ function saveRoute(){
 let routeSeeded=false;
 window.addEventListener('popstate',()=>{
   if(!routeOn||!loaded)return;
+  // Düzenleme modundayken geri/ileri: kaydedilmemiş değişiklik varsa onay istenir, yoksa düzenleme kapatılır (aksi halde düzenleme durumu başka projeye taşınırdı).
+  if(siteEdit&&editDirty){
+    try{history.pushState(null,'',location.pathname+location.search+routeHash());}catch(e){}
+    ask('Kaydedilmemiş değişiklikler var. Vazgeçip çıkılsın mı?','Değişiklikleri At').then(ok=>{if(!ok)return;cancelEdit(true);history.back();});
+    return;
+  }
+  if(siteEdit)exitEdit();
   view='portfolio';sub='ovw';restoreRoute();render();window.scrollTo(0,0);
 });
 function restoreRoute(){
