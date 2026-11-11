@@ -255,7 +255,10 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 /* Sayfa geçiş perdesi */
 #pgFx{position:fixed;top:0;right:0;bottom:0;left:0;z-index:25;display:none;align-items:center;justify-content:center;background:var(--paper);pointer-events:none}
 #pgFx.run{display:flex;animation:pgfx .8s ease-out both}
-#pgFx .logobox{padding:22px 34px;box-shadow:0 10px 30px rgba(8,26,48,.12)}
+#pgFx .logobox{padding:22px 34px;background:transparent}
+/* Koyu temada lacivert yazı kaybolmasın diye logo beyaz kutuda kalır. */
+:root[data-theme="dark"] #pgFx .logobox{background:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #pgFx .logobox{background:#fff}}
 #pgFx.run .logobox{animation:pgfxlogo .8s cubic-bezier(.22,.8,.3,1) both}
 #pgFx img{height:112px}
 @keyframes pgfx{0%,55%{opacity:1}100%{opacity:0;visibility:hidden}}
@@ -882,7 +885,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   <div class="scroll"><table class="cat-tbl"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
   <p class="note">Kaynak: starcharge.com ürün sayfaları. Güç yazmayan dispenser modellerinde (Hydrus, Aries, Triton) güç, bağlı güç kabinine göre belirlenir; kW elle girilir.</p>
 </dialog>
-<div id="pgFx" aria-hidden="true"><span class="logobox"><img src="/ekonix-logo.jpeg" alt="" width="289" height="93"></span></div>
+<div id="pgFx" aria-hidden="true"><span class="logobox"><img src="/ekonix-logo-t.png" alt="" width="289" height="93"></span></div>
 <dialog id="grpDlg"><h3 style="margin:0 0 6px">Projeleri Gruplandır</h3><p id="grpInfo" class="note" style="margin:0 0 10px"></p>
   <label>Grup başlığı<input id="grpName" list="grpNames" maxlength="60" autocomplete="off" placeholder="ör. IKEA Lokasyonları"></label><datalist id="grpNames"></datalist>
   <p class="alert" id="grpErr" role="alert" hidden></p>
