@@ -1273,6 +1273,9 @@ function totals(s){
 // Başlıkta ve Takip alanında: 8 kriterin hepsi puanlanmadıysa şimdiye kadarki ön puan (ör. 15/37) gösterilir; kesin skor (liste, rapor) tamamlanınca oluşur.
 function scoreShown(s){const sc=scoreOf(s);if(sc.v!=null)return {label:sc.label,cls:sc.cls,text:sc.text};const d=amgScore(s);
   return d.done?{label:`${d.total}/${d.max}`,cls:'',text:`Ön puan · ${d.done}/${AMG.length} kriter`}:{label:'—',cls:'none',text:''};}
+// Elektrik maliyeti tek yönlüdür: Altyapı & Güç'te TL tarife ve dolar kuru girilir; Gelir Modeli'ndeki $/kWh maliyet buradan hesaplanır (orada değiştirilemez).
+function tariffUsd(s){const t=+s.survey?.tariffTl,k=+s.survey?.usdTry;return t>0&&k>0?Math.round(t/k*1e4)/1e4:null;}
+function syncTariff(s){const v=tariffUsd(s);if(v!=null)s.fin.cost=Math.min(FIN_LIMITS.cost[1],v);}
 function amgScore(s){
   const sc=s.amg?.scores||{};let total=0,done=0,max=0;
   for(const c of AMG){const v=sc[c.k];if(v===''||v==null||!Number.isFinite(+v))continue;done++;total+=+v;max+=c.w;}
@@ -1714,7 +1717,7 @@ function renderSite(){
     ${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
     ${chk('access','Erişim ve yol durumu')}${chk('pave','Zemin / inşaat işleri')}
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}${sel('trafoInvest','Trafo yatırımı gerekiyor mu?',[['y','Evet'],['n','Hayır']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}
-    ${sv('connPoint','Bağlantı noktası yeri')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}<label>Elektrik tarifesi ($/kWh)<input id="tariffBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Gelir Modeli’ndeki Elektrik maliyetinden gelir; orada girilir"></label>${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
+    ${sv('connPoint','Bağlantı noktası yeri')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sv('tariffTl','Elektrik tarifesi (₺/kWh)','number')}${sv('usdTry','Dolar kuru (₺)','number')}${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
     ${chk('lay','Kablo döşeme')}${chk('pvpot','PV potansiyeli')}
     ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
@@ -1743,7 +1746,7 @@ function renderSite(){
   <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal USD; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
   <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
   <div class="shareinfo" id="shareStatus"></div>
-  <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','$/kWh')}${finField('cost','Elektrik maliyeti','$/kWh')}</div>
+  <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','$/kWh')}<label>Elektrik maliyeti ($/kWh)<input id="costBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Altyapı &amp; Güç’teki Elektrik tarifesi (₺/kWh) ÷ Dolar kuru; orada girilir"></label></div>
   <details><summary>Fiyat Artışları ve İşletme Gideri</summary>
     <div class="grid subgrid">${finField('saleGrowth','Satış fiyatı yıllık artışı','%')}${finField('costGrowth','Elektrik maliyeti yıllık artışı','%')}${finField('commission','Co-CPO ödeme komisyonu','hasılatın %')}${finField('opex','İlk yıl işletme gideri','USD')}${finField('opexGrowth','İşletme gideri yıllık artışı','%')}</div>
     <p class="note">Komisyon ve işletme gideri Co-CPO payından düşülür. Varsayılan fiyatlar örnektir, tarife teklifi değildir.</p>
@@ -1822,7 +1825,7 @@ function updateDerived(){
   const attDone=ATTACH.filter(a=>s.att[a.k]).length;$('attProgress').textContent=`${attDone}/${ATTACH.length} ek işaretlendi`;
   $('evPotential').textContent=t.kw?`Şarj potansiyeli ünite tablosundan alınır: ${s.units.filter(u=>u.kind!=='CAB').map(u=>`${u.kind} ${nf.format(u.kw)} kW × ${u.qty}`).join(', ')}.`:'Şarj potansiyeli ünite tablosundan alınır.';
   $('vKw').textContent=nf.format(t.kw)+' kW';
-  const tb=$('tariffBox');if(tb)tb.value=s.fin.cost;
+  const tb=$('costBox');if(tb)tb.value=s.fin.cost;
   $('unitSummary').textContent=`${t.dcUnits} DC (${t.dcSock} soket) · ${t.acUnits} AC (${t.acSock} soket)`+(t.cabs?` · ${t.cabs} Dağıtım Kabini`:'');
   $('unitFoot').innerHTML=s.units.length?`<tr><td colspan="5">DC ${nf.format(t.dcKw)} kW + AC ${nf.format(t.acKw)} kW</td><td class="num">${nf.format(t.kw)}</td><td></td></tr>`:'';
   const cr=capRef(s),g=cr?cr.v:0,bar=$('capbar'),note=$('capnote');
@@ -1899,7 +1902,7 @@ $('view').addEventListener('click',e=>{
   if(e.target.id==='applyAll'){const keys=[],fin=$('apFin').checked;if($('apShare').checked)keys.push('share','entShare','starShare','ekoShare','fundShare');if($('apPrice').checked)keys.push('sale','cost','saleGrowth','costGrowth');if($('apUsage').checked)keys.push('initial','growth');
     if(!keys.length&&!fin){toast('En az bir grup seçin.');return;}
     const targets=db.sites.filter(x=>x.id!==s.id&&true);
-    targets.forEach(x=>{keys.forEach(k=>x.fin[k]=s.fin[k]);if(fin){x.fin.fundName=s.fin.fundName;const old=x.tranches||[];x.tranches=s.tranches.map(t=>({...t,id:uid(),amount:(old.find(o=>o.item===t.item)||{}).amount??t.amount}));}touched(x);});touched(s);updateDerived();toast(targets.length+' projeye uygulandı.');return;}
+    targets.forEach(x=>{keys.forEach(k=>{if(k==='cost'&&tariffUsd(x)!=null)return;x.fin[k]=s.fin[k];});if(fin){x.fin.fundName=s.fin.fundName;const old=x.tranches||[];x.tranches=s.tranches.map(t=>({...t,id:uid(),amount:(old.find(o=>o.item===t.item)||{}).amount??t.amount}));}touched(x);});touched(s);updateDerived();toast(targets.length+' projeye uygulandı.');return;}
   const seg=e.target.closest('.seg button');
   if(seg){const k=seg.closest('.dd-row').dataset.c,v=seg.dataset.v;s.dd[k]=s.dd[k]||{};s.dd[k].v=s.dd[k].v===v?'':v;
     seg.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===s.dd[k].v));touched(s);updateDerived();return;}
@@ -1938,7 +1941,7 @@ $('view').addEventListener('input',e=>{
     t[k]=v;touched(s);updateDerived();return;}
   if(el.dataset.finText){s.fin[el.dataset.finText]=el.value;touched(s);updateDerived();return;}
   if('lead' in el.dataset){s.survey.lead=el.value;touched(s);updateDerived();return;}
-  if(el.dataset.sv){const k=el.dataset.sv;s.survey[k]=el.type==='number'?(el.value===''?'':Math.max(0,+el.value||0)):el.value;touched(s);updateDerived();return;}
+  if(el.dataset.sv){const k=el.dataset.sv;s.survey[k]=el.type==='number'?(el.value===''?'':Math.max(0,+el.value||0)):el.value;if(k==='tariffTl'||k==='usdTry')syncTariff(s);touched(s);updateDerived();return;}
   if(el.dataset.svc){const k=el.dataset.svc;s.survey[k]=[...document.querySelectorAll(`[data-svc="${k}"]:checked`)].map(x=>x.value);touched(s);return;}
   if(el.dataset.amg){const c=AMG.find(x=>x.k===el.dataset.amg),raw=el.value.trim();
     if(raw===''){s.amg.scores[c.k]='';el.removeAttribute('aria-invalid');syncScore(s);touched(s);updateDerived();return;}
