@@ -500,7 +500,7 @@ button.mt-chip.link{cursor:pointer;font-family:inherit}button.mt-chip.link:hover
 .box details{margin-top:14px;border-top:1px solid var(--hair);padding-top:10px}
 .box summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink2)}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.grid.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.grid.g5{grid-template-columns:repeat(5,minmax(0,1fr))}.grid.g6{grid-template-columns:repeat(6,minmax(0,1fr))}
 /* Proje Bilgileri: dar, iki sütunlu form; tek kalan alan yarım genişlikte, yanı boş kalır */
 .grid.infogrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .info-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;margin-bottom:16px}
@@ -758,7 +758,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
 @media (max-width:2040px) and (min-width:1101px){.ovw-grid{grid-template-columns:1fr}.kpi-col{grid-template-columns:repeat(7,minmax(0,1fr));order:-1;gap:10px}.kpi-col .mk{padding:7px 14px}.kpi-col .mk strong{margin-top:1px;font-size:20px}.kpi-col .mk.split>button{padding:7px 14px}#view .locbar{margin-bottom:10px}}
 @media (max-width:1100px){.ovw-grid{grid-template-columns:1fr}.kpi-col{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));order:-1}}
 @media (max-width:1000px){
-  .grid,.grid.g5{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid,.grid.g5,.grid.g6{grid-template-columns:repeat(2,minmax(0,1fr))}
     .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .pipe-legend{grid-template-columns:repeat(3,minmax(0,1fr))}
   .shell{grid-template-columns:240px minmax(0,1fr)}
@@ -999,14 +999,15 @@ const statusOf=k=>STATUSES.find(s=>s.k===k)||STATUSES[0];
 
 /* ---------- revenue & financing model ---------- */
 const YEARS=7;
-const FIN_DEFAULT={initial:15,growth:2,sale:0.29,cost:0.11,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:0,ekoShare:0,fundShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
-const FIN_LIMITS={initial:[0,100],growth:[-20,20],sale:[0,1000],cost:[0,1000],saleGrowth:[-100,200],costGrowth:[-100,200],share:[0,100],entShare:[0,100],starShare:[0,100],ekoShare:[0,100],fundShare:[0,100],commission:[0,100],opex:[0,1e10],opexGrowth:[0,200]};
+const FIN_DEFAULT={initial:15,growth:2,sale:0.29,cost:0.11,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:0,ekoShare:0,fundShare:0,partnerShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
+const FIN_LIMITS={initial:[0,100],growth:[-20,20],sale:[0,1000],cost:[0,1000],saleGrowth:[-100,200],costGrowth:[-100,200],share:[0,100],entShare:[0,100],starShare:[0,100],ekoShare:[0,100],fundShare:[0,100],partnerShare:[0,100],commission:[0,100],opex:[0,1e10],opexGrowth:[0,200]};
 const PARTIES=[
   {k:'owner',t:'Yer Sağlayıcı',sh:'Yer Sağlayıcı',c:'var(--p-owner)',share:'share'},
   {k:'ent',t:'Co-CPO',sh:'Co-CPO',c:'var(--p-ent)',share:'entShare'},
   {k:'star',t:'StarCharge (AMG)',sh:'StarCharge',c:'var(--p-star)',share:'starShare'},
-  {k:'eko',t:'EKONİX',sh:'EKONİX',c:'var(--p-eko)',share:'ekoShare'},
-  {k:'fon',t:'Diğer Fon',sh:'Diğer Fon',c:'var(--p-fon)',share:'fundShare'}
+  {k:'partner',t:'Partner',sh:'Partner',c:'var(--stg-08)',share:'partnerShare'},
+  {k:'fon',t:'Diğer Fon',sh:'Diğer Fon',c:'var(--p-fon)',share:'fundShare'},
+  {k:'eko',t:'EKONİX',sh:'EKONİX',c:'var(--p-eko)',share:'ekoShare'}
 ];
 [STATUSES,DECISIONS].forEach(a=>a.forEach(x=>{x.t=toTurkishTitleCase(x.t);}));Object.values(VAL).forEach(x=>{x.t=toTurkishTitleCase(x.t);});PARTIES.forEach(x=>{x.t=toTurkishTitleCase(x.t);x.sh=toTurkishTitleCase(x.sh);});
 const ITEMS=['Donanım','Saha işleri (EPC)','Şebeke bağlantısı','Diğer'];
@@ -1015,7 +1016,10 @@ const pName=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).t;
 const pShort=(k,s)=>k==='fon'&&s&&s.fin.fundName?s.fin.fundName:party(k).sh;
 const money=v=>(v<0?'−':'')+'$'+nf.format(Math.abs(v));
 const df=new Intl.NumberFormat(LOC,{maximumFractionDigits:1});
-const shareTotal=v=>v.share+v.entShare+v.starShare+v.ekoShare+(v.fundShare||0);
+const shareTotal=v=>v.share+v.entShare+v.starShare+v.ekoShare+(v.fundShare||0)+(v.partnerShare||0);
+// EKONİX payı elle girilmez: diğer payların 100'den kalanıdır (toplam 100'ü aşarsa 0).
+const othersShare=v=>(+v.share||0)+(+v.entShare||0)+(+v.starShare||0)+(+v.fundShare||0)+(+v.partnerShare||0);
+function syncEko(v){v.ekoShare=Math.max(0,Math.round((100-othersShare(v))*1e4)/1e4);}
 function tranche(item,fin='star'){return {id:uid(),item,amount:0,fin,mode:'share'};}
 const defaultTranches=()=>[tranche('Donanım'),tranche('Saha işleri (EPC)')];
 const totalFin=s=>(s.tranches||[]).reduce((a,t)=>a+(+t.amount||0),0);
@@ -1027,12 +1031,12 @@ function calculate(s){
     const u=Math.min(100,Math.max(0,v.initial+i*v.growth)),energy=kw*8760*u/100,
       sale=v.sale*(1+v.saleGrowth/100)**i,cost=v.cost*(1+v.costGrowth/100)**i,
       revenue=energy*sale,margin=energy*(sale-cost),p=x=>margin*(x||0)/100,
-      owner=p(v.share),ent=p(v.entShare),star=p(v.starShare),eko=p(v.ekoShare),fon=p(v.fundShare),
+      owner=p(v.share),ent=p(v.entShare),star=p(v.starShare),eko=p(v.ekoShare),fon=p(v.fundShare),partner=p(v.partnerShare),
       fee=revenue*v.commission/100,opex=v.opex*(1+v.opexGrowth/100)**i;
-    return {year:i+1,u,energy,revenue,margin,owner,ent,star,eko,fon,fee,opex,entCash:ent-fee-opex,remaining:margin*(100-shareTotal(v))/100};
+    return {year:i+1,u,energy,revenue,margin,owner,ent,star,eko,fon,partner,fee,opex,entCash:ent-fee-opex,remaining:margin*(100-shareTotal(v))/100};
   });
 }
-const SUMKEYS=['energy','revenue','margin','owner','ent','star','eko','fon','fee','opex','entCash','remaining'];
+const SUMKEYS=['energy','revenue','margin','owner','ent','star','eko','fon','partner','fee','opex','entCash','remaining'];
 function aggregate(sites){
   const all=sites.map(calculate);
   return Array.from({length:YEARS},(_,i)=>{const r={year:i+1,u:all.length?all.reduce((t,a)=>t+a[i].u,0)/all.length:0};for(const k of SUMKEYS)r[k]=all.reduce((t,a)=>t+a[i][k],0);return r;});
@@ -1097,8 +1101,8 @@ function partyTable(P,s){
   <p class="note">Nakit girişi: gelir payı (Co-CPO için komisyon ve işletme gideri düşülmüş). İç verim yalnız ${YEARS} yıllık nakde dayanır; ekipmanın kalan değeri ve sözleşme sonrası gelir dahil değildir.</p>`;
 }
 function yearlyTable(rows){
-  const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),R=rows;
-  const cols=[['energy','Enerji kWh'],['revenue','Hasılat USD'],['margin','Elektrik Sonrası USD'],['owner','Yer Sağlayıcı USD'],['ent','Co-CPO Payı USD'],['star','StarCharge USD'],['eko','EKONİX USD'],...(hasFon?[['fon','Diğer Fon USD']]:[]),['remaining','Dağıtılmayan USD'],['fee','Komisyon USD'],['opex','İşletme Gideri USD']];
+  const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),hasPartner=rows.some(r=>Math.abs(r.partner)>0.5),R=rows;
+  const cols=[['energy','Enerji kWh'],['revenue','Hasılat USD'],['margin','Elektrik Sonrası USD'],['owner','Yer Sağlayıcı USD'],['ent','Co-CPO Payı USD'],['star','StarCharge USD'],...(hasPartner?[['partner','Partner USD']]:[]),...(hasFon?[['fon','Diğer Fon USD']]:[]),['eko','EKONİX USD'],['remaining','Dağıtılmayan USD'],['fee','Komisyon USD'],['opex','İşletme Gideri USD']];
   const sum=k=>R.reduce((t,r)=>t+r[k],0);
   return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar USD. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
 }
@@ -1138,7 +1142,7 @@ function migrateSite(s){
   for(const k of ['phone','nextAction','nextActionDate','blocker','blockerTr','statusTr','needs','siteFiles','manHours','evseKw','pvbess','approvalDate','cpoPartner'])if(s[k]==null)s[k]='';
   if(s.score==null||!Number.isFinite(+s.score)||s.score==='')s.score='';
   s.fx=s.fx||{};
-  s.fin={...FIN_DEFAULT,...(s.fin||{})};
+  s.fin={...FIN_DEFAULT,...(s.fin||{})};syncEko(s.fin);
   // Eski TL varsayılanları (14,49 / 5,454) dolar varsayılanlarına çevrilir.
   if(s.fin.sale===14.49&&s.fin.cost===5.454){s.fin.sale=FIN_DEFAULT.sale;s.fin.cost=FIN_DEFAULT.cost;}
   s.units=Array.isArray(s.units)?s.units:[];s.dd=s.dd||{};
@@ -1587,8 +1591,8 @@ function applyPreset(s,p){
   if(p==='split'){Object.assign(hw,{fin:'star',mode:'share'});Object.assign(epc,{fin:'ent',mode:'share'});}
 }
 function renderFin(){
-  const s=cur(),v=s.fin,t=shareTotal(v),bad=t>100,el=$('shareStatus');
-  el.textContent='Pay toplamı %'+df.format(t)+(bad?': %100 aşılıyor, sonuçlar geçersiz':t<100?': dağıtılmayan %'+df.format(100-t):': dağılım tamam');
+  const s=cur(),v=s.fin,t=shareTotal(v),el=$('shareStatus');let bad=t>100;
+  const oth=othersShare(v);bad=oth>100;el.textContent=bad?'Diğer payların toplamı %'+df.format(oth)+': %100 aşılıyor, sonuçlar geçersiz':'Diğer paylar %'+df.format(oth)+' · EKONİX payı %'+df.format(v.ekoShare)+' (kalan)';
   el.className='shareinfo'+(bad?' bad':'');
   const rows=calculate(s),f=finance(s,rows),tf=totalFin(s);
   document.querySelectorAll('#trBody [data-t]').forEach(tr=>{const x=s.tranches.find(q=>q.id===tr.dataset.t);tr.querySelector('[data-tshare]').textContent=x?'%'+df.format(+v[party(x.fin).share]||0):'—';});
@@ -1745,7 +1749,7 @@ function renderSite(){
   <section class="box" data-tab="credit" data-fsub="ozet"><h3>Finansman Özeti<small>${YEARS} yıl, nominal USD</small></h3><div id="finKpis"></div></section>
 
   <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal USD; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
-  <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
+  <div class="grid g6">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('starShare','StarCharge payı','%')}${finField('partnerShare','Partner payı','%')}${finField('fundShare','Diğer fon payı','%')}<label>EKONİX payı (%)<input id="ekoBox" data-locked readonly tabindex="-1" value="${esc(s.fin.ekoShare)}" title="Diğer payların 100’den kalanı; kendiliğinden hesaplanır"></label></div>
   <div class="shareinfo" id="shareStatus"></div>
   <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','$/kWh')}<label>Elektrik maliyeti ($/kWh)<input id="costBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Altyapı &amp; Güç’teki Elektrik tarifesi (₺/kWh, KDV dahil) ÷ Dolar kuru; orada girilir"></label></div>
   <details><summary>Fiyat Artışları ve İşletme Gideri</summary>
@@ -1900,7 +1904,7 @@ $('view').addEventListener('click',e=>{
   const pre=e.target.closest('[data-preset]');if(pre){applyPreset(s,pre.dataset.preset);touched(s);renderTranches();updateDerived();toast('Finansman yapısı uygulandı; tutarları kontrol edin.');return;}
   if(e.target.id==='addTr'){s.tranches.push(tranche('Şebeke bağlantısı'));touched(s);renderTranches();updateDerived();return;}
   const dtr=e.target.closest('[data-deltr]');if(dtr){s.tranches=s.tranches.filter(t=>t.id!==dtr.dataset.deltr);touched(s);renderTranches();updateDerived();return;}
-  if(e.target.id==='applyAll'){const keys=[],fin=$('apFin').checked;if($('apShare').checked)keys.push('share','entShare','starShare','ekoShare','fundShare');if($('apPrice').checked)keys.push('sale','cost','saleGrowth','costGrowth');if($('apUsage').checked)keys.push('initial','growth');
+  if(e.target.id==='applyAll'){const keys=[],fin=$('apFin').checked;if($('apShare').checked)keys.push('share','entShare','starShare','ekoShare','fundShare','partnerShare');if($('apPrice').checked)keys.push('sale','cost','saleGrowth','costGrowth');if($('apUsage').checked)keys.push('initial','growth');
     if(!keys.length&&!fin){toast('En az bir grup seçin.');return;}
     const targets=db.sites.filter(x=>x.id!==s.id&&true);
     targets.forEach(x=>{keys.forEach(k=>{if(k==='cost'&&tariffUsd(x)!=null)return;x.fin[k]=s.fin[k];});if(fin){x.fin.fundName=s.fin.fundName;const old=x.tranches||[];x.tranches=s.tranches.map(t=>({...t,id:uid(),amount:(old.find(o=>o.item===t.item)||{}).amount??t.amount}));}touched(x);});touched(s);updateDerived();toast(targets.length+' projeye uygulandı.');return;}
@@ -1936,7 +1940,7 @@ $('view').addEventListener('input',e=>{
   if(el.dataset.fx){s.fx=s.fx||{};s.fx[el.dataset.fx]=el.value;touched(s);return;}
   if(el.dataset.fin){const k=el.dataset.fin,[lo,hi]=FIN_LIMITS[k],v=el.value.trim()===''?NaN:+el.value;
     if(!Number.isFinite(v)||v<lo||v>hi){el.setAttribute('aria-invalid','true');status('Hatalı giriş: '+lo+' ile '+nf.format(hi)+' arasında değer girin',true);return;}
-    el.removeAttribute('aria-invalid');s.fin[k]=v;touched(s);updateDerived();return;}
+    el.removeAttribute('aria-invalid');s.fin[k]=v;if(/[sS]hare$/.test(k)){syncEko(s.fin);const eb=$('ekoBox');if(eb)eb.value=s.fin.ekoShare;}touched(s);updateDerived();return;}
   if(el.dataset.tf){const tr=el.closest('[data-t]'),t=s.tranches.find(x=>x.id===tr.dataset.t),k=el.dataset.tf;let v=el.value;
     if(el.type==='number')v=Math.max(0,+v||0);
     t[k]=v;touched(s);updateDerived();return;}
