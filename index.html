@@ -263,7 +263,7 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 #pgFx img{height:112px}
 @keyframes pgfx{0%,55%{opacity:1}100%{opacity:0;visibility:hidden}}
 /* Logo her geçişte saat yönünde sıradaki yönden (K, KD, D, GD, G, GB, B, KB) kayarak gelir, karşı yöne doğru çıkar. */
-@keyframes pgfxlogo{0%{transform:translate(var(--dx,0),var(--dy,0)) scale(.92);opacity:0}35%,60%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(calc(var(--dx,0)*-.6),calc(var(--dy,0)*-.6)) scale(1.03);opacity:0}}
+@keyframes pgfxlogo{0%{transform:translate(var(--dx,0),var(--dy,0)) scale(.92);opacity:0}35%,60%{transform:translate(0,0) scale(1);opacity:.5}100%{transform:translate(calc(var(--dx,0)*-.6),calc(var(--dy,0)*-.6)) scale(1.03);opacity:0}}
 @media (prefers-reduced-motion:reduce){#pgFx.run{display:none;animation:none}}
 @media print{#pgFx{display:none!important}}
 .logobox{display:inline-flex;align-items:center;padding:6px 10px;background:#fff;border-radius:var(--radius);min-width:0}
