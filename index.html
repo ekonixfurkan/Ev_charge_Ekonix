@@ -252,6 +252,16 @@ main{padding:24px 28px;max-width:calc(var(--wrap) + 56px);width:100%}
 @media (prefers-reduced-motion:reduce){body,aside{transition:none!important}}
 aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(--side-d);padding:0;gap:0;position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;display:flex;flex-direction:column}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px;background:var(--side-d);border-bottom:1px solid rgba(255,255,255,.08)}
+/* Sayfa geçiş perdesi */
+#pgFx{position:fixed;top:0;right:0;bottom:0;left:0;z-index:25;display:none;align-items:center;justify-content:center;background:var(--paper);pointer-events:none}
+#pgFx.run{display:flex;animation:pgfx .62s ease-out both}
+#pgFx .logobox{padding:14px 22px;box-shadow:0 10px 30px rgba(8,26,48,.12)}
+#pgFx.run .logobox{animation:pgfxlogo .62s ease-out both}
+#pgFx img{height:64px}
+@keyframes pgfx{0%,45%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes pgfxlogo{0%{transform:scale(.9);opacity:0}25%,55%{transform:scale(1);opacity:1}100%{transform:scale(1.04);opacity:0}}
+@media (prefers-reduced-motion:reduce){#pgFx.run{display:none;animation:none}}
+@media print{#pgFx{display:none!important}}
 .logobox{display:inline-flex;align-items:center;padding:6px 10px;background:#fff;border-radius:var(--radius);min-width:0}
 .logoimg{display:block;overflow:hidden}
 .logobox img{display:block;height:32px;width:auto;max-width:none;object-fit:contain}
@@ -870,6 +880,7 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   <div class="scroll"><table class="cat-tbl"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
   <p class="note">Kaynak: starcharge.com ürün sayfaları. Güç yazmayan dispenser modellerinde (Hydrus, Aries, Triton) güç, bağlı güç kabinine göre belirlenir; kW elle girilir.</p>
 </dialog>
+<div id="pgFx" aria-hidden="true"><span class="logobox"><img src="/ekonix-logo.jpeg" alt="" width="289" height="93"></span></div>
 <dialog id="grpDlg"><h3 style="margin:0 0 6px">Projeleri Gruplandır</h3><p id="grpInfo" class="note" style="margin:0 0 10px"></p>
   <label>Grup başlığı<input id="grpName" list="grpNames" maxlength="60" autocomplete="off" placeholder="ör. IKEA Lokasyonları"></label><datalist id="grpNames"></datalist>
   <p class="alert" id="grpErr" role="alert" hidden></p>
@@ -1154,6 +1165,13 @@ function saveRoute(){
   const h=routeHash(),first=!routeSeeded;routeSeeded=true;if(location.hash===h)return;
   // İlk açılışta mevcut kayıt güncellenir; sonraki sayfa geçişleri geçmişe eklenir (geri tuşu bir önceki sayfaya döner).
   try{history[first?'replaceState':'pushState'](null,'',location.pathname+location.search+h);}catch(e){}
+  if(!first)pageFx();
+}
+// Sayfa geçişi: içerik alanının üstünde Ekonix logolu kısa bir perde belirir ve açılır (sunum geçişi gibi). İçerik arkada hazırdır; gecikme eklemez.
+function pageFx(){
+  const el=$('pgFx'),m=document.querySelector('main');if(!el||!m)return;
+  el.style.left=Math.max(0,m.getBoundingClientRect().left)+'px';
+  el.classList.remove('run');void el.offsetWidth;el.classList.add('run');
 }
 let routeSeeded=false;
 window.addEventListener('popstate',()=>{
@@ -1165,7 +1183,7 @@ window.addEventListener('popstate',()=>{
     return;
   }
   if(siteEdit)exitEdit();
-  view='portfolio';sub='ovw';restoreRoute();render();window.scrollTo(0,0);
+  view='portfolio';sub='ovw';restoreRoute();render();window.scrollTo(0,0);pageFx();
 });
 function restoreRoute(){
   routeOn=true;
