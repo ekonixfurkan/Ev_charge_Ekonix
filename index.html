@@ -1731,18 +1731,23 @@ function renderSite(){
     ${sv('parkShared','Park yeri, ortak','number')}${sel('parkType','Otopark türü',[['closed','Kapalı'],['open','Açık']])}
     ${sv('parkFee','Park ücreti kuralı')}${sv('rentTl','Aylık araç başı kiralama bedeli (₺) (KDV dahildir)','number')}
   </div></section>
+
+  <section class="box"><h3>Yol Bilgileri</h3>
+  <div class="grid infogrid">
+    ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}<label>Yol geçişi detayı<input data-sv="roadNote" type="text" value="${esc(s.survey.roadNote??'')}" placeholder="Geçiş güzergâhı, mülk sahibi, Karayolları"></label>
+    ${chk('access','Erişim ve yol durumu',' class="span4"')}
+  </div></section>
   </div>
 
   <section class="box"><h3>Saha Koşulları ve Teknik Yapılabilirlik</h3>
   <div class="grid infogrid">
-    ${chk('access','Erişim ve yol durumu',' class="span4"')}${chk('pave','Zemin / inşaat işleri',' class="span4"')}
+    ${chk('pave','Zemin / inşaat işleri',' class="span4"')}
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}
     ${sel('trafoInvest','Trafo yatırımı gerekiyor mu?',[['y','Evet'],['n','Hayır']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}
     ${sv('voltage','Gerilim (V)','number')}${sv('connPoint','Bağlantı noktası yeri')}
     ${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
     ${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}
     ${chk('lay','Kablo döşeme',' class="span4"')}${chk('pvpot','PV potansiyeli',' class="span4"')}
-    ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}<label>Yol geçişi detayı<input data-sv="roadNote" type="text" value="${esc(s.survey.roadNote??'')}" placeholder="Geçiş güzergâhı, mülk sahibi, Karayolları"></label>
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
     <label class="span4">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label>
   </div><p class="note" id="evPotential"></p></section>
