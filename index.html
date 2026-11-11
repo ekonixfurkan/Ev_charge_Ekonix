@@ -1717,7 +1717,7 @@ function renderSite(){
     ${sv('parkTotal','Park yeri, toplam','number')}${sv('parkDed','Park yeri, ayrılmış','number')}${sv('parkShared','Park yeri, ortak','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
     ${chk('access','Erişim ve yol durumu')}${chk('pave','Zemin / inşaat işleri')}
     ${field('gridKva','Trafo gücü (kVA)','number')}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}${sel('trafoInvest','Trafo yatırımı gerekiyor mu?',[['y','Evet'],['n','Hayır']])}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}${sv('voltage','Gerilim (V)','number')}
-    ${sv('connPoint','Bağlantı noktası yeri')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sv('tariffTl','Elektrik tarifesi (₺/kWh)','number')}${sv('usdTry','Dolar kuru (₺)','number')}${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
+    ${sv('connPoint','Bağlantı noktası yeri')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}${sv('parkFee','Park ücreti kuralı')}${sel('loadMgmt','Yük yönetimi',[['y','Var'],['n','Yok']])}
     ${chk('lay','Kablo döşeme')}${chk('pvpot','PV potansiyeli')}
     ${sel('roadCross','Yol geçişi var mı?',[['street','Sokak'],['main','Anayol'],['onsite','Saha İçi Yol']])}
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
@@ -1746,7 +1746,7 @@ function renderSite(){
   <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal USD; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
   <div class="grid g5">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('starShare','StarCharge payı','%')}${finField('ekoShare','EKONİX payı','%')}${finField('fundShare','Diğer fon payı','%')}</div>
   <div class="shareinfo" id="shareStatus"></div>
-  <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','$/kWh')}<label>Elektrik maliyeti ($/kWh)<input id="costBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Altyapı &amp; Güç’teki Elektrik tarifesi (₺/kWh) ÷ Dolar kuru; orada girilir"></label></div>
+  <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','$/kWh')}<label>Elektrik maliyeti ($/kWh)<input id="costBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Altyapı &amp; Güç’teki Elektrik tarifesi (₺/kWh, KDV dahil) ÷ Dolar kuru; orada girilir"></label></div>
   <details><summary>Fiyat Artışları ve İşletme Gideri</summary>
     <div class="grid subgrid">${finField('saleGrowth','Satış fiyatı yıllık artışı','%')}${finField('costGrowth','Elektrik maliyeti yıllık artışı','%')}${finField('commission','Co-CPO ödeme komisyonu','hasılatın %')}${finField('opex','İlk yıl işletme gideri','USD')}${finField('opexGrowth','İşletme gideri yıllık artışı','%')}</div>
     <p class="note">Komisyon ve işletme gideri Co-CPO payından düşülür. Varsayılan fiyatlar örnektir, tarife teklifi değildir.</p>
