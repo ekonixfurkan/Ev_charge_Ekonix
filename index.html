@@ -1415,7 +1415,7 @@ function saveGrp(){
   if(!name){$('grpErr').textContent='Grup başlığı gerekli.';$('grpErr').hidden=false;return;}
   let n=0;db.sites.forEach(s=>{if(grp.sel.has(s.id)&&grpOf(s)!==name){s.group=name;touched(s);n++;}});
   $('grpDlg').close();grp.sel.clear();grp.on=false;grp.closed.delete(name);
-  paintLocRows();paintGrpBar();toast(n?`${n} proje "${name}" grubuna alındı.`:'Seçilen projeler zaten bu grupta.');
+  paintLocRows();paintGrpBar();pageFx();toast(n?`${n} proje "${name}" grubuna alındı.`:'Seçilen projeler zaten bu grupta.');
 }
 document.addEventListener('click',async e=>{
   if(view!=='locations')return;
@@ -1425,11 +1425,11 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('#grpCancel')){$('grpDlg').close();return;}
   const del=e.target.closest('[data-grpdel]');
   if(del){const g=del.dataset.grpdel;if(!await ask(`"${g}" grubu dağıtılsın mı? Projeler silinmez, yalnızca gruptan çıkar.`,'Grubu Dağıt'))return;
-    db.sites.forEach(s=>{if(grpOf(s)===g){s.group='';touched(s);}});grp.closed.delete(g);paintLocRows();toast('Grup dağıtıldı.');return;}
+    db.sites.forEach(s=>{if(grpOf(s)===g){s.group='';touched(s);}});grp.closed.delete(g);paintLocRows();pageFx();toast('Grup dağıtıldı.');return;}
   const row=e.target.closest('#locRows [data-gsel]');
   if(row){const id=row.dataset.gsel;if(grp.sel.has(id))grp.sel.delete(id);else grp.sel.add(id);paintLocRows();paintGrpBar();return;}
   const hd=e.target.closest('#locRows .grp-head');
-  if(hd){const g=hd.dataset.grp;if(grp.closed.has(g))grp.closed.delete(g);else grp.closed.add(g);paintLocRows();}
+  if(hd){const g=hd.dataset.grp;if(grp.closed.has(g))grp.closed.delete(g);else grp.closed.add(g);paintLocRows();pageFx();}
 });
 document.addEventListener('keydown',e=>{
   if(view!=='locations')return;
