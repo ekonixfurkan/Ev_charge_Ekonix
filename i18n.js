@@ -113,7 +113,7 @@
     'Kullanım': 'Utilization', 'Kurulu gücün şebeke kapasitesine oranı': 'Installed power as a share of grid capacity',
     'Zemin / inşaat işleri': 'Groundwork / civil works', 'Saha işleri (EPC)': 'Site works (EPC)', 'Donanım': 'Hardware', 'Şebeke bağlantısı': 'Grid connection',
     'Saha işleri dış fon kredisi': 'Site works external-fund loan', 'Diğer': 'Other',
-    'Keşif mühendisi': 'Survey engineer', 'İşletme sahibi': 'Operator', 'Saha sahibi': 'Site owner',
+    'Keşif mühendisi': 'Survey engineer', 'Keşif Yapan Firma-Kişi İsmi': 'Surveying Company-Person Name', 'İşletme sahibi': 'Operator', 'Saha sahibi': 'Site owner',
     'Keşif mühendisi, ad': 'Survey engineer, name', 'İşletme sahibi, ad': 'Operator, name', 'Yerel ortak, ad': 'Local partner, name', 'Saha sahibi, ad': 'Site owner, name',
     'AMG saha keşif formu, bölüm 1–2': 'AMG site survey form, sections 1–2',
 
