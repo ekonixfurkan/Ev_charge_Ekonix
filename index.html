@@ -508,6 +508,12 @@ button.mt-chip.link{cursor:pointer;font-family:inherit}button.mt-chip.link:hover
 .grid.infogrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .info-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;margin-bottom:16px}
 .info-pair .box{margin-bottom:0}
+.info-pair.stretch{align-items:stretch}
+.info-pair.stretch .info-col>.box:last-child{flex:1}
+.info-pair.stretch>.box{display:flex;flex-direction:column}
+.info-pair.stretch>.box>.grid{flex:none}
+.notes-fill{display:flex;flex-direction:column;flex:1;margin-top:14px}
+.notes-fill textarea{flex:1;min-height:64px}
 .info-col{display:flex;flex-direction:column;gap:16px;min-width:0}
 @media (max-width:1100px){.info-pair{grid-template-columns:minmax(0,1fr)}.info-pair .box{margin-bottom:16px}}
 .trio{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -1725,7 +1731,7 @@ function renderSite(){
   </div></section>
   </div>
 
-  <div class="info-pair" data-tab="infra">
+  <div class="info-pair stretch" data-tab="infra">
   <div class="info-col">
   <section class="box"><h3>Keşif Bilgileri</h3>
   <div class="grid infogrid">
@@ -1758,8 +1764,8 @@ function renderSite(){
     ${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}
     ${chk('lay','Kablo döşeme',' class="span4"')}${chk('pvpot','PV potansiyeli',' class="span4"')}
     ${chk('exist','Mevcut güvenlik',' class="span4"')}
-    <label class="span4">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label>
-  </div><p class="note" id="evPotential"></p></section>
+  </div>
+  <label class="notes-fill">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label></section>
   </div>
 
   <section class="box" data-tab="units"><h3>Şarj Üniteleri<small id="unitSummary"></small></h3>
@@ -1860,7 +1866,6 @@ function updateDerived(){
   $('amgDec').textContent=d.complete?'Karar: '+d.dec.t+' ('+d.dec.en+')':d.done?`${AMG.length-d.done} kriter daha puanlanınca karar gösterilir`:'Her kriteri 0 ile ağırlığı arasında puanlayın';
   AMG.forEach(c=>{const m=document.querySelector(`[data-meter="${c.k}"]`),raw=s.amg.scores[c.k],v=+raw;if(m)m.style.width=(raw!==''&&raw!=null&&Number.isFinite(v)?v/c.w*100:0)+'%';});
   const attDone=ATTACH.filter(a=>s.att[a.k]).length;$('attProgress').textContent=`${attDone}/${ATTACH.length} ek işaretlendi`;
-  $('evPotential').textContent=t.kw?`Şarj potansiyeli ünite tablosundan alınır: ${s.units.filter(u=>u.kind!=='CAB').map(u=>`${u.kind} ${nf.format(u.kw)} kW × ${u.qty}`).join(', ')}.`:'Şarj potansiyeli ünite tablosundan alınır.';
   $('vKw').textContent=nf.format(t.kw)+' kW';
   const tb=$('costBox');if(tb)tb.value=s.fin.cost;
   $('unitSummary').textContent=`${t.dcUnits} DC (${t.dcSock} soket) · ${t.acUnits} AC (${t.acSock} soket)`+(t.cabs?` · ${t.cabs} Dağıtım Kabini`:'');

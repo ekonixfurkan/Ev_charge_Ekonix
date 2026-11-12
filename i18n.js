@@ -103,7 +103,7 @@
     'Ünite Gücü kW': 'Unit Power kW', 'Ünite Başına Soket': 'Sockets per Unit', 'Şarj Noktası': 'Charging Points', 'DC Ünite': 'DC Units', 'AC Ünite': 'AC Units',
     '+ DC ünite': '+ DC unit', '+ AC ünite': '+ AC unit', '+ Finansman kalemi': '+ Financing item', 'Tamam.': 'Done.',
     'Henüz ünite yok. Aşağıdan DC veya AC ünite ekleyin.': 'No units yet. Add a DC or AC unit below.',
-    'Ünite girilince sonuçlar burada görünür.': 'Results appear here once units are entered.', 'Şarj potansiyeli ünite tablosundan alınır.': 'Charging potential is taken from the unit table.',
+    'Ünite girilince sonuçlar burada görünür.': 'Results appear here once units are entered.',
     'Park yeri, toplam': 'Parking spaces, total', 'Park yeri, ayrılmış': 'Parking spaces, reserved', 'Park yeri, ortak': 'Parking spaces, shared',
     'Park ücreti kuralı': 'Parking fee rule', 'Rakip konnektör sayısı': 'Competitor connector count', 'Rakip fiyat / hizmet / kullanım notları': 'Competitor price / service / usage notes',
     '3 km içindeki hızlı şarj sahası': 'Fast-charging sites within 3 km', 'Erişim ve yol durumu': 'Access and road conditions', 'Ana kapsam': 'Main scope',
