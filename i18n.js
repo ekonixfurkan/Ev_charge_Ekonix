@@ -35,7 +35,7 @@
 
     /* genel eylemler */
     'Düzenle': 'Edit', 'Yazdır': 'Print', 'Değişiklikleri Kaydet': 'Save Changes', 'İptal': 'Cancel', 'Vazgeç': 'Cancel', 'Tamam': 'OK',
-    'Sil': 'Delete', 'Ekle': 'Add', 'Kapat': 'Close', 'Gönder': 'Send', 'Ara': 'Search', 'Seçin': 'Select', 'Tümü': 'All', 'Uygula': 'Apply',
+    'Sil': 'Delete', 'Ekle': 'Add', 'Kapat': 'Close', 'Gönder': 'Send', 'Ara': 'Search', 'Seçin': 'Select', 'Seçiniz': 'Select', 'Tümü': 'All', 'Uygula': 'Apply',
     'Üret': 'Generate', 'Gerekli': 'Required', 'Opsiyonel': 'Optional', 'Kayıt': 'Record', 'Kaydet': 'Save', 'Evet': 'Yes', 'Hayır': 'No',
     'Daha Fazla Yükle': 'Load More', 'Filtreleri Temizle': 'Clear Filters', 'Sırala': 'Sort by', 'Katalogdan Seç': 'Pick from Catalog',
     'Değişiklikleri At': 'Discard Changes', 'Üniteyi sil': 'Delete unit', 'Kalemi sil': 'Delete item',

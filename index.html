@@ -695,11 +695,17 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 .seg button[aria-pressed=true][data-v=ok]{background:var(--ok-soft);color:var(--ok);font-weight:700}
 .seg button[aria-pressed=true][data-v=risk]{background:var(--risk-soft);color:var(--risk);font-weight:700}
 .seg button[aria-pressed=true][data-v=no]{background:var(--no-soft);color:var(--no);font-weight:700}
-fieldset.chks{border:1px solid var(--hair);border-radius:var(--radius);padding:8px 10px 10px;margin:0;display:flex;flex-wrap:wrap;gap:6px 14px;min-width:0}
-fieldset.chks.span2{grid-column:span 2}fieldset.chks.span4{grid-column:1/-1}
-fieldset.chks legend{font-size:11.5px;color:var(--muted);font-weight:600;padding:0 4px;text-transform:uppercase;letter-spacing:.07em}
-fieldset.chks label{display:flex;align-items:center;gap:6px;font-weight:400;color:var(--ink);font-size:13.5px;text-transform:none;letter-spacing:0}
-fieldset.chks input{width:auto;min-height:0;margin:0}
+.mfield{min-width:0}.mfield.span2{grid-column:span 2}.mfield.span4{grid-column:1/-1}
+.mlabel{display:block;font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.msel{position:relative}
+.msel summary{list-style:none;cursor:pointer;min-height:38px;padding:8px 28px 8px 10px;border:1px solid var(--hair-strong);border-radius:var(--radius);background:var(--card);font-size:14px;font-weight:400;color:var(--ink);text-transform:none;letter-spacing:0;display:flex;align-items:center;position:relative;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.msel summary::-webkit-details-marker{display:none}
+.msel summary::after{content:"";position:absolute;right:11px;top:50%;width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:translateY(-70%) rotate(45deg)}
+.msel summary.ph{color:var(--muted)}
+.msel[open] summary,.msel summary:focus-visible{outline:2px solid var(--navy);outline-offset:0;border-color:var(--navy)}
+.msel .mpanel{position:absolute;left:0;right:0;top:calc(100% + 2px);z-index:20;background:var(--card);border:1px solid var(--hair-strong);border-radius:var(--radius);padding:6px 4px;display:flex;flex-direction:column}
+.msel .mpanel label{display:flex;align-items:center;gap:8px;padding:6px 8px;font-weight:400;color:var(--ink);font-size:13.5px;text-transform:none;letter-spacing:0}
+.msel .mpanel input{width:auto;min-height:0;margin:0}
 .scoretotal{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
 .scoretotal strong{font-size:30px;font-variant-numeric:tabular-nums}
 .scoretotal span{color:var(--muted);font-size:14px}
@@ -775,7 +781,6 @@ fieldset.chks input{width:auto;min-height:0;margin:0}
   aside{position:static;height:auto;overflow:visible}
   main{padding:14px}
     .dd-row,.amg-row{grid-template-columns:1fr}
-  fieldset.chks.span2{grid-column:1/-1}
   .verdict{width:100%}.vcell{flex:1;min-width:0}
   .emptystate{padding:36px 16px}
   #dlg .dgrid{grid-template-columns:1fr}
@@ -1550,7 +1555,7 @@ function field(key,label,type='text',extra=''){
 const BLANK_OK=new Set(['score','manHours','evseKw','contractBase','contractExt','lat','lng']);
 const cur=()=>db.sites.find(s=>s.id===activeId);
 /* İl / ilçe listeleri (data/turkey-locations.js) */
-const optsOf=(list,cur)=>'<option value="">Seçin</option>'+[...(cur&&!list.includes(cur)?[cur]:[]),...list].map(x=>`<option ${x===cur?'selected':''}>${esc(x)}</option>`).join('');
+const optsOf=(list,cur)=>'<option value="">Seçiniz</option>'+[...(cur&&!list.includes(cur)?[cur]:[]),...list].map(x=>`<option ${x===cur?'selected':''}>${esc(x)}</option>`).join('');
 const ilOptions=cur=>optsOf(window.TR_ILLER||[],cur);
 const ilceOptions=(il,cur)=>optsOf((window.TR_IL_ILCE||{})[il]||[],cur);
 /* Sözleşme süresi: ilk süre + uzatma = toplam (toplam elle girilmez) */
@@ -1572,13 +1577,16 @@ async function loadPeople(){
 function leadField(){
   const v=cur().survey.lead||'',names=people.map(x=>x.name||x.email);
   const list=[...(v&&!names.includes(v)?[v]:[]),...names];
-  return `<label>Sorumlu<select data-lead aria-label="Sorumlu"><option value="">Seçin</option>${list.map(n=>`<option value="${esc(n)}" ${n===v?'selected':''}>${esc(n)}</option>`).join('')}</select></label>`;
+  return `<label>Sorumlu<select data-lead aria-label="Sorumlu"><option value="">Seçiniz</option>${list.map(n=>`<option value="${esc(n)}" ${n===v?'selected':''}>${esc(n)}</option>`).join('')}</select></label>`;
 }
 // Sıradaki iş: bir sonraki aşama (aşama değişince kendiliğinden güncellenir, elle değiştirilmez).
 const nextStageOf=s=>{const i=STAGES.findIndex(x=>x[0]===s.stage),n=STAGES[i+1];return n?n[0]+' '+n[1]:'Süreç tamamlandı';};
 function sv(k,label,type='text',extra=''){const s=cur(),v=s.survey[k]??'';return `<label${extra}>${label}<input data-sv="${k}" type="${type}" value="${esc(v)}" ${type==='number'?'min="0" step="any" inputmode="decimal"':''}></label>`;}
-function sel(k,label,opts){const v=cur().survey[k]||'';return `<label>${label}<select data-sv="${k}"><option value="">Seçin</option>${opts.map(([o,t])=>`<option value="${o}" ${o===v?'selected':''}>${t}</option>`).join('')}</select></label>`;}
-function chk(k,label,extra=' class="span2"'){const on=cur().survey[k]||[],span=(extra.match(/span\d/)||['span2'])[0];return `<fieldset class="chks ${span}"><legend>${label}</legend>${CHK[k].map(([o,t])=>`<label><input type="checkbox" data-svc="${k}" value="${o}" ${on.includes(o)?'checked':''}>${t}</label>`).join('')}</fieldset>`;}
+function sel(k,label,opts){const v=cur().survey[k]||'';return `<label>${label}<select data-sv="${k}"><option value="">Seçiniz</option>${opts.map(([o,t])=>`<option value="${o}" ${o===v?'selected':''}>${t}</option>`).join('')}</select></label>`;}
+document.addEventListener('click',e=>{document.querySelectorAll('details.msel[open]').forEach(d=>{if(!d.contains(e.target))d.removeAttribute('open');});});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('details.msel[open]').forEach(d=>d.removeAttribute('open'));});
+function msLabel(k,on){const t=CHK[k].filter(([o])=>on.includes(o)).map(([,x])=>x);return t.length?t.join(', '):'Seçiniz';}
+function chk(k,label,extra=' class="span2"'){const on=cur().survey[k]||[],span=(extra.match(/span\d/)||['span2'])[0];return `<div class="mfield ${span}"><span class="mlabel">${label}</span><details class="msel" data-msel="${k}"><summary class="${on.length?'':'ph'}">${msLabel(k,on)}</summary><div class="mpanel">${CHK[k].map(([o,t])=>`<label><input type="checkbox" data-svc="${k}" value="${o}" ${on.includes(o)?'checked':''}>${t}</label>`).join('')}</div></details></div>`;}
 function finField(k,label,unitTxt){const [lo,hi]=FIN_LIMITS[k];return `<label>${label}${unitTxt?' ('+unitTxt+')':''}<input data-fin="${k}" type="number" min="${lo}" max="${hi}" step="any" inputmode="decimal" value="${cur().fin[k]}"></label>`;}
 function trRow(t){
   const opt=sel=>PARTIES.map(p=>`<option value="${p.k}" ${p.k===sel?'selected':''}>${esc(p.t)}</option>`).join('');
@@ -1813,7 +1821,7 @@ function renderSite(){
   </section>
 
   <section class="box" data-tab="check"><h3>Ekler ve Onay<small id="attProgress"></small></h3>
-  <div class="scroll"><table class="yearly"><thead><tr><th>Ek Türü</th><th>Durum</th></tr></thead><tbody>${ATTACH.map(a=>`<tr><th>${esc(a.t)}</th><td style="text-align:left;min-width:170px"><select data-att="${a.k}" aria-label="${esc(a.t)} durumu"><option value="">Seçin</option>${[['var','Mevcut, ekte'],['yok','Mevcut değil'],['na','Uygulanamaz']].map(([v,t])=>`<option value="${v}" ${s.att[a.k]===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
+  <div class="scroll"><table class="yearly"><thead><tr><th>Ek Türü</th><th>Durum</th></tr></thead><tbody>${ATTACH.map(a=>`<tr><th>${esc(a.t)}</th><td style="text-align:left;min-width:170px"><select data-att="${a.k}" aria-label="${esc(a.t)} durumu"><option value="">Seçiniz</option>${[['var','Mevcut, ekte'],['yok','Mevcut değil'],['na','Uygulanamaz']].map(([v,t])=>`<option value="${v}" ${s.att[a.k]===v?'selected':''}>${t}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
   <details><summary>İmza ve Katılımcılar</summary><div class="grid subgrid">${SIGN.map(r=>`<label>${esc(r.t)}, ad<input data-sign="${r.k}Name" value="${esc(s.sign[r.k+'Name'])}"></label><label>Tarih<input data-sign="${r.k}Date" type="date" value="${esc(s.sign[r.k+'Date'])}"></label>`).join('')}
     <label class="span4">Diğer katılımcılar<input data-sign="others" value="${esc(s.sign.others)}"></label></div></details>
   </section>
@@ -1970,7 +1978,7 @@ $('view').addEventListener('input',e=>{
   if(el.dataset.finText){s.fin[el.dataset.finText]=el.value;touched(s);updateDerived();return;}
   if('lead' in el.dataset){s.survey.lead=el.value;touched(s);updateDerived();return;}
   if(el.dataset.sv){const k=el.dataset.sv;s.survey[k]=el.type==='number'?(el.value===''?'':Math.max(0,+el.value||0)):el.value;if(k==='tariffTl'||k==='usdTry')syncTariff(s);touched(s);updateDerived();return;}
-  if(el.dataset.svc){const k=el.dataset.svc;s.survey[k]=[...document.querySelectorAll(`[data-svc="${k}"]:checked`)].map(x=>x.value);touched(s);return;}
+  if(el.dataset.svc){const k=el.dataset.svc;s.survey[k]=[...document.querySelectorAll(`[data-svc="${k}"]:checked`)].map(x=>x.value);const sm=document.querySelector(`[data-msel="${k}"] summary`);if(sm){sm.textContent=msLabel(k,s.survey[k]);sm.classList.toggle('ph',!s.survey[k].length);}touched(s);return;}
   if(el.dataset.amg){const c=AMG.find(x=>x.k===el.dataset.amg),raw=el.value.trim();
     if(raw===''){s.amg.scores[c.k]='';el.removeAttribute('aria-invalid');syncScore(s);touched(s);updateDerived();return;}
     const v=+raw;if(!Number.isFinite(v)||v<0||v>c.w){el.setAttribute('aria-invalid','true');status(c.t+': 0 ile '+c.w+' arasında puan girin',true);return;}
