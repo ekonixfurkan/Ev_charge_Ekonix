@@ -1018,13 +1018,13 @@ const statusOf=k=>STATUSES.find(s=>s.k===k)||STATUSES[0];
 
 /* ---------- revenue & financing model ---------- */
 const YEARS=7;
-const FIN_DEFAULT={initial:15,growth:2,sale:0.29,cost:0.11,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:0,ekoShare:0,fundShare:0,partnerShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
+const FIN_DEFAULT={initial:15,growth:2,sale:0.29,cost:0.11,saleGrowth:0,costGrowth:0,share:20,entShare:0,starShare:50,ekoShare:0,fundShare:0,partnerShare:0,fundName:'',commission:0,opex:0,opexGrowth:0};
 const FIN_LIMITS={initial:[0,100],growth:[-20,20],sale:[0,1000],cost:[0,1000],saleGrowth:[-100,200],costGrowth:[-100,200],share:[0,100],entShare:[0,100],starShare:[0,100],ekoShare:[0,100],fundShare:[0,100],partnerShare:[0,100],commission:[0,100],opex:[0,1e10],opexGrowth:[0,200]};
 const PARTIES=[
-  {k:'owner',t:'Yer Sağlayıcı',sh:'Yer Sağlayıcı',c:'var(--p-owner)',share:'share'},
-  {k:'ent',t:'Co-CPO',sh:'Co-CPO',c:'var(--p-ent)',share:'entShare'},
   {k:'star',t:'StarCharge (AMG)',sh:'StarCharge',c:'var(--p-star)',share:'starShare'},
-  {k:'partner',t:'Partner',sh:'Partner',c:'var(--stg-08)',share:'partnerShare'},
+  {k:'ent',t:'Co-CPO',sh:'Co-CPO',c:'var(--p-ent)',share:'entShare'},
+  {k:'owner',t:'Yer Sağlayıcı',sh:'Yer Sağlayıcı',c:'var(--p-owner)',share:'share'},
+  {k:'partner',t:'Paydaş',sh:'Paydaş',c:'var(--stg-08)',share:'partnerShare'},
   {k:'fon',t:'Diğer Fon',sh:'Diğer Fon',c:'var(--p-fon)',share:'fundShare'},
   {k:'eko',t:'EKONİX',sh:'EKONİX',c:'var(--p-eko)',share:'ekoShare'}
 ];
@@ -1121,7 +1121,7 @@ function partyTable(P,s){
 }
 function yearlyTable(rows){
   const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),hasPartner=rows.some(r=>Math.abs(r.partner)>0.5),R=rows;
-  const cols=[['energy','Enerji kWh'],['revenue','Hasılat USD'],['margin','Elektrik Sonrası USD'],['owner','Yer Sağlayıcı USD'],['ent','Co-CPO Payı USD'],['star','StarCharge USD'],...(hasPartner?[['partner','Partner USD']]:[]),...(hasFon?[['fon','Diğer Fon USD']]:[]),['eko','EKONİX USD'],['remaining','Dağıtılmayan USD'],['fee','Komisyon USD'],['opex','İşletme Gideri USD']];
+  const cols=[['energy','Enerji kWh'],['revenue','Hasılat USD'],['margin','Elektrik Sonrası USD'],['star','StarCharge USD'],['ent','Co-CPO Payı USD'],['owner','Yer Sağlayıcı USD'],...(hasPartner?[['partner','Paydaş USD']]:[]),...(hasFon?[['fon','Diğer Fon USD']]:[]),['eko','EKONİX USD'],['remaining','Dağıtılmayan USD'],['fee','Komisyon USD'],['opex','İşletme Gideri USD']];
   const sum=k=>R.reduce((t,r)=>t+r[k],0);
   return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar USD. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
 }
@@ -1789,7 +1789,7 @@ function renderSite(){
   <section class="box" data-tab="credit" data-fsub="ozet"><h3>Finansman Özeti<small>${YEARS} yıl, nominal USD</small></h3><div id="finKpis"></div></section>
 
   <section class="box" data-tab="credit" data-fsub="gelir"><h3>Gelir Modeli<small>${YEARS} yıl, nominal USD; enerji yukarıdaki ünitelerden hesaplanır</small></h3>
-  <div class="grid g6">${finField('share','Yer sağlayıcı payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('starShare','StarCharge payı','%')}${finField('partnerShare','Partner payı','%')}${finField('fundShare','Diğer fon payı','%')}<label>EKONİX payı (%)<input id="ekoBox" data-locked readonly tabindex="-1" value="${esc(s.fin.ekoShare)}" title="Diğer payların 100’den kalanı; kendiliğinden hesaplanır"></label></div>
+  <div class="grid g6">${finField('starShare','StarCharge payı','%')}${finField('entShare','Co-CPO payı','%')}${finField('share','Yer sağlayıcı payı','%')}${finField('partnerShare','Paydaş payı','%')}${finField('fundShare','Diğer fon payı','%')}<label>EKONİX payı (%)<input id="ekoBox" data-locked readonly tabindex="-1" value="${esc(s.fin.ekoShare)}" title="Diğer payların 100’den kalanı; kendiliğinden hesaplanır"></label></div>
   <div class="shareinfo" id="shareStatus"></div>
   <div class="grid subgrid">${finField('initial','İlk yıl kapasite kullanımı','%')}${finField('growth','Yıllık kullanım artışı','puan')}${finField('sale','Satış fiyatı','$/kWh')}<label>Elektrik maliyeti ($/kWh)<input id="costBox" data-locked readonly tabindex="-1" value="${esc(s.fin.cost)}" title="Altyapı &amp; Güç’teki Elektrik tarifesi (₺/kWh, KDV dahil) ÷ Dolar kuru; orada girilir"></label></div>
   <details><summary>Fiyat Artışları ve İşletme Gideri</summary>
