@@ -1756,14 +1756,13 @@ function renderSite(){
 
   <section class="box"><h3>Saha Koşulları ve Teknik Yapılabilirlik</h3>
   <div class="grid infogrid">
-    ${chk('pave','Zemin / inşaat işleri',' class="span4"')}
     ${sel('trafoInvest','Trafo yatırımı gerekiyor mu?',[['y','Evet'],['n','Hayır']])}${sel('connType','Bağlantı şekli',[['AG','AG'],['OG','OG'],['OG-AG','OG-AG']])}
     ${field('gridKva','Trafo gücü (kVA)','number')}${sv('availKw','Kullanılabilir güç (kW/kVA)','number')}
     ${sv('voltage','Gerilim (V)','number')}${sv('connPoint','Bağlantı noktası yeri')}
-    ${sv('cableM','İstasyona kablo mesafesi (m)','number')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
-    ${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}${sv('usdTry','Dolar kuru (₺)','number')}
-    ${chk('lay','Kablo döşeme',' class="span4"')}${chk('pvpot','PV potansiyeli',' class="span4"')}
-    ${chk('exist','Mevcut güvenlik',' class="span4"')}
+    ${sv('cableM','İstasyona kablo mesafesi (m)','number')}${chk('pave','Zemin / inşaat işleri',' class="span4"')}
+    ${chk('lay','Kablo döşeme',' class="span4"')}${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}
+    ${chk('pvpot','PV potansiyeli',' class="span4"')}${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}
+    ${sv('usdTry','Dolar kuru (₺)','number')}${chk('exist','Mevcut güvenlik',' class="span4"')}
   </div>
   <label class="notes-fill">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label></section>
   </div>
