@@ -606,6 +606,11 @@ table.portfolio.comp-tbl{width:100%}
 .ld-tbl select,.ld-tbl input{min-height:34px;padding:5px 8px;font-size:13px}.ld-tbl select{min-width:150px}.ld-tbl .ld-note{min-width:220px}
 .ld-tbl tr.st-done td{opacity:.6}
 .comp-pick{margin-bottom:14px}
+.comp-hist .lchk{display:flex;align-items:center;gap:6px;margin:0 0 10px;font-size:13px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer}.comp-hist .lchk input{width:auto;min-height:0;height:auto;margin:0}
+table.portfolio.comp-hist-tbl{width:100%}
+.comp-hist-tbl{font-size:12.5px}.comp-hist-tbl td{vertical-align:middle}
+.comp-hist-tbl .ch-act{white-space:nowrap}.comp-hist-tbl .ch-act button{min-height:30px;padding:0 10px;font-size:12px;margin-right:4px}
+.comp-hist .scroll{overflow-x:auto}
 .comp-key{margin:12px 0;padding:10px 12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--soft)}.comp-key summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink2)}
 .comp-keyrow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.comp-keyrow input{flex:1 1 260px}
 .comp-act{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}.comp-act button{min-height:38px}
@@ -899,6 +904,9 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   table.ld-tbl.m-cards .ld-call{display:flex;align-items:center;justify-content:center;min-height:46px;background:var(--navy);color:#fff;border-radius:var(--radius);font-size:16px}
   table.ld-tbl.m-cards select,table.ld-tbl.m-cards input{min-height:44px;font-size:16px;width:100%}
   table.ld-tbl .ld-note{min-width:0}
+  table.comp-hist-tbl.m-cards.m-cards td:nth-child(3){display:block;text-align:left;font-weight:700;font-size:15px;padding-bottom:7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
+  table.comp-hist-tbl.m-cards.m-cards td:nth-child(3)::before{display:none}
+  table.comp-hist-tbl.m-cards td.ch-act{display:flex;flex-wrap:wrap;gap:6px}table.comp-hist-tbl.m-cards td.ch-act::before{display:none}table.comp-hist-tbl.m-cards .ch-act button{min-height:44px;font-size:14px;flex:1 1 40%}
   table.comp-tbl.m-cards.m-cards tbody tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:10px;align-items:start;padding:12px}
   table.comp-tbl.m-cards.m-cards td{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:1px;text-align:left;padding:0!important}
   table.comp-tbl.m-cards.m-cards td::before{flex:none;white-space:nowrap}
@@ -2036,6 +2044,7 @@ function renderSite(){
   </section>
 
   ${compSectionHtml(false)}
+  ${compHistoryHtml(false)}
 
   <section class="box files-box" data-tab="files"><h3>Dosyalar<small id="flSummary"></small></h3>
     <div id="flBody"><p class="note">Yükleniyor…</p></div>
@@ -2049,7 +2058,7 @@ function renderSite(){
   updateDerived();
   applyEditState();
   paintNotesBadge();if(mode==='cloud'&&notesFor!==activeId)loadNotes(activeId);
-  initFiles();compPaint();compKeyLoad();
+  initFiles();compPaint();compKeyLoad();chLoad(false);
 }
 function unitRow(u){
   const cab=u.kind==='CAB',cls=u.kind==='DC'?'kind-dc':cab?'kind-cab':'kind-ac';
@@ -3130,13 +3139,14 @@ document.addEventListener('click',async e=>{
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#notifRows [data-bellact]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click();}});
 
 /* ---------- Rakip Analizi (TomTom, anlık) ---------- */
-const comp={site:'',lat:'',lon:'',rad:3000,res:null,busy:false,pick:''};
+const comp={site:'',lat:'',lon:'',rad:3000,res:null,busy:false,pick:'',label:'',hist:{rows:[],total:0,mine:false,loaded:false,busy:false}};
 function compSectionHtml(standalone){
   return `<section class="box comp-box"${standalone?'':' data-tab="comp"'}><h3>Rakip Analizi<small>TomTom: çevredeki şarj istasyonları ve anlık doluluk</small></h3>${standalone?`<div class="grid infogrid comp-pick no-print"><label class="span4">Proje seç<select id="compPick"><option value="">Seçin (isteğe bağlı)</option>${db.sites.map(x=>`<option value="${esc(x.id)}" ${x.id===comp.pick?'selected':''}>${esc((x.code?x.code+' · ':'')+x.name)}</option>`).join('')}</select></label></div>`:''}
     <div class="grid infogrid comp-form no-print">
       <label>Enlem<input id="compLat" type="text" inputmode="decimal" autocomplete="off" placeholder="41.088204 ya da 41°00'23.9&quot;N" value="${esc(comp.lat)}"></label>
       <label>Boylam<input id="compLon" type="text" inputmode="decimal" autocomplete="off" placeholder="29.018024 ya da 28°50'29.0&quot;E" value="${esc(comp.lon)}"></label>
       <label>Çap<select id="compRad">${[1000,2000,3000,5000].map(r=>`<option value="${r}" ${r===comp.rad?'selected':''}>${r/1000} km</option>`).join('')}</select></label>
+      <label class="span4">Ad / Not (isteğe bağlı)<input id="compLabel" type="text" maxlength="120" autocomplete="off" placeholder="Örn. Levent AVM önü" value="${esc(comp.label)}"></label>
       <div class="comp-act"><button type="button" class="primary" id="compGo">Analiz Et</button><button type="button" id="compCsv" hidden>Excel'e Aktar (CSV)</button></div>
     </div>
     <p class="note" id="compNote"></p>
@@ -3147,10 +3157,38 @@ function compSectionHtml(standalone){
     <div id="compOut"></div>
   </section>`;
 }
+function compHistoryHtml(standalone){
+  return `<section class="box comp-hist"${standalone?'':' data-tab="comp"'}><h3>Geçmiş Analizler<small id="chSummary"></small></h3>
+    <label class="lchk no-print"><input type="checkbox" id="chMine" ${comp.hist.mine?'checked':''}>Yalnızca benim analizlerim</label>
+    <div class="scroll"><table class="portfolio comp-hist-tbl m-cards"><thead><tr><th>Tarih</th><th>Yapan</th><th>Ad</th><th>İl</th><th>İlçe</th><th>Mahalle</th><th>Cadde</th><th>Koordinat</th><th class="num">Çap</th><th class="num">İstasyon</th><th class="num">Soket</th><th class="num">Boş</th><th class="num">Dolu</th><th class="num">Doluluk</th><th></th></tr></thead><tbody id="chRows"><tr><td colspan="15" class="note" style="padding:20px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <div class="row-actions" id="chMore" hidden><button type="button" id="chMoreBtn">Daha Fazla Göster</button></div></section>`;
+}
+async function chApi(method,qs,body){
+  const r=await fetch('/api/sites?evh='+qs,{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'HTTP '+r.status);return d;
+}
+async function chLoad(more){
+  const h=comp.hist;if(h.busy||!$('chRows'))return;h.busy=true;
+  try{
+    const off=more?h.rows.length:0;
+    const d=await chApi('GET','list&'+new URLSearchParams({limit:'20',offset:String(off),mine:h.mine?'1':'0'}).toString());
+    h.rows=more?h.rows.concat(d.rows):d.rows;h.total=d.total;h.me=d.me;h.owner=d.owner;h.loaded=true;chPaint();
+  }catch(e){const t=$('chRows');if(t)t.innerHTML=`<tr><td colspan="15" class="note comp-warn" style="padding:20px;text-align:center">${esc(e.message)}</td></tr>`;}
+  finally{h.busy=false;}
+}
+function chPaint(){
+  const t=$('chRows');if(!t)return;const h=comp.hist;
+  $('chSummary').textContent=h.total?nf.format(h.total)+' analiz':'';
+  t.innerHTML=h.rows.length?h.rows.map(r=>{const T=r.totals||{};
+    return `<tr data-ch="${esc(r.id)}"><td style="white-space:nowrap">${esc(fmtTs(r.createdAt))}</td><td>${esc(r.createdByName||r.createdBy)}</td><td>${esc(r.label)||'—'}</td><td>${esc(r.il)||'—'}</td><td>${esc(r.ilce)||'—'}</td><td>${esc(r.mahalle)||'—'}</td><td>${esc(r.cadde)||'—'}</td><td style="white-space:nowrap">${esc((+r.lat).toFixed(6))}, ${esc((+r.lon).toFixed(6))}</td><td class="num">${nf.format(r.radius/1000)} km</td><td class="num">${nf.format(T.stations||0)}</td><td class="num">${nf.format(T.sockets||0)}</td><td class="num">${T.liveSockets?nf.format(T.available||0):'—'}</td><td class="num">${T.liveSockets?nf.format(T.occupied||0):'—'}</td><td class="num">${T.occupancyPct==null?'—':'%'+df.format(T.occupancyPct)}</td>
+      <td class="ch-act"><button type="button" class="primary" data-chopen="${esc(r.id)}">Aç</button><button type="button" data-chcsv="${esc(r.id)}">Excel (CSV)</button><button type="button" class="ghost" data-chren="${esc(r.id)}" title="Adı düzenle">Ad</button>${h.owner?`<button type="button" class="ghost danger" data-chdel="${esc(r.id)}" title="Sil">Sil</button>`:''}</td></tr>`;}).join(''):`<tr><td colspan="15" class="note" style="padding:20px;text-align:center">Henüz kayıtlı analiz yok. Yapacağınız her analiz buraya kaydedilir.</td></tr>`;
+  $('chMore').hidden=h.rows.length>=h.total;
+}
 function renderRakip(){
   if(comp.site!=='__free'){comp.site='__free';comp.res=null;comp.pick='';}
-  $('view').innerHTML=compSectionHtml(true);
-  applyEditState();compPaint();compKeyLoad();
+  $('view').innerHTML=compSectionHtml(true)+compHistoryHtml(true);
+  applyEditState();compPaint();compKeyLoad();chLoad(false);
 }
 /* Koordinat okuma: ondalık (41.088204), derece-dakika-saniye (41°00'23.9"N 28°50'29.0"E), tek alanda ikisi birden */
 function dmsTokens(str){
@@ -3197,10 +3235,12 @@ function compPaint(){
   const r=comp.res;
   if(csv)csv.hidden=!r;
   if(!r){out.innerHTML='';if(note&&!note.textContent)note.textContent=comp.lat?'':'Koordinat bulunamadı. Altyapı & Güç sekmesindeki GPS alanına koordinat yazın (ör. 41.088204, 29.018024) ya da buraya girin.';return;}
-  const T=r.totals,tm=new Date(r.fetchedAt).toLocaleTimeString(LOC,{hour:'2-digit',minute:'2-digit'});
+  const T=r.totals,tm=new Date(r.fetchedAt).toLocaleString(LOC,{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),ad=r.address||{};
+  const where=[ad.cadde,ad.mahalle,ad.ilce,ad.il].filter(Boolean).join(', ')||ad.adres||'';
   const k=(l,v,sm)=>`<div class="mk"><span>${l}</span><strong>${v}${sm?`<small>${sm}</small>`:''}</strong></div>`;
   const rows=r.stations.map(s=>`<tr><td>${esc(s.name)}<small>${esc(s.address)}</small></td><td>${esc(s.operator)||'—'}</td><td class="num">${nf.format(s.distance)} m</td><td>${esc(s.kind)||'—'}</td><td class="num">${s.maxKw?nf.format(s.maxKw)+' kW':'—'}</td><td class="num">${s.sockets||'—'}</td><td class="num ${s.live?'':'live-no'}">${s.live?s.available:'—'}</td><td class="num ${s.live?'':'live-no'}">${s.live?s.occupied:'—'}</td></tr>`).join('');
   out.innerHTML=`<div class="comp-sum">${k('Toplam İstasyon',T.stations)}${k('Toplam Soket',T.sockets)}${k('Boş Soket',T.liveSockets?T.available:'—')}${k('Dolu Soket',T.liveSockets?T.occupied:'—')}${k('Doluluk',T.occupancyPct==null?'—':df.format(T.occupancyPct),T.occupancyPct==null?'':'%')}</div>
+  ${where?`<p class="note"><b>Konum:</b> ${esc(where)}</p>`:''}
   <p class="note">Veri ${esc(tm)} anında alındı; TomTom doluluğu yaklaşık 3 dakikada bir günceller. Anlık görüntüdür, tarihsel kayıt tutulmaz. Canlı doluluk verisi olan istasyon: ${T.liveStations}/${T.stations}.${T.truncated?' Bölgede '+nf.format(T.totalResults)+' istasyon var, en yakın 100 tanesi gösteriliyor.':''}${T.skipped?' Kota koruması için '+T.skipped+' istasyonun doluluğu sorgulanmadı.':''}${T.failed?' '+T.failed+' istasyonun doluluğu alınamadı.':''}${r.usage?' Bugünkü TomTom isteği: '+nf.format(r.usage.used)+'/'+nf.format(r.usage.limit)+'.':''}</p>
   <div class="scroll"><table class="portfolio comp-tbl m-cards"><thead><tr><th>İstasyon</th><th>İşletmeci</th><th class="num">Mesafe</th><th>Tip</th><th class="num">Güç</th><th class="num">Soket</th><th class="num">Boş</th><th class="num">Dolu</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="note" style="padding:20px;text-align:center">Bu çapta şarj istasyonu bulunamadı.</td></tr>'}</tbody></table></div>`;
 }
@@ -3213,22 +3253,26 @@ async function compRun(){
   if(mode!=='cloud'){note.textContent='Rakip analizi için sunucu bağlantısı gerekli.';note.className='note comp-warn';return;}
   comp.busy=true;const b=$('compGo');b.disabled=true;b.textContent='Çekiliyor…';note.textContent='';note.className='note';
   try{
-    const r=await fetch('/api/sites?'+new URLSearchParams({ev:'1',lat,lon,radius:String(rad)}),{credentials:'same-origin'});
+    comp.label=($('compLabel')||{}).value||'';
+    const r=await fetch('/api/sites?'+new URLSearchParams({ev:'1',lat,lon,radius:String(rad),label:comp.label,site:view==='site'?sid:comp.pick||''}),{credentials:'same-origin'});
     if(r.status===401){location.replace('/login.html');return;}
     const d=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(d.error||'HTTP '+r.status);
     // Sonuç yalnızca aynı sayfada hâlâ isek çizilir (sayfa değiştiyse atılır).
-    if(view===view0&&(view==='rakip'||(cur()&&cur().id===sid))){comp.res=d;compPaint();}
+    if(view===view0&&(view==='rakip'||(cur()&&cur().id===sid))){comp.res=d;compPaint();chLoad(false);if(d.cached){const n2=$('compNote');if(n2){n2.textContent='Son 3 dakika içinde aynı konum sorgulandığı için sonuç önbellekten geldi; yeni kayıt eklenmedi.';n2.className='note';}}}
   }catch(e){note.textContent=e.message;note.className='note comp-warn';comp.res=null;compPaint();}
   finally{comp.busy=false;const b2=$('compGo');if(b2){b2.disabled=false;b2.textContent='Analiz Et';}}
 }
-function compCsv(){
-  const r=comp.res;if(!r)return;const s=cur();
+function compCsv(rr){
+  const r=rr||comp.res;if(!r)return;const s=cur();
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const head=['İstasyon','İşletmeci','Adres','Mesafe (m)','Tip','Maks. Güç (kW)','Soket','Boş','Dolu','Rezerve','Arızalı','Canlı Veri','Enlem','Boylam'];
-  const lines=[head.map(q).join(';')].concat(r.stations.map(x=>[x.name,x.operator,x.address,x.distance,x.kind,x.maxKw,x.sockets,x.live?x.available:'',x.live?x.occupied:'',x.live?x.reserved:'',x.live?x.outOfService:'',x.live?'Evet':'Hayır',x.lat,x.lon].map(q).join(';')));
-  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='rakip-analizi-'+((s&&s.code)||'proje')+'-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  const ad=r.address||{},a=r.area||{},when=r.fetchedAt?new Date(r.fetchedAt):new Date();
+  const meta=[when.toLocaleString(LOC),r.createdByName||r.createdBy||'',r.label||'',ad.il||r.il||'',ad.ilce||r.ilce||'',ad.mahalle||r.mahalle||'',ad.cadde||r.cadde||'',a.lat,a.lon,a.radius];
+  const head=['Analiz Tarihi','Analiz Yapan','Ad / Not','İl','İlçe','Mahalle','Cadde','Analiz Enlem','Analiz Boylam','Çap (m)','İstasyon','İşletmeci','Adres','Mesafe (m)','Tip','Maks. Güç (kW)','Soket','Boş','Dolu','Rezerve','Arızalı','Canlı Veri','İstasyon Enlem','İstasyon Boylam'];
+  const lines=[head.map(q).join(';')].concat(r.stations.map(x=>meta.concat([x.name,x.operator,x.address,x.distance,x.kind,x.maxKw,x.sockets,x.live?x.available:'',x.live?x.occupied:'',x.live?x.reserved:'',x.live?x.outOfService:'',x.live?'Evet':'Hayır',x.lat,x.lon]).map(q).join(';')));
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),el=document.createElement('a');
+  const day=when.toISOString().slice(0,10),loc=[ad.ilce||r.ilce,ad.il||r.il].filter(Boolean).join('-').replace(/[^\p{L}\p{N}-]+/gu,'_');
+  el.href=URL.createObjectURL(blob);el.download='rakip-analizi-'+(loc||((s&&s.code)||'konum'))+'-'+day+'.csv';document.body.appendChild(el);el.click();el.remove();setTimeout(()=>URL.revokeObjectURL(el.href),2000);
 }
 async function compKeyApi(method,body){
   const r=await fetch('/api/sites?evkey=1',{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
@@ -3242,6 +3286,32 @@ function compKeyPaint(d){
 }
 async function compKeyLoad(){if(!$('compKeyState'))return;try{compKeyPaint(await compKeyApi('GET'));}catch(e){const st=$('compKeyState');if(st)st.textContent=e.message;}}
 document.addEventListener('click',async e=>{
+  const T=e.target.closest&&e.target;
+  const op=T&&T.closest('[data-chopen]'),cs=T&&T.closest('[data-chcsv]'),rn=T&&T.closest('[data-chren]'),dl2=T&&T.closest('[data-chdel]');
+  if(op||cs){
+    const id=(op||cs).dataset.chopen||(op||cs).dataset.chcsv,b=op||cs;b.disabled=true;
+    try{
+      const d=await chApi('GET',encodeURIComponent(id));
+      if(cs){compCsv(d);}
+      else{comp.res=d;comp.lat=String(d.lat);comp.lon=String(d.lon);comp.rad=d.radius;comp.label=d.label||'';
+        const la=$('compLat'),lo=$('compLon'),ra=$('compRad'),lb=$('compLabel');if(la)la.value=comp.lat;if(lo)lo.value=comp.lon;if(ra)ra.value=String(d.radius);if(lb)lb.value=comp.label;
+        const n=$('compNote');if(n){n.textContent='Kayıtlı analiz gösteriliyor ('+fmtTs(d.createdAt)+'). Güncel veri için “Analiz Et”e basın.';n.className='note';}
+        compPaint();const box=document.querySelector('.comp-box');if(box)box.scrollIntoView({behavior:'smooth',block:'start'});}
+    }catch(x){toast(x.message);}
+    b.disabled=false;return;
+  }
+  if(rn){
+    const id=rn.dataset.chren,row=comp.hist.rows.find(x=>x.id===id),v=prompt('Analiz adı / notu:',row?row.label:'');
+    if(v===null)return;
+    try{const d=await chApi('PATCH',encodeURIComponent(id),{label:v});if(row)row.label=d.label;chPaint();toast('Ad kaydedildi.');}catch(x){toast(x.message);}
+    return;
+  }
+  if(dl2){
+    if(!await ask('Bu analiz kaydı silinsin mi?','Sil'))return;
+    try{await chApi('DELETE',encodeURIComponent(dl2.dataset.chdel));chLoad(false);}catch(x){toast(x.message);}
+    return;
+  }
+  if(T&&T.closest('#chMoreBtn')){chLoad(true);return;}
   if(e.target.closest('#compGo')){compRun();return;}
   if(e.target.closest('#compCsv')){compCsv();return;}
   const sv=e.target.closest('#compKeySave'),dl=e.target.closest('#compKeyDel');if(!sv&&!dl)return;
@@ -3255,6 +3325,7 @@ document.addEventListener('click',async e=>{
   finally{btn.disabled=false;}
 });
 document.addEventListener('input',e=>{const el=e.target;if(el.id==='compLat')comp.lat=el.value;else if(el.id==='compLon')comp.lon=el.value;else if(el.id==='compRad')comp.rad=+el.value;});
+document.addEventListener('change',e=>{if(e.target.id==='chMine'){comp.hist.mine=e.target.checked;chLoad(false);}});
 document.addEventListener('paste',e=>{if(e.target.id==='compLat'||e.target.id==='compLon')setTimeout(compNormalize,0);});
 document.addEventListener('change',e=>{
   if(e.target.id==='compLat'||e.target.id==='compLon'){compNormalize();return;}

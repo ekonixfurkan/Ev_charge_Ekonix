@@ -1,6 +1,7 @@
 // /api/sites — GET (tüm projeler + ekip), PUT (proje upsert), DELETE (?id=)
 // Ek uç noktalar (Hobby planda 12 işlev sınırı nedeniyle burada): GET ?kur=usd (TCMB dolar kuru), GET ?ev=1&lat&lon&radius (TomTom çevre şarj istasyonları, anlık),
-// ?evkey=1: TomTom anahtarı (yalnızca sahip hesap) GET durum · POST {key} kaydet · DELETE sil
+// ?evkey=1: TomTom anahtarı (yalnızca sahip hesap) GET durum · POST {key} kaydet · DELETE sil,
+// ?evh=…: Rakip Analizi geçmişi (bkz. lib/evhistory.js)
 import { sql, ensureSchema, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
@@ -9,6 +10,7 @@ import { nextCode, backfillCodes } from '../lib/codes.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
 import { analyze, validArea, maxRequests, sealKey, openKey, keyLooksValid, testKey } from '../lib/tomtom.js';
+import { saveAnalysis, handleHistory } from '../lib/evhistory.js';
 
 // TCMB günlük kurlar: USD döviz satış kuru, 3 saat önbellekte tutulur.
 // Anahtar: önce Vercel ortam değişkeni, yoksa sistemden girilmiş (şifreli) kayıt.
@@ -78,7 +80,10 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: 'Yöntem desteklenmiyor' });
     }
 
-    // TomTom çevre şarj istasyonu analizi (anlık; kayıt tutulmaz). Ücretsiz katman günde 2.500 istek: günlük sayaç ve 3 dk önbellek ile korunur.
+    // Rakip Analizi geçmişi: liste, yeniden açma, adlandırma, silme
+    if (req.query?.evh) { res.setHeader('cache-control', 'no-store'); return await handleHistory(req, res, user, s); }
+
+    // TomTom çevre şarj istasyonu analizi (her yeni analiz geçmişe kaydedilir). Ücretsiz katman günde 2.500 istek: günlük sayaç ve 3 dk önbellek ile korunur.
     if (req.method === 'GET' && req.query?.ev === '1') {
       const area = validArea(req.query);
       if (!area) return res.status(400).json({ error: 'Geçersiz konum veya yarıçap (500–5000 m)' });
@@ -87,7 +92,7 @@ export default async function handler(req, res) {
       res.setHeader('cache-control', 'no-store');
       const ck = `${area.lat.toFixed(4)},${area.lon.toFixed(4)},${area.radius}`;
       const hit = evCache.get(ck);
-      if (hit && Date.now() - hit.at < 3 * 60e3) return res.status(200).json({ ...hit.data, cached: true });
+      if (hit && Date.now() - hit.at < 3 * 60e3) return res.status(200).json({ ...hit.data, cached: true });   // önbellekten gelen yeniden kaydedilmez
       const day = new Date().toISOString().slice(0, 10);
       const limit = Number(process.env.TOMTOM_DAILY_LIMIT) || 2000;
       const u = await s`SELECT data FROM config WHERE key = 'tomtom_usage'`;
@@ -102,6 +107,7 @@ export default async function handler(req, res) {
       await s`INSERT INTO config (key, data) VALUES ('tomtom_usage', ${JSON.stringify({ day, n: data.requests })}::jsonb)
         ON CONFLICT (key) DO UPDATE SET data = jsonb_build_object('day', ${day}::text, 'n', (CASE WHEN config.data->>'day' = ${day} THEN (config.data->>'n')::int ELSE 0 END) + ${data.requests}::int)`;
       data.usage = { used: used + data.requests, limit };
+      try { data.analysisId = await saveAnalysis(s, user, data, { label: String(req.query?.label || ''), siteId: String(req.query?.site || '') }); } catch { /* geçmiş kaydedilemese de sonuç gösterilir */ }
       evCache.set(ck, { at: Date.now(), data });
       if (evCache.size > 200) evCache.delete(evCache.keys().next().value);
       return res.status(200).json(data);
