@@ -572,7 +572,24 @@ table.portfolio.comp-tbl{width:100%}
 .ld-chip{display:inline-flex;align-items:baseline;gap:6px;padding:4px 12px;border:1px solid var(--hair);border-radius:999px;background:var(--soft);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer}.ld-chip b{font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .ld-chip.on{border-color:var(--navy);background:var(--navy-soft)}.ld-chip.on b{color:var(--navy)}
 .ld-tbl td{vertical-align:top}.ld-tbl td.c-name{min-width:200px;white-space:normal}.ld-tbl td.c-name small{display:block;margin-top:2px;font-size:11.5px;font-weight:400;color:var(--risk);white-space:normal}
-.ld-tbl td.c-name small.ld-sub{color:var(--muted);overflow-wrap:anywhere}.ld-tbl td.c-name small.ld-sub a{color:var(--navy)}
+.ld-tbl td.c-name small.ld-sub{color:var(--muted)}.ld-tbl td.c-name small.ld-sub a{color:var(--navy)}
+.ld-warn{color:var(--risk);cursor:help;font-size:12px}.ld-flagtxt{display:none}
+@media (min-width:701px){
+  table.portfolio.ld-tbl{table-layout:auto;width:100%}
+  table.portfolio.ld-tbl th,table.portfolio.ld-tbl td{padding-top:6px;padding-bottom:6px}
+  .ld-tbl td:last-child{position:relative}
+  .ld-tbl .ct-flag{position:absolute;right:20px;bottom:0;font-size:10.5px;line-height:1.1}
+  .ld-tbl td.c-name{white-space:nowrap;max-width:min(34vw,520px);overflow:hidden;text-overflow:ellipsis;min-width:180px}
+  .ld-tbl td.c-name b{display:inline}
+  .ld-tbl td.c-name small.ld-sub{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .ld-tbl td{vertical-align:middle}
+  .ld-tbl td:nth-child(3){white-space:nowrap}
+  .ld-tbl .ld-note{min-width:160px;width:100%}
+  .ld-box .scroll{overflow-x:auto}
+  /* Rakip Analizi: tablo ekrana sığar, uzun listede kendi içinde kayar (başlık sabit) */
+  .comp-box .scroll{max-height:calc(100vh - 380px);min-height:220px;overflow:auto}
+  .comp-box .scroll table{min-width:0}.comp-tbl thead th{position:sticky;top:0;z-index:2}
+}
 .ld-tbl .ld-call{font-weight:700;color:var(--navy);text-decoration:none;white-space:nowrap}.ld-tbl .ld-call:hover{text-decoration:underline}
 .ld-tbl select,.ld-tbl input{min-height:34px;padding:5px 8px;font-size:13px}.ld-tbl select{min-width:150px}.ld-tbl .ld-note{min-width:220px}
 .ld-tbl tr.st-done td{opacity:.6}
@@ -863,6 +880,8 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   .grid.infogrid.comp-form{grid-template-columns:minmax(0,1fr)}
   table.ld-tbl.m-cards.m-cards td:nth-child(1){display:block;text-align:left;font-weight:700;font-size:15px;padding-bottom:7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
   table.ld-tbl.m-cards.m-cards td:nth-child(1)::before{display:none}
+  .ld-tbl .ld-warn{display:none}.ld-tbl .ld-flagtxt{display:block;font-weight:400;font-size:11.5px;color:var(--risk);margin-top:2px}
+  .ld-tbl td.c-name small.ld-sub{display:block;font-weight:400;overflow-wrap:anywhere}
   table.ld-tbl.m-cards.m-cards td:nth-child(2){display:block;text-align:left;padding:4px 0 8px!important}
   table.ld-tbl.m-cards.m-cards td:nth-child(2)::before{display:none}
   table.ld-tbl.m-cards .ld-call{display:flex;align-items:center;justify-content:center;min-height:46px;background:var(--navy);color:#fff;border-radius:var(--radius);font-size:16px}
@@ -3195,7 +3214,7 @@ document.addEventListener('change',e=>{
 
 /* ---------- Lead Havuzu (soğuk arama listesi) ---------- */
 const LD_ST=['Aranmadı','Ulaşılamadı','Tekrar Aranacak','İlgilendi','Toplantı Ayarlandı','İstemiyor','Yanlış Numara'];
-const ld={rows:[],total:0,page:1,size:50,q:'',sector:'',il:'',status:'',prio:'',flagged:'',stats:null,owner:false,loaded:false,seq:0,busy:false};
+const ld={rows:[],total:0,page:1,size:15,q:'',sector:'',il:'',status:'',prio:'',flagged:'',stats:null,owner:false,loaded:false,seq:0,busy:false};
 const ldFmt=p=>/^\d{10}$/.test(p)?'+90 '+p.slice(0,3)+' '+p.slice(3,6)+' '+p.slice(6,8)+' '+p.slice(8):p;
 async function ldApi(method,qs,body){
   const r=await fetch('/api/contacts?leads='+qs,{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
@@ -3245,7 +3264,7 @@ function ldPaintStats(){
 function ldRowHtml(r){
   const done=r.status==='İstemiyor'||r.status==='Yanlış Numara';
   const col=r.priority==='Yüksek'?'var(--ok)':r.priority==='Orta'?'var(--info)':'var(--muted)';
-  return `<tr data-ld="${esc(r.id)}" class="${done?'st-done':''}"><td class="c-name"><b>${esc(r.company)}</b>${r.address?`<small class="ld-sub">${esc(r.address)}</small>`:''}${r.email||r.web?`<small class="ld-sub">${r.email?`<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>`:''}${r.email&&r.web?' · ':''}${r.web?`<a href="https://${esc(r.web)}" target="_blank" rel="noopener noreferrer">${esc(r.web)}</a>`:''}</small>`:''}${r.flags?`<small>${esc(r.flags)}</small>`:''}</td>
+  return `<tr data-ld="${esc(r.id)}" class="${done?'st-done':''}"><td class="c-name"><b>${esc(r.company)}</b>${r.flags?` <span class="ld-warn" title="${esc(r.flags)}" aria-label="${esc(r.flags)}">⚠</span><small class="ld-flagtxt">${esc(r.flags)}</small>`:''}${(()=>{const sub=[r.address,r.email,r.web].filter(Boolean).join(' · ');return sub?`<small class="ld-sub" title="${esc(sub)}">${r.address?esc(r.address):''}${r.address&&(r.email||r.web)?' · ':''}${r.email?`<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>`:''}${r.email&&r.web?' · ':''}${r.web?`<a href="https://${esc(r.web)}" target="_blank" rel="noopener noreferrer">${esc(r.web)}</a>`:''}</small>`:'';})()}</td>
     <td><a class="ld-call" href="tel:+90${esc(r.phone)}">${esc(ldFmt(r.phone))}</a></td>
     <td>${esc([r.il,r.ilce].filter(Boolean).join(' / '))||'—'}</td><td>${esc(r.sector)||'—'}</td>
     <td><span class="pill" style="--c:${col}">${esc(r.priority)}</span></td>
