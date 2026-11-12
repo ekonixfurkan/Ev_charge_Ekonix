@@ -1,9 +1,10 @@
-// /api/contacts — Kişiler rehberi (şirket · ad · soyad · telefon · e-posta · unvan). Giriş yapan herkes okur/ekler/düzenler.
+// /api/contacts — Kişiler rehberi (+ Lead Havuzu: ?leads=…, bkz. lib/leads.js) (şirket · ad · soyad · telefon · e-posta · unvan). Giriş yapan herkes okur/ekler/düzenler.
 // GET · POST { alanlar } · PATCH ?id { değişen alanlar } · DELETE ?id (yalnızca sahip hesap)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
 import { logActivity } from '../lib/activity.js';
+import { handleLeads } from '../lib/leads.js';
 
 let _ready = null;
 function ensureContacts() {
@@ -59,6 +60,8 @@ export default async function handler(req, res) {
     const user = await requireAuth(req, res);
     if (!user) return;
     if (!process.env.DATABASE_URL) return res.status(503).json({ error: 'Kişiler için veritabanı gerekli' });
+    // Lead Havuzu (soğuk arama listesi) aynı işlevde çalışır: ?leads=…
+    if (req.query?.leads) return await handleLeads(req, res, user, sql());
     await ensureContacts();
     const s = sql();
 

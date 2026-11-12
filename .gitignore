@@ -9,3 +9,6 @@ node_modules
 # İş verisi içeren Excel dosyaları repoya girmesin
 *.xlsx
 *.xls
+
+# Lead verisi (kişisel/iş verisi) repoya girmesin
+leads_out/

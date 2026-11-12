@@ -568,6 +568,13 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--hair-strong)
 .uinfo{display:block;margin-top:3px;font-size:11.5px;color:var(--muted);line-height:1.35}.uinfo a{color:var(--navy)}
 .grid.infogrid.comp-form{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end}
 table.portfolio.comp-tbl{width:100%}
+.ld-chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.ld-chip{display:inline-flex;align-items:baseline;gap:6px;padding:4px 12px;border:1px solid var(--hair);border-radius:999px;background:var(--soft);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer}.ld-chip b{font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.ld-chip.on{border-color:var(--navy);background:var(--navy-soft)}.ld-chip.on b{color:var(--navy)}
+.ld-tbl td{vertical-align:top}.ld-tbl td.c-name{min-width:200px;white-space:normal}.ld-tbl td.c-name small{display:block;margin-top:2px;font-size:11.5px;font-weight:400;color:var(--risk);white-space:normal}
+.ld-tbl .ld-call{font-weight:700;color:var(--navy);text-decoration:none;white-space:nowrap}.ld-tbl .ld-call:hover{text-decoration:underline}
+.ld-tbl select,.ld-tbl input{min-height:34px;padding:5px 8px;font-size:13px}.ld-tbl select{min-width:150px}.ld-tbl .ld-note{min-width:220px}
+.ld-tbl tr.st-done td{opacity:.6}
 .comp-pick{margin-bottom:14px}
 .comp-key{margin:12px 0;padding:10px 12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--soft)}.comp-key summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink2)}
 .comp-keyrow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.comp-keyrow input{flex:1 1 260px}
@@ -853,6 +860,13 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   table.m-cards.m-cards tr{display:block;margin:0 0 10px;padding:8px 12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card)}
   .chart{min-width:620px}
   .grid.infogrid.comp-form{grid-template-columns:minmax(0,1fr)}
+  table.ld-tbl.m-cards.m-cards td:nth-child(1){display:block;text-align:left;font-weight:700;font-size:15px;padding-bottom:7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
+  table.ld-tbl.m-cards.m-cards td:nth-child(1)::before{display:none}
+  table.ld-tbl.m-cards.m-cards td:nth-child(2){display:block;text-align:left;padding:4px 0 8px!important}
+  table.ld-tbl.m-cards.m-cards td:nth-child(2)::before{display:none}
+  table.ld-tbl.m-cards .ld-call{display:flex;align-items:center;justify-content:center;min-height:46px;background:var(--navy);color:#fff;border-radius:var(--radius);font-size:16px}
+  table.ld-tbl.m-cards select,table.ld-tbl.m-cards input{min-height:44px;font-size:16px;width:100%}
+  table.ld-tbl .ld-note{min-width:0}
   table.comp-tbl.m-cards.m-cards tbody tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:10px;align-items:start;padding:12px}
   table.comp-tbl.m-cards.m-cards td{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:1px;text-align:left;padding:0!important}
   table.comp-tbl.m-cards.m-cards td::before{flex:none;white-space:nowrap}
@@ -1013,7 +1027,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
       </section>
       <section class="nav-group" data-group="records">
         <button type="button" class="nav-head" aria-expanded="true">Kayıtlar<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Müşteri Bilgileri</span></button><button type="button" class="nav-item" data-nav="meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg><span>Toplantı Notları</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Müşteri Bilgileri</span></button><button type="button" class="nav-item" data-nav="meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg><span>Toplantı Notları</span></button><button type="button" class="nav-item" data-nav="leads"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span>Lead Havuzu</span></button></div>
       </section>
       <section class="nav-group" data-group="admin" id="adminGroup">
         <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1325,7 +1339,7 @@ async function api(path,opts){
 /* ---------- Sayfa adresi: yenileyince aynı sayfada kalmak için #/… ---------- */
 let routeOn=false;
 const ROUTE_VIEWS=['locations','users','activity','contacts','notifs','planner'];
-const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip'};
+const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip',leads:'leads'};
 function routeHash(){
   if(view==='portfolio')return '#/'+sub;
   if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
@@ -1396,7 +1410,7 @@ async function poll(){
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip')render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -1528,7 +1542,7 @@ function legendHtml(){
   return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 // Üst başlık: proje sayfasında proje adı (altında il/ilçe), diğer sayfalarda uygulama adı.
-const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi'};
+const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu'};
 // Üst başlık: proje sayfasında proje adı (altında kod ve il/ilçe), diğer sayfalarda seçilen menü başlığı.
 function setPageTitle(){
   const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
@@ -1653,12 +1667,12 @@ function renderLocations(){
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();
+  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   setPageTitle();
   saveRoute();
@@ -2163,7 +2177,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','comp','credit','check','files'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['comp','Rakip Analizi'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
-  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='leads'?'leads':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -2188,6 +2202,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(k==='planner'){view='planner';render();window.scrollTo(0,0);}
     else if(k==='meetings'){view='meetings';render();window.scrollTo(0,0);}
     else if(k==='rakip'){view='rakip';render();window.scrollTo(0,0);}
+    else if(k==='leads'){view='leads';render();window.scrollTo(0,0);}
     else if(SITE_SUBS.includes(k))goSite(k);
   });
 });
@@ -3176,6 +3191,154 @@ document.addEventListener('change',e=>{
     else{n.textContent='Bu projenin GPS alanında koordinat yok; Altyapı & Güç sekmesine yazın ya da buraya girin.';n.className='note comp-warn';}
   }
 });
+
+/* ---------- Lead Havuzu (soğuk arama listesi) ---------- */
+const LD_ST=['Aranmadı','Ulaşılamadı','Tekrar Aranacak','İlgilendi','Toplantı Ayarlandı','İstemiyor','Yanlış Numara'];
+const ld={rows:[],total:0,page:1,size:50,q:'',sector:'',il:'',status:'',prio:'',flagged:'',stats:null,owner:false,loaded:false,seq:0,busy:false};
+const ldFmt=p=>/^\d{10}$/.test(p)?'+90 '+p.slice(0,3)+' '+p.slice(3,6)+' '+p.slice(6,8)+' '+p.slice(8):p;
+async function ldApi(method,qs,body){
+  const r=await fetch('/api/contacts?leads='+qs,{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'HTTP '+r.status);return d;
+}
+const ldQs=()=>'list&'+new URLSearchParams({page:String(ld.page),size:String(ld.size),q:ld.q,sector:ld.sector,il:ld.il,status:ld.status,prio:ld.prio,flagged:ld.flagged}).toString();
+const ldHas=()=>Boolean(ld.q||ld.sector||ld.il||ld.status||ld.prio||ld.flagged);
+function ldOpts(items,cur,all='Tümü'){return `<option value="">${all}</option>`+items.map(x=>`<option value="${esc(x)}" ${x===cur?'selected':''}>${esc(x)}</option>`).join('');}
+function renderLeads(){
+  if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Lead Havuzu</h3><p class="note">Lead Havuzu için sunucu bağlantısı gerekli.</p></section>';return;}
+  $('view').innerHTML=`<section class="box ld-box"><h3>Lead Havuzu<small id="ldSummary"></small></h3>
+    <div class="ld-chips" id="ldChips"></div>
+    <div class="locbar ld-bar no-print${lfOpen?' lf-open':''}">
+      <label class="lf lq">Ara<input type="search" id="ldQ" value="${esc(ld.q)}" placeholder="Firma, telefon, il, not…" autocomplete="off"></label>
+      <button type="button" id="lfToggle" class="lf-toggle${ld.sector||ld.il||ld.status||ld.prio||ld.flagged?' on':''}" aria-expanded="${lfOpen}">Filtreler</button>
+      <label class="lf">Sektör<select id="ldSector"></select></label>
+      <label class="lf">İl<select id="ldIl"></select></label>
+      <label class="lf">Durum<select id="ldStatus">${ldOpts(LD_ST,ld.status)}</select></label>
+      <label class="lf">Öncelik<select id="ldPrio">${ldOpts(['Yüksek','Orta','Düşük'],ld.prio)}</select></label>
+      <label class="lf">Uyarı<select id="ldFlag"><option value="">Tümü</option><option value="0" ${ld.flagged==='0'?'selected':''}>Uyarısız</option><option value="1" ${ld.flagged==='1'?'selected':''}>Uyarılı</option></select></label>
+      <button type="button" id="ldClear" class="ghost" ${ldHas()?'':'hidden'}>Filtreleri Temizle</button>
+      ${me.owner?'<button type="button" id="ldImport">CSV İçe Aktar</button><input type="file" id="ldFile" accept=".csv,text/csv,text/plain" hidden>':''}
+    </div>
+    <p class="note" id="ldNote"></p>
+    <div class="scroll"><table class="portfolio ld-tbl m-cards"><thead><tr><th>Firma</th><th>Telefon</th><th>İl / İlçe</th><th>Sektör</th><th>Öncelik</th><th>Durum</th><th>Toplantı Tarihi</th><th>Not</th></tr></thead><tbody id="ldRows"><tr><td colspan="8" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <div class="pager" id="ldPager"></div></section>`;
+  if(ld.stats)ldPaintStats();
+  if(ld.loaded)ldPaintRows();
+  ldLoad();
+}
+async function ldLoad(statsToo=true){
+  const my=++ld.seq;
+  try{
+    const [list,st]=await Promise.all([ldApi('GET',ldQs()),statsToo||!ld.stats?ldApi('GET','stats'):Promise.resolve(ld.stats)]);
+    if(my!==ld.seq||view!=='leads')return;
+    ld.rows=list.rows;ld.total=list.total;ld.stats=st;ld.loaded=true;ldPaintStats();ldPaintRows();
+  }catch(e){const n=$('ldNote');if(n&&view==='leads'){n.textContent=e.message;n.className='note comp-warn';}}
+}
+function ldPaintStats(){
+  const st=ld.stats;if(!st)return;
+  const s=$('ldSummary');if(s)s.textContent=nf.format(st.total)+' kayıt';
+  const c=$('ldChips');if(c)c.innerHTML=LD_ST.map(k=>`<button type="button" class="ld-chip${ld.status===k?' on':''}" data-ldst="${esc(k)}"><b>${nf.format(st.byStatus[k]||0)}</b>${esc(k)}</button>`).join('');
+  const sec=$('ldSector');if(sec)sec.innerHTML=ldOpts(st.sectors,ld.sector);
+  const il=$('ldIl');if(il)il.innerHTML=ldOpts(st.ils,ld.il);
+}
+function ldRowHtml(r){
+  const done=r.status==='İstemiyor'||r.status==='Yanlış Numara';
+  const col=r.priority==='Yüksek'?'var(--ok)':r.priority==='Orta'?'var(--info)':'var(--muted)';
+  return `<tr data-ld="${esc(r.id)}" class="${done?'st-done':''}"><td class="c-name"><b>${esc(r.company)}</b>${r.flags?`<small>${esc(r.flags)}</small>`:''}</td>
+    <td><a class="ld-call" href="tel:+90${esc(r.phone)}">${esc(ldFmt(r.phone))}</a></td>
+    <td>${esc([r.il,r.ilce].filter(Boolean).join(' / '))||'—'}</td><td>${esc(r.sector)||'—'}</td>
+    <td><span class="pill" style="--c:${col}">${esc(r.priority)}</span></td>
+    <td><select data-ldf="status" aria-label="Durum">${LD_ST.map(k=>`<option value="${esc(k)}" ${k===r.status?'selected':''}>${esc(k)}</option>`).join('')}</select></td>
+    <td><input type="date" data-ldf="meetingAt" value="${esc(r.meetingAt)}" aria-label="Toplantı tarihi"></td>
+    <td><input class="ld-note" data-ldf="note" value="${esc(r.note)}" maxlength="2000" placeholder="Not" aria-label="Not"><span class="ct-flag" role="status"></span></td></tr>`;
+}
+function ldPaintRows(){
+  const t=$('ldRows');if(!t)return;
+  t.innerHTML=ld.rows.length?ld.rows.map(ldRowHtml).join(''):`<tr><td colspan="8" class="note" style="padding:24px;text-align:center">${ld.stats&&ld.stats.total?'Bu süzgeçlere uyan kayıt yok.':'Henüz kayıt yok.'+(me.owner?' “CSV İçe Aktar” ile liste ekleyin.':'')}</td></tr>`;
+  const pages=Math.max(1,Math.ceil(ld.total/ld.size)),pg=$('ldPager');
+  if(pg)pg.innerHTML=ld.total>ld.size?`<button type="button" data-ldpg="${ld.page-1}" ${ld.page<=1?'disabled':''}>‹ Önceki</button><span class="pg-info">${nf.format((ld.page-1)*ld.size+1)}–${nf.format(Math.min(ld.page*ld.size,ld.total))} / ${nf.format(ld.total)}</span><button type="button" data-ldpg="${ld.page+1}" ${ld.page>=pages?'disabled':''}>Sonraki ›</button>`:'';
+  const cl=$('ldClear');if(cl)cl.hidden=!ldHas();
+  const tg=$('lfToggle');if(tg)tg.classList.toggle('on',Boolean(ld.sector||ld.il||ld.status||ld.prio||ld.flagged));
+}
+const ldFlagEl=(id)=>document.querySelector(`#ldRows tr[data-ld="${CSS.escape(id)}"] .ct-flag`);
+const ldTimers={};
+async function ldSave(id,patch){
+  const f=ldFlagEl(id);if(f){f.textContent='…';f.className='ct-flag';}
+  try{
+    const d=await ldApi('PATCH',encodeURIComponent(id),patch);
+    const i=ld.rows.findIndex(x=>x.id===id);if(i>=0)ld.rows[i]=d.lead;
+    const f2=ldFlagEl(id);if(f2){f2.textContent='✓ Kaydedildi';f2.className='ct-flag ok';setTimeout(()=>{if(f2.textContent==='✓ Kaydedildi'){f2.textContent='';f2.className='ct-flag';}},2200);}
+    if('status' in patch){const tr=document.querySelector(`#ldRows tr[data-ld="${CSS.escape(id)}"]`);if(tr)tr.classList.toggle('st-done',d.lead.status==='İstemiyor'||d.lead.status==='Yanlış Numara');ldApi('GET','stats').then(s=>{ld.stats=s;ldPaintStats();}).catch(()=>{});}
+  }catch(e){const f2=ldFlagEl(id);if(f2){f2.textContent='Kaydedilemedi';f2.className='ct-flag bad';}toast(e.message);}
+}
+let ldQT=0;
+function ldFilter(){ld.page=1;ldLoad(false);}
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.id==='ldQ'){ld.q=el.value;clearTimeout(ldQT);ldQT=setTimeout(ldFilter,350);return;}
+  const f=el.dataset&&el.dataset.ldf;if(f!=='note')return;
+  const tr=el.closest('tr[data-ld]');if(!tr)return;const id=tr.dataset.ld;
+  clearTimeout(ldTimers[id]);ldTimers[id]=setTimeout(()=>ldSave(id,{note:el.value}),700);
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.id==='ldSector'){ld.sector=el.value;ldFilter();return;}
+  if(el.id==='ldIl'){ld.il=el.value;ldFilter();return;}
+  if(el.id==='ldStatus'){ld.status=el.value;ldFilter();return;}
+  if(el.id==='ldPrio'){ld.prio=el.value;ldFilter();return;}
+  if(el.id==='ldFlag'){ld.flagged=el.value;ldFilter();return;}
+  if(el.id==='ldFile'){ldImport(el.files&&el.files[0]);el.value='';return;}
+  const f=el.dataset&&el.dataset.ldf;if(!f||f==='note')return;
+  const tr=el.closest('tr[data-ld]');if(!tr)return;
+  ldSave(tr.dataset.ld,f==='status'?{status:el.value}:{meetingAt:el.value});
+});
+document.addEventListener('click',e=>{
+  const chip=e.target.closest&&e.target.closest('[data-ldst]');
+  if(chip&&view==='leads'){ld.status=ld.status===chip.dataset.ldst?'':chip.dataset.ldst;const s=$('ldStatus');if(s)s.value=ld.status;ldFilter();ldPaintStats();return;}
+  const pg=e.target.closest&&e.target.closest('[data-ldpg]');
+  if(pg&&view==='leads'){ld.page=Math.max(1,+pg.dataset.ldpg||1);ldLoad(false).then(()=>window.scrollTo({top:0}));return;}
+  if(e.target.closest&&e.target.closest('#ldClear')){Object.assign(ld,{q:'',sector:'',il:'',status:'',prio:'',flagged:'',page:1});renderLeads();return;}
+  if(e.target.closest&&e.target.closest('#ldImport')){const f=$('ldFile');if(f)f.click();}
+});
+/* CSV okuma (; , ya da sekme ayraçlı; tırnaklı alanlar) */
+function csvRows(text){
+  text=String(text).replace(/^﻿/,'');
+  const first=text.split(/\r?\n/,1)[0]||'',cnt=c=>first.split(c).length-1;
+  const d=cnt(';')>=cnt(',')&&cnt(';')>=cnt('\t')?';':cnt('\t')>cnt(',')?'\t':',';
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"')q=true;
+    else if(c===d){row.push(f);f='';}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);f='';if(row.some(x=>x!==''))rows.push(row);row=[];}
+    else f+=c;
+  }
+  row.push(f);if(row.some(x=>x!==''))rows.push(row);
+  return rows;
+}
+const ldKey=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/ı/g,'i').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+const LD_MAP={firma:'company',firmakurumadi:'company',company:'company',telefon:'phone',telefonnumarasi:'phone',phone:'phone',il:'il',ilce:'ilce',sektor:'sector',oncelik:'priority',uyari:'flags',kaynak:'source'};
+async function ldImport(file){
+  if(!file||ld.busy)return;const note=$('ldNote');
+  ld.busy=true;const btn=$('ldImport');if(btn)btn.disabled=true;
+  try{
+    const rows=csvRows(await file.text());
+    if(rows.length<2)throw new Error('Dosyada veri satırı yok.');
+    const cols=rows[0].map(h=>LD_MAP[ldKey(h)]||'');
+    if(!cols.includes('company')||!cols.includes('phone'))throw new Error('Başlık satırında “Firma” ve “Telefon” sütunları olmalı.');
+    const items=rows.slice(1).map(r=>{const o={};cols.forEach((k,i)=>{if(k)o[k]=r[i]||'';});return o;});
+    const tot={added:0,duplicate:0,invalid:0,mobile:0};
+    for(let i=0;i<items.length;i+=400){
+      note.className='note';note.textContent='Aktarılıyor… '+nf.format(Math.min(i+400,items.length))+' / '+nf.format(items.length);
+      const d=await ldApi('POST','import',{rows:items.slice(i,i+400)});
+      for(const k of Object.keys(tot))tot[k]+=d[k]||0;
+    }
+    note.textContent=`Bitti: ${nf.format(tot.added)} eklendi, ${nf.format(tot.duplicate)} tekrar (zaten vardı), ${nf.format(tot.invalid)} geçersiz satır, ${nf.format(tot.mobile)} cep numarası (kişisel veri olabileceği için alınmadı).`;
+    ld.page=1;await ldLoad(true);
+  }catch(e){note.textContent=e.message;note.className='note comp-warn';}
+  finally{ld.busy=false;const b=$('ldImport');if(b)b.disabled=false;}
+}
 
 /* ---------- StarCharge ürün kataloğu ---------- */
 let catType='',catList=[];
