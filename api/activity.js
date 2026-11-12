@@ -1,4 +1,4 @@
-// GET /api/activity — işlem geçmişi. Yönetici her şeyi görür; diğer kullanıcılar yalnızca proje işlemlerini. ?limit&before&actor&entity&q&own
+// GET /api/activity — işlem geçmişi. Yalnızca sahip hesap okuyabilir (diğerlerine 403). ?limit&before&actor&entity&q&own
 import { requireAuth } from '../lib/auth.js';
 import { listActivity, activityActors, logActivity, ensureActivity } from '../lib/activity.js';
 import { sql, readJson } from '../lib/db.js';
@@ -26,6 +26,8 @@ export default async function handler(req, res) {
       res.setHeader('allow', 'GET, POST');
       return res.status(405).json({ error: 'Yöntem desteklenmiyor' });
     }
+    // İşlem geçmişi yalnızca sahip hesabın görebileceği bir sayfadır.
+    if (!user.owner) return res.status(403).json({ error: 'Bu sayfayı yalnızca sahip hesap görebilir' });
     const { limit, before, actor, q, site, own } = req.query || {};
     // Varsayılan: kendi işlemlerim gizli. own=1 ya da Kullanıcı süzgecinde kendim seçiliyse gösterilir.
     const exclude = own === '1' || String(actor || '') === user.email ? '' : user.email;

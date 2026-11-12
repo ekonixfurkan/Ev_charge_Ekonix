@@ -992,7 +992,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
       </section>
       <section class="nav-group" data-group="admin" id="adminGroup">
         <button type="button" class="nav-head" aria-expanded="true">Yönetim<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" id="usersNav" data-nav="users" hidden><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button><button type="button" class="nav-item" data-nav="activity"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>İşlem Geçmişi</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" id="usersNav" data-nav="users" hidden><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button><button type="button" class="nav-item" id="actNav" data-nav="activity" hidden><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>İşlem Geçmişi</span></button></div>
       </section>
     </nav>
     <div class="sb-user"><div class="lang-sw" translate="no" role="group" aria-label="Dil / Language"><button type="button" data-lang="tr" aria-pressed="true" title="Türkçe"><svg class="flag" viewBox="0 0 30 20" width="18" height="12" aria-hidden="true"><rect width="30" height="20" fill="#e30a17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#e30a17"/><polygon points="19.30,10.00 17.49,10.65 17.43,12.57 16.26,11.05 14.42,11.59 15.50,10.00 14.42,8.41 16.26,8.95 17.43,7.43 17.49,9.35" fill="#fff"/></svg><span>TR</span></button><button type="button" data-lang="en" aria-pressed="false" title="English"><svg class="flag" viewBox="0 0 60 30" width="18" height="12" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#c8102e" stroke-width="2.5"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#c8102e" stroke-width="6"/></svg><span>EN</span></button></div><div id="saveStatus" role="status">Yükleniyor…</div><span class="whoami" id="whoami" hidden></span><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
@@ -2328,6 +2328,7 @@ function paintActivity(){
   $('actClear').hidden=!(actF.q||actF.actor||actF.entity||actF.site);
 }
 async function renderActivity(){
+  if(me.email&&!me.owner){view='portfolio';sub='ovw';render();return;}  // yalnızca sahip hesap (hesap bilgisi gelmeden karar verilmez)
   $('view').innerHTML='<section class="box"><h3>İşlem Geçmişi<small>Yükleniyor…</small></h3></section>';
   try{await fetchActivity(true);}catch(e){if(view!=='activity')return;$('view').innerHTML='<section class="box"><h3>İşlem Geçmişi</h3><p class="note">'+esc(e.message)+'</p></section>';return;}
   if(view!=='activity')return;
@@ -3091,7 +3092,12 @@ document.addEventListener('input',e=>{if(e.target.id==='catQ')paintCat();});
     const r=await fetch('/api/auth/me',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
-      me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};if(d.role==='admin')$('usersNav').hidden=false;if(view==='site')render();}
+      me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};if(d.role==='admin')$('usersNav').hidden=false;
+      // İşlem Geçmişi yalnızca sahip hesaba açık (sunucu da 403 verir).
+      if(me.owner)$('actNav').hidden=false;
+      { const g=$('usersNav').closest('.nav-group'); if(g)g.hidden=$('usersNav').hidden&&$('actNav').hidden; }
+      if(!me.owner&&view==='activity'){view='portfolio';sub='ovw';render();}
+      else if(view==='site')render();}
   }catch(e){/* çevrimdışı: yerel kayıtla devam */}
   document.documentElement.classList.remove('pending');
 })();
