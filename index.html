@@ -572,6 +572,7 @@ table.portfolio.comp-tbl{width:100%}
 .ld-chip{display:inline-flex;align-items:baseline;gap:6px;padding:4px 12px;border:1px solid var(--hair);border-radius:999px;background:var(--soft);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer}.ld-chip b{font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .ld-chip.on{border-color:var(--navy);background:var(--navy-soft)}.ld-chip.on b{color:var(--navy)}
 .ld-tbl td{vertical-align:top}.ld-tbl td.c-name{min-width:200px;white-space:normal}.ld-tbl td.c-name small{display:block;margin-top:2px;font-size:11.5px;font-weight:400;color:var(--risk);white-space:normal}
+.ld-tbl td.c-name small.ld-sub{color:var(--muted);overflow-wrap:anywhere}.ld-tbl td.c-name small.ld-sub a{color:var(--navy)}
 .ld-tbl .ld-call{font-weight:700;color:var(--navy);text-decoration:none;white-space:nowrap}.ld-tbl .ld-call:hover{text-decoration:underline}
 .ld-tbl select,.ld-tbl input{min-height:34px;padding:5px 8px;font-size:13px}.ld-tbl select{min-width:150px}.ld-tbl .ld-note{min-width:220px}
 .ld-tbl tr.st-done td{opacity:.6}
@@ -3209,7 +3210,7 @@ function renderLeads(){
   $('view').innerHTML=`<section class="box ld-box"><h3>Lead Havuzu<small id="ldSummary"></small></h3>
     <div class="ld-chips" id="ldChips"></div>
     <div class="locbar ld-bar no-print${lfOpen?' lf-open':''}">
-      <label class="lf lq">Ara<input type="search" id="ldQ" value="${esc(ld.q)}" placeholder="Firma, telefon, il, not…" autocomplete="off"></label>
+      <label class="lf lq">Ara<input type="search" id="ldQ" value="${esc(ld.q)}" placeholder="Firma, telefon, il, adres, e-posta, not…" autocomplete="off"></label>
       <button type="button" id="lfToggle" class="lf-toggle${ld.sector||ld.il||ld.status||ld.prio||ld.flagged?' on':''}" aria-expanded="${lfOpen}">Filtreler</button>
       <label class="lf">Sektör<select id="ldSector"></select></label>
       <label class="lf">İl<select id="ldIl"></select></label>
@@ -3244,7 +3245,7 @@ function ldPaintStats(){
 function ldRowHtml(r){
   const done=r.status==='İstemiyor'||r.status==='Yanlış Numara';
   const col=r.priority==='Yüksek'?'var(--ok)':r.priority==='Orta'?'var(--info)':'var(--muted)';
-  return `<tr data-ld="${esc(r.id)}" class="${done?'st-done':''}"><td class="c-name"><b>${esc(r.company)}</b>${r.flags?`<small>${esc(r.flags)}</small>`:''}</td>
+  return `<tr data-ld="${esc(r.id)}" class="${done?'st-done':''}"><td class="c-name"><b>${esc(r.company)}</b>${r.address?`<small class="ld-sub">${esc(r.address)}</small>`:''}${r.email||r.web?`<small class="ld-sub">${r.email?`<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>`:''}${r.email&&r.web?' · ':''}${r.web?`<a href="https://${esc(r.web)}" target="_blank" rel="noopener noreferrer">${esc(r.web)}</a>`:''}</small>`:''}${r.flags?`<small>${esc(r.flags)}</small>`:''}</td>
     <td><a class="ld-call" href="tel:+90${esc(r.phone)}">${esc(ldFmt(r.phone))}</a></td>
     <td>${esc([r.il,r.ilce].filter(Boolean).join(' / '))||'—'}</td><td>${esc(r.sector)||'—'}</td>
     <td><span class="pill" style="--c:${col}">${esc(r.priority)}</span></td>
@@ -3318,7 +3319,7 @@ function csvRows(text){
   return rows;
 }
 const ldKey=s=>String(s||'').toLocaleLowerCase('tr-TR').replace(/ı/g,'i').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
-const LD_MAP={firma:'company',firmakurumadi:'company',company:'company',telefon:'phone',telefonnumarasi:'phone',phone:'phone',il:'il',ilce:'ilce',sektor:'sector',oncelik:'priority',uyari:'flags',kaynak:'source'};
+const LD_MAP={firma:'company',firmakurumadi:'company',company:'company',telefon:'phone',telefonnumarasi:'phone',phone:'phone',il:'il',ilce:'ilce',sektor:'sector',oncelik:'priority',uyari:'flags',kaynak:'source',eposta:'email',email:'email',mail:'email',web:'web',webadresi:'web',website:'web',adres:'address',adresi:'address',iletisimadresi:'address'};
 async function ldImport(file){
   if(!file||ld.busy)return;const note=$('ldNote');
   ld.busy=true;const btn=$('ldImport');if(btn)btn.disabled=true;
