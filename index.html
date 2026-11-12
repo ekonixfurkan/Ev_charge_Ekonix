@@ -695,8 +695,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 .seg button[aria-pressed=true][data-v=ok]{background:var(--ok-soft);color:var(--ok);font-weight:700}
 .seg button[aria-pressed=true][data-v=risk]{background:var(--risk-soft);color:var(--risk);font-weight:700}
 .seg button[aria-pressed=true][data-v=no]{background:var(--no-soft);color:var(--no);font-weight:700}
-.mfield{min-width:0}.mfield.span2{grid-column:span 2}.mfield.span4{grid-column:1/-1}
-.mlabel{display:block;font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.mfield{min-width:0}.mlabel{display:block;font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
 .msel{position:relative}
 .msel summary{list-style:none;cursor:pointer;min-height:38px;padding:8px 28px 8px 10px;border:1px solid var(--hair-strong);border-radius:var(--radius);background:var(--card);font-size:14px;font-weight:400;color:var(--ink);text-transform:none;letter-spacing:0;display:flex;align-items:center;position:relative;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .msel summary::-webkit-details-marker{display:none}
@@ -1586,7 +1585,7 @@ function sel(k,label,opts){const v=cur().survey[k]||'';return `<label>${label}<s
 document.addEventListener('click',e=>{document.querySelectorAll('details.msel[open]').forEach(d=>{if(!d.contains(e.target))d.removeAttribute('open');});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('details.msel[open]').forEach(d=>d.removeAttribute('open'));});
 function msLabel(k,on){const t=CHK[k].filter(([o])=>on.includes(o)).map(([,x])=>x);return t.length?t.join(', '):'Seçiniz';}
-function chk(k,label,extra=' class="span2"'){const on=cur().survey[k]||[],span=(extra.match(/span\d/)||['span2'])[0];return `<div class="mfield ${span}"><span class="mlabel">${label}</span><details class="msel" data-msel="${k}"><summary class="${on.length?'':'ph'}">${msLabel(k,on)}</summary><div class="mpanel">${CHK[k].map(([o,t])=>`<label><input type="checkbox" data-svc="${k}" value="${o}" ${on.includes(o)?'checked':''}>${t}</label>`).join('')}</div></details></div>`;}
+function chk(k,label,extra=' class="span2"'){const on=cur().survey[k]||[],span=(extra.match(/span\d/)||['span2'])[0];return `<div class="mfield"><span class="mlabel">${label}</span><details class="msel" data-msel="${k}"><summary class="${on.length?'':'ph'}">${msLabel(k,on)}</summary><div class="mpanel">${CHK[k].map(([o,t])=>`<label><input type="checkbox" data-svc="${k}" value="${o}" ${on.includes(o)?'checked':''}>${t}</label>`).join('')}</div></details></div>`;}
 function finField(k,label,unitTxt){const [lo,hi]=FIN_LIMITS[k];return `<label>${label}${unitTxt?' ('+unitTxt+')':''}<input data-fin="${k}" type="number" min="${lo}" max="${hi}" step="any" inputmode="decimal" value="${cur().fin[k]}"></label>`;}
 function trRow(t){
   const opt=sel=>PARTIES.map(p=>`<option value="${p.k}" ${p.k===sel?'selected':''}>${esc(p.t)}</option>`).join('');
