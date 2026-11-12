@@ -3117,7 +3117,7 @@ function compPaint(){
   <div class="scroll"><table class="portfolio comp-tbl m-cards"><thead><tr><th>İstasyon</th><th>İşletmeci</th><th class="num">Mesafe</th><th>Tip</th><th class="num">Güç</th><th class="num">Soket</th><th class="num">Boş</th><th class="num">Dolu</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="note" style="padding:20px;text-align:center">Bu çapta şarj istasyonu bulunamadı.</td></tr>'}</tbody></table></div>`;
 }
 async function compRun(){
-  if(comp.busy)return;const s=cur(),note=$('compNote');
+  if(comp.busy)return;const sid=cur()?cur().id:'',view0=view,note=$('compNote');
   const lat=compNum($('compLat').value),lon=compNum($('compLon').value),rad=+$('compRad').value;
   comp.lat=$('compLat').value;comp.lon=$('compLon').value;comp.rad=rad;
   if(!(+lat>=-90&&+lat<=90&&lat!=='')||!(+lon>=-180&&+lon<=180&&lon!=='')){note.textContent='Geçerli bir enlem ve boylam girin (ör. 41.088204 ve 29.018024).';note.className='note comp-warn';return;}
@@ -3128,7 +3128,8 @@ async function compRun(){
     if(r.status===401){location.replace('/login.html');return;}
     const d=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(d.error||'HTTP '+r.status);
-    if(cur()&&cur().id===s.id){comp.res=d;compPaint();}
+    // Sonuç yalnızca aynı sayfada hâlâ isek çizilir (sayfa değiştiyse atılır).
+    if(view===view0&&(view==='rakip'||(cur()&&cur().id===sid))){comp.res=d;compPaint();}
   }catch(e){note.textContent=e.message;note.className='note comp-warn';comp.res=null;compPaint();}
   finally{comp.busy=false;const b2=$('compGo');if(b2){b2.disabled=false;b2.textContent='Analiz Et';}}
 }
