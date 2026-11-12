@@ -67,7 +67,7 @@ scripts/hash-password.mjs   AUTH_USERS satırı üretir
 2. `AUTH_USERS`: kullanıcılar, `;` ile ayrılmış. Her kullanıcı için:
    `node scripts/hash-password.mjs ad@firma.com` (şifreyi sorar, en az 10 karakter) çıktıyı ekleyin.
    Örnek: `ali@firma.com:scrypt:<salt>:<hash>;veli@firma.com:scrypt:<salt>:<hash>`
-3. (İsteğe bağlı) Rakip Analizi sekmesi için `TOMTOM_API_KEY`: TomTom Developer anahtarı. Yalnızca sunucuda kullanılır, koda yazılmaz. `TOMTOM_DAILY_LIMIT` (varsayılan 2000) günlük istek üst sınırıdır; ücretsiz katman günde 2.500 istektir. Anlık çalışır, tarihsel kayıt tutmaz (`GET /api/sites?ev=1&lat&lon&radius`, 12 işlev sınırı nedeniyle `api/sites.js` içinde).
+3. (İsteğe bağlı) Rakip Analizi sekmesi için TomTom Developer anahtarı: ya `TOMTOM_API_KEY` ortam değişkeni ya da sahip hesabın Rakip Analizi sekmesindeki "TomTom Anahtarı" kutusu (veritabanında AES-256-GCM ile şifreli saklanır, geri gösterilmez; ortam değişkeni varsa o öncelikli). Anahtar koda yazılmaz. `TOMTOM_DAILY_LIMIT` (varsayılan 2000) günlük istek üst sınırıdır; ücretsiz katman günde 2.500 istektir. Anlık çalışır, tarihsel kayıt tutmaz (`GET /api/sites?ev=1&lat&lon&radius`, 12 işlev sınırı nedeniyle `api/sites.js` içinde).
 4. Değişkenleri ekledikten sonra **Redeploy**.
 
 Kullanıcı eklemek/çıkarmak/şifre değiştirmek: `AUTH_USERS`'ı düzenleyip redeploy edin. Çıkarılan kullanıcının açık oturumları da geçersiz olur.

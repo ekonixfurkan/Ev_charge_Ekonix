@@ -1,5 +1,6 @@
 // /api/sites — GET (tüm projeler + ekip), PUT (proje upsert), DELETE (?id=)
-// Ek uç noktalar (Hobby planda 12 işlev sınırı nedeniyle burada): GET ?kur=usd (TCMB dolar kuru), GET ?ev=1&lat&lon&radius (TomTom çevre şarj istasyonları, anlık)
+// Ek uç noktalar (Hobby planda 12 işlev sınırı nedeniyle burada): GET ?kur=usd (TCMB dolar kuru), GET ?ev=1&lat&lon&radius (TomTom çevre şarj istasyonları, anlık),
+// ?evkey=1: TomTom anahtarı (yalnızca sahip hesap) GET durum · POST {key} kaydet · DELETE sil
 import { sql, ensureSchema, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
@@ -7,9 +8,16 @@ import { seedOnce } from '../lib/seed.js';
 import { nextCode, backfillCodes } from '../lib/codes.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
-import { analyze, validArea, maxRequests } from '../lib/tomtom.js';
+import { analyze, validArea, maxRequests, sealKey, openKey, keyLooksValid, testKey } from '../lib/tomtom.js';
 
 // TCMB günlük kurlar: USD döviz satış kuru, 3 saat önbellekte tutulur.
+// Anahtar: önce Vercel ortam değişkeni, yoksa sistemden girilmiş (şifreli) kayıt.
+async function tomtomKey(s) {
+  if (process.env.TOMTOM_API_KEY) return { key: process.env.TOMTOM_API_KEY, source: 'env' };
+  const r = await s`SELECT data FROM config WHERE key = 'tomtom_key'`;
+  const key = r[0] ? openKey(r[0].data) : '';
+  return { key, source: key ? 'db' : '' };
+}
 let usdCache = null;
 const evCache = new Map();  // TomTom analiz önbelleği (3 dk; sıcak işlev örneğinde)
 async function usdSelling() {
@@ -42,12 +50,40 @@ export default async function handler(req, res) {
     await ensureSchema();
     const s = sql();
 
+    // TomTom anahtarı yönetimi: yalnızca sahip hesap. Anahtar şifreli saklanır ve tarayıcıya hiçbir zaman geri gönderilmez (yalnızca son 4 hane).
+    if (req.query?.evkey === '1') {
+      res.setHeader('cache-control', 'no-store');
+      if (!user.owner) return res.status(403).json({ error: 'Bu işlem yalnızca sahip hesaba açık' });
+      if (req.method === 'GET') {
+        const k = await tomtomKey(s);
+        return res.status(200).json({ set: Boolean(k.key), source: k.source, last4: k.key ? k.key.slice(-4) : '' });
+      }
+      if (req.method === 'POST') {
+        const b = await readJson(req);
+        const key = String(b?.key || '').trim();
+        if (!keyLooksValid(key)) return res.status(400).json({ error: 'Anahtar biçimi geçersiz (harf ve rakamlardan oluşan 16-80 karakter)' });
+        const chk = await testKey(key).catch(() => 'error');
+        if (chk === 'invalid') return res.status(400).json({ error: 'TomTom bu anahtarı kabul etmedi' });
+        if (chk !== 'ok') return res.status(502).json({ error: 'TomTom şu an doğrulanamadı; biraz sonra tekrar deneyin' });
+        await s`INSERT INTO config (key, data) VALUES ('tomtom_key', ${JSON.stringify(sealKey(key))}::jsonb) ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data`;
+        evCache.clear();
+        return res.status(200).json({ set: true, source: 'db', last4: key.slice(-4) });
+      }
+      if (req.method === 'DELETE') {
+        await s`DELETE FROM config WHERE key = 'tomtom_key'`;
+        evCache.clear();
+        const k = await tomtomKey(s);
+        return res.status(200).json({ set: Boolean(k.key), source: k.source, last4: k.key ? k.key.slice(-4) : '' });
+      }
+      return res.status(405).json({ error: 'Yöntem desteklenmiyor' });
+    }
+
     // TomTom çevre şarj istasyonu analizi (anlık; kayıt tutulmaz). Ücretsiz katman günde 2.500 istek: günlük sayaç ve 3 dk önbellek ile korunur.
     if (req.method === 'GET' && req.query?.ev === '1') {
       const area = validArea(req.query);
       if (!area) return res.status(400).json({ error: 'Geçersiz konum veya yarıçap (500–5000 m)' });
-      const key = process.env.TOMTOM_API_KEY;
-      if (!key) return res.status(503).json({ error: 'TomTom anahtarı tanımlı değil (Vercel ortam değişkeni TOMTOM_API_KEY)' });
+      const key = (await tomtomKey(s)).key;
+      if (!key) return res.status(503).json({ error: 'TomTom anahtarı tanımlı değil; sahip hesap Rakip Analizi sekmesinden girebilir' });
       res.setHeader('cache-control', 'no-store');
       const ck = `${area.lat.toFixed(4)},${area.lon.toFixed(4)},${area.radius}`;
       const hit = evCache.get(ck);
