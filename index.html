@@ -573,7 +573,20 @@ table.portfolio.comp-tbl{width:100%}
 .ld-chip.on{border-color:var(--navy);background:var(--navy-soft)}.ld-chip.on b{color:var(--navy)}
 .ld-tbl td{vertical-align:top}.ld-tbl td.c-name{min-width:200px;white-space:normal}.ld-tbl td.c-name small{display:block;margin-top:2px;font-size:11.5px;font-weight:400;color:var(--risk);white-space:normal}
 .ld-tbl td.c-name small.ld-sub{color:var(--muted)}.ld-tbl td.c-name small.ld-sub a{color:var(--navy)}
-.ld-warn{color:var(--risk);cursor:help;font-size:12px}.ld-flagtxt{display:none}
+.ld-namerow{display:flex;align-items:center;gap:10px}.ld-namerow .ld-nm{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ld-warn{flex:none;margin-left:auto;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--risk-soft);border:1.5px solid var(--risk);color:var(--risk);font:800 13px/1 var(--font);cursor:help}.ld-flagtxt{display:none}
+.ld-notebtn{display:flex;align-items:center;gap:6px;width:100%;min-height:34px;padding:4px 10px;background:var(--card);border:1px solid var(--hair-strong);border-radius:var(--radius);color:var(--ink);font-weight:600;font-size:13px;text-align:left;cursor:pointer}
+.ld-notebtn:hover{border-color:var(--navy);background:var(--navy-soft)}.ld-notebtn b{color:var(--navy);font-variant-numeric:tabular-nums}
+.ld-notebtn .ld-last{font-weight:400;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.ld-tbl tbody tr{cursor:default}
+.lead-panel .np-list{gap:12px}
+.lp-card{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:12px;display:grid;gap:8px;font-size:13px}
+.lp-card .lp-call{display:flex;align-items:center;justify-content:center;min-height:44px;background:var(--navy);color:#fff;border-radius:var(--radius);font-weight:700;font-size:15px;text-decoration:none}
+.lp-kv{display:grid;grid-template-columns:92px minmax(0,1fr);gap:4px 10px;align-items:baseline}.lp-kv dt{color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em}.lp-kv dd{margin:0;overflow-wrap:anywhere}
+.lp-kv a{color:var(--navy)}.lp-kv .lp-warn{color:var(--risk)}
+.lp-ctrl{display:grid;grid-template-columns:1fr 1fr;gap:8px}.lp-ctrl label{margin:0}
+.np-note.auto{background:transparent;border-style:dashed}.np-note.auto p{color:var(--muted);font-size:12.5px}
+.lp-h{margin:4px 0 -4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 @media (min-width:701px){
   table.portfolio.ld-tbl{table-layout:auto;width:100%}
   table.portfolio.ld-tbl th,table.portfolio.ld-tbl td{padding-top:6px;padding-bottom:6px}
@@ -584,7 +597,6 @@ table.portfolio.comp-tbl{width:100%}
   .ld-tbl td.c-name small.ld-sub{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
   .ld-tbl td{vertical-align:middle}
   .ld-tbl td:nth-child(3){white-space:nowrap}
-  .ld-tbl .ld-note{min-width:160px;width:100%}
   .ld-box .scroll{overflow-x:auto}
   /* Rakip Analizi: tablo ekrana sığar, uzun listede kendi içinde kayar (başlık sabit) */
   .comp-box .scroll{max-height:calc(100vh - 380px);min-height:220px;overflow:auto}
@@ -880,7 +892,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   .grid.infogrid.comp-form{grid-template-columns:minmax(0,1fr)}
   table.ld-tbl.m-cards.m-cards td:nth-child(1){display:block;text-align:left;font-weight:700;font-size:15px;padding-bottom:7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
   table.ld-tbl.m-cards.m-cards td:nth-child(1)::before{display:none}
-  .ld-tbl .ld-warn{display:none}.ld-tbl .ld-flagtxt{display:block;font-weight:400;font-size:11.5px;color:var(--risk);margin-top:2px}
+  .ld-tbl .ld-warn{display:none}.ld-notebtn{min-height:44px;font-size:15px}.ld-tbl .ld-flagtxt{display:block;font-weight:400;font-size:11.5px;color:var(--risk);margin-top:2px}
   .ld-tbl td.c-name small.ld-sub{display:block;font-weight:400;overflow-wrap:anywhere}
   table.ld-tbl.m-cards.m-cards td:nth-child(2){display:block;text-align:left;padding:4px 0 8px!important}
   table.ld-tbl.m-cards.m-cards td:nth-child(2)::before{display:none}
@@ -1066,6 +1078,11 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   <div class="np-head"><div><strong>Şirket İçi Bilgilendirme</strong><small id="npSite"></small></div><button type="button" id="npClose" class="ghost" aria-label="Kapat">✕</button></div>
   <div class="np-list" id="npList"></div>
   <div class="np-form"><textarea id="npText" rows="3" maxlength="2000" placeholder="Not yazın… (Ctrl+Enter ile gönder)"></textarea><button type="button" class="primary" id="npSend">Gönder</button></div>
+</div>
+<div id="leadPanel" class="notes-panel lead-panel" role="complementary" aria-label="Lead notları" hidden>
+  <div class="np-head"><div><strong id="lpTitle">Lead</strong><small id="lpSub"></small></div><button type="button" id="lpClose" class="ghost" aria-label="Kapat">✕</button></div>
+  <div class="np-list" id="lpList"></div>
+  <div class="np-form"><textarea id="lpText" rows="3" maxlength="2000" placeholder="Görüşme notu yazın… (Ctrl+Enter ile gönder)"></textarea><button type="button" class="primary" id="lpSend">Not Ekle</button></div>
 </div>
 <div id="toast" role="status" hidden></div>
 <dialog id="actDlg"><div id="actBody"></div><div class="row"><button type="button" id="actClose" class="primary">Kapat</button></div></dialog>
@@ -3240,7 +3257,7 @@ function renderLeads(){
       ${me.owner?'<button type="button" id="ldImport">CSV İçe Aktar</button><input type="file" id="ldFile" accept=".csv,text/csv,text/plain" hidden>':''}
     </div>
     <p class="note" id="ldNote"></p>
-    <div class="scroll"><table class="portfolio ld-tbl m-cards"><thead><tr><th>Firma</th><th>Telefon</th><th>İl / İlçe</th><th>Sektör</th><th>Öncelik</th><th>Durum</th><th>Toplantı Tarihi</th><th>Not</th></tr></thead><tbody id="ldRows"><tr><td colspan="8" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <div class="scroll"><table class="portfolio ld-tbl m-cards"><thead><tr><th>Firma</th><th>Telefon</th><th>İl / İlçe</th><th>Sektör</th><th>Öncelik</th><th>Durum</th><th>Toplantı Tarihi</th><th>Notlar</th></tr></thead><tbody id="ldRows"><tr><td colspan="8" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
     <div class="pager" id="ldPager"></div></section>`;
   if(ld.stats)ldPaintStats();
   if(ld.loaded)ldPaintRows();
@@ -3264,13 +3281,13 @@ function ldPaintStats(){
 function ldRowHtml(r){
   const done=r.status==='İstemiyor'||r.status==='Yanlış Numara';
   const col=r.priority==='Yüksek'?'var(--ok)':r.priority==='Orta'?'var(--info)':'var(--muted)';
-  return `<tr data-ld="${esc(r.id)}" class="${done?'st-done':''}"><td class="c-name"><b>${esc(r.company)}</b>${r.flags?` <span class="ld-warn" title="${esc(r.flags)}" aria-label="${esc(r.flags)}">⚠</span><small class="ld-flagtxt">${esc(r.flags)}</small>`:''}${(()=>{const sub=[r.address,r.email,r.web].filter(Boolean).join(' · ');return sub?`<small class="ld-sub" title="${esc(sub)}">${r.address?esc(r.address):''}${r.address&&(r.email||r.web)?' · ':''}${r.email?`<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>`:''}${r.email&&r.web?' · ':''}${r.web?`<a href="https://${esc(r.web)}" target="_blank" rel="noopener noreferrer">${esc(r.web)}</a>`:''}</small>`:'';})()}</td>
+  return `<tr data-ld="${esc(r.id)}" class="${done?'st-done':''}"><td class="c-name"><div class="ld-namerow"><b class="ld-nm">${esc(r.company)}</b>${r.flags?`<span class="ld-warn" title="${esc(r.flags)}" aria-label="Uyarı: ${esc(r.flags)}">!</span>`:''}</div>${r.flags?`<small class="ld-flagtxt">${esc(r.flags)}</small>`:''}${(()=>{const sub=[r.address,r.email,r.web].filter(Boolean).join(' · ');return sub?`<small class="ld-sub" title="${esc(sub)}">${r.address?esc(r.address):''}${r.address&&(r.email||r.web)?' · ':''}${r.email?`<a href="mailto:${esc(r.email)}">${esc(r.email)}</a>`:''}${r.email&&r.web?' · ':''}${r.web?`<a href="https://${esc(r.web)}" target="_blank" rel="noopener noreferrer">${esc(r.web)}</a>`:''}</small>`:'';})()}</td>
     <td><a class="ld-call" href="tel:+90${esc(r.phone)}">${esc(ldFmt(r.phone))}</a></td>
     <td>${esc([r.il,r.ilce].filter(Boolean).join(' / '))||'—'}</td><td>${esc(r.sector)||'—'}</td>
     <td><span class="pill" style="--c:${col}">${esc(r.priority)}</span></td>
     <td><select data-ldf="status" aria-label="Durum">${LD_ST.map(k=>`<option value="${esc(k)}" ${k===r.status?'selected':''}>${esc(k)}</option>`).join('')}</select></td>
     <td><input type="date" data-ldf="meetingAt" value="${esc(r.meetingAt)}" aria-label="Toplantı tarihi"></td>
-    <td><input class="ld-note" data-ldf="note" value="${esc(r.note)}" maxlength="2000" placeholder="Not" aria-label="Not"><span class="ct-flag" role="status"></span></td></tr>`;
+    <td><button type="button" class="ld-notebtn" data-ldopen="${esc(r.id)}" title="${esc(r.lastNote||'Not ekle')}"><b>${r.noteCount||0}</b> not${r.lastNote?`<span class="ld-last">${esc(r.lastNote)}</span>`:''}</button><span class="ct-flag" role="status"></span></td></tr>`;
 }
 function ldPaintRows(){
   const t=$('ldRows');if(!t)return;
@@ -3296,9 +3313,6 @@ function ldFilter(){ld.page=1;ldLoad(false);}
 document.addEventListener('input',e=>{
   const el=e.target;
   if(el.id==='ldQ'){ld.q=el.value;clearTimeout(ldQT);ldQT=setTimeout(ldFilter,350);return;}
-  const f=el.dataset&&el.dataset.ldf;if(f!=='note')return;
-  const tr=el.closest('tr[data-ld]');if(!tr)return;const id=tr.dataset.ld;
-  clearTimeout(ldTimers[id]);ldTimers[id]=setTimeout(()=>ldSave(id,{note:el.value}),700);
 });
 document.addEventListener('change',e=>{
   const el=e.target;
@@ -3308,7 +3322,7 @@ document.addEventListener('change',e=>{
   if(el.id==='ldPrio'){ld.prio=el.value;ldFilter();return;}
   if(el.id==='ldFlag'){ld.flagged=el.value;ldFilter();return;}
   if(el.id==='ldFile'){ldImport(el.files&&el.files[0]);el.value='';return;}
-  const f=el.dataset&&el.dataset.ldf;if(!f||f==='note')return;
+  const f=el.dataset&&el.dataset.ldf;if(!f)return;
   const tr=el.closest('tr[data-ld]');if(!tr)return;
   ldSave(tr.dataset.ld,f==='status'?{status:el.value}:{meetingAt:el.value});
 });
@@ -3319,6 +3333,64 @@ document.addEventListener('click',e=>{
   if(pg&&view==='leads'){ld.page=Math.max(1,+pg.dataset.ldpg||1);ldLoad(false).then(()=>window.scrollTo({top:0}));return;}
   if(e.target.closest&&e.target.closest('#ldClear')){Object.assign(ld,{q:'',sector:'',il:'',status:'',prio:'',flagged:'',page:1});renderLeads();return;}
   if(e.target.closest&&e.target.closest('#ldImport')){const f=$('ldFile');if(f)f.click();}
+});
+/* ---------- Lead paneli: bilgiler + birden çok not (şirket içi bilgilendirme gibi) + otomatik aşama geçmişi ---------- */
+const lp={id:'',lead:null,notes:[],owner:false,open:false};
+async function lpLoad(id){
+  try{
+    const d=await ldApi('GET','notes&id='+encodeURIComponent(id));
+    if(lp.id!==id)return;lp.lead=d.lead;lp.notes=d.notes;lp.owner=d.owner;lpPaint();
+  }catch(e){const l=$('lpList');if(l&&lp.id===id)l.innerHTML='<div class="np-empty">'+esc(e.message)+'</div>';}
+}
+function lpPaint(){
+  const x=lp.lead;if(!x)return;
+  $('lpTitle').textContent=x.company;$('lpSub').textContent=[x.il&&x.ilce?x.il+' / '+x.ilce:x.il,x.sector].filter(Boolean).join(' · ');
+  const kv=(k,v)=>v?`<dt>${k}</dt><dd>${v}</dd>`:'';
+  const info=`<div class="lp-card"><a class="lp-call" href="tel:+90${esc(x.phone)}">${esc(ldFmt(x.phone))}</a>
+    <dl class="lp-kv">${kv('Öncelik',esc(x.priority))}${kv('Adres',esc(x.address))}${kv('E-posta',x.email?`<a href="mailto:${esc(x.email)}">${esc(x.email)}</a>`:'')}${kv('Web',x.web?`<a href="https://${esc(x.web)}" target="_blank" rel="noopener noreferrer">${esc(x.web)}</a>`:'')}${kv('Uyarı',x.flags?`<span class="lp-warn">${esc(x.flags)}</span>`:'')}${kv('Kaynak',esc(x.source))}</dl>
+    <div class="lp-ctrl"><label>Durum<select data-lpf="status">${LD_ST.map(k=>`<option value="${esc(k)}" ${k===x.status?'selected':''}>${esc(k)}</option>`).join('')}</select></label>
+    <label>Toplantı Tarihi<input type="date" data-lpf="meetingAt" value="${esc(x.meetingAt)}"></label></div></div>`;
+  const notes=lp.notes.length?lp.notes.map(n=>`<div class="np-note ${n.kind==='durum'?'auto':''}"><div class="np-meta"><b>${esc(n.authorName||n.author)}</b><span>${esc(fmtTs(n.createdAt))}${lp.owner?` <button type="button" class="ghost" data-lpdel="${esc(n.id)}" title="Notu sil">Sil</button>`:''}</span></div><p>${esc(n.body)}</p></div>`).join(''):'<div class="np-empty">Bu lead için henüz not yok. Her arama sonrası bir not ekleyin.</div>';
+  const l=$('lpList'),keep=l.scrollTop;
+  l.innerHTML=info+'<div class="lp-h">Görüşme Geçmişi</div>'+notes;
+  l.scrollTop=keep;
+}
+function ldOpen(id){
+  lp.id=id;lp.open=true;lp.lead=null;lp.notes=[];
+  const p=$('leadPanel');p.hidden=false;requestAnimationFrame(()=>p.classList.add('open'));
+  $('lpList').innerHTML='<div class="np-empty">Yükleniyor…</div>';$('lpTitle').textContent='Lead';$('lpSub').textContent='';
+  lpLoad(id);setTimeout(()=>{const t=$('lpText');if(t&&lp.open)t.focus();},220);
+}
+function ldClosePanel(){lp.open=false;lp.id='';const p=$('leadPanel');p.classList.remove('open');setTimeout(()=>{if(!lp.open)p.hidden=true;},200);if(view==='leads')ldLoad(false);}
+async function lpSend(){
+  const body=$('lpText').value.trim();if(!body||!lp.id)return;
+  const id=lp.id,b=$('lpSend');b.disabled=true;
+  try{await ldApi('POST','note',{id,body});$('lpText').value='';await lpLoad(id);const l=$('lpList');l.scrollTop=l.scrollHeight;}
+  catch(e){toast(e.message);}
+  b.disabled=false;$('lpText').focus();
+}
+document.addEventListener('click',async e=>{
+  const o=e.target.closest&&e.target.closest('[data-ldopen]');if(o){ldOpen(o.dataset.ldopen);return;}
+  if(e.target.closest&&e.target.closest('#lpClose')){ldClosePanel();return;}
+  if(e.target.closest&&e.target.closest('#lpSend')){lpSend();return;}
+  const d=e.target.closest&&e.target.closest('[data-lpdel]');
+  if(d){if(!await ask('Bu not silinsin mi?','Sil'))return;try{await ldApi('DELETE','delnote&id='+encodeURIComponent(d.dataset.lpdel));await lpLoad(lp.id);}catch(x){toast(x.message);}}
+});
+document.addEventListener('change',async e=>{
+  const f=e.target.dataset&&e.target.dataset.lpf;if(!f||!lp.id)return;
+  const id=lp.id;
+  try{
+    const d=await ldApi('PATCH',encodeURIComponent(id),f==='status'?{status:e.target.value}:{meetingAt:e.target.value});
+    lp.lead={...lp.lead,...d.lead};
+    const tr=document.querySelector(`#ldRows tr[data-ld="${CSS.escape(id)}"]`);
+    if(tr){const s=tr.querySelector('select[data-ldf=status]'),m=tr.querySelector('input[data-ldf=meetingAt]');if(s)s.value=d.lead.status;if(m)m.value=d.lead.meetingAt;tr.classList.toggle('st-done',d.lead.status==='İstemiyor'||d.lead.status==='Yanlış Numara');}
+    ldApi('GET','stats').then(s=>{ld.stats=s;ldPaintStats();}).catch(()=>{});
+    await lpLoad(id);
+  }catch(x){toast(x.message);}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&lp.open&&!$('ask').open)ldClosePanel();
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)&&e.target.id==='lpText'){e.preventDefault();lpSend();}
 });
 /* CSV okuma (; , ya da sekme ayraçlı; tırnaklı alanlar) */
 function csvRows(text){
