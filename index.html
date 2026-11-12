@@ -568,6 +568,7 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--hair-strong)
 .uinfo{display:block;margin-top:3px;font-size:11.5px;color:var(--muted);line-height:1.35}.uinfo a{color:var(--navy)}
 .grid.infogrid.comp-form{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end}
 table.portfolio.comp-tbl{width:100%}
+.comp-pick{margin-bottom:14px}
 .comp-key{margin:12px 0;padding:10px 12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--soft)}.comp-key summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--ink2)}
 .comp-keyrow{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.comp-keyrow input{flex:1 1 260px}
 .comp-act{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}.comp-act button{min-height:38px}
@@ -1008,7 +1009,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
       </section>
       <section class="nav-group" data-group="tracker" id="trackerGroup">
         <button type="button" class="nav-head" aria-expanded="true">İş Takibi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Proje Ekle</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Proje Listesi</span></button><button type="button" class="nav-item" data-nav="planner"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><span>Proje Görev Listesi</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Proje Ekle</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Proje Listesi</span></button><button type="button" class="nav-item" data-nav="planner"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><span>Proje Görev Listesi</span></button><button type="button" class="nav-item" data-nav="rakip"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Rakip Analizi</span></button></div>
       </section>
       <section class="nav-group" data-group="records">
         <button type="button" class="nav-head" aria-expanded="true">Kayıtlar<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1324,7 +1325,7 @@ async function api(path,opts){
 /* ---------- Sayfa adresi: yenileyince aynı sayfada kalmak için #/… ---------- */
 let routeOn=false;
 const ROUTE_VIEWS=['locations','users','activity','contacts','notifs','planner'];
-const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings'};
+const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip'};
 function routeHash(){
   if(view==='portfolio')return '#/'+sub;
   if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
@@ -1395,7 +1396,7 @@ async function poll(){
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings')render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -1527,7 +1528,7 @@ function legendHtml(){
   return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 // Üst başlık: proje sayfasında proje adı (altında il/ilçe), diğer sayfalarda uygulama adı.
-const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları'};
+const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi'};
 // Üst başlık: proje sayfasında proje adı (altında kod ve il/ilçe), diğer sayfalarda seçilen menü başlığı.
 function setPageTitle(){
   const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
@@ -1652,12 +1653,12 @@ function renderLocations(){
 function render(){
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();
+  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   setPageTitle();
   saveRoute();
@@ -1983,20 +1984,7 @@ function renderSite(){
     <label class="span4">Diğer katılımcılar<input data-sign="others" value="${esc(s.sign.others)}"></label></div></details>
   </section>
 
-  <section class="box comp-box" data-tab="comp"><h3>Rakip Analizi<small>TomTom: çevredeki şarj istasyonları ve anlık doluluk</small></h3>
-    <div class="grid infogrid comp-form no-print">
-      <label>Enlem<input id="compLat" type="text" inputmode="decimal" autocomplete="off" placeholder="41.088204" value="${esc(comp.lat)}"></label>
-      <label>Boylam<input id="compLon" type="text" inputmode="decimal" autocomplete="off" placeholder="29.018024" value="${esc(comp.lon)}"></label>
-      <label>Çap<select id="compRad">${[1000,2000,3000,5000].map(r=>`<option value="${r}" ${r===comp.rad?'selected':''}>${r/1000} km</option>`).join('')}</select></label>
-      <div class="comp-act"><button type="button" class="primary" id="compGo">Analiz Et</button><button type="button" id="compCsv" hidden>Excel'e Aktar (CSV)</button></div>
-    </div>
-    <p class="note" id="compNote"></p>
-    ${me.owner&&mode==='cloud'?`<details class="comp-key no-print"><summary>TomTom Anahtarı</summary>
-      <p class="note" id="compKeyState">Yükleniyor…</p>
-      <div class="comp-keyrow"><input id="compKeyIn" type="password" autocomplete="off" spellcheck="false" placeholder="Yeni TomTom API anahtarı" aria-label="TomTom API anahtarı"><button type="button" class="primary" id="compKeySave">Kaydet</button><button type="button" id="compKeyDel" class="danger" hidden>Sistemden Sil</button></div>
-      <p class="note">Anahtar sunucuda şifreli saklanır ve bir daha gösterilmez. Vercel'de TOMTOM_API_KEY tanımlıysa o geçerlidir.</p></details>`:''}
-    <div id="compOut"></div>
-  </section>
+  ${compSectionHtml(false)}
 
   <section class="box files-box" data-tab="files"><h3>Dosyalar<small id="flSummary"></small></h3>
     <div id="flBody"><p class="note">Yükleniyor…</p></div>
@@ -2175,7 +2163,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','comp','credit','check','files'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['comp','Rakip Analizi'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
-  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -2199,6 +2187,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(k==='notifs'){view='notifs';render();window.scrollTo(0,0);}
     else if(k==='planner'){view='planner';render();window.scrollTo(0,0);}
     else if(k==='meetings'){view='meetings';render();window.scrollTo(0,0);}
+    else if(k==='rakip'){view='rakip';render();window.scrollTo(0,0);}
     else if(SITE_SUBS.includes(k))goSite(k);
   });
 });
@@ -3089,7 +3078,28 @@ document.addEventListener('click',async e=>{
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#notifRows [data-bellact]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click();}});
 
 /* ---------- Rakip Analizi (TomTom, anlık) ---------- */
-const comp={site:'',lat:'',lon:'',rad:3000,res:null,busy:false};
+const comp={site:'',lat:'',lon:'',rad:3000,res:null,busy:false,pick:''};
+function compSectionHtml(standalone){
+  return `<section class="box comp-box"${standalone?'':' data-tab="comp"'}><h3>Rakip Analizi<small>TomTom: çevredeki şarj istasyonları ve anlık doluluk</small></h3>${standalone?`<div class="grid infogrid comp-pick no-print"><label class="span4">Proje seç<select id="compPick"><option value="">Seçin (isteğe bağlı)</option>${db.sites.map(x=>`<option value="${esc(x.id)}" ${x.id===comp.pick?'selected':''}>${esc((x.code?x.code+' · ':'')+x.name)}</option>`).join('')}</select></label></div>`:''}
+    <div class="grid infogrid comp-form no-print">
+      <label>Enlem<input id="compLat" type="text" inputmode="decimal" autocomplete="off" placeholder="41.088204" value="${esc(comp.lat)}"></label>
+      <label>Boylam<input id="compLon" type="text" inputmode="decimal" autocomplete="off" placeholder="29.018024" value="${esc(comp.lon)}"></label>
+      <label>Çap<select id="compRad">${[1000,2000,3000,5000].map(r=>`<option value="${r}" ${r===comp.rad?'selected':''}>${r/1000} km</option>`).join('')}</select></label>
+      <div class="comp-act"><button type="button" class="primary" id="compGo">Analiz Et</button><button type="button" id="compCsv" hidden>Excel'e Aktar (CSV)</button></div>
+    </div>
+    <p class="note" id="compNote"></p>
+    ${me.owner&&mode==='cloud'?`<details class="comp-key no-print"><summary>TomTom Anahtarı</summary>
+      <p class="note" id="compKeyState">Yükleniyor…</p>
+      <div class="comp-keyrow"><input id="compKeyIn" type="password" autocomplete="off" spellcheck="false" placeholder="Yeni TomTom API anahtarı" aria-label="TomTom API anahtarı"><button type="button" class="primary" id="compKeySave">Kaydet</button><button type="button" id="compKeyDel" class="danger" hidden>Sistemden Sil</button></div>
+      <p class="note">Anahtar sunucuda şifreli saklanır ve bir daha gösterilmez. Vercel'de TOMTOM_API_KEY tanımlıysa o geçerlidir.</p></details>`:''}
+    <div id="compOut"></div>
+  </section>`;
+}
+function renderRakip(){
+  if(comp.site!=='__free'){comp.site='__free';comp.res=null;comp.pick='';}
+  $('view').innerHTML=compSectionHtml(true);
+  applyEditState();compPaint();compKeyLoad();
+}
 function parseGps(v){const s=String(v||''),m=s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(?:[?&](?:q|ll|query|destination)=)(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[,; ]\s*(-?\d{1,3}\.\d{3,})/);return m?[m[1],m[2]]:null;}
 // Proje değişince alanlar GPS bilgisinden doldurulur; aynı projede kullanıcının yazdığı değerler korunur.
 function compPrime(s){if(comp.site===s.id)return;comp.site=s.id;const g=parseGps(s.survey&&s.survey.gps);comp.lat=g?g[0]:'';comp.lon=g?g[1]:'';comp.rad=3000;comp.res=null;}
@@ -3155,7 +3165,16 @@ document.addEventListener('click',async e=>{
   finally{btn.disabled=false;}
 });
 document.addEventListener('input',e=>{const el=e.target;if(el.id==='compLat')comp.lat=el.value;else if(el.id==='compLon')comp.lon=el.value;else if(el.id==='compRad')comp.rad=+el.value;});
-document.addEventListener('change',e=>{if(e.target.id==='compRad')comp.rad=+e.target.value;});
+document.addEventListener('change',e=>{
+  if(e.target.id==='compRad')comp.rad=+e.target.value;
+  else if(e.target.id==='compPick'){
+    const s=db.sites.find(x=>x.id===e.target.value);comp.pick=e.target.value;const n=$('compNote');
+    if(!s){return;}
+    const g=parseGps(s.survey&&s.survey.gps);
+    if(g){comp.lat=g[0];comp.lon=g[1];$('compLat').value=g[0];$('compLon').value=g[1];comp.res=null;compPaint();n.textContent='';n.className='note';}
+    else{n.textContent='Bu projenin GPS alanında koordinat yok; Altyapı & Güç sekmesine yazın ya da buraya girin.';n.className='note comp-warn';}
+  }
+});
 
 /* ---------- StarCharge ürün kataloğu ---------- */
 let catType='',catList=[];
