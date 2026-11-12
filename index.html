@@ -796,7 +796,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 }
 /* ---------- Telefon (≤700px): yalnızca burada geçerli; masaüstü tasarımı değişmez ---------- */
 .sb-toggle .tg-m{display:none}
-@media (max-width:700px){
+@media screen and (max-width:700px){
   /* Sol menü: kapalıyken yalnızca logo ve Menü düğmesi; düğmeyle açılır, bir öğe seçilince kapanır */
   aside{position:sticky;top:0;z-index:50;max-height:100vh;overflow-y:auto}
   aside .brand{padding:10px 14px}
@@ -836,10 +836,53 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   .ct-tools{flex-wrap:wrap;width:100%;gap:8px}
   .ct-tools select,.ct-tools input[type=search]{width:100%;flex:1 1 100%;min-height:44px;font-size:16px}
   .vc-kw{white-space:normal;text-align:center;font-size:10px}.vc-l{font-size:10.5px;overflow-wrap:anywhere}
-  /* Proje Listesi: yalnızca ana sütunlar (Proje, Aşama, İl/İlçe, Sorumlu, Skor, Durum); ayrıntı proje sayfasında */
-  table.loclist :is(th,td):is(:nth-child(1),:nth-child(5),:nth-child(n+7):nth-child(-n+11),:nth-child(14),:nth-child(15)){display:none}
+  /* Proje Listesi, Bildirimler, Müşteri Bilgileri: her satır etiketli bir kart olur (etiketler JS ile başlıklardan yazılır) */
+  table.m-cards.m-cards,table.m-cards.m-cards tbody,table.m-cards.m-cards tfoot{display:block;width:100%}
+  table.m-cards.m-cards thead{display:none}
+  table.m-cards.m-cards tr{display:block;margin:0 0 10px;padding:8px 12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card)}
+  .chart{min-width:620px}
+  dialog{max-width:calc(100vw - 16px);max-height:calc(100vh - 16px)}
+  table.m-cards.m-cards tr.grp-head{padding:0}
+  table.m-cards.m-cards tbody th{display:block;text-align:left;font-weight:700;padding:3px 0 7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
+  table.m-cards.m-cards tr:hover td,table.m-cards.m-cards tr:hover th{background:transparent}
+  table.m-cards.m-cards :is(td,th){display:grid;grid-template-columns:38% minmax(0,1fr);column-gap:12px;align-items:baseline;width:auto!important;max-width:none!important;min-width:0!important;padding:5px 0!important;border:0;white-space:normal!important;text-align:right;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+  table.m-cards.m-cards td>*{grid-column:2;min-width:0}
+  table.m-cards.m-cards td::before{content:attr(data-label);grid-column:1;grid-row:1/span 4;color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-align:left;overflow-wrap:normal}
+  table.m-cards.m-cards td[data-label=""]{grid-template-columns:minmax(0,1fr)}
+  table.m-cards.m-cards td[data-label=""]::before{display:none}
+  table.m-cards.m-cards td[data-label=""]>*{grid-column:1}
+  table.m-cards.m-cards td:empty{display:none}
+  table.m-cards.m-cards td[colspan]{display:block;text-align:left}
+  table.m-cards.m-cards td.sp{display:none}
+  .ovwtbl td.c-name .p1{max-width:none;white-space:normal}
+  /* Proje kartı: üstte kod ve ad, altında iki sütunlu etiketli değerler */
+  table.loclist.m-cards.m-cards tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;align-items:start}
+  table.loclist.m-cards.m-cards td{display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:2px;text-align:left}
+  table.loclist.m-cards.m-cards td::before{flex:none}
+  table.loclist.m-cards.m-cards td:nth-child(1){grid-column:1/-1;order:-2;flex-direction:row;justify-content:space-between;align-items:baseline}
+  table.loclist.m-cards.m-cards td:nth-child(2){grid-column:1/-1;order:-1;font-size:15px;font-weight:700;padding-bottom:7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
+  table.loclist.m-cards.m-cards td:nth-child(2)::before{display:none}
+  table.loclist.m-cards.m-cards td[colspan]{grid-column:1/-1}
+  table.m-cards .badge{white-space:normal;max-width:100%}
+  /* Kullanıcılar: ad üstte başlık, düğmeler alt alta sığar */
+  table.u-tbl.m-cards.m-cards td:first-child{display:block;text-align:left;font-weight:600;padding-bottom:7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
+  table.u-tbl.m-cards.m-cards td:first-child::before{display:none}
+  table.u-tbl.m-cards .acts{flex-wrap:wrap;justify-content:flex-start;gap:8px}
+  table.u-tbl.m-cards .acts :is(button,select){min-height:40px;font-size:14px}
+  table.u-tbl.m-cards .name-in{text-align:left}
+  table.notif-tbl.m-cards .p2,table.act-tbl.m-cards td .p2{font-size:11.5px;overflow-wrap:anywhere}
+  /* Bildirimler: aynı işlemin satırları tek kart gibi arka arkaya durur */
+  table.notif-tbl.m-cards tr{margin:0;border-top:0;border-radius:0}
+  table.notif-tbl.m-cards tr.grp-first{margin-top:12px;border-top:1px solid var(--hair);border-radius:var(--radius) var(--radius) 0 0}
+  table.notif-tbl.m-cards tr:has(+tr.grp-first),table.notif-tbl.m-cards tr:last-child{border-radius:0 0 var(--radius) var(--radius)}
+  table.notif-tbl.m-cards tr.grp-first:has(+tr.grp-first),table.notif-tbl.m-cards tr.grp-first:last-child{border-radius:var(--radius)}
+  table.notif-tbl.m-cards tr.grp-first td[rowspan]+td:not([rowspan]){border-top:1px dashed var(--hair-strong);margin-top:4px;padding-top:8px!important}
+  table.notif-tbl.m-cards td[rowspan]{padding-top:3px!important;padding-bottom:3px!important}
+  table.ct-tbl.m-cards td .ct-in{flex:1 1 auto;min-width:0;text-align:left}
+  table.ct-tbl.m-cards td.ct-act{justify-content:flex-end}
+  table.ct-tbl.m-cards tr.ct-grp{padding:0}
 }
-@media (max-width:520px){
+@media screen and (max-width:520px){
   .grid,.grid.g5,.grid.g6,.grid.infogrid{grid-template-columns:minmax(0,1fr)}
   .trio{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .dd-row,.amg-row{grid-template-columns:minmax(0,1fr)}
@@ -941,13 +984,13 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 <dialog id="ctDlg">
   <div class="cat-head"><div><h2>Kişilerden Seç</h2><p class="dsub">Satıra tıklayın; ad, telefon ve şirket projeye işlenir.</p></div><button type="button" id="ctDlgClose" class="ghost" aria-label="Kapat">✕</button></div>
   <div class="cat-bar"><input type="search" id="ctDlgQ" placeholder="Şirket, kişi veya telefon…" autocomplete="off"></div>
-  <div class="scroll"><table class="cat-tbl"><thead><tr><th>Şirket</th><th>Ad Soyad</th><th>Telefon</th><th>E-posta</th></tr></thead><tbody id="ctDlgRows"></tbody></table></div>
+  <div class="scroll"><table class="cat-tbl m-cards"><thead><tr><th>Şirket</th><th>Ad Soyad</th><th>Telefon</th><th>E-posta</th></tr></thead><tbody id="ctDlgRows"></tbody></table></div>
   <p class="note">Listede yoksa Müşteri Bilgileri sayfasından ekleyin.</p>
 </dialog>
 <dialog id="catDlg">
   <div class="cat-head"><div><h2>StarCharge Ürün Kataloğu</h2><p class="dsub">Satıra "Ekle" diyerek ünite listesine direkt ekleyin; marka/model, tip, güç ve soket sayısı otomatik dolar.</p></div><button type="button" id="catClose" class="ghost" aria-label="Kapat">✕</button></div>
   <div class="cat-bar"><div class="viewbar" id="catType"><button type="button" data-ct="" aria-pressed="true">Tümü</button><button type="button" data-ct="DC" aria-pressed="false">DC</button><button type="button" data-ct="AC" aria-pressed="false">AC</button><button type="button" data-ct="CAB" aria-pressed="false">Dağıtım Kabini</button></div><input type="search" id="catQ" placeholder="Model ara…" autocomplete="off"></div>
-  <div class="scroll"><table class="cat-tbl"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
+  <div class="scroll"><table class="cat-tbl m-cards"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
   <p class="note">Kaynak: starcharge.com ürün sayfaları. Güç yazmayan dispenser modellerinde (Hydrus, Aries, Triton) güç, bağlı güç kabinine göre belirlenir; kW elle girilir.</p>
 </dialog>
 <div id="pgFx" aria-hidden="true"><span class="logobox"><img src="/ekonix-logo-t.png" alt="" width="289" height="93"></span></div>
@@ -1164,7 +1207,7 @@ function chartSvg(P,s){
 }
 function partyTable(P,s){
   const ps=PARTIES.filter(p=>involved(P[p.k]));if(!ps.length)return '<p class="note">Henüz pay veya finansman girilmedi.</p>';
-  return `<div class="scroll"><table class="yearly"><thead><tr><th>Taraf</th><th class="num">Yatırım USD</th><th class="num">${YEARS} Yıl Nakit Girişi USD</th><th class="num">${YEARS} Yıl Net USD</th><th class="num">Geri Dönüş</th><th class="num">İç Verim (${YEARS} Yıl)</th></tr></thead><tbody>${ps.map(p=>{const x=P[p.k],inflow=x.flows.slice(1).reduce((a,b)=>a+b,0),r=irr(x.flows);
+  return `<div class="scroll"><table class="yearly m-cards"><thead><tr><th>Taraf</th><th class="num">Yatırım USD</th><th class="num">${YEARS} Yıl Nakit Girişi USD</th><th class="num">${YEARS} Yıl Net USD</th><th class="num">Geri Dönüş</th><th class="num">İç Verim (${YEARS} Yıl)</th></tr></thead><tbody>${ps.map(p=>{const x=P[p.k],inflow=x.flows.slice(1).reduce((a,b)=>a+b,0),r=irr(x.flows);
     return `<tr><th><span class="chip" style="--c:${p.c}">${esc(pName(p.k,s))}</span></th><td>${x.invest?nf.format(x.invest):'—'}</td><td>${nf.format(inflow)}</td><td>${nf.format(inflow-x.invest)}</td><td>${paybackOf(x.flows)}</td><td>${r==null?'—':'%'+df.format(r*100)}</td></tr>`;}).join('')}</tbody></table></div>
   <p class="note">Nakit girişi: gelir payı (Co-CPO için komisyon ve işletme gideri düşülmüş). İç verim yalnız ${YEARS} yıllık nakde dayanır; ekipmanın kalan değeri ve sözleşme sonrası gelir dahil değildir.</p>`;
 }
@@ -1172,13 +1215,13 @@ function yearlyTable(rows){
   const hasFon=rows.some(r=>Math.abs(r.fon)>0.5),hasPartner=rows.some(r=>Math.abs(r.partner)>0.5),R=rows;
   const cols=[['energy','Enerji kWh'],['revenue','Hasılat USD'],['margin','Elektrik Sonrası USD'],['star','StarCharge USD'],['ent','Co-CPO Payı USD'],['owner','Yer Sağlayıcı USD'],...(hasPartner?[['partner','Paydaş USD']]:[]),...(hasFon?[['fon','Diğer Fon USD']]:[]),['eko','EKONİX USD'],['remaining','Dağıtılmayan USD'],['fee','Komisyon USD'],['opex','İşletme Gideri USD']];
   const sum=k=>R.reduce((t,r)=>t+r[k],0);
-  return `<div class="scroll"><table class="yearly"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar USD. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
+  return `<div class="scroll"><table class="yearly m-cards"><thead><tr><th>Yıl</th><th class="num">Kullanım</th>${cols.map(c=>`<th class="num">${c[1]}</th>`).join('')}</tr></thead><tbody>${R.map(r=>`<tr><th>${r.year}. Yıl</th><td>%${df.format(r.u)}</td>${cols.map(([k])=>`<td>${nf.format(r[k])}</td>`).join('')}</tr>`).join('')}</tbody><tfoot><tr><td style="text-align:left">${YEARS} yıl toplam</td><td></td>${cols.map(([k])=>`<td>${nf.format(sum(k))}</td>`).join('')}</tr></tfoot></table></div><p class="note">Tutarlar USD. Paylar elektrik sonrası taban üzerinden; komisyon ve işletme gideri Co-CPO payından düşülür.</p>`;
 }
 function resultsHtml(rows,f,s,tf,mode='all'){
   const k=(l,val,sub)=>`<div class="kpi"><span>${l}</span><strong>${val}</strong><small>${sub}</small></div>`;
   const kpis=`<div class="kpis">${k('İlk Yıl Enerji',nf.format(rows[0].energy)+' kWh','%'+df.format(rows[0].u)+' kullanım')}${k('İlk Yıl Hasılat',money(rows[0].revenue),'Elektrik sonrası '+money(rows[0].margin))}${k('Toplam Finansman',money(tf),tf?'StarCharge %'+df.format(f.P.star.invest/tf*100):'Tutar girilmedi')}${k(YEARS+' Yıl Yer Sağlayıcı',money(rows.reduce((a,r)=>a+r.owner,0)),'Elektrik sonrası taban')}</div>`,
   party=`<h4 class="subh">Taraflara Göre Getiri</h4>${partyTable(f.P,s)}`,
-  detail=`<h4 class="subh">Kümülatif Nakit</h4>${chartSvg(f.P,s)}
+  detail=`<h4 class="subh">Kümülatif Nakit</h4><div class="scroll">${chartSvg(f.P,s)}</div>
   <h4 class="subh">Yıllık Sonuçlar</h4>${yearlyTable(rows)}`;
   return mode==='kpi'?kpis+party:mode==='detail'?detail:kpis+party+detail;
 }
@@ -1548,7 +1591,7 @@ function renderLocations(){
       <button type="button" id="grpGo" class="save grp-go" hidden>Seçilenleri Gruplandır</button>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl loclist"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>İl / İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th><th>Güncelleme</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
+    <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl loclist m-cards"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>İl / İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th><th>Güncelleme</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
   paintLocRows();
 }
 function render(){
@@ -1820,7 +1863,7 @@ function renderSite(){
   </div>
 
   <section class="box" data-tab="units"><h3>Şarj Üniteleri<small id="unitSummary"></small></h3>
-  <div class="scroll"><table class="units"><thead><tr><th>Tip</th><th class="num">Ünite Gücü kW</th><th class="num">Ünite Başına Soket</th><th class="num">Adet</th><th>Marka / Model</th><th class="num">Toplam kW</th><th></th></tr></thead>
+  <div class="scroll"><table class="units m-cards"><thead><tr><th>Tip</th><th class="num">Ünite Gücü kW</th><th class="num">Ünite Başına Soket</th><th class="num">Adet</th><th>Marka / Model</th><th class="num">Toplam kW</th><th></th></tr></thead>
   <tbody id="unitBody">${s.units.map(u=>unitRow(u)).join('')||`<tr><td colspan="7" style="color:var(--muted);padding:14px 6px">Henüz ünite yok. Aşağıdan DC veya AC ünite ekleyin.</td></tr>`}</tbody>
   <tfoot id="unitFoot"></tfoot></table></div>
   <div class="unit-actions"><button id="addDC">+ DC ünite</button><button id="addAC">+ AC ünite</button><button id="addCab">+ Dağıtım Kabini</button><button id="addCat" type="button">Katalogdan Seç</button></div>
@@ -2105,6 +2148,28 @@ $('sbToggle').onclick=()=>{if(mobileNav()){setMNav(!document.body.classList.cont
 document.querySelector('aside').addEventListener('click',e=>{if(mobileNav()&&e.target.closest('.nav-item'))setMNav(false);});
 window.addEventListener('resize',()=>{if(!mobileNav()&&document.body.classList.contains('m-nav-open'))setMNav(false);});
 if(mobileNav())$('sbToggle').setAttribute('aria-expanded','false');
+/* Telefonda tablo satırları kart olur: her hücreye sütun başlığı etiket olarak yazılır */
+function mLabelCells(){
+  if(!mobileNav())return;
+  document.querySelectorAll('table.m-cards').forEach(tb=>{
+    const hs=[...tb.querySelectorAll('thead th')].map(h=>h.textContent.trim());
+    const occ=[];  // birleşik (rowspan) hücrelerin kapladığı sütunlar: sonraki satırlarda başlık hizası kaymasın
+    tb.querySelectorAll('tbody tr,tfoot tr').forEach(tr=>{
+      const skip=occ.map(v=>v>0);let i=0;
+      [...tr.children].forEach(td=>{
+        while(skip[i])i++;
+        const sp=td.colSpan||1,rs=td.rowSpan||1,l=sp>1?'':(hs[i]||'');
+        if(td.dataset.label!==l)td.dataset.label=l;
+        if(rs>1)for(let c=i;c<i+sp;c++)occ[c]=rs-1;
+        i+=sp;
+      });
+      skip.forEach((s,c)=>{if(s)occ[c]--;});
+    });
+  });
+}
+{let raf=0;const sched=()=>{if(raf||!mobileNav())return;raf=requestAnimationFrame(()=>{raf=0;mLabelCells();});};
+ new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,characterData:true});
+ window.addEventListener('resize',sched);sched();}
 // Fare menünün üstüne gelince geçici genişler (yalnızca daraltılmış menüde, geniş ekranda).
 function peek(on){
   if(!sbPref||window.innerWidth<=700)return;
@@ -2160,7 +2225,7 @@ async function renderUsers(){
       <span class="u-btns"><button type="submit" class="primary">Kullanıcıyı Ekle</button><button type="button" id="uCancel" class="ghost">Vazgeç</button></span>
     </form><p class="u-msg" id="uMsg" role="status"></p>
     <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
-    <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl"><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl m-cards"><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
     const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
@@ -2244,7 +2309,7 @@ async function renderActivity(){
       <label class="lf lchk"><input type="checkbox" id="actOwn" ${actOwn?'checked':''}>Kendi güncellemelerimi göster</label>
       <button type="button" id="actClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="scroll"><table class="portfolio loctbl act-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Proje Kodu</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
+    <div class="scroll"><table class="portfolio loctbl act-tbl m-cards"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>İşlem</th><th>Proje Kodu</th><th>Kayıt</th><th>Özet</th></tr></thead><tbody id="actRows"></tbody></table></div>
     <div class="row-actions"><button type="button" id="actMore" hidden>Daha Fazla Yükle</button></div>
     <p class="note">Günlük sunucuda tutulur; kayıtlar arayüzden silinemez veya düzenlenemez.${me&&me.role==='admin'?'':' Bu sayfada proje işlemleri görünür.'}</p></section>`;
   paintActivity();
@@ -2676,7 +2741,7 @@ async function renderContacts(){
       <input type="search" id="ctQ" value="${esc(ct.q)}" placeholder="Ara: şirket, kişi veya telefon…" aria-label="Ara" autocomplete="off">
       <label class="lchk"><input type="checkbox" id="ctGroup" ${ct.group?'checked':''}>Şirkete Göre Grupla</label>
       <button type="button" class="primary" id="ctAdd">+ Yeni Kişi</button><span id="ctState" role="status"></span></span></h3>
-    <div class="scroll"><table class="portfolio ct-tbl"><thead><tr>${CT_COLS.map(([k,l])=>`<th>${l}</th>`).join('')}<th></th></tr></thead><tbody id="ctRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div></section>`;
+    <div class="scroll"><table class="portfolio ct-tbl m-cards"><thead><tr>${CT_COLS.map(([k,l])=>`<th>${l}</th>`).join('')}<th></th></tr></thead><tbody id="ctRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div></section>`;
   if(ct.loaded)paintContacts();
   try{await loadContacts();}catch(e){if(view==='contacts')ctState(e.message,true);return;}
   if(view==='contacts')paintContacts();
@@ -2796,7 +2861,7 @@ function paintFiles(){
     <div id="flUploads"></div>
     ${fl.folders.map(name=>{const list=by[name]||[],open=fl.collapsed[name]===undefined?list.length>0:!fl.collapsed[name];
       return `<div class="fl-folder${list.length?'':' empty'}" data-flfolder="${esc(name)}"><div class="fl-head"><button type="button" class="ct-tg" data-fltg="${esc(name)}" aria-expanded="${open}" aria-label="${esc(name)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><strong>${esc(name)}</strong><small>${list.length} dosya</small><button type="button" class="ghost pick-btn" data-flup="${esc(name)}">Yükle</button></div>
-      ${open&&list.length?`<div class="scroll"><table class="yearly fl-tbl"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${list.map(flRowHtml).join('')}</tbody></table></div>`:''}</div>`;}).join('')}`;
+      ${open&&list.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${list.map(flRowHtml).join('')}</tbody></table></div>`:''}</div>`;}).join('')}`;
   paintUploads();
 }
 async function flUploadFiles(folder,fileList){
@@ -2916,7 +2981,7 @@ async function renderNotifs(){
       <label class="lchk nt-own"><input type="checkbox" id="ntOwn" ${bell.own?'checked':''}>Kendi güncellemelerimi göster</label>
       <select id="ntSite" aria-label="Proje"><option value="">Tüm projeler</option>${siteOptions('')}</select>
       <button type="button" id="ntClear" class="ghost" hidden>Filtreyi Temizle</button></span></h3>
-    <div class="scroll"><table class="portfolio loctbl notif-tbl"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Proje Kodu</th><th>Proje</th><th>Alan</th><th>Eski Değer</th><th>Yeni Değer</th></tr></thead><tbody id="notifRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
+    <div class="scroll"><table class="portfolio loctbl notif-tbl m-cards"><thead><tr><th>Zaman</th><th>Kullanıcı</th><th>Proje Kodu</th><th>Proje</th><th>Alan</th><th>Eski Değer</th><th>Yeni Değer</th></tr></thead><tbody id="notifRows"><tr><td colspan="7" class="note" style="padding:24px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
     <div class="row-actions"><button type="button" id="bellRead" hidden>Tümünü Okundu Say</button></div></section>`;
   paintNotifRows();
   await pollBell(true);
