@@ -482,6 +482,7 @@ button.mt-chip.link{cursor:pointer;font-family:inherit}button.mt-chip.link:hover
   #view[data-sub="info"] [data-tab]:not([data-tab="info"]),
   #view[data-sub="units"] [data-tab]:not([data-tab="units"]),
   #view[data-sub="infra"] [data-tab]:not([data-tab="infra"]),
+  #view[data-sub="comp"] [data-tab]:not([data-tab="comp"]),
   #view[data-sub="credit"] [data-tab]:not([data-tab="credit"]),
   #view[data-sub="check"] [data-tab]:not([data-tab="check"]),
   #view[data-sub="files"] [data-tab]:not([data-tab="files"]){display:none}
@@ -565,6 +566,12 @@ tfoot td{font-weight:700;border-bottom:0;border-top:2px solid var(--hair-strong)
 .units td input:disabled,.units td select:disabled{opacity:.35}
 .units td.w-n input,.tranches td input[type=number]{text-align:right}
 .uinfo{display:block;margin-top:3px;font-size:11.5px;color:var(--muted);line-height:1.35}.uinfo a{color:var(--navy)}
+.grid.infogrid.comp-form{grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:end}
+table.portfolio.comp-tbl{width:100%}
+.comp-act{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}.comp-act button{min-height:38px}
+.comp-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.comp-tbl td small{display:block;color:var(--muted);font-size:11.5px;font-weight:400;white-space:normal}.comp-tbl td:first-child{white-space:normal;min-width:180px;font-weight:600}
+.comp-tbl .live-no{color:var(--muted)}.comp-warn{color:var(--risk)}
 .units td.w-kind{width:140px}.units td.w-n{width:90px}
 .kind-dc{border-left:4px solid var(--dc)}.kind-ac{border-left:4px solid var(--ac)}.kind-cab{border-left:4px solid var(--hair-strong)}
 .tranches td select{min-width:140px}.tranches td input[data-tf=term],.tranches td input[data-tf=rate]{min-width:64px}.tranches td input[data-tf=item]{min-width:170px}.tranches td input[data-tf=amount]{min-width:120px}
@@ -842,6 +849,21 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   table.m-cards.m-cards thead{display:none}
   table.m-cards.m-cards tr{display:block;margin:0 0 10px;padding:8px 12px;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card)}
   .chart{min-width:620px}
+  .grid.infogrid.comp-form{grid-template-columns:minmax(0,1fr)}
+  table.comp-tbl.m-cards.m-cards tbody tr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:10px;align-items:start;padding:12px}
+  table.comp-tbl.m-cards.m-cards td{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:1px;text-align:left;padding:0!important}
+  table.comp-tbl.m-cards.m-cards td::before{flex:none;white-space:nowrap}
+  table.comp-tbl.m-cards.m-cards td:nth-child(1){grid-column:1/-1;grid-row:1;font-size:15px;font-weight:700;margin-bottom:8px}
+  table.comp-tbl.m-cards.m-cards td:nth-child(1)::before{display:none}
+  table.comp-tbl.m-cards.m-cards td:nth-child(2){grid-column:1/3;grid-row:2}
+  table.comp-tbl.m-cards.m-cards td:nth-child(3){grid-column:3;grid-row:2}
+  table.comp-tbl.m-cards.m-cards td:nth-child(4){grid-column:4;grid-row:2}
+  table.comp-tbl.m-cards.m-cards td:is(:nth-child(5),:nth-child(6),:nth-child(7),:nth-child(8)){grid-row:3;margin-top:10px;padding-top:8px!important;border-top:1px solid var(--hair)}
+  table.comp-tbl.m-cards.m-cards td:nth-child(5){grid-column:1}
+  table.comp-tbl.m-cards.m-cards td:nth-child(6){grid-column:2}
+  table.comp-tbl.m-cards.m-cards td:nth-child(7){grid-column:3}
+  table.comp-tbl.m-cards.m-cards td:nth-child(8){grid-column:4}
+  table.comp-tbl.m-cards.m-cards td[colspan]{grid-column:1/-1!important;grid-row:auto!important}
   dialog{max-width:calc(100vw - 16px);max-height:calc(100vh - 16px)}
   table.m-cards.m-cards tr.grp-head{padding:0}
   table.m-cards.m-cards tbody th{display:block;text-align:left;font-weight:700;padding:3px 0 7px!important;margin-bottom:4px;border-bottom:1px solid var(--hair)}
@@ -1766,7 +1788,7 @@ function applyEditState(){
   const v=$('view');if(view!=='site')return;
   v.classList.toggle('ro',!siteEdit);
   v.querySelectorAll('input,select,textarea').forEach(el=>{
-    if(el.closest('.subtabs')||el.closest('.edit-actions')||el.closest('.files-box'))return;
+    if(el.closest('.subtabs')||el.closest('.edit-actions')||el.closest('.files-box')||el.closest('.comp-box'))return;
     if(el.hasAttribute('data-locked')){el.disabled=false;el.readOnly=true;return;}
     el.disabled=!siteEdit||(el.hasAttribute('data-needs-city')&&!cur().city);
   });
@@ -1809,7 +1831,7 @@ document.addEventListener('click',e=>{
 });
 
 function renderSite(){
-  const s=cur();
+  const s=cur();compPrime(s);
   let h=`<div class="site-bar ${siteEdit?'editing':''}">
   <div class="sitetabs subtabs no-print" role="tablist" aria-label="Proje bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" role="tab" data-sub="${k}" aria-pressed="${sub===k}" aria-selected="${sub===k}">${t}</button>`).join('')}${mode==='cloud'?`<button type="button" class="notes-tab" id="notesBtn" aria-pressed="${notesOpen}" title="Şirket içi notlar"><span>Şirket İçi</span><span>Bilgilendirme</span><i class="cnt" id="notesCount" hidden></i></button>`:''}</div>
   <div class="site-head">
@@ -1959,6 +1981,17 @@ function renderSite(){
     <label class="span4">Diğer katılımcılar<input data-sign="others" value="${esc(s.sign.others)}"></label></div></details>
   </section>
 
+  <section class="box comp-box" data-tab="comp"><h3>Rakip Analizi<small>TomTom: çevredeki şarj istasyonları ve anlık doluluk</small></h3>
+    <div class="grid infogrid comp-form no-print">
+      <label>Enlem<input id="compLat" type="text" inputmode="decimal" autocomplete="off" placeholder="41.088204" value="${esc(comp.lat)}"></label>
+      <label>Boylam<input id="compLon" type="text" inputmode="decimal" autocomplete="off" placeholder="29.018024" value="${esc(comp.lon)}"></label>
+      <label>Çap<select id="compRad">${[1000,2000,3000,5000].map(r=>`<option value="${r}" ${r===comp.rad?'selected':''}>${r/1000} km</option>`).join('')}</select></label>
+      <div class="comp-act"><button type="button" class="primary" id="compGo">Analiz Et</button><button type="button" id="compCsv" hidden>Excel'e Aktar (CSV)</button></div>
+    </div>
+    <p class="note" id="compNote"></p>
+    <div id="compOut"></div>
+  </section>
+
   <section class="box files-box" data-tab="files"><h3>Dosyalar<small id="flSummary"></small></h3>
     <div id="flBody"><p class="note">Yükleniyor…</p></div>
     <input type="file" id="flPick" multiple hidden accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.jpg,.jpeg,.png">
@@ -1971,7 +2004,7 @@ function renderSite(){
   updateDerived();
   applyEditState();
   paintNotesBadge();if(mode==='cloud'&&notesFor!==activeId)loadNotes(activeId);
-  initFiles();
+  initFiles();compPaint();
 }
 function unitRow(u){
   const cab=u.kind==='CAB',cls=u.kind==='DC'?'kind-dc':cab?'kind-cab':'kind-ac';
@@ -2133,8 +2166,8 @@ $('view').addEventListener('input',e=>{
 let sub='ovw',fsub='ozet',psub='ozet';
 const PORT_TABS=[['ozet','Özet'],['sonuc','Detaylı Sonuçlar ve Notlar']];
 const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yapısı'],['sonuc','Detaylı Sonuçlar']];
-const SITE_SUBS=['info','units','infra','credit','check','files'],PORT_SUBS=['ovw','port'];
-const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
+const SITE_SUBS=['info','units','infra','comp','credit','check','files'],PORT_SUBS=['ovw','port'];
+const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['comp','Rakip Analizi'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
   const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
@@ -3048,6 +3081,52 @@ document.addEventListener('click',async e=>{
   bell.site='';const sel=$('ntSite');if(sel)sel.value='';$('ntClear').hidden=true;await pollBell(true);
 });
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#notifRows [data-bellact]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click();}});
+
+/* ---------- Rakip Analizi (TomTom, anlık) ---------- */
+const comp={site:'',lat:'',lon:'',rad:3000,res:null,busy:false};
+function parseGps(v){const s=String(v||''),m=s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(?:[?&](?:q|ll|query|destination)=)(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[,; ]\s*(-?\d{1,3}\.\d{3,})/);return m?[m[1],m[2]]:null;}
+// Proje değişince alanlar GPS bilgisinden doldurulur; aynı projede kullanıcının yazdığı değerler korunur.
+function compPrime(s){if(comp.site===s.id)return;comp.site=s.id;const g=parseGps(s.survey&&s.survey.gps);comp.lat=g?g[0]:'';comp.lon=g?g[1]:'';comp.rad=3000;comp.res=null;}
+const compNum=v=>String(v||'').trim().replace(',','.');
+function compPaint(){
+  const out=$('compOut'),note=$('compNote'),csv=$('compCsv');if(!out)return;
+  const r=comp.res;
+  if(csv)csv.hidden=!r;
+  if(!r){out.innerHTML='';if(note&&!note.textContent)note.textContent=comp.lat?'':'Koordinat bulunamadı. Altyapı & Güç sekmesindeki GPS alanına koordinat yazın (ör. 41.088204, 29.018024) ya da buraya girin.';return;}
+  const T=r.totals,tm=new Date(r.fetchedAt).toLocaleTimeString(LOC,{hour:'2-digit',minute:'2-digit'});
+  const k=(l,v,sm)=>`<div class="mk"><span>${l}</span><strong>${v}${sm?`<small>${sm}</small>`:''}</strong></div>`;
+  const rows=r.stations.map(s=>`<tr><td>${esc(s.name)}<small>${esc(s.address)}</small></td><td>${esc(s.operator)||'—'}</td><td class="num">${nf.format(s.distance)} m</td><td>${esc(s.kind)||'—'}</td><td class="num">${s.maxKw?nf.format(s.maxKw)+' kW':'—'}</td><td class="num">${s.sockets||'—'}</td><td class="num ${s.live?'':'live-no'}">${s.live?s.available:'—'}</td><td class="num ${s.live?'':'live-no'}">${s.live?s.occupied:'—'}</td></tr>`).join('');
+  out.innerHTML=`<div class="comp-sum">${k('Toplam İstasyon',T.stations)}${k('Toplam Soket',T.sockets)}${k('Boş Soket',T.liveSockets?T.available:'—')}${k('Dolu Soket',T.liveSockets?T.occupied:'—')}${k('Doluluk',T.occupancyPct==null?'—':df.format(T.occupancyPct),T.occupancyPct==null?'':'%')}</div>
+  <p class="note">Veri ${esc(tm)} anında alındı; TomTom doluluğu yaklaşık 3 dakikada bir günceller. Anlık görüntüdür, tarihsel kayıt tutulmaz. Canlı doluluk verisi olan istasyon: ${T.liveStations}/${T.stations}.${T.truncated?' Bölgede '+nf.format(T.totalResults)+' istasyon var, en yakın 100 tanesi gösteriliyor.':''}${T.skipped?' Kota koruması için '+T.skipped+' istasyonun doluluğu sorgulanmadı.':''}${T.failed?' '+T.failed+' istasyonun doluluğu alınamadı.':''}${r.usage?' Bugünkü TomTom isteği: '+nf.format(r.usage.used)+'/'+nf.format(r.usage.limit)+'.':''}</p>
+  <div class="scroll"><table class="portfolio comp-tbl m-cards"><thead><tr><th>İstasyon</th><th>İşletmeci</th><th class="num">Mesafe</th><th>Tip</th><th class="num">Güç</th><th class="num">Soket</th><th class="num">Boş</th><th class="num">Dolu</th></tr></thead><tbody>${rows||'<tr><td colspan="8" class="note" style="padding:20px;text-align:center">Bu çapta şarj istasyonu bulunamadı.</td></tr>'}</tbody></table></div>`;
+}
+async function compRun(){
+  if(comp.busy)return;const s=cur(),note=$('compNote');
+  const lat=compNum($('compLat').value),lon=compNum($('compLon').value),rad=+$('compRad').value;
+  comp.lat=$('compLat').value;comp.lon=$('compLon').value;comp.rad=rad;
+  if(!(+lat>=-90&&+lat<=90&&lat!=='')||!(+lon>=-180&&+lon<=180&&lon!=='')){note.textContent='Geçerli bir enlem ve boylam girin (ör. 41.088204 ve 29.018024).';note.className='note comp-warn';return;}
+  if(mode!=='cloud'){note.textContent='Rakip analizi için sunucu bağlantısı gerekli.';note.className='note comp-warn';return;}
+  comp.busy=true;const b=$('compGo');b.disabled=true;b.textContent='Çekiliyor…';note.textContent='';note.className='note';
+  try{
+    const r=await fetch('/api/sites?'+new URLSearchParams({ev:'1',lat,lon,radius:String(rad)}),{credentials:'same-origin'});
+    if(r.status===401){location.replace('/login.html');return;}
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.error||'HTTP '+r.status);
+    if(cur()&&cur().id===s.id){comp.res=d;compPaint();}
+  }catch(e){note.textContent=e.message;note.className='note comp-warn';comp.res=null;compPaint();}
+  finally{comp.busy=false;const b2=$('compGo');if(b2){b2.disabled=false;b2.textContent='Analiz Et';}}
+}
+function compCsv(){
+  const r=comp.res;if(!r)return;const s=cur();
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const head=['İstasyon','İşletmeci','Adres','Mesafe (m)','Tip','Maks. Güç (kW)','Soket','Boş','Dolu','Rezerve','Arızalı','Canlı Veri','Enlem','Boylam'];
+  const lines=[head.map(q).join(';')].concat(r.stations.map(x=>[x.name,x.operator,x.address,x.distance,x.kind,x.maxKw,x.sockets,x.live?x.available:'',x.live?x.occupied:'',x.live?x.reserved:'',x.live?x.outOfService:'',x.live?'Evet':'Hayır',x.lat,x.lon].map(q).join(';')));
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='rakip-analizi-'+((s&&s.code)||'proje')+'-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+document.addEventListener('click',e=>{if(e.target.closest('#compGo'))compRun();else if(e.target.closest('#compCsv'))compCsv();});
+document.addEventListener('input',e=>{const el=e.target;if(el.id==='compLat')comp.lat=el.value;else if(el.id==='compLon')comp.lon=el.value;else if(el.id==='compRad')comp.rad=+el.value;});
+document.addEventListener('change',e=>{if(e.target.id==='compRad')comp.rad=+e.target.value;});
 
 /* ---------- StarCharge ürün kataloğu ---------- */
 let catType='',catList=[];

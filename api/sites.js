@@ -1,4 +1,5 @@
 // /api/sites — GET (tüm projeler + ekip), PUT (proje upsert), DELETE (?id=)
+// Ek uç noktalar (Hobby planda 12 işlev sınırı nedeniyle burada): GET ?kur=usd (TCMB dolar kuru), GET ?ev=1&lat&lon&radius (TomTom çevre şarj istasyonları, anlık)
 import { sql, ensureSchema, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
@@ -6,9 +7,11 @@ import { seedOnce } from '../lib/seed.js';
 import { nextCode, backfillCodes } from '../lib/codes.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
+import { analyze, validArea, maxRequests } from '../lib/tomtom.js';
 
 // TCMB günlük kurlar: USD döviz satış kuru, 3 saat önbellekte tutulur.
 let usdCache = null;
+const evCache = new Map();  // TomTom analiz önbelleği (3 dk; sıcak işlev örneğinde)
 async function usdSelling() {
   if (usdCache && Date.now() - usdCache.at < 3 * 3600e3) return usdCache;
   const r = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml', { signal: AbortSignal.timeout(8000) });
@@ -38,6 +41,35 @@ export default async function handler(req, res) {
     }
     await ensureSchema();
     const s = sql();
+
+    // TomTom çevre şarj istasyonu analizi (anlık; kayıt tutulmaz). Ücretsiz katman günde 2.500 istek: günlük sayaç ve 3 dk önbellek ile korunur.
+    if (req.method === 'GET' && req.query?.ev === '1') {
+      const area = validArea(req.query);
+      if (!area) return res.status(400).json({ error: 'Geçersiz konum veya yarıçap (500–5000 m)' });
+      const key = process.env.TOMTOM_API_KEY;
+      if (!key) return res.status(503).json({ error: 'TomTom anahtarı tanımlı değil (Vercel ortam değişkeni TOMTOM_API_KEY)' });
+      res.setHeader('cache-control', 'no-store');
+      const ck = `${area.lat.toFixed(4)},${area.lon.toFixed(4)},${area.radius}`;
+      const hit = evCache.get(ck);
+      if (hit && Date.now() - hit.at < 3 * 60e3) return res.status(200).json({ ...hit.data, cached: true });
+      const day = new Date().toISOString().slice(0, 10);
+      const limit = Number(process.env.TOMTOM_DAILY_LIMIT) || 2000;
+      const u = await s`SELECT data FROM config WHERE key = 'tomtom_usage'`;
+      const used = u[0]?.data?.day === day ? Number(u[0].data.n) || 0 : 0;
+      if (used + maxRequests() > limit) return res.status(429).json({ error: 'Günlük TomTom kotası doldu; yarın yeniden deneyin', used, limit });
+      let data;
+      try {
+        data = await analyze({ ...area, key });
+      } catch (e) {
+        return res.status(e.status === 503 ? 503 : 502).json({ error: e.status === 403 || e.status === 401 ? 'TomTom anahtarı geçersiz veya yetkisiz' : e.status === 429 ? 'TomTom kotası doldu' : 'TomTom verisi alınamadı' });
+      }
+      await s`INSERT INTO config (key, data) VALUES ('tomtom_usage', ${JSON.stringify({ day, n: data.requests })}::jsonb)
+        ON CONFLICT (key) DO UPDATE SET data = jsonb_build_object('day', ${day}::text, 'n', (CASE WHEN config.data->>'day' = ${day} THEN (config.data->>'n')::int ELSE 0 END) + ${data.requests}::int)`;
+      data.usage = { used: used + data.requests, limit };
+      evCache.set(ck, { at: Date.now(), data });
+      if (evCache.size > 200) evCache.delete(evCache.keys().next().value);
+      return res.status(200).json(data);
+    }
 
     if (req.method === 'GET') {
       try { await seedOnce(s); } catch { /* başlangıç listesi eklenemezse okuma bozulmasın */ }
