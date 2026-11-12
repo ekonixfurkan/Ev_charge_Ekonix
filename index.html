@@ -512,6 +512,9 @@ button.mt-chip.link{cursor:pointer;font-family:inherit}button.mt-chip.link:hover
 .info-pair.stretch .info-col>.box:last-child{flex:1}
 .info-pair.stretch>.box{display:flex;flex-direction:column}
 .info-pair.stretch>.box>.grid{flex:none}
+.rate-row{display:flex;gap:6px;margin-top:5px;font-weight:400;text-transform:none;letter-spacing:0}
+.rate-row input{flex:1;min-width:0}
+.rate-row button{flex:none;white-space:nowrap}
 .notes-fill{display:flex;flex-direction:column;flex:1;margin-top:14px}
 .notes-fill textarea{flex:1;min-height:64px}
 .info-col{display:flex;flex-direction:column;gap:16px;min-width:0}
@@ -1761,7 +1764,7 @@ function renderSite(){
     ${sv('voltage','Gerilim (V)','number')}${sv('connPoint','Bağlantı noktası yeri')}
     ${sel('bess','BESS',[['req','Gerekli'],['opt','Opsiyonel'],['na','Uygulanamaz']])}${chk('pave','Zemin / inşaat işleri',' class="span4"')}
     ${chk('lay','Kablo döşeme',' class="span4"')}${sv('cableM','İstasyona kablo mesafesi (m)','number')}
-    ${sv('usdTry','Dolar kuru (₺)','number')}${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}
+    <label>Dolar kuru (₺)<span class="rate-row"><input data-sv="usdTry" type="number" min="0" step="any" inputmode="decimal" value="${esc(s.survey.usdTry??'')}"><button type="button" class="ghost" id="fetchUsd" ${siteEdit?'':'disabled'} title="TCMB günlük döviz satış kuru">Güncel Kuru Al</button></span></label>${sv('tariffTl','Elektrik tarifesi (₺/kWh) (KDV dahildir)','number')}
     ${chk('pvpot','PV potansiyeli',' class="span4"')}${chk('exist','Mevcut güvenlik',' class="span4"')}
   </div>
   <label class="notes-fill">Ek notlar<textarea data-sv="supp" rows="2">${esc(s.survey.supp)}</textarea></label></section>
@@ -1932,6 +1935,9 @@ $('view').addEventListener('click',e=>{
   const s=cur();if(!s||view!=='site')return;
   if(!siteEdit&&e.target.closest(MUTATORS))return;
   const pre=e.target.closest('[data-preset]');if(pre){applyPreset(s,pre.dataset.preset);touched(s);renderTranches();updateDerived();toast('Finansman yapısı uygulandı; tutarları kontrol edin.');return;}
+  if(e.target.id==='fetchUsd'){if(!siteEdit)return;const b=e.target;b.disabled=true;
+    api('/sites?kur=usd').then(r=>{const inp=document.querySelector('[data-sv="usdTry"]');inp.value=r.rate;inp.dispatchEvent(new Event('input',{bubbles:true}));toast('Dolar kuru güncellendi: '+nf.format(r.rate)+' ₺ (TCMB'+(r.date?', '+r.date:'')+')');})
+      .catch(()=>toast('Kur alınamadı; elle girin.')).finally(()=>{b.disabled=!siteEdit;});return;}
   if(e.target.id==='addTr'){s.tranches.push(tranche('Şebeke bağlantısı'));touched(s);renderTranches();updateDerived();return;}
   const dtr=e.target.closest('[data-deltr]');if(dtr){s.tranches=s.tranches.filter(t=>t.id!==dtr.dataset.deltr);touched(s);renderTranches();updateDerived();return;}
   if(e.target.id==='applyAll'){const keys=[],fin=$('apFin').checked;if($('apShare').checked)keys.push('share','entShare','starShare','ekoShare','fundShare','partnerShare');if($('apPrice').checked)keys.push('sale','cost','saleGrowth','costGrowth');if($('apUsage').checked)keys.push('initial','growth');

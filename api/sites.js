@@ -7,10 +7,35 @@ import { nextCode, backfillCodes } from '../lib/codes.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
 
+// TCMB günlük kurlar: USD döviz satış kuru, 3 saat önbellekte tutulur.
+let usdCache = null;
+async function usdSelling() {
+  if (usdCache && Date.now() - usdCache.at < 3 * 3600e3) return usdCache;
+  const r = await fetch('https://www.tcmb.gov.tr/kurlar/today.xml', { signal: AbortSignal.timeout(8000) });
+  if (!r.ok) throw new Error('TCMB ' + r.status);
+  const xml = await r.text();
+  const blk = xml.match(/<Currency[^>]*Kod="USD"[\s\S]*?<\/Currency>/)?.[0] || '';
+  const rate = parseFloat(blk.match(/<ForexSelling>([\d.]+)<\/ForexSelling>/)?.[1]);
+  if (!(rate > 0)) throw new Error('Kur okunamadı');
+  const date = xml.match(/<Tarih_Date[^>]*\sTarih="([^"]+)"/)?.[1] || '';
+  usdCache = { rate, date, at: Date.now() };
+  return usdCache;
+}
+
 export default async function handler(req, res) {
   try {
     const user = await requireAuth(req, res);
     if (!user) return;
+
+    if (req.method === 'GET' && req.query?.kur === 'usd') {
+      try {
+        const k = await usdSelling();
+        res.setHeader('cache-control', 'no-store');
+        return res.status(200).json({ rate: k.rate, date: k.date, source: 'TCMB' });
+      } catch {
+        return res.status(502).json({ error: 'Kur alınamadı' });
+      }
+    }
     await ensureSchema();
     const s = sql();
 
