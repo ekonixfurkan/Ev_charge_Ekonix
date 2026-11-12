@@ -1881,12 +1881,6 @@ function updateDerived(){
   if(s.autoClosed&&s.status==='ddfailed')a+=`<div class="alert warn">Skor ${sc.label} (75 altı) olduğu için durum otomatik “Uygun Değil” yapıldı. Skor 75’e çıkarsa Aktif’e döner; Durum’u elle de değiştirebilirsiniz.</div>`;
   else if(sc.v!=null&&sc.v<75&&isOpen(s))a+=`<div class="alert warn">Skor ${sc.label}; 75 altı. Sahayla devam edilip edilmeyeceği değerlendirilmeli.</div>`;
   if((s.blockerTr||s.blocker)&&isOpen(s))a+=`<div class="alert warn">Engel: ${esc(s.blockerTr||s.blocker)}</div>`;
-  const todo=[];
-  if(!s.units.length)todo.push('Şarj Üniteleri');
-  if(!(+s.gridKva)&&!(+s.survey.availKw))todo.push('Altyapı & Güç');
-  if(!totalFin(s))todo.push('Finansman');
-  if(!d.done&&!Object.values(s.dd||{}).some(x=>x&&(x.v||x.note)))todo.push('Skor Hesaplama');
-  if(todo.length&&s.stage>='03'&&isOpen(s))a+=`<div class="alert warn">Girilmesi gereken bölümler: ${todo.map(esc).join(', ')}. Lütfen giriniz.</div>`;
   if(shareTotal(s.fin)>100)a+=`<div class="alert">Gelir paylaşımı toplamı %100'ü aşıyor.</div>`;
   renderFin();
   $('ddAlerts').innerHTML=a;

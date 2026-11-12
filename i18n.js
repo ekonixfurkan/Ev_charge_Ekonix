@@ -343,7 +343,7 @@
     'Lokasyon oluşturuldu': 'Project created', 'Lokasyon oluşturuldu (başlangıç listesi)': 'Project created (initial list)', 'Lokasyon silindi': 'Project deleted', 'Lokasyon sayfası açıldı': 'Project page opened',
     'Lokasyon Adı': 'Project Name', 'Lokasyon Önerisi': 'Project Proposal', '01 Lokasyon Önerisi': '01 Project Proposal', 'Yeni lokasyon eklendi': 'New project added',
     /* yazdırma / diğer */
-    'Proje Raporu': 'Project Report', 'Girilmesi gereken bölümler': 'Sections to complete',
+    'Proje Raporu': 'Project Report',
     'Pay toplamı %100\'ü aşan projeler toplama dahil edilmedi': 'Projects whose share total exceeds 100% were excluded from the sum'
   };
 
@@ -415,7 +415,6 @@
     [/^(\d+) projeye uygulandı\.$/, function (m) { return 'Applied to ' + m[1] + ' project' + (m[1] === '1' ? '' : 's') + '.'; }],
     [/^Skor (\d+(?:,\d+)?) \(75 altı\) olduğu için durum otomatik “Uygun Değil” yapıldı\. Skor 75’e çıkarsa Aktif’e döner; Durum’u elle de değiştirebilirsiniz\.$/, function (m) { return 'Because the score is ' + m[1] + ' (below 75), the status was automatically set to “DD Failed”. If the score rises to 75 it returns to Active; you can also change Status by hand.'; }],
     [/^Skor (\d+(?:,\d+)?); 75 altı\. Sahayla devam edilip edilmeyeceği değerlendirilmeli\.$/, function (m) { return 'Score ' + m[1] + '; below 75. Decide whether to continue with this site.'; }],
-    [/^Girilmesi gereken bölümler: (.+)\. Lütfen giriniz\.$/, function (m) { return 'Sections to complete: ' + m[1].split(', ').map(sub).join(', ') + '. Please fill them in.'; }],
     [/^Engel: (.+) uygun değil\.$/, function (m) { return 'Blocker: ' + m[1].split(', ').map(sub).join(', ') + ' not suitable.'; }],
     [/^Pay toplamı %100'ü aşan projeler toplama dahil edilmedi: (.+)\.$/, function (m) { return 'Projects whose share total exceeds 100% were excluded from the sum: ' + m[1] + '.'; }],
     [/^Gelir paylaşımı toplamı %100'ü aşıyor\.$/, function () { return 'Revenue share total exceeds 100%.'; }],
