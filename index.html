@@ -3134,8 +3134,8 @@ const comp={site:'',lat:'',lon:'',rad:3000,res:null,busy:false,pick:''};
 function compSectionHtml(standalone){
   return `<section class="box comp-box"${standalone?'':' data-tab="comp"'}><h3>Rakip Analizi<small>TomTom: çevredeki şarj istasyonları ve anlık doluluk</small></h3>${standalone?`<div class="grid infogrid comp-pick no-print"><label class="span4">Proje seç<select id="compPick"><option value="">Seçin (isteğe bağlı)</option>${db.sites.map(x=>`<option value="${esc(x.id)}" ${x.id===comp.pick?'selected':''}>${esc((x.code?x.code+' · ':'')+x.name)}</option>`).join('')}</select></label></div>`:''}
     <div class="grid infogrid comp-form no-print">
-      <label>Enlem<input id="compLat" type="text" inputmode="decimal" autocomplete="off" placeholder="41.088204" value="${esc(comp.lat)}"></label>
-      <label>Boylam<input id="compLon" type="text" inputmode="decimal" autocomplete="off" placeholder="29.018024" value="${esc(comp.lon)}"></label>
+      <label>Enlem<input id="compLat" type="text" inputmode="decimal" autocomplete="off" placeholder="41.088204 ya da 41°00'23.9&quot;N" value="${esc(comp.lat)}"></label>
+      <label>Boylam<input id="compLon" type="text" inputmode="decimal" autocomplete="off" placeholder="29.018024 ya da 28°50'29.0&quot;E" value="${esc(comp.lon)}"></label>
       <label>Çap<select id="compRad">${[1000,2000,3000,5000].map(r=>`<option value="${r}" ${r===comp.rad?'selected':''}>${r/1000} km</option>`).join('')}</select></label>
       <div class="comp-act"><button type="button" class="primary" id="compGo">Analiz Et</button><button type="button" id="compCsv" hidden>Excel'e Aktar (CSV)</button></div>
     </div>
@@ -3152,10 +3152,46 @@ function renderRakip(){
   $('view').innerHTML=compSectionHtml(true);
   applyEditState();compPaint();compKeyLoad();
 }
-function parseGps(v){const s=String(v||''),m=s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(?:[?&](?:q|ll|query|destination)=)(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[,; ]\s*(-?\d{1,3}\.\d{3,})/);return m?[m[1],m[2]]:null;}
+/* Koordinat okuma: ondalık (41.088204), derece-dakika-saniye (41°00'23.9"N 28°50'29.0"E), tek alanda ikisi birden */
+function dmsTokens(str){
+  const s=String(str||'').replace(/[′’‘`´]/g,"'").replace(/[″”“]/g,'"').replace(/[º˚]/g,'°');
+  const re=/([NSEWnsew])?\s*(\d{1,3}(?:[.,]\d+)?)\s*°\s*(?:(\d{1,2}(?:[.,]\d+)?)\s*'\s*(?:(\d{1,2}(?:[.,]\d+)?)\s*(?:"|'')?)?)?\s*([NSEWnsew])?/g;
+  const out=[];let m;
+  while((m=re.exec(s))){
+    const n=x=>x==null?0:parseFloat(String(x).replace(',','.'));
+    const deg=n(m[2]),min=n(m[3]),sec=n(m[4]);
+    if(min>=60||sec>=60)continue;
+    const h=(m[1]||m[5]||'').toUpperCase(),sign=h==='S'||h==='W'?-1:1;
+    out.push({v:sign*(deg+min/60+sec/3600),axis:h==='N'||h==='S'?'lat':h==='E'||h==='W'?'lon':''});
+  }
+  return out;
+}
+const r6=v=>String(Math.round(v*1e6)/1e6);
+// [enlem, boylam] ya da null; hem "41°..N 28°..E" hem "41.0066, 28.8414" biçimini tek metinden çıkarır
+function coordPair(str){
+  const d=dmsTokens(str);
+  if(d.length>=2){let a=d[0],b=d[1];if(a.axis==='lon'||b.axis==='lat'){const x=a;a=b;b=x;}return [r6(a.v),r6(b.v)];}
+  const m=String(str||'').match(/^\s*(-?\d{1,3}[.,]\d+)\s*[,;\s]\s*(-?\d{1,3}[.,]\d+)\s*$/);
+  return m?[r6(+m[1].replace(',','.')),r6(+m[2].replace(',','.'))]:null;
+}
+// Tek bir alan: ondalık ya da derece-dakika-saniye → ondalık metin; anlaşılmazsa null
+function coordOne(str){
+  const d=dmsTokens(str);if(d.length===1)return r6(d[0].v);
+  const m=String(str||'').match(/^\s*(-?\d{1,3}(?:[.,]\d+)?)\s*$/);return m?m[1].replace(',','.'):null;
+}
+function parseGps(v){const s=String(v||''),m=s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(?:[?&](?:q|ll|query|destination)=)(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[,; ]\s*(-?\d{1,3}\.\d{3,})/);if(m)return [m[1],m[2]];const d=dmsTokens(s);return d.length>=2?coordPair(s):null;}
 // Proje değişince alanlar GPS bilgisinden doldurulur; aynı projede kullanıcının yazdığı değerler korunur.
 function compPrime(s){if(comp.site===s.id)return;comp.site=s.id;const g=parseGps(s.survey&&s.survey.gps);comp.lat=g?g[0]:'';comp.lon=g?g[1]:'';comp.rad=3000;comp.res=null;}
 const compNum=v=>String(v||'').trim().replace(',','.');
+function compNormalize(){
+  const la=$('compLat'),lo=$('compLon');if(!la||!lo)return false;
+  const pair=coordPair(la.value)||coordPair(lo.value);let changed=false;
+  if(pair){la.value=pair[0];lo.value=pair[1];changed=true;}
+  else{const a=coordOne(la.value),b=coordOne(lo.value);if(a!=null&&a!==la.value.trim()){la.value=a;changed=true;}if(b!=null&&b!==lo.value.trim()){lo.value=b;changed=true;}}
+  comp.lat=la.value;comp.lon=lo.value;
+  const n=$('compNote');if(changed&&n){n.textContent='Koordinat ondalık dereceye çevrildi: '+la.value+', '+lo.value;n.className='note';}
+  return changed;
+}
 function compPaint(){
   const out=$('compOut'),note=$('compNote'),csv=$('compCsv');if(!out)return;
   const r=comp.res;
@@ -3170,6 +3206,7 @@ function compPaint(){
 }
 async function compRun(){
   if(comp.busy)return;const sid=cur()?cur().id:'',view0=view,note=$('compNote');
+  compNormalize();
   const lat=compNum($('compLat').value),lon=compNum($('compLon').value),rad=+$('compRad').value;
   comp.lat=$('compLat').value;comp.lon=$('compLon').value;comp.rad=rad;
   if(!(+lat>=-90&&+lat<=90&&lat!=='')||!(+lon>=-180&&+lon<=180&&lon!=='')){note.textContent='Geçerli bir enlem ve boylam girin (ör. 41.088204 ve 29.018024).';note.className='note comp-warn';return;}
@@ -3218,7 +3255,9 @@ document.addEventListener('click',async e=>{
   finally{btn.disabled=false;}
 });
 document.addEventListener('input',e=>{const el=e.target;if(el.id==='compLat')comp.lat=el.value;else if(el.id==='compLon')comp.lon=el.value;else if(el.id==='compRad')comp.rad=+el.value;});
+document.addEventListener('paste',e=>{if(e.target.id==='compLat'||e.target.id==='compLon')setTimeout(compNormalize,0);});
 document.addEventListener('change',e=>{
+  if(e.target.id==='compLat'||e.target.id==='compLon'){compNormalize();return;}
   if(e.target.id==='compRad')comp.rad=+e.target.value;
   else if(e.target.id==='compPick'){
     const s=db.sites.find(x=>x.id===e.target.value);comp.pick=e.target.value;const n=$('compNote');
