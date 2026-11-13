@@ -1623,7 +1623,7 @@ function sumOf(list){
 const mkTile=(l,v,u)=>`<div class="mk"><span>${l}</span><strong>${v}${u?`<small>${u}</small>`:''}</strong></div>`;
 function kpiTilesHtml(T,n){return (n!=null?mkTile('Proje Sayısı',n):'')+mkTile('DC Ünite',T.dcU)+mkTile('AC Ünite',T.acU)+mkTile('Toplam Ünite',T.dcU+T.acU)+mkTile('Toplam Soket',T.sock)+mkTile('Toplam Güç',nf.format(T.dcKw+T.acKw),'kW');}
 /* ---------- Proje grupları: seçilen projeler bir başlık altında listelenir (s.group); başlık satırında grubun toplamları ---------- */
-let grp={on:false,sel:new Set(),closed:new Set()};
+let grp={on:false,sel:new Set(),closed:new Set(),target:''};  // target: var olan bir gruba proje eklenirken o grubun adı
 const grpOf=s=>String(s.group||'').trim();
 // Gruplu projeler, sıralamada ilk üyenin bulunduğu yerde art arda dizilir.
 function arrangeGroups(list){
@@ -1635,7 +1635,7 @@ function grpHeadHtml(g,all){
   const m=all.filter(x=>grpOf(x)===g),T=sumOf(m),open=!grp.closed.has(g);
   return `<tr class="grp-head" data-grp="${esc(g)}" tabindex="0" aria-expanded="${open}"><td colspan="6"><span class="grp-chev" aria-hidden="true">${open?'▾':'▸'}</span><span class="grp-name">${esc(g)}</span><small>${m.length} proje</small></td>
     <td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td>
-    <td><button type="button" class="ghost grp-x" data-grpdel="${esc(g)}" title="Grubu dağıt (projeler silinmez)">Grubu Dağıt</button></td></tr>`;
+    <td><button type="button" class="ghost grp-x" data-grpadd="${esc(g)}" title="Bu gruba yeni proje ekle">Proje Ekle</button> <button type="button" class="ghost grp-x" data-grpdel="${esc(g)}" title="Grubu dağıt (projeler silinmez)">Grubu Dağıt</button></td></tr>`;
 }
 function locRowsHtml(rows,all=rows){
   let prev=null,h='';
@@ -1655,7 +1655,7 @@ function locRowsHtml(rows,all=rows){
 function paintGrpBar(){
   const t=$('grpToggle'),go=$('grpGo');if(!t||!go)return;
   t.setAttribute('aria-pressed',String(grp.on));t.textContent=grp.on?'Seçimi Kapat':'Gruplandır';
-  go.hidden=!(grp.on&&grp.sel.size>0);go.textContent=`Seçilenleri Gruplandır (${grp.sel.size})`;
+  go.hidden=!(grp.on&&grp.sel.size>0);go.textContent=grp.target?`Seçilenleri "${grp.target}" Grubuna Ekle (${grp.sel.size})`:`Seçilenleri Gruplandır (${grp.sel.size})`;
 }
 function openGrpDlg(){
   const names=[...new Set(db.sites.map(grpOf).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));
@@ -1663,19 +1663,21 @@ function openGrpDlg(){
   $('grpName').value='';$('grpErr').hidden=true;$('grpInfo').textContent=`${grp.sel.size} proje seçildi. Grup başlığını yazın; var olan bir başlığı yazarsanız projeler o gruba eklenir.`;
   $('grpDlg').showModal();$('grpName').focus();
 }
-function saveGrp(){
-  const name=$('grpName').value.replace(/\s+/g,' ').trim().slice(0,60);
+function saveGrp(fixed){
+  const name=(fixed||$('grpName').value).replace(/\s+/g,' ').trim().slice(0,60);
   if(!name){$('grpErr').textContent='Grup başlığı gerekli.';$('grpErr').hidden=false;return;}
   let n=0;db.sites.forEach(s=>{if(grp.sel.has(s.id)&&grpOf(s)!==name){s.group=name;touched(s);n++;}});
-  $('grpDlg').close();grp.sel.clear();grp.on=false;grp.closed.delete(name);
+  if($('grpDlg').open)$('grpDlg').close();grp.sel.clear();grp.on=false;grp.target='';grp.closed.delete(name);
   // Gruplu projeler grubun ilk üyesinin yanına dizilir; o sayfada olmayabilir. Listeyi grubun bulunduğu sayfaya götür.
   let at='';{const all=arrangeGroups(visibleSites()),i=all.findIndex(x=>grpOf(x)===name);if(i>=0){pg.loc=Math.floor(i/PAGE_SIZE)+1;at=pg.loc;}}
   paintLocRows();paintGrpBar();pageFx();toast(n?`${n} proje "${name}" grubuna alındı${at?` (${at}. sayfada)`:''}.`:'Seçilen projeler zaten bu grupta.');
 }
 document.addEventListener('click',async e=>{
   if(view!=='locations')return;
-  if(e.target.closest('#grpToggle')){grp.on=!grp.on;if(!grp.on)grp.sel.clear();paintLocRows();paintGrpBar();return;}
-  if(e.target.closest('#grpGo')){if(grp.sel.size)openGrpDlg();return;}
+  if(e.target.closest('#grpToggle')){grp.on=!grp.on;grp.target='';if(!grp.on)grp.sel.clear();paintLocRows();paintGrpBar();return;}
+  if(e.target.closest('#grpGo')){if(grp.sel.size){if(grp.target)saveGrp(grp.target);else openGrpDlg();}return;}
+  const add=e.target.closest('[data-grpadd]');
+  if(add){grp.on=true;grp.target=add.dataset.grpadd;grp.sel.clear();grp.closed.delete(grp.target);paintLocRows();paintGrpBar();toast(`"${grp.target}" grubuna eklemek için projeleri işaretleyin.`);return;}
   if(e.target.closest('#grpSave')){saveGrp();return;}
   if(e.target.closest('#grpCancel')){$('grpDlg').close();return;}
   const del=e.target.closest('[data-grpdel]');
