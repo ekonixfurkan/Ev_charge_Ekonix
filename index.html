@@ -93,13 +93,17 @@ label > input[type=checkbox],label > input[type=radio]{margin-top:0}
 /* ---------- Sayfa başlığı ---------- */
 header{background:var(--card);color:var(--ink);border-bottom:1px solid var(--hair);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
 header h1{font-size:20px;font-weight:700}
+.hdr-tools{flex:1 1 520px;min-width:0}
+.hdr-tools:empty{display:none}
+.hdr-tools .locbar{margin:0}
+header{justify-content:flex-start}
 #saveStatus{display:flex;align-items:flex-start;gap:8px;margin:0 4px 10px;padding:7px 10px;border-radius:var(--radius);font-size:11.5px;line-height:1.35;font-weight:600;color:#7fe0a8;background:rgba(95,193,135,.12);border:1px solid rgba(127,224,168,.45)}
 #saveStatus::before{content:"";width:7px;height:7px;margin-top:4px;border-radius:50%;background:currentColor;flex:none}
 #saveStatus.err{color:#ffb0a6;background:rgba(236,122,108,.14);border-color:rgba(255,176,166,.5)}
 #saveStatus.err::before{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}
 @keyframes pulse{50%{opacity:.35}}
 /* Tasarım %75 tarayıcı yakınlaştırmasına göre hazırlandı (MKT Motors'taki uyarının Ekonix karşılığı). */
-.zoom-note{display:none;align-items:center;gap:8px;max-width:30rem;padding:6px 12px;border-radius:var(--radius);font-size:12px;font-weight:600;line-height:1.35;color:var(--no);background:var(--no-soft);border:1px solid color-mix(in srgb,var(--no) 35%,transparent);animation:pulse 2.4s cubic-bezier(.4,0,.6,1) infinite}
+.zoom-note{display:none;align-items:center;justify-content:center;gap:8px;width:100%;max-width:none;box-sizing:border-box;white-space:nowrap;padding:6px 14px;border-radius:0;font-size:12px;font-weight:600;line-height:1.35;color:var(--no);background:var(--no-soft);border:0;border-bottom:1px solid color-mix(in srgb,var(--no) 35%,transparent);animation:pulse 2.4s cubic-bezier(.4,0,.6,1) infinite}
 .zoom-note svg{flex:none}
 @media (min-width:1100px){.zoom-note{display:flex}}
 @media (prefers-reduced-motion:reduce){.zoom-note{animation:none}}
@@ -222,8 +226,11 @@ main{padding:24px 28px;max-width:calc(var(--wrap) + 56px);width:100%}
 @media (min-width:701px){
   body{display:grid;grid-template-columns:256px minmax(0,1fr);grid-template-rows:auto auto 1fr;min-height:100vh}
   .shell{display:contents}
-  aside{grid-column:1;grid-row:1/span 3}
+  body{grid-template-rows:auto auto auto 1fr}
+  .zoom-note{grid-column:1/-1;grid-row:1}
+  aside{grid-column:1;grid-row:2/span 3}
   body>header,.pipeline,main{grid-column:2}
+  body>header{grid-row:2}.pipeline{grid-row:3}main{grid-row:4}
   body{transition:grid-template-columns .3s ease-in-out}
   aside{transition:width .26s cubic-bezier(.4,0,.2,1),box-shadow .26s ease}
   body.sb-collapsed{grid-template-columns:64px minmax(0,1fr)}
@@ -1051,12 +1058,13 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   tr,.kpi{break-inside:avoid}
 }
 </style>
+  <span class="zoom-note" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Web site yakınlaştırma ayarı %75'e göre tasarlanmıştır. Verimli kullanılabilmek adına ayarlarınızı kontrol ediniz.</span>
 <header>
-  <div>
+  <div class="hdr-title">
     <h1 id="pageTitle">Saha Değerlendirme</h1>
     <p class="page-sub" id="pageSub" hidden></p>
   </div>
-  <span class="zoom-note" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Web site yakınlaştırma ayarı %75'e göre tasarlanmıştır. Verimli kullanılabilmek adına ayarlarınızı kontrol ediniz.</span>
+  <div id="hdrTools" class="hdr-tools"></div>
 </header>
 <section class="pipeline" aria-label="Projelerin durum dağılımı">
   <div class="pipe-legend" id="pipeLegend"></div>
@@ -1720,7 +1728,15 @@ function renderLocations(){
     <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl loclist m-cards"><thead><tr><th>Proje Kodu</th><th>Proje</th><th>Aşama</th><th>İl / İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th><th>Güncelleme</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
   paintLocRows();
 }
+// Süzgeç çubuğu (.locbar) sayfa başlığıyla aynı satıra, üst çubuğa taşınır (tüm sayfalarda).
+function dockBar(){
+  const t=$('hdrTools'),v=$('view');if(!t||!v)return;
+  const b=v.querySelector('.locbar');
+  if(b)t.replaceChildren(b);
+}
+new MutationObserver(()=>{if($('view').querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
 function render(){
+  {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
   $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads')?'':sub;
@@ -1730,7 +1746,7 @@ function render(){
   document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='site'||(view==='portfolio'&&sub==='ovw');
   if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
-  setPageTitle();
+  dockBar();setPageTitle();
   saveRoute();
   if(view!=='site'&&notesOpen)closeNotes();
 }
