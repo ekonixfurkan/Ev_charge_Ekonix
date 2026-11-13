@@ -7,7 +7,7 @@ import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
 import { seedOnce } from '../lib/seed.js';
 import { nextCode, backfillCodes } from '../lib/codes.js';
-import { renumberOnce, RENUMBER_MARK } from '../lib/renumber.js';
+import { undoSubcodesOnce } from '../lib/undo-subcodes.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
 import { analyze, validArea, maxRequests, sealKey, openKey, keyLooksValid, testKey } from '../lib/tomtom.js';
@@ -114,27 +114,12 @@ export default async function handler(req, res) {
       return res.status(200).json(data);
     }
 
-    // Sahip hesap tanısı: kod yeniden numaralamasını çalıştırır ve sonucu (ya da hatayı) gösterir. ?renumber=1 (işaret varsa çalıştırmaz), ?renumber=1&force=1 (yeniden çalıştırır).
-    if (req.method === 'GET' && req.query?.renumber) {
-      if (!user.owner) return res.status(403).json({ error: 'Bu işlem yalnızca sahip hesaba açık' });
-      res.setHeader('cache-control', 'no-store');
-      try {
-        if (req.query.force === '1') await s`DELETE FROM config WHERE key = ${RENUMBER_MARK}`;
-        const had = (await s`SELECT data FROM config WHERE key = ${RENUMBER_MARK}`)[0]?.data || null;
-        await renumberOnce(s, true);
-        const after = (await s`SELECT data->>'code' AS code, data->>'name' AS name, data->>'stage' AS stage FROM sites ORDER BY data->>'code' LIMIT 40`);
-        return res.status(200).json({ ok: true, markerBefore: had, sample: after });
-      } catch (e) {
-        return res.status(500).json({ ok: false, error: String(e?.message || e) });
-      }
-    }
-
     if (req.method === 'GET') {
       try { await seedOnce(s); } catch { /* başlangıç listesi eklenemezse okuma bozulmasın */ }
       try { await backfillCodes(s); } catch { /* kod verilemezse okuma bozulmasın */ }
       try { await reorderOnce(s); } catch { /* sıra değişmezse okuma bozulmasın */ }
       try { await swapCodesOnce(s); } catch { /* kodlar değişmezse okuma bozulmasın */ }
-      try { await renumberOnce(s); } catch { /* kodlar değişmezse okuma bozulmasın */ }
+      try { await undoSubcodesOnce(s); } catch { /* geri alma olmazsa okuma bozulmasın */ }
       const rows = await s`SELECT data FROM sites ORDER BY updated_at`;
       const cfg = await s`SELECT data FROM config WHERE key = 'team'`;
       const team = cfg[0]?.data?.names;
