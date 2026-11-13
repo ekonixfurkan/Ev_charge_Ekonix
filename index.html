@@ -1145,8 +1145,8 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
         <label>Uzatma (yıl)<input id="dlgExt" type="number" min="0" step="any" inputmode="decimal"></label>
         <label>Toplam (yıl)<input id="dlgTotal" data-locked readonly tabindex="-1" title="İlk süre ile uzatmanın toplamı"></label>
       </div>
-      <label>İl<select id="dlgCity"></select></label>
-      <label>İlçe<select id="dlgDistrict" disabled></select></label>
+      <label>İl *<select id="dlgCity"></select></label>
+      <label>İlçe *<select id="dlgDistrict" disabled></select></label>
       <label class="span2">Adres<textarea id="dlgAddress" rows="2" maxlength="300"></textarea></label>
       <label>Tarih<input id="dlgDate" type="date"></label>
       <label class="span2">Genel notlar<textarea id="dlgNotes" rows="3" maxlength="2000"></textarea></label>
@@ -2156,12 +2156,20 @@ function openAdd(){guard(()=>{
 });}
 $('addSite').onclick=openAdd;
 $('dlgCancel').onclick=()=>$('dlg').close();
-$('dlgForm').onsubmit=e=>{e.preventDefault();
+$('dlgForm').onsubmit=async e=>{e.preventDefault();
   const v=id=>$(id).value.trim(),name=v('dlgName');
   if(!name){toast('Proje adı zorunlu.');return;}
   const bad=(el,msg)=>{const e=$('dlgErr');e.textContent=I18N.t(msg);e.hidden=false;el.setAttribute('aria-invalid','true');el.focus();};
   if(!v('dlgContact')){bad($('dlgContact'),'İletişim kişisi zorunlu.');return;}
   if(v('dlgPhone').replace(/\D/g,'').replace(/^90/,'').length!==10){bad($('dlgPhone'),'Telefon numarasını +90 (5xx) xxx xx xx biçiminde eksiksiz girin.');return;}
+  if(!v('dlgCity')){bad($('dlgCity'),'İl seçin.');return;}
+  if(!v('dlgDistrict')){bad($('dlgDistrict'),'İlçe seçin.');return;}
+  // Tekrar kontrolü: aynı ad kabul edilmez; aynı ilçe ve adres için onay istenir. (İletişim kişisi tekrar edebilir: bir kişiden birden çok proje gelir.)
+  const nk=t=>String(t||'').toLocaleLowerCase('tr').replace(/\s+/g,' ').trim();
+  const same=db.sites.find(x=>nk(x.name)===nk(name));
+  if(same){bad($('dlgName'),I18N.t('Bu adla bir proje zaten var')+': '+(same.code||'')+'. '+I18N.t('Farklı bir ad verin.'));return;}
+  const ak=nk(v('dlgAddress')),near=ak&&db.sites.find(x=>nk(x.address)===ak&&nk(x.district)===nk(v('dlgDistrict')));
+  if(near&&!await ask(`${near.code||''} ${near.name} ${I18N.t('projesi aynı adreste kayıtlı. Yine de yeni proje eklensin mi?')}`,'Yine de ekle'))return;
   const s=blankSite(name);
   const base=$('dlgBase').value===''?'':Math.max(0,+$('dlgBase').value||0),ext=$('dlgExt').value===''?'':Math.max(0,+$('dlgExt').value||0);
   Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractBase:base,contractExt:ext,contractYears:(+base||0)+(+ext||0),
