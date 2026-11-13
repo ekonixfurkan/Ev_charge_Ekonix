@@ -6,7 +6,7 @@ import { sql, ensureSchema, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
 import { seedOnce } from '../lib/seed.js';
-import { nextCode, backfillCodes } from '../lib/codes.js';
+import { nextCode, nextSubCode, backfillCodes } from '../lib/codes.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
 import { analyze, validArea, maxRequests, sealKey, openKey, keyLooksValid, testKey } from '../lib/tomtom.js';
@@ -135,7 +135,14 @@ export default async function handler(req, res) {
       }
       const prev = await s`SELECT data FROM sites WHERE id = ${site.id}`;
       // Proje kodu yalnızca sunucudan gelir: varsa korunur, yoksa sıradaki numara verilir (istemcinin gönderdiği değer yok sayılır).
-      site.code = prev[0]?.data?.code || (await nextCode(s, site));
+      // Alt proje: bağlı olduğu ana proje oluşturulurken seçilir, sonradan değişmez; yalnızca ana proje (kendisi alt proje olmayan) seçilebilir.
+      if (prev[0]) site.parent = prev[0].data?.parent || '';
+      else {
+        const pr = site.parent && site.parent !== site.id ? (await s`SELECT id, data FROM sites WHERE id = ${String(site.parent)}`)[0] : null;
+        site.parent = pr && pr.data?.code && !pr.data?.parent ? pr.id : '';
+        if (site.parent) site.code = await nextSubCode(s, pr);
+      }
+      site.code = prev[0]?.data?.code || site.code || (await nextCode(s, site));
       await s`INSERT INTO sites (id, data, updated_at)
               VALUES (${site.id}, ${JSON.stringify(site)}::jsonb, now())
               ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`;

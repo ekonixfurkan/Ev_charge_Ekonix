@@ -191,6 +191,7 @@ table.portfolio.ovwtbl .sp{width:auto;padding:0}
 /* Proje grupları */
 table.portfolio.loclist tr.grp-head td{background:var(--navy-soft);font-weight:700;color:var(--ink);border-top:2px solid var(--navy);cursor:pointer}
 .grp-head .grp-chev{display:inline-block;width:16px;color:var(--navy)}.grp-head .grp-name{font-size:14px}.grp-head small{margin-left:10px;font-weight:500;color:var(--muted)}
+.loclist .sub-row td.c-code{padding-left:38px!important;position:relative}.loclist .sub-row td.c-code::before{content:"↳";position:absolute;left:22px;color:var(--muted)}
 .grp-head .grp-x{padding:2px 8px;font-size:12px}
 table.portfolio.loclist tr.grp-row td:first-child{box-shadow:inset 3px 0 0 var(--navy)}
 table.portfolio.loclist tr.sel td{background:var(--ok-soft)}
@@ -1135,6 +1136,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
     <p class="dsub">Temel bilgileri girin. Üniteler, altyapı ve finansman detayı kayıttan sonra proje sayfasında doldurulur.</p>
     <div class="dgrid">
       <label class="span2">Proje adı *<input id="dlgName" required maxlength="120" autocomplete="off"></label>
+      <label class="span2">Bağlı Olduğu Ana Proje<select id="dlgParent"></select><small class="note">Alt proje ise seçin; kodu ana proje koduna -1, -2… eklenerek verilir.</small></label>
       <div class="span2" style="display:flex;justify-content:flex-end"><button type="button" class="ghost pick-btn" id="dlgPickContact">Kişilerden Seç</button></div>
       <label>İletişim kişisi *<input id="dlgContact" maxlength="120" autocomplete="off"></label>
       <label>Telefon *<input id="dlgPhone" data-phone type="tel" inputmode="tel" maxlength="22" placeholder="+90 (5__) ___ __ __" autocomplete="off"></label>
@@ -1359,7 +1361,7 @@ function resultsHtml(rows,f,s,tf,mode='all'){
 function unit(kind,kw,sockets,qty,model=''){return {id:uid(),kind,kw,sockets,qty,model};}
 const cabUnit=()=>unit('CAB',0,0,1,'');
 function blankSite(name){
-  return {id:uid(),name,city:'',district:'',address:'',type:'Other',host:'',code:'',contact:'',contactCompany:'',lat:'',lng:'',recordDate:todayStr(),phone:'',contractBase:'',contractExt:'',
+  return {id:uid(),parent:'',name,city:'',district:'',address:'',type:'Other',host:'',code:'',contact:'',contactCompany:'',lat:'',lng:'',recordDate:todayStr(),phone:'',contractBase:'',contractExt:'',
     status:'active',stage:'01',score:'',nextAction:'',nextActionDate:'',blocker:'',blockerTr:'',statusTr:'',needs:'',siteFiles:'',manHours:'',evseKw:'',pvbess:'',approvalDate:'',cpoPartner:'',fx:{},gridKva:0,gridNote:'',contractYears:0,notes:'',units:[],dd:{},survey:{},amg:{scores:{},notes:{}},att:{},sign:{},fin:{...FIN_DEFAULT},tranches:defaultTranches(),createdAt:now(),updatedAt:now()};
 }
 /* ---------- storage: REST API (/api) + polling, localStorage fallback ---------- */
@@ -1597,7 +1599,7 @@ function filterText(){
   return t.join(' · ');
 }
 function legendHtml(){
-  const total=db.sites.length,active=db.sites.filter(isOpen).length,passive=total-active;
+  const mains=db.sites.filter(s=>!isSub(s)),total=mains.length,active=mains.filter(isOpen).length,passive=total-active;  // Qualified Lead: yalnızca ana projeler (alt proje aynı sahanın parçası)
   const mk=(l,v)=>`<div class="mk"><span>${l}</span><strong>${v}</strong></div>`;
   // Aktif / Pasif tek kutuda ortadan ikiye bölünmüş; tıklayınca altındaki değerler ve liste o gruba göre süzülür.
   const half=(k,l,n)=>`<button type="button" data-act="${k}" aria-pressed="${F.act===k}" title="${l} projeleri göster (tekrar tıklayınca tümü)"><span>${l}</span><strong>${n}</strong></button>`;
@@ -1626,6 +1628,14 @@ function kpiTilesHtml(T,n){return (n!=null?mkTile('Proje Sayısı',n):'')+mkTile
 let grp={on:false,sel:new Set(),closed:new Set(),target:''};  // target: var olan bir gruba proje eklenirken o grubun adı
 const grpOf=s=>String(s.group||'').trim();
 // Gruplu projeler, sıralamada ilk üyenin bulunduğu yerde art arda dizilir.
+// Alt projeler (s.parent) ana projenin hemen altına dizilir; ana proje süzgeçte yoksa alt proje tek başına kalır.
+function arrangeSubs(list){
+  const ids=new Set(list.map(s=>s.id)),kids=new Map();
+  list.forEach(s=>{if(s.parent&&ids.has(s.parent)){(kids.get(s.parent)||kids.set(s.parent,[]).get(s.parent)).push(s);}});
+  const out=[];
+  list.forEach(s=>{if(s.parent&&ids.has(s.parent))return;out.push(s);(kids.get(s.id)||[]).sort((a,b)=>String(a.code).localeCompare(String(b.code),'tr',{numeric:true})).forEach(k=>out.push(k));});
+  return out;
+}
 function arrangeGroups(list){
   const out=[],seen=new Set();
   for(const s of list){const g=grpOf(s);if(!g){out.push(s);continue;}if(seen.has(g))continue;seen.add(g);out.push(...list.filter(x=>grpOf(x)===g));}
@@ -1645,7 +1655,7 @@ function locRowsHtml(rows,all=rows){
     prev=g;
     if(g&&grp.closed.has(g))continue;
     const t=totals(s),d=scoreOf(s),st=statusOf(s.status),on=grp.sel.has(s.id);
-    h+=`<tr ${grp.on?`data-gsel="${s.id}" aria-selected="${on}"`:`data-open="${s.id}"`} tabindex="0" class="${isOpen(s)?'':'closed'}${g?' grp-row':''}${on?' sel':''}"><td class="c-code">${grp.on?`<input type="checkbox" class="grp-cb" tabindex="-1" ${on?'checked':''} aria-label="Seç"> `:''}${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc([s.city,s.district].filter(Boolean).join(' / '))||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
+    h+=`<tr ${grp.on?`data-gsel="${s.id}" aria-selected="${on}"`:`data-open="${s.id}"`} tabindex="0" class="${isOpen(s)?'':'closed'}${g?' grp-row':''}${on?' sel':''}${isSub(s)?' sub-row':''}"><td class="c-code">${grp.on?`<input type="checkbox" class="grp-cb" tabindex="-1" ${on?'checked':''} aria-label="Seç"> `:''}${esc(s.code||'—')}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc([s.city,s.district].filter(Boolean).join(' / '))||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td><td class="num">${t.sockets}</td>
       <td class="num"><span class="amgscore ${d.cls}">${d.label}</span></td>
       <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td><td title="${esc(fmtTs(s.updatedAt))}">${esc(agoText(s.updatedAt))}</td></tr>`;
@@ -1669,7 +1679,7 @@ function saveGrp(fixed){
   let n=0;db.sites.forEach(s=>{if(grp.sel.has(s.id)&&grpOf(s)!==name){s.group=name;touched(s);n++;}});
   if($('grpDlg').open)$('grpDlg').close();grp.sel.clear();grp.on=false;grp.target='';grp.closed.delete(name);
   // Gruplu projeler grubun ilk üyesinin yanına dizilir; o sayfada olmayabilir. Listeyi grubun bulunduğu sayfaya götür.
-  let at='';{const all=arrangeGroups(visibleSites()),i=all.findIndex(x=>grpOf(x)===name);if(i>=0){pg.loc=Math.floor(i/PAGE_SIZE)+1;at=pg.loc;}}
+  let at='';{const all=arrangeGroups(arrangeSubs(visibleSites())),i=all.findIndex(x=>grpOf(x)===name);if(i>=0){pg.loc=Math.floor(i/PAGE_SIZE)+1;at=pg.loc;}}
   paintLocRows();paintGrpBar();pageFx();toast(n?`${n} proje "${name}" grubuna alındı${at?` (${at}. sayfada)`:''}.`:'Seçilen projeler zaten bu grupta.');
 }
 document.addEventListener('click',async e=>{
@@ -1700,7 +1710,7 @@ function agoText(v){const t=new Date(v);if(!v||isNaN(t))return '—';const a=new
   return n<=0?'Bugün':n===1?'Dün':n<=30?n+' gün önce':t.toLocaleDateString(LOC);}
 const fmtDate=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)),d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
-  const list=arrangeGroups(visibleSites()),pi=pageOf(list,'loc');
+  const list=arrangeGroups(arrangeSubs(visibleSites())),pi=pageOf(list,'loc');
   $('locRows').innerHTML=list.length?locRowsHtml(pi.rows,list):'<tr><td colspan="15" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
   const T=sumOf(list);$('locFoot').innerHTML=locFootHtml(T);$('locKpi').innerHTML=legendHtml()+kpiTilesHtml(T);
   $('locPager').innerHTML=pagerHtml('loc',pi);
@@ -1872,7 +1882,7 @@ const ICON_X='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke
 function editBarHtml(){
   return siteEdit
     ?`${me.owner?`<button type="button" class="danger" id="delSite">Sil</button>`:''}<button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
-    :`<button type="button" class="print-btn" id="printBtn" title="A4 dikey yazdır">${ICON_PRINT}Yazdır</button><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
+    :`${cur()&&!cur().parent?`<button type="button" class="ghost" id="subAdd" title="Bu projenin altına yeni alt proje ekle">Alt Proje Ekle</button>`:''}<button type="button" class="print-btn" id="printBtn" title="A4 dikey yazdır">${ICON_PRINT}Yazdır</button><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
 }
 const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,#addCab,#addCat,[data-del]';
 function applyEditState(){
@@ -2150,11 +2160,16 @@ document.addEventListener('input',e=>{
 document.addEventListener('change',e=>{if(e.target.id!=='dlgCity')return;const d=$('dlgDistrict');d.innerHTML=ilceOptions(e.target.value,'');d.disabled=!e.target.value;});
 function clearDlgErr(){const e=$('dlgErr');e.hidden=true;e.textContent='';['dlgContact','dlgPhone'].forEach(i=>$(i).removeAttribute('aria-invalid'));}
 document.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('#dlg')&&(e.target.id==='dlgContact'||e.target.id==='dlgPhone'))clearDlgErr();});
-function openAdd(){guard(()=>{
-  $('dlgForm').reset();$('dlgCity').innerHTML=ilOptions('');$('dlgDistrict').innerHTML=ilceOptions('','');$('dlgDistrict').disabled=true;$('dlgTotal').value='';$('dlgDate').value=todayStr();clearDlgErr();
+const isSub=s=>Boolean(s.parent)&&db.sites.some(p=>p.id===s.parent);
+function fillParentOpts(sel){
+  $('dlgParent').innerHTML='<option value="">— Ana proje (alt proje değil) —</option>'+db.sites.filter(p=>!p.parent&&p.code).sort((a,b)=>String(a.code).localeCompare(String(b.code))).map(p=>`<option value="${esc(p.id)}" ${p.id===sel?'selected':''}>${esc(p.code)} · ${esc(p.name)}</option>`).join('');
+}
+function openAdd(parentId){guard(()=>{
+  $('dlgForm').reset();fillParentOpts(typeof parentId==='string'?parentId:'');$('dlgCity').innerHTML=ilOptions('');$('dlgDistrict').innerHTML=ilceOptions('','');$('dlgDistrict').disabled=true;$('dlgTotal').value='';$('dlgDate').value=todayStr();clearDlgErr();
   $('dlg').showModal();$('dlgName').focus();
 });}
-$('addSite').onclick=openAdd;
+$('addSite').onclick=()=>openAdd();
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#subAdd')){const s=cur();if(s)openAdd(s.id);}});
 $('dlgCancel').onclick=()=>$('dlg').close();
 $('dlgForm').onsubmit=e=>{e.preventDefault();
   const v=id=>$(id).value.trim(),name=v('dlgName');
@@ -2163,6 +2178,7 @@ $('dlgForm').onsubmit=e=>{e.preventDefault();
   if(!v('dlgContact')){bad($('dlgContact'),'İletişim kişisi zorunlu.');return;}
   if(v('dlgPhone').replace(/\D/g,'').replace(/^90/,'').length!==10){bad($('dlgPhone'),'Telefon numarasını +90 (5xx) xxx xx xx biçiminde eksiksiz girin.');return;}
   const s=blankSite(name);
+  {const pid=$('dlgParent').value,par=db.sites.find(x=>x.id===pid&&!x.parent);if(par){s.parent=par.id;s.group=par.group||'';}}
   const base=$('dlgBase').value===''?'':Math.max(0,+$('dlgBase').value||0),ext=$('dlgExt').value===''?'':Math.max(0,+$('dlgExt').value||0);
   Object.assign(s,{city:v('dlgCity'),district:v('dlgDistrict'),type:$('dlgType').value,contractBase:base,contractExt:ext,contractYears:(+base||0)+(+ext||0),
     address:v('dlgAddress'),contact:v('dlgContact'),contactCompany:v('dlgCompany'),recordDate:$('dlgDate').value||todayStr(),phone:v('dlgPhone'),notes:v('dlgNotes')});
