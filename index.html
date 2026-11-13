@@ -1660,7 +1660,9 @@ function saveGrp(){
   if(!name){$('grpErr').textContent='Grup başlığı gerekli.';$('grpErr').hidden=false;return;}
   let n=0;db.sites.forEach(s=>{if(grp.sel.has(s.id)&&grpOf(s)!==name){s.group=name;touched(s);n++;}});
   $('grpDlg').close();grp.sel.clear();grp.on=false;grp.closed.delete(name);
-  paintLocRows();paintGrpBar();pageFx();toast(n?`${n} proje "${name}" grubuna alındı.`:'Seçilen projeler zaten bu grupta.');
+  // Gruplu projeler grubun ilk üyesinin yanına dizilir; o sayfada olmayabilir. Listeyi grubun bulunduğu sayfaya götür.
+  let at='';{const all=arrangeGroups(visibleSites()),i=all.findIndex(x=>grpOf(x)===name);if(i>=0){pg.loc=Math.floor(i/PAGE_SIZE)+1;at=pg.loc;}}
+  paintLocRows();paintGrpBar();pageFx();toast(n?`${n} proje "${name}" grubuna alındı${at?` (${at}. sayfada)`:''}.`:'Seçilen projeler zaten bu grupta.');
 }
 document.addEventListener('click',async e=>{
   if(view!=='locations')return;

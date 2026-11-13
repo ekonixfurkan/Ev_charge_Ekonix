@@ -362,6 +362,7 @@
     [/^Seçilenleri Gruplandır \((\d+)\)$/, function (m) { return 'Group Selected (' + m[1] + ')'; }],
     [/^(\d+) proje seçildi\. Grup başlığını yazın; var olan bir başlığı yazarsanız projeler o gruba eklenir\.$/, function (m) { return m[1] + ' projects selected. Enter a group title; if you enter an existing title, the projects are added to that group.'; }],
     [/^(\d+) proje "(.+)" grubuna alındı\.$/, function (m) { return m[1] + ' projects added to group "' + m[2] + '".'; }],
+    [/^(\d+) proje "(.+)" grubuna alındı \((\d+)\. sayfada\)\.$/, function (m) { return m[1] + ' projects added to group "' + m[2] + '" (on page ' + m[3] + ').'; }],
     [/^"(.+)" grubu dağıtılsın mı\? Projeler silinmez, yalnızca gruptan çıkar\.$/, function (m) { return 'Remove the group "' + m[1] + '"? Projects are not deleted, only ungrouped.'; }],
     [/^(\d+) proje$/, function (m) { return m[1] + (m[1] === '1' ? ' project' : ' projects'); }],
     [/^(\d+) kişi$/, function (m) { return m[1] + (m[1] === '1' ? ' person' : ' people'); }],
