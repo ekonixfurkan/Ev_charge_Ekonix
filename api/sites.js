@@ -7,6 +7,7 @@ import { requireAuth } from '../lib/auth.js';
 import { logActivity, diffSite, summarize } from '../lib/activity.js';
 import { seedOnce } from '../lib/seed.js';
 import { nextCode, nextSubCode, backfillCodes } from '../lib/codes.js';
+import { applyGroup, groupSubcodesOnce } from '../lib/subgroups.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
 import { analyze, validArea, maxRequests, sealKey, openKey, keyLooksValid, testKey } from '../lib/tomtom.js';
@@ -118,6 +119,7 @@ export default async function handler(req, res) {
       try { await backfillCodes(s); } catch { /* kod verilemezse okuma bozulmasın */ }
       try { await reorderOnce(s); } catch { /* sıra değişmezse okuma bozulmasın */ }
       try { await swapCodesOnce(s); } catch { /* kodlar değişmezse okuma bozulmasın */ }
+      try { await groupSubcodesOnce(s); } catch { /* kodlar değişmezse okuma bozulmasın */ }
       const rows = await s`SELECT data FROM sites ORDER BY updated_at`;
       const cfg = await s`SELECT data FROM config WHERE key = 'team'`;
       const team = cfg[0]?.data?.names;
@@ -136,13 +138,14 @@ export default async function handler(req, res) {
       const prev = await s`SELECT data FROM sites WHERE id = ${site.id}`;
       // Proje kodu yalnızca sunucudan gelir: varsa korunur, yoksa sıradaki numara verilir (istemcinin gönderdiği değer yok sayılır).
       // Alt proje: bağlı olduğu ana proje oluşturulurken seçilir, sonradan değişmez; yalnızca ana proje (kendisi alt proje olmayan) seçilebilir.
-      if (prev[0]) site.parent = prev[0].data?.parent || '';
+      if (prev[0]) { site.parent = prev[0].data?.parent || ''; site.oldCodes = prev[0].data?.oldCodes || []; }
       else {
         const pr = site.parent && site.parent !== site.id ? (await s`SELECT id, data FROM sites WHERE id = ${String(site.parent)}`)[0] : null;
         site.parent = pr && pr.data?.code && !pr.data?.parent ? pr.id : '';
         if (site.parent) site.code = await nextSubCode(s, pr);
       }
       site.code = prev[0]?.data?.code || site.code || (await nextCode(s, site));
+      await applyGroup(s, site, prev[0]?.data);
       await s`INSERT INTO sites (id, data, updated_at)
               VALUES (${site.id}, ${JSON.stringify(site)}::jsonb, now())
               ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`;
@@ -153,7 +156,7 @@ export default async function handler(req, res) {
         const changes = diffSite(old, site);
         if (changes.length) await logActivity({ actor: user.email, action: 'guncelle', entity: 'lokasyon', entityId: site.id, entityName: site.name, summary: summarize(changes), changes });
       }
-      return res.status(200).json({ ok: true, code: site.code });
+      return res.status(200).json({ ok: true, code: site.code, parent: site.parent || '' });
     }
 
     if (req.method === 'DELETE') {

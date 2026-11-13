@@ -1486,7 +1486,8 @@ async function flush(){
   for(const [id,p] of [...pending]){
     const site=db.sites.find(x=>x.id===id);
     try{if(p.op==='delete'||!site)await api('/sites?id='+encodeURIComponent(id),{method:'DELETE'});
-      else{const r=await api('/sites',{method:'PUT',body:JSON.stringify(site)});if(r&&r.code&&site.code!==r.code){site.code=r.code;if(view==='site'&&activeId===id){setPageTitle();const cb=$('codeBox');if(cb)cb.value=r.code;}}}
+      else{const r=await api('/sites',{method:'PUT',body:JSON.stringify(site)});if(r&&r.parent!==undefined&&(site.parent||'')!==r.parent)site.parent=r.parent;
+      if(r&&r.code&&site.code!==r.code){site.code=r.code;if(view==='site'&&activeId===id){setPageTitle();const cb=$('codeBox');if(cb)cb.value=r.code;}}}
       if(pending.get(id)?.v===p.v)pending.delete(id);}
     catch(e){failed=e;break;}
   }
