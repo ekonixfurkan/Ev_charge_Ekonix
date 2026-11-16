@@ -196,9 +196,9 @@
     'Aktifleştir': 'Activate', 'Pasifleştir': 'Deactivate', 'Şifre belirle': 'Set password', 'Şifre (en az 8)': 'Password (min. 8)', 'Şifre': 'Password',
     'Bu hesabın rolü değiştirilemez': 'This account’s role cannot be changed',
     'Hesabı yönetici açar; kendi kendine kayıt yok': 'Accounts are created by an administrator; no self-registration',
-    'Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Lead Kullanıcı: yalnızca Lead Havuzu\'nu görür (proje, kişi ve diğer kayıtlar kapalı). Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.':
-      'Administrator: can manage users. User: works only with site data. Lead User: sees only the Lead Pool (projects, contacts and other records are closed). The password is shown only here and the saved version cannot be read back; ask the user to change it after you pass it on.',
-    'Lead Kullanıcı': 'Lead User',
+    'Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Kısıtlı Kullanıcı: Kullanıcı gibidir ama menüdeki Kayıtlar bölümünü (Müşteri Bilgileri, Toplantı Notları, Lead Havuzu) göremez. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.':
+      'Administrator: can manage users. User: works only with site data. Restricted User: like User but cannot see the Records section of the menu (Customer Information, Meeting Notes, Lead Pool). The password is shown only here and the saved version cannot be read back; ask the user to change it after you pass it on.',
+    'Kısıtlı Kullanıcı': 'Restricted User',
     'Ad güncellendi.': 'Name updated.', 'Rol güncellendi.': 'Role updated.', 'Hesap aktifleştirildi.': 'Account activated.', 'Hesap pasifleştirildi.': 'Account deactivated.',
     'Kullanıcı eklendi: ': 'User added: ', 'E-posta ve şifre gerekli.': 'E-mail and password are required.', 'Şifreyi göster': 'Show password', 'Şifreyi gizle': 'Hide password',
     'Çıkış yapıldı.': 'Logged out.', 'Giriş yap': 'Log in', 'Giriş yapılıyor…': 'Logging in…', 'Giriş yapılamadı. Lütfen tekrar deneyin.': 'Could not log in. Please try again.',

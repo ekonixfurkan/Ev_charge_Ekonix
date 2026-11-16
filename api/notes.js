@@ -139,7 +139,8 @@ async function meetingHandler(req, res, user, s) {
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'no-store');
   try {
-    const user = await requireAuth(req, res);
+    // Toplantı Notları "Kayıtlar" grubundadır; proje notları (?site=) değildir.
+    const user = await requireAuth(req, res, { records: req.query?.meeting !== undefined });
     if (!user) return;
     if (!process.env.DATABASE_URL) return res.status(503).json({ error: 'Notlar için veritabanı gerekli' });
     await ensureNotes();

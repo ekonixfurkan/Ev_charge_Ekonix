@@ -6,7 +6,7 @@ import { ROLES, isOwner, dbOn, listUsers, createUser, updateUser, deleteUser, fi
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASS = 8;
-const ROLE_TR = { admin: 'Yönetici', user: 'Kullanıcı', lead: 'Lead Kullanıcı' };
+const ROLE_TR = { admin: 'Yönetici', user: 'Kullanıcı', restricted: 'Kısıtlı Kullanıcı' };
 const norm = (v) => (typeof v === 'string' ? v.trim().toLowerCase() : '');
 const bad = (res, msg, code = 400) => res.status(code).json({ error: msg });
 
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
         if (!checkPassword(b.password)) return bad(res, `Şifre en az ${MIN_PASS} karakter olmalı`);
         patch.password = b.password;
       }
-      const losesAdmin = target.role === 'admin' && target.active && (patch.role === 'user' || patch.role === 'lead' || patch.active === false);
+      const losesAdmin = target.role === 'admin' && target.active && (patch.role === 'user' || patch.role === 'restricted' || patch.active === false);
       if (losesAdmin) {
         if (email === me.email) return bad(res, 'Kendi yönetici yetkinizi veya hesabınızı kapatamazsınız', 409);
         if ((await activeAdminCount(email)) < 1) return bad(res, 'Son yönetici kapatılamaz', 409);
