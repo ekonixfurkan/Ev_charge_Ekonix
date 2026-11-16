@@ -16,8 +16,9 @@
 /* EKONIX design-v1: lacivert zemin, çizgili belge kartı, tek marka mürekkebi */
 :root{color-scheme:light;--navy:#0b2e57;--navy-d:#082244;--teal:#13a08a;--ink:#10202e;--muted:#5b6a7a;--hair:#dde4eb;--hair-strong:#c3ced9;--no:#a33327;--no-soft:#fbeae7;--side:#0a2440}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);background:#f2f5f8;color:var(--ink);font:14px/1.5 "Plus Jakarta Sans","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-.brand{position:relative;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:48px;color:#fff;background:linear-gradient(135deg,#071b33,var(--side) 55%,#0d2d52)}
+html{min-height:100%;background:#f2f5f8}
+body{margin:0;min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-template-rows:minmax(100vh,auto);grid-template-rows:minmax(100dvh,auto);background:#f2f5f8;color:var(--ink);font:14px/1.5 "Plus Jakarta Sans","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.brand{position:relative;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:48px;color:#fff;background:linear-gradient(135deg,#071b33,var(--side) 55%,#0d2d52)}
 .brand::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(110deg,transparent 0 63px,rgba(19,160,138,.09) 63px 64px),radial-gradient(circle at 20% 10%,rgba(19,160,138,.22),transparent 65%),radial-gradient(circle at 95% 100%,rgba(19,160,138,.14),transparent 55%);pointer-events:none}
 .brand>*{position:relative}
 .brand .lg{display:inline-flex;align-self:flex-start;background:#fff;border-radius:12px;padding:14px 22px;box-shadow:0 18px 40px rgba(0,0,0,.35)}
@@ -30,7 +31,7 @@ body{margin:0;min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05f
 .brand li span{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;border:1px solid rgba(19,160,138,.45);background:rgba(19,160,138,.14);color:#5fd3bf}
 .brand li svg{width:16px;height:16px}
 .brand .copy{margin:0;font-size:13px;font-weight:600;color:#8aa0b6}
-.right{position:relative;display:flex;align-items:center;justify-content:center;padding:40px 24px}
+.right{position:relative;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:40px 24px}
 .card{width:100%;max-width:420px}
 .mlogo{display:none;justify-content:center;margin-bottom:24px}
 .mlogo span{display:inline-flex;background:var(--side);border-radius:12px;padding:10px 16px}
