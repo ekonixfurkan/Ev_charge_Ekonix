@@ -1745,6 +1745,7 @@ function applyLeadOnly(){
   document.documentElement.classList.add('lead-only');
   document.querySelectorAll('aside .nav-item').forEach(b=>{if(b.dataset.nav!=='leads')b.remove();});
   document.querySelectorAll('aside .nav-group').forEach(g=>{if(!g.querySelector('.nav-item'))g.remove();});
+  document.querySelectorAll('aside .nav-head').forEach(h=>h.remove());
   if(view!=='leads'){view='leads';render();}
 }
 function render(){
