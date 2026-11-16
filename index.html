@@ -1445,6 +1445,8 @@ function restoreRoute(){
   if(a==='site'&&b&&db.sites.some(x=>x.id===b)){view='site';activeId=b;sub=SITE_SUBS.includes(c)?c:'info';}
 }
 async function load(){
+  await meReady;
+  if(isLead()){loaded=true;mode='cloud';applyLeadOnly();restoreRoute();render();return;}
   try{
     const data=await api('/sites');
     if(Array.isArray(data.sites))db.sites=data.sites.map(migrateSite);
@@ -1737,7 +1739,16 @@ function dockBar(){
   if(b)t.replaceChildren(b);
 }
 new MutationObserver(()=>{if($('view').querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
+// Lead Kullanıcı: yalnızca Lead Havuzu. Menü ve üst şerit gizlenir; sunucu da diğer uçlara 403 verir.
+const isLead=()=>!!(me&&me.role==='lead');
+function applyLeadOnly(){
+  document.documentElement.classList.add('lead-only');
+  document.querySelectorAll('aside .nav-item').forEach(b=>{if(b.dataset.nav!=='leads')b.remove();});
+  document.querySelectorAll('aside .nav-group').forEach(g=>{if(!g.querySelector('.nav-item'))g.remove();});
+  if(view!=='leads'){view='leads';render();}
+}
 function render(){
+  if(isLead()&&view!=='leads')view='leads';
   {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
@@ -2369,7 +2380,7 @@ async function renderUsers(){
       ${d.owner?`<td>${fmtDt(u.passChangedAt||u.createdAt)}</td>`:''}
       <td><div class="acts" data-email="${esc(u.email)}">
         <button type="button" data-act="pw" ${u.owner&&!d.owner?'disabled':''}>Şifre belirle</button>
-        <select class="role-sel" data-act="role" aria-label="Rol" ${lock||u.owner?'disabled title="Bu hesabın rolü değiştirilemez"':''}><option value="user" ${u.role==='user'?'selected':''}>Kullanıcı</option><option value="admin" ${u.role==='admin'?'selected':''}>Yönetici</option></select>
+        <select class="role-sel" data-act="role" aria-label="Rol" ${lock||u.owner?'disabled title="Bu hesabın rolü değiştirilemez"':''}><option value="user" ${u.role==='user'?'selected':''}>Kullanıcı</option><option value="lead" ${u.role==='lead'?'selected':''}>Lead Kullanıcı</option><option value="admin" ${u.role==='admin'?'selected':''}>Yönetici</option></select>
         <button type="button" data-act="active" ${lock?'disabled':''}>${u.active?'Pasifleştir':'Aktifleştir'}</button>
         <button type="button" data-act="del" class="danger" ${lock?'disabled':''}>Sil</button>
       </div></td></tr>`;}).join('');
@@ -2378,10 +2389,10 @@ async function renderUsers(){
       <label>Ad soyad<input id="uName" required maxlength="120"></label>
       <label>E-posta<input id="uEmail" type="email" required maxlength="254"></label>
       <label>Şifre (en az 8)<span class="pw"><input id="uPass" type="text" required minlength="8" maxlength="200" autocomplete="new-password"><button type="button" id="uGen">Üret</button></span></label>
-      <label>Rol<select id="uRole"><option value="user">Kullanıcı</option><option value="admin">Yönetici</option></select></label>
+      <label>Rol<select id="uRole"><option value="user">Kullanıcı</option><option value="lead">Lead Kullanıcı</option><option value="admin">Yönetici</option></select></label>
       <span class="u-btns"><button type="submit" class="primary">Kullanıcıyı Ekle</button><button type="button" id="uCancel" class="ghost">Vazgeç</button></span>
     </form><p class="u-msg" id="uMsg" role="status"></p>
-    <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
+    <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Lead Kullanıcı: yalnızca Lead Havuzu'nu görür (proje, kişi ve diğer kayıtlar kapalı). Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
     <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl m-cards"><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
@@ -3631,12 +3642,13 @@ document.addEventListener('click',e=>{
 document.addEventListener('input',e=>{if(e.target.id==='catQ')paintCat();});
 
 /* ---------- oturum ---------- */
-(async()=>{
+const meReady=(async()=>{
   try{
     const r=await fetch('/api/auth/me',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
       me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};if(d.role==='admin')$('usersNav').hidden=false;
+      if(d.role==='lead')applyLeadOnly();
       // İşlem Geçmişi yalnızca sahip hesaba açık (sunucu da 403 verir).
       if(me.owner)$('actNav').hidden=false;
       { const g=$('usersNav').closest('.nav-group'); if(g)g.hidden=$('usersNav').hidden&&$('actNav').hidden; }

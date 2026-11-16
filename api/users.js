@@ -6,6 +6,7 @@ import { ROLES, isOwner, dbOn, listUsers, createUser, updateUser, deleteUser, fi
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASS = 8;
+const ROLE_TR = { admin: 'Yönetici', user: 'Kullanıcı', lead: 'Lead Kullanıcı' };
 const norm = (v) => (typeof v === 'string' ? v.trim().toLowerCase() : '');
 const bad = (res, msg, code = 400) => res.status(code).json({ error: msg });
 
@@ -35,7 +36,7 @@ export default async function handler(req, res) {
       if (!EMAIL_RE.test(email) || email.length > 254) return bad(res, 'Geçerli bir e-posta girin');
       if (!checkPassword(b.password)) return bad(res, `Şifre en az ${MIN_PASS} karakter olmalı`);
       if (!(await createUser({ email, name, role, password: b.password }, me.email))) return bad(res, 'Bu e-posta zaten kayıtlı', 409);
-      await logActivity({ actor: me.email, action: 'olustur', entity: 'kullanici', entityId: email, entityName: email, summary: `Kullanıcı eklendi (${role === 'admin' ? 'Yönetici' : 'Kullanıcı'})` });
+      await logActivity({ actor: me.email, action: 'olustur', entity: 'kullanici', entityId: email, entityName: email, summary: `Kullanıcı eklendi (${ROLE_TR[role]})` });
       return res.status(201).json({ ok: true });
     }
 
@@ -56,7 +57,7 @@ export default async function handler(req, res) {
         if (!checkPassword(b.password)) return bad(res, `Şifre en az ${MIN_PASS} karakter olmalı`);
         patch.password = b.password;
       }
-      const losesAdmin = target.role === 'admin' && target.active && (patch.role === 'user' || patch.active === false);
+      const losesAdmin = target.role === 'admin' && target.active && (patch.role === 'user' || patch.role === 'lead' || patch.active === false);
       if (losesAdmin) {
         if (email === me.email) return bad(res, 'Kendi yönetici yetkinizi veya hesabınızı kapatamazsınız', 409);
         if ((await activeAdminCount(email)) < 1) return bad(res, 'Son yönetici kapatılamaz', 409);
@@ -64,7 +65,7 @@ export default async function handler(req, res) {
       await updateUser(email, patch);
       const parts = [];
       if (patch.password !== undefined) parts.push('şifre sıfırlandı');
-      if (patch.role !== undefined && patch.role !== target.role) parts.push(`rol: ${target.role === 'admin' ? 'Yönetici' : 'Kullanıcı'} → ${patch.role === 'admin' ? 'Yönetici' : 'Kullanıcı'}`);
+      if (patch.role !== undefined && patch.role !== target.role) parts.push(`rol: ${ROLE_TR[target.role] || target.role} → ${ROLE_TR[patch.role]}`);
       if (patch.active !== undefined && patch.active !== target.active) parts.push(patch.active ? 'hesap aktifleştirildi' : 'hesap pasifleştirildi');
       if (patch.name !== undefined && patch.name !== target.name) parts.push('ad güncellendi');
       if (parts.length) await logActivity({ actor: me.email, action: 'guncelle', entity: 'kullanici', entityId: email, entityName: email, summary: parts.join('; ') });

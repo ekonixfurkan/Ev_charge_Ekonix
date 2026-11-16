@@ -57,11 +57,12 @@ const label = (r) => [r.first_name, r.last_name].filter(Boolean).join(' ') || r.
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'no-store');
   try {
-    const user = await requireAuth(req, res);
+    const user = await requireAuth(req, res, { lead: true });
     if (!user) return;
     if (!process.env.DATABASE_URL) return res.status(503).json({ error: 'Kişiler için veritabanı gerekli' });
     // Lead Havuzu (soğuk arama listesi) aynı işlevde çalışır: ?leads=…
     if (req.query?.leads) return await handleLeads(req, res, user, sql());
+    if (user.role === 'lead') return res.status(403).json({ error: 'Bu hesap yalnızca Lead Havuzu\'na erişebilir' });
     await ensureContacts();
     const s = sql();
 
