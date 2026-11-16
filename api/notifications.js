@@ -22,7 +22,7 @@ const ENTITIES = ['lokasyon'];
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'no-store');
   try {
-    const user = await requireAuth(req, res);
+    const user = await requireAuth(req, res, { personal: true });
     if (!user) return;
     if (!process.env.DATABASE_URL) return res.status(503).json({ error: 'Bildirimler için veritabanı gerekli' });
     await ensureSeen();

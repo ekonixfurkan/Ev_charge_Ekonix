@@ -1057,6 +1057,8 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   .amg-row,.dd-row{break-inside:avoid}
   tr,.kpi{break-inside:avoid}
 }
+html.ro [data-nav="add"],html.ro #editStart,html.ro #delSite,html.ro [data-grpadd],html.ro [data-grpdel],html.ro #grpToggle,html.ro #grpGo,html.ro #grpSave,html.ro #ctAdd,html.ro [data-mtnew],html.ro [data-mtdel],html.ro [data-chdel],html.ro #compKeySave,html.ro #compGo,html.ro #npSend,html.ro #lpSend,html.ro #flNewOk,html.ro .pl-add,html.ro [data-pdsave],html.ro [data-pdcancel],html.ro #mtSave,html.ro .grp-x,html.ro #uNew,html.ro button[data-del],html.ro .file-drop{display:none!important}
+html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
 </style>
   <span class="zoom-note" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Web site yakınlaştırma ayarı %75'e göre tasarlanmıştır. Verimli kullanılabilmek adına ayarlarınızı kontrol ediniz.</span>
 <header>
@@ -1743,6 +1745,13 @@ const REC_VIEWS=['contacts','meetings','leads'];
 const RESTRICT_RECORDS=true; // Kısıtlı Kullanıcı Kayıtlar grubunu göremez; kapatmak için false
 
 const isRestricted=()=>RESTRICT_RECORDS&&!!(me&&me.role==='restricted');
+// Kısıtlı rol salt okunurdur: yazma düğmeleri CSS ile gizlenir (html.ro), alanlar kilitlenir; asıl kilit sunucudadır (GET dışı 403).
+const isRO=()=>!!(me&&me.role==='restricted');
+function lockRO(){
+  if(!isRO())return;
+  document.querySelectorAll('#view textarea, #view input[type=file], #view input[type=checkbox]:not([data-ro-ok]), #view .box input:not([type=search]):not([data-ro-ok]), #view .box select:not([data-ro-ok])').forEach(el=>{if(el.closest('.locbar,.filters,[data-ro-ok]'))return;el.disabled=true;});
+}
+new MutationObserver(lockRO).observe(document.documentElement,{childList:true,subtree:true});
 function applyRestricted(){
   const g=document.querySelector('aside .nav-group[data-group="records"]');if(g)g.remove();
   if(REC_VIEWS.includes(view)){view='portfolio';sub='ovw';render();}
@@ -3648,7 +3657,7 @@ const meReady=(async()=>{
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
       me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};if(d.role==='admin')$('usersNav').hidden=false;
-      if(isRestricted())applyRestricted();
+      document.documentElement.classList.toggle('ro',isRO());if(isRestricted())applyRestricted();
       // İşlem Geçmişi yalnızca sahip hesaba açık (sunucu da 403 verir).
       if(me.owner)$('actNav').hidden=false;
       { const g=$('usersNav').closest('.nav-group'); if(g)g.hidden=$('usersNav').hidden&&$('actNav').hidden; }
