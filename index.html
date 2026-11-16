@@ -1740,7 +1740,9 @@ function dockBar(){
 new MutationObserver(()=>{if($('view').querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
 // Kısıtlı Kullanıcı: menüdeki "Kayıtlar" grubu gizlenir; sunucu da bu uçlara 403 verir.
 const REC_VIEWS=['contacts','meetings','leads'];
-const isRestricted=()=>!!(me&&me.role==='restricted');
+const RESTRICT_RECORDS=false; // şimdilik kapalı: Kısıtlı Kullanıcı da her şeyi görür; açmak için true yap
+
+const isRestricted=()=>RESTRICT_RECORDS&&!!(me&&me.role==='restricted');
 function applyRestricted(){
   const g=document.querySelector('aside .nav-group[data-group="records"]');if(g)g.remove();
   if(REC_VIEWS.includes(view)){view='portfolio';sub='ovw';render();}
@@ -3646,7 +3648,7 @@ const meReady=(async()=>{
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
       me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};if(d.role==='admin')$('usersNav').hidden=false;
-      if(d.role==='restricted')applyRestricted();
+      if(isRestricted())applyRestricted();
       // İşlem Geçmişi yalnızca sahip hesaba açık (sunucu da 403 verir).
       if(me.owner)$('actNav').hidden=false;
       { const g=$('usersNav').closest('.nav-group'); if(g)g.hidden=$('usersNav').hidden&&$('actNav').hidden; }
