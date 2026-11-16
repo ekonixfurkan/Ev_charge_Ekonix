@@ -1740,7 +1740,7 @@ function dockBar(){
 new MutationObserver(()=>{if($('view').querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
 // Kısıtlı Kullanıcı: menüdeki "Kayıtlar" grubu gizlenir; sunucu da bu uçlara 403 verir.
 const REC_VIEWS=['contacts','meetings','leads'];
-const RESTRICT_RECORDS=false; // şimdilik kapalı: Kısıtlı Kullanıcı da her şeyi görür; açmak için true yap
+const RESTRICT_RECORDS=true; // Kısıtlı Kullanıcı Kayıtlar grubunu göremez; kapatmak için false
 
 const isRestricted=()=>RESTRICT_RECORDS&&!!(me&&me.role==='restricted');
 function applyRestricted(){
