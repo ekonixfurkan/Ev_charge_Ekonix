@@ -238,6 +238,7 @@
     'Notlar işlenemedi': 'Could not process notes', 'Notu yalnızca yazan kişi veya yönetici silebilir': 'Only the author or an administrator can delete a note',
     'Oturum doğrulanamadı': 'Session could not be verified', 'Oturum yok': 'No session', 'Silme için yönetici yetkisi gerekli': 'Administrator permission is required to delete',
     'Veritabanı gerekli': 'A database is required', 'Yöntem desteklenmiyor': 'Method not supported',
+    'Hoş Geldiniz': 'Welcome', 'Projeleriniz, sahalarınız ve müşterileriniz tek yerde.': 'Your projects, sites and customers in one place.', 'Giriş yapın ve kaldığınız yerden devam edin.': 'Sign in and pick up where you left off.', 'Saha ve proje takibi': 'Site and project tracking', 'Şarj ünitesi, altyapı ve finansman': 'Charging units, infrastructure and financing', 'Rakip analizi ve lead takibi': 'Competitor analysis and lead tracking', 'Giriş bilgileri sistem yöneticisi tarafından iletilmektedir. Girişte sorun yaşarsanız sistem yöneticisiyle iletişime geçin.': 'Login details are provided by the system administrator. If you have trouble signing in, contact the system administrator.',
     'Kimlik doğrulama henüz yapılandırılmamış. Yöneticinizle iletişime geçin.': 'Authentication is not configured yet. Contact your administrator.',
     'Silinsin mi?': 'Delete?', 'Bu geri alınamaz.': 'This cannot be undone.',
     /* diyaloglar */
