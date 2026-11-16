@@ -38,6 +38,28 @@ body{margin:0;min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05f
 .mlogo img{display:block;height:36px;width:auto}
 .note{margin:16px 0 0;padding:10px 12px;border-radius:6px;border:1px solid var(--hair-strong);background:#fff;color:var(--muted);font-size:12px;font-weight:600;text-align:center}
 @media (max-width:1023px){body{grid-template-columns:1fr}.brand{display:none}.mlogo{display:flex}}
+/* Tasarım %75 tarayıcı yakınlaştırmasına göre: geniş ve yüksek ekranda her şey büyütülür (yoksa sayfa boş ve küçük kalır). */
+@media (min-width:1700px) and (min-height:850px){
+.brand{padding:72px 80px}
+.brand .lg{padding:20px 32px;border-radius:16px}.brand .lg img{height:68px}
+.brand .bar{width:84px;height:6px;margin-bottom:28px}
+.brand h2{font-size:52px}
+.brand .tag{font-size:24px;margin-top:24px;max-width:40rem}
+.brand ul{gap:18px;margin-top:44px}
+.brand li{font-size:20px;gap:16px}.brand li span{width:46px;height:46px;border-radius:12px}.brand li svg{width:22px;height:22px}
+.brand .copy{font-size:17px}
+.card{max-width:560px}
+h1{font-size:42px}.sub{font-size:19px;margin-top:12px}
+form{margin-top:40px;gap:24px}
+label{font-size:14px;margin-bottom:10px}
+input{height:60px;font-size:19px;padding-left:52px;border-radius:8px}.field>svg{left:18px;width:22px;height:22px}
+input[type=password],input.pw{padding-right:60px}
+.eye{width:48px;height:48px;right:6px}.eye svg{width:22px;height:22px}
+.err{font-size:16px;padding:14px 16px}
+button.go{height:60px;font-size:19px;border-radius:8px}
+.note{font-size:15px;padding:14px 16px;margin-top:24px}
+.lang-sw{top:24px;right:28px}.lang-sw button{padding:8px 14px;font-size:15px}.lang-sw .flag{width:24px;height:16px}
+}
 h1{margin:0;font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-.01em}
 .sub{margin:8px 0 0;font-size:14px;font-weight:600;color:var(--muted)}
 form{margin-top:28px;display:flex;flex-direction:column;gap:16px}
