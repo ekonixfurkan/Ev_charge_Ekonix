@@ -196,12 +196,12 @@
     'Günlük Toplantı': 'Daily Meeting',
     '1. Gecikmiş ve Bugün Biten Görevler': '1. Overdue and Due-Today Tasks',
     'Önce bunlar': 'Start here',
-    '3. Engeli Olan Projeler': '3. Blocked Projects',
+    
     'Açık projeler': 'Open projects',
-    '4. Güncellenmeyen Projeler': '4. Stale Projects',
-    '5. Son 24 Saatte Güncellenenler': '5. Updated in the Last 24 Hours',
+    '3. Güncellenmeyen Projeler': '3. Stale Projects',
+    '4. Son 24 Saatte Güncellenenler': '4. Updated in the Last 24 Hours',
     'Dünden beri': 'Since yesterday',
-    '6. Açık Görevi Olmayan Projeler': '6. Projects Without Open Tasks',
+    
     'Aktif projeler': 'Active projects',
     'Sıradaki Aşama': 'Next Stage',
     'Gecikmiş ya da bugün biten görev yok.': 'No overdue or due-today tasks.',
