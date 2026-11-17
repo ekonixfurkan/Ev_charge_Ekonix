@@ -1,4 +1,4 @@
-// /api/notes — proje başına şirket içi notlar. GET ?site=ID · POST { site, body } · DELETE ?id=
+// /api/notes — proje başına şirket içi notlar. GET ?site=ID · GET ?recent=GÜN (tüm projelerde son notlar, Günlük Toplantı için) · POST { site, body } · DELETE ?id=
 // Toplantı notları da burada (Hobby planda işlev sayısı sınırlı): ?meeting=list (GET) · ?meeting=new (POST) · ?meeting=ID (PATCH, DELETE)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
@@ -148,6 +148,13 @@ export default async function handler(req, res) {
     if (req.query?.meeting !== undefined) return await meetingHandler(req, res, user, s);
 
     if (req.method === 'GET') {
+      if (req.query?.recent !== undefined) {
+        const d = Math.min(30, Math.max(1, parseInt(req.query.recent, 10) || 3));
+        const rows = await s`SELECT n.id, n.site_id, n.body, n.created_at, n.author, NULLIF(u.name, '') AS author_name
+          FROM site_notes n LEFT JOIN users u ON u.email = n.author
+          WHERE n.created_at > now() - make_interval(days => ${d}) ORDER BY n.id DESC LIMIT 100`;
+        return res.status(200).json({ notes: rows });
+      }
       const site = String(req.query?.site || '');
       if (!site) return res.status(400).json({ error: 'site gerekli' });
       const rows = await s`SELECT n.id, n.body, n.created_at, n.author, NULLIF(u.name, '') AS author_name

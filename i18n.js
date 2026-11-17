@@ -191,15 +191,17 @@
       'Via revenue share: the financier recovers its investment from its own revenue share. Loan: the repaying party pays equal annual installments; the installment is deducted from its cash and goes to the financier.',
 
     /* günlük toplantı */
+    '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
+    'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
     'Günlük Toplantı': 'Daily Meeting',
     '1. Gecikmiş ve Bugün Biten Görevler': '1. Overdue and Due-Today Tasks',
     'Önce bunlar': 'Start here',
-    '2. Engeli Olan Projeler': '2. Blocked Projects',
+    '3. Engeli Olan Projeler': '3. Blocked Projects',
     'Açık projeler': 'Open projects',
-    '3. Güncellenmeyen Projeler': '3. Stale Projects',
-    '4. Son 24 Saatte Güncellenenler': '4. Updated in the Last 24 Hours',
+    '4. Güncellenmeyen Projeler': '4. Stale Projects',
+    '5. Son 24 Saatte Güncellenenler': '5. Updated in the Last 24 Hours',
     'Dünden beri': 'Since yesterday',
-    '5. Açık Görevi Olmayan Projeler': '5. Projects Without Open Tasks',
+    '6. Açık Görevi Olmayan Projeler': '6. Projects Without Open Tasks',
     'Aktif projeler': 'Active projects',
     'Sıradaki Aşama': 'Next Stage',
     'Gecikmiş ya da bugün biten görev yok.': 'No overdue or due-today tasks.',
@@ -210,7 +212,6 @@
     'Her aktif projenin açık görevi var.': 'Every active project has an open task.',
     'daha (Proje Listesi\'nden bakın)': 'more (see Project List)',
     'Gün gecikti': 'days late',
-    'Liste projelerin kayıtlarından otomatik çıkar; sırayla konuşun: önce 1 ve 4, sonra 2, 3 ve 5. Satıra tıklayınca proje açılır. Süre eşiği: 7 gün.': 'The list is built automatically from project records; go through it in order: 1 and 4 first, then 2, 3 and 5. Click a row to open the project. Staleness threshold: 7 days.',
 
     /* kullanıcı yönetimi / giriş */
     'Kayıtlı Kullanıcılar': 'Registered Users', 'Yeni Kullanıcı Ekle': 'Add New User', '+ Yeni Kullanıcı Ekle': '+ Add New User', 'Kullanıcıyı Ekle': 'Add User', 'E-posta': 'E-mail',
@@ -383,6 +384,7 @@
     [/^(\d+) projede skor var$/, function (m) { return m[1] + ' projects scored'; }],
     [/^İlk (\d+) il$/, function (m) { return 'Top ' + m[1] + ' provinces'; }],
     [/^Ön puan · (\d+)\/(\d+) kriter$/, function (m) { return 'Preliminary · ' + m[1] + '/' + m[2] + ' criteria'; }],
+    [/^Son (\d+) gün$/, function (m) { return 'Last ' + m[1] + ' days'; }],
     [/^(\d+) gün gecikti$/, function (m) { return m[1] + (m[1] === '1' ? ' day late' : ' days late'); }],
     [/^(\d+)\+ gündür$/, function (m) { return m[1] + '+ days'; }],
     [/^\+(\d+) daha \(Proje Listesi'nden bakın\)$/, function (m) { return '+' + m[1] + ' more (see Project List)'; }],

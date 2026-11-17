@@ -2772,7 +2772,7 @@ function paintPlanner(){
   paintPlanner.last=ordered.map(([x])=>x.id);
 }
 /* ---------- Günlük Toplantı: bugün konuşulacak projeler (veriden otomatik) ---------- */
-const DY_QUIET=7,DY_CAP=10;
+const DY_QUIET=7,DY_CAP=10,DY_NOTE_DAYS=3;
 function dyRows(rows,cols,empty){
   if(!rows.length)return `<p class="note">${esc(empty)}</p>`;
   const head=cols.map(c=>`<th>${esc(c)}</th>`).join('');
@@ -2783,8 +2783,11 @@ function dyRows(rows,cols,empty){
 async function renderDaily(){
   if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Projeler Yükleniyor</h2><p>Kayıtlı projeler buluttan getiriliyor.</p></div>';return;}
   $('view').innerHTML='<section class="box"><h3>Günlük Toplantı<small>Yükleniyor…</small></h3></section>';
-  let tasks=[];
-  if(mode==='cloud'){try{await loadTasks();tasks=pl.tasks||[];}catch(e){tasks=[];}}
+  let tasks=[],notes=[];
+  if(mode==='cloud'){
+    try{await loadTasks();tasks=pl.tasks||[];}catch(e){tasks=[];}
+    try{const r=await fetch('/api/notes?recent='+DY_NOTE_DAYS,{credentials:'same-origin'});if(r.ok)notes=(await r.json()).notes||[];}catch(e){notes=[];}
+  }
   if(view!=='daily')return;
   const d0=new Date(),today=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');
   const open=db.sites.filter(isOpen),byId=new Map(db.sites.map(x=>[x.id,x]));
@@ -2794,24 +2797,27 @@ async function renderDaily(){
   // 1) Gecikmiş ve bugün biten görevler
   const due=tasks.filter(t=>!t.done&&t.due&&t.due<=today&&byId.has(t.siteId)).sort((a,b)=>a.due.localeCompare(b.due))
     .map(t=>{const x=byId.get(t.siteId),n=lateDays(t.due);return {id:x.id,cells:[code(x),esc(t.title||'—'),esc(t.assigneeName||t.assignee||'—'),n>0?`<span class="badge" style="--c:var(--s-red)">${n} gün gecikti</span>`:'<span class="badge" style="--c:var(--s-sunuldu)">Bugün</span>']};});
-  // 2) Engeli olan projeler
+  // 2) Şirket içi bilgilendirme: son günlerde eklenen proje notları
+  const noteRows=notes.filter(n=>byId.has(n.site_id)).map(n=>{const x=byId.get(n.site_id),t=String(n.body||'').replace(/\s+/g,' ');
+    return {id:x.id,cells:[code(x),esc(t.length>180?t.slice(0,180)+'…':t),esc(n.author_name||n.author||'—'),esc(agoText(n.created_at))]};});
+  // 3) Engeli olan projeler
   const blocked=open.filter(x=>(x.blockerTr||x.blocker||'').trim()).map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),esc((x.blockerTr||x.blocker).trim())]}));
-  // 3) Uzun süredir güncellenmeyenler
+  // 4) Uzun süredir güncellenmeyenler
   const quiet=open.filter(x=>days(x)>=DY_QUIET).sort((a,b)=>String(a.updatedAt).localeCompare(String(b.updatedAt)))
     .map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),`${days(x)} gün önce`]}));
-  // 4) Son 24 saatte güncellenenler
+  // 5) Son 24 saatte güncellenenler
   const fresh=open.filter(x=>days(x)<1).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)))
     .map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),esc(agoText(x.updatedAt))]}));
-  // 5) Açık görevi olmayan aktif projeler
+  // 6) Açık görevi olmayan aktif projeler
   const hasTask=new Set(tasks.filter(t=>!t.done).map(t=>t.siteId));
   const idle=open.filter(x=>x.status==='active'&&!hasTask.has(x.id)).map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),esc(nextStageOf(x)||'—')]}));
   const sec=(t,sub,n,html)=>`<section class="box"><h3>${esc(t)}<small>${esc(sub)} · ${n}</small></h3>${html}</section>`;
-  $('view').innerHTML=`<section class="box"><p class="note">Liste projelerin kayıtlarından otomatik çıkar; sırayla konuşun: önce 1 ve 4, sonra 2, 3 ve 5. Satıra tıklayınca proje açılır. Süre eşiği: ${DY_QUIET} gün.</p></section>`
-    +sec('1. Gecikmiş ve Bugün Biten Görevler','Önce bunlar',due.length,dyRows(due,['Proje','Görev','Sorumlu','Durum'],mode==='cloud'?'Gecikmiş ya da bugün biten görev yok.':'Görevler için sunucu bağlantısı gerekli.'))
-    +sec('2. Engeli Olan Projeler','Açık projeler',blocked.length,dyRows(blocked,['Proje','Aşama','Sorumlu','Engel'],'Engeli olan proje yok.'))
-    +sec('3. Güncellenmeyen Projeler',DY_QUIET+'+ gündür',quiet.length,dyRows(quiet,['Proje','Aşama','Sorumlu','Son Güncelleme'],'Bütün açık projeler güncel.'))
-    +sec('4. Son 24 Saatte Güncellenenler','Dünden beri',fresh.length,dyRows(fresh,['Proje','Aşama','Sorumlu','Güncelleme'],'Son 24 saatte güncellenen proje yok.'))
-    +sec('5. Açık Görevi Olmayan Projeler','Aktif projeler',idle.length,dyRows(idle,['Proje','Aşama','Sorumlu','Sıradaki Aşama'],'Her aktif projenin açık görevi var.'));
+  $('view').innerHTML=sec('1. Gecikmiş ve Bugün Biten Görevler','Önce bunlar',due.length,dyRows(due,['Proje','Görev','Sorumlu','Durum'],mode==='cloud'?'Gecikmiş ya da bugün biten görev yok.':'Görevler için sunucu bağlantısı gerekli.'))
+    +sec('2. Şirket İçi Bilgilendirme','Son '+DY_NOTE_DAYS+' gün',noteRows.length,dyRows(noteRows,['Proje','Not','Yazan','Zaman'],'Son günlerde eklenen şirket içi not yok.'))
+    +sec('3. Engeli Olan Projeler','Açık projeler',blocked.length,dyRows(blocked,['Proje','Aşama','Sorumlu','Engel'],'Engeli olan proje yok.'))
+    +sec('4. Güncellenmeyen Projeler',DY_QUIET+'+ gündür',quiet.length,dyRows(quiet,['Proje','Aşama','Sorumlu','Son Güncelleme'],'Bütün açık projeler güncel.'))
+    +sec('5. Son 24 Saatte Güncellenenler','Dünden beri',fresh.length,dyRows(fresh,['Proje','Aşama','Sorumlu','Güncelleme'],'Son 24 saatte güncellenen proje yok.'))
+    +sec('6. Açık Görevi Olmayan Projeler','Aktif projeler',idle.length,dyRows(idle,['Proje','Aşama','Sorumlu','Sıradaki Aşama'],'Her aktif projenin açık görevi var.'));
 }
 document.addEventListener('click',e=>{const r=e.target.closest('[data-dopen]');if(r&&view==='daily')openSite(r.dataset.dopen);});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const r=e.target.closest&&e.target.closest('[data-dopen]');if(r&&view==='daily')openSite(r.dataset.dopen);});
