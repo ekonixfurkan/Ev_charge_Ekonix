@@ -1078,7 +1078,7 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
     <nav class="nav" aria-label="Ana gezinme">
       <section class="nav-group" data-group="main">
         <button type="button" class="nav-head" aria-expanded="true">Ana menü<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="notifs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="notifs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button><button type="button" class="nav-item" data-nav="daily"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg><span>Günlük Toplantı</span></button></div>
       </section>
       <section class="nav-group" data-group="tracker" id="trackerGroup">
         <button type="button" class="nav-head" aria-expanded="true">İş Takibi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1402,8 +1402,8 @@ async function api(path,opts){
 }
 /* ---------- Sayfa adresi: yenileyince aynı sayfada kalmak için #/… ---------- */
 let routeOn=false;
-const ROUTE_VIEWS=['locations','users','activity','contacts','notifs','planner'];
-const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip',leads:'leads'};
+const ROUTE_VIEWS=['locations','users','activity','contacts','notifs','planner','daily'];
+const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip',leads:'leads',daily:'daily'};
 function routeHash(){
   if(view==='portfolio')return '#/'+sub;
   if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
@@ -1475,7 +1475,7 @@ async function poll(){
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads')render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads'&&view!=='daily')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -1607,7 +1607,7 @@ function legendHtml(){
   return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 // Üst başlık: proje sayfasında proje adı (altında il/ilçe), diğer sayfalarda uygulama adı.
-const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu'};
+const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Günlük Toplantı'};
 // Üst başlık: proje sayfasında proje adı (altında kod ve il/ilçe), diğer sayfalarda seçilen menü başlığı.
 function setPageTitle(){
   const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
@@ -1761,12 +1761,12 @@ function render(){
   {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();
+  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   dockBar();setPageTitle();
   saveRoute();
@@ -2279,7 +2279,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','comp','credit','check','files'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['comp','Rakip Analizi'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
-  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='leads'?'leads':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='leads'?'leads':view==='daily'?'daily':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -2301,6 +2301,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(k==='activity'){view='activity';render();window.scrollTo(0,0);}
     else if(k==='contacts'){view='contacts';render();window.scrollTo(0,0);}
     else if(k==='notifs'){view='notifs';render();window.scrollTo(0,0);}
+    else if(k==='daily'){view='daily';render();window.scrollTo(0,0);}
     else if(k==='planner'){view='planner';render();window.scrollTo(0,0);}
     else if(k==='meetings'){view='meetings';render();window.scrollTo(0,0);}
     else if(k==='rakip'){view='rakip';render();window.scrollTo(0,0);}
@@ -2770,6 +2771,50 @@ function paintPlanner(){
   const e=$('plPagerTop');if(e)e.innerHTML=pagerHtml('pl',pi);
   paintPlanner.last=ordered.map(([x])=>x.id);
 }
+/* ---------- Günlük Toplantı: bugün konuşulacak projeler (veriden otomatik) ---------- */
+const DY_QUIET=7,DY_CAP=10;
+function dyRows(rows,cols,empty){
+  if(!rows.length)return `<p class="note">${esc(empty)}</p>`;
+  const head=cols.map(c=>`<th>${esc(c)}</th>`).join('');
+  const body=rows.slice(0,DY_CAP).map(x=>`<tr data-dopen="${esc(x.id)}" tabindex="0" role="button">${x.cells.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('');
+  const more=rows.length>DY_CAP?`<p class="note">+${rows.length-DY_CAP} ${esc('daha (Proje Listesi\'nden bakın)')}</p>`:'';
+  return `<div class="u-wrap"><table class="u-tbl"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${more}`;
+}
+async function renderDaily(){
+  if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Projeler Yükleniyor</h2><p>Kayıtlı projeler buluttan getiriliyor.</p></div>';return;}
+  $('view').innerHTML='<section class="box"><h3>Günlük Toplantı<small>Yükleniyor…</small></h3></section>';
+  let tasks=[];
+  if(mode==='cloud'){try{await loadTasks();tasks=pl.tasks||[];}catch(e){tasks=[];}}
+  if(view!=='daily')return;
+  const d0=new Date(),today=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');
+  const open=db.sites.filter(isOpen),byId=new Map(db.sites.map(x=>[x.id,x]));
+  const code=x=>`<b>${esc(x.code||'')}</b> ${esc(x.name||'')}`;
+  const days=x=>Math.floor((Date.now()-Date.parse(x.updatedAt))/864e5);
+  const lateDays=due=>Math.round((Date.parse(today)-Date.parse(due))/864e5);
+  // 1) Gecikmiş ve bugün biten görevler
+  const due=tasks.filter(t=>!t.done&&t.due&&t.due<=today&&byId.has(t.siteId)).sort((a,b)=>a.due.localeCompare(b.due))
+    .map(t=>{const x=byId.get(t.siteId),n=lateDays(t.due);return {id:x.id,cells:[code(x),esc(t.title||'—'),esc(t.assigneeName||t.assignee||'—'),n>0?`<span class="badge" style="--c:var(--s-red)">${n} gün gecikti</span>`:'<span class="badge" style="--c:var(--s-sunuldu)">Bugün</span>']};});
+  // 2) Engeli olan projeler
+  const blocked=open.filter(x=>(x.blockerTr||x.blocker||'').trim()).map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),esc((x.blockerTr||x.blocker).trim())]}));
+  // 3) Uzun süredir güncellenmeyenler
+  const quiet=open.filter(x=>days(x)>=DY_QUIET).sort((a,b)=>String(a.updatedAt).localeCompare(String(b.updatedAt)))
+    .map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),`${days(x)} gün önce`]}));
+  // 4) Son 24 saatte güncellenenler
+  const fresh=open.filter(x=>days(x)<1).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)))
+    .map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),esc(agoText(x.updatedAt))]}));
+  // 5) Açık görevi olmayan aktif projeler
+  const hasTask=new Set(tasks.filter(t=>!t.done).map(t=>t.siteId));
+  const idle=open.filter(x=>x.status==='active'&&!hasTask.has(x.id)).map(x=>({id:x.id,cells:[code(x),esc(stageLabel(x.stage)),esc(x.survey.lead||'—'),esc(nextStageOf(x)||'—')]}));
+  const sec=(t,sub,n,html)=>`<section class="box"><h3>${esc(t)}<small>${esc(sub)} · ${n}</small></h3>${html}</section>`;
+  $('view').innerHTML=`<section class="box"><p class="note">Liste projelerin kayıtlarından otomatik çıkar; sırayla konuşun: önce 1 ve 4, sonra 2, 3 ve 5. Satıra tıklayınca proje açılır. Süre eşiği: ${DY_QUIET} gün.</p></section>`
+    +sec('1. Gecikmiş ve Bugün Biten Görevler','Önce bunlar',due.length,dyRows(due,['Proje','Görev','Sorumlu','Durum'],mode==='cloud'?'Gecikmiş ya da bugün biten görev yok.':'Görevler için sunucu bağlantısı gerekli.'))
+    +sec('2. Engeli Olan Projeler','Açık projeler',blocked.length,dyRows(blocked,['Proje','Aşama','Sorumlu','Engel'],'Engeli olan proje yok.'))
+    +sec('3. Güncellenmeyen Projeler',DY_QUIET+'+ gündür',quiet.length,dyRows(quiet,['Proje','Aşama','Sorumlu','Son Güncelleme'],'Bütün açık projeler güncel.'))
+    +sec('4. Son 24 Saatte Güncellenenler','Dünden beri',fresh.length,dyRows(fresh,['Proje','Aşama','Sorumlu','Güncelleme'],'Son 24 saatte güncellenen proje yok.'))
+    +sec('5. Açık Görevi Olmayan Projeler','Aktif projeler',idle.length,dyRows(idle,['Proje','Aşama','Sorumlu','Sıradaki Aşama'],'Her aktif projenin açık görevi var.'));
+}
+document.addEventListener('click',e=>{const r=e.target.closest('[data-dopen]');if(r&&view==='daily')openSite(r.dataset.dopen);});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const r=e.target.closest&&e.target.closest('[data-dopen]');if(r&&view==='daily')openSite(r.dataset.dopen);});
 async function renderPlanner(){
   if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Proje Görev Listesi</h3><p class="note">Proje Görev Listesi için sunucu bağlantısı gerekli.</p></section>';return;}
   if(!people.length)loadPeople();
