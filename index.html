@@ -1057,7 +1057,10 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   .amg-row,.dd-row{break-inside:avoid}
   tr,.kpi{break-inside:avoid}
 }
-.dy-back{margin-left:auto;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+/* Açılır geri dönüş düğmesi: sayfa düzenine girmez (fixed), kenar çubuğu renginde çerçeveli */
+.dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:4px 12px;font-size:12px;font-weight:600;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
+.dy-back:hover{background:var(--side-d);color:#fff}
+.dy-back:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .dy-back[hidden]{display:none}
 .dy-tbl{table-layout:fixed;width:100%}
 .dy-tbl td,.dy-tbl th{vertical-align:top;overflow-wrap:anywhere}
@@ -1074,7 +1077,6 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
     <p class="page-sub" id="pageSub" hidden></p>
   </div>
   <div id="hdrTools" class="hdr-tools"></div>
-  <button type="button" id="dyBack" class="ghost dy-back no-print" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg><span>Günlük Toplantı</span></button>
 </header>
 <section class="pipeline" aria-label="Projelerin durum dağılımı">
   <div class="pipe-legend" id="pipeLegend"></div>
@@ -3742,4 +3744,5 @@ $('logoutBtn').onclick=async()=>{
 render();load();
 </script>
 
+<button type="button" id="dyBack" class="dy-back no-print" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg><span>Günlük Toplantı</span></button>
 </body></html>
