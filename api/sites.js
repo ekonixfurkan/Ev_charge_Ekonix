@@ -12,6 +12,7 @@ import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
 import { _deps as _filesDeps } from '../lib/files.js';
 import { analyze, validArea, maxRequests, sealKey, openKey, keyLooksValid, testKey } from '../lib/tomtom.js';
 import { saveAnalysis, handleHistory } from '../lib/evhistory.js';
+import { resolveMapsLink } from '../lib/geo.js';
 
 // TCMB günlük kurlar: USD döviz satış kuru, 3 saat önbellekte tutulur.
 // Anahtar: önce Vercel ortam değişkeni, yoksa sistemden girilmiş (şifreli) kayıt.
@@ -49,6 +50,12 @@ export default async function handler(req, res) {
       } catch {
         return res.status(502).json({ error: 'Kur alınamadı' });
       }
+    }
+    // GET ?geo=<harita bağlantısı>: kısa Google Haritalar bağlantısından koordinat (Rakip Analizi'nde enlem/boylam otomatik dolsun diye)
+    if (req.method === 'GET' && req.query?.geo) {
+      res.setHeader('cache-control', 'no-store');
+      const g = await resolveMapsLink(String(req.query.geo).slice(0, 600));
+      return res.status(g.error ? 422 : 200).json(g);
     }
     await ensureSchema();
     const s = sql();
