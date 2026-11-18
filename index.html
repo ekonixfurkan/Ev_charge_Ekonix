@@ -1057,6 +1057,8 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   .amg-row,.dd-row{break-inside:avoid}
   tr,.kpi{break-inside:avoid}
 }
+.dy-back{margin-left:auto;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.dy-back[hidden]{display:none}
 .dy-tbl{table-layout:fixed;width:100%}
 .dy-tbl td,.dy-tbl th{vertical-align:top;overflow-wrap:anywhere}
 .dy-tbl td{white-space:normal}
@@ -1072,6 +1074,7 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
     <p class="page-sub" id="pageSub" hidden></p>
   </div>
   <div id="hdrTools" class="hdr-tools"></div>
+  <button type="button" id="dyBack" class="ghost dy-back no-print" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg><span>Günlük Toplantı</span></button>
 </header>
 <section class="pipeline" aria-label="Projelerin durum dağılımı">
   <div class="pipe-legend" id="pipeLegend"></div>
@@ -1774,6 +1777,7 @@ function render(){
   if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   dockBar();setPageTitle();
+  {const b=$('dyBack');if(b)b.hidden=!(dyBack&&view!=='daily');}
   saveRoute();
   if(view!=='site'&&notesOpen)closeNotes();
 }
@@ -2297,7 +2301,7 @@ document.querySelector('aside').addEventListener('click',e=>{
   if(head){const g=head.parentElement,c=g.classList.toggle('collapsed');head.setAttribute('aria-expanded',String(!c));
     try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');st[g.dataset.group]=c;localStorage.setItem('saha-nav',JSON.stringify(st));}catch(x){}return;}
   const b=e.target.closest('.nav-item[data-nav]');if(!b)return;
-  const k=b.dataset.nav;
+  const k=b.dataset.nav;dyBack=false;
   if(SITE_SUBS.includes(k)&&view==='site'){sub=k;render();window.scrollTo(0,0);return;}
   guard(()=>{
     if(PORT_SUBS.includes(k)){view='portfolio';sub=k;render();window.scrollTo(0,0);}
@@ -2787,7 +2791,9 @@ function dyRows(rows,h2,h3,empty){
   return `<table class="u-tbl dy-tbl"><colgroup><col style="width:36%"><col style="width:38%"><col style="width:26%"></colgroup><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>${more}`;
 }
 // Satıra tıklayınca ilgili yere gider: görev → Proje Görev Listesi (o proje), not → proje + Şirket İçi Notlar paneli, diğerleri → proje.
+let dyBack=false;
 function dyGo(id,go){
+  dyBack=true;
   if(go==='task'){pl.f.site=id;pl.f.status='open';pl.f.assignee='';pl.f.range='';pl.f.hideEmpty=false;guard(()=>{view='planner';render();window.scrollTo(0,0);});return;}
   openSite(id);
   setTimeout(()=>{
@@ -2827,7 +2833,8 @@ async function renderDaily(){
     +sec('3. Güncellenmeyen Projeler',DY_QUIET+'+ gündür',quiet.length,dyRows(quiet,'İl','Güncelleme','Bütün açık projeler güncel.'))
     +sec('4. Son 24 Saatte Güncellenenler','Dünden beri',fresh.length,dyRows(fresh,'İl','Güncelleme','Son 24 saatte güncellenen proje yok.'))+'</div>';
 }
-document.addEventListener('click',e=>{const r=e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
+document.addEventListener('click',e=>{if(e.target.closest('#dyBack')){guard(()=>{dyBack=false;if(notesOpen)closeNotes();view='daily';render();window.scrollTo(0,0);});return;}
+  const r=e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const r=e.target.closest&&e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
 async function renderPlanner(){
   if(mode!=='cloud'){$('view').innerHTML='<section class="box"><h3>Proje Görev Listesi</h3><p class="note">Proje Görev Listesi için sunucu bağlantısı gerekli.</p></section>';return;}
