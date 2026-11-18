@@ -201,7 +201,7 @@
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
-    'Günlük Toplantı': 'Daily Meeting',
+    'Daily Toplantı Notları': 'Daily Meeting Notes',
     '1. Gecikmiş ve Bugün Biten Görevler': '1. Overdue and Due-Today Tasks',
     'Önce bunlar': 'Start here',
     

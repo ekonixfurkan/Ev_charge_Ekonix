@@ -1119,7 +1119,7 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
     <nav class="nav" aria-label="Ana gezinme">
       <section class="nav-group" data-group="main">
         <button type="button" class="nav-head" aria-expanded="true">Ana menü<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="notifs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button><button type="button" class="nav-item" data-nav="daily"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg><span>Günlük Toplantı</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="notifs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button><button type="button" class="nav-item" data-nav="daily"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg><span>Daily Toplantı Notları</span></button></div>
       </section>
       <section class="nav-group" data-group="tracker" id="trackerGroup">
         <button type="button" class="nav-head" aria-expanded="true">İş Takibi<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -1654,7 +1654,7 @@ function legendHtml(){
   return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 // Üst başlık: proje sayfasında proje adı (altında il/ilçe), diğer sayfalarda uygulama adı.
-const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Günlük Toplantı'};
+const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Daily Toplantı Notları'};
 // Üst başlık: proje sayfasında proje adı (altında kod ve il/ilçe), diğer sayfalarda seçilen menü başlığı.
 function setPageTitle(){
   const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
@@ -2819,7 +2819,7 @@ function paintPlanner(){
   const e=$('plPagerTop');if(e)e.innerHTML=pagerHtml('pl',pi);
   paintPlanner.last=ordered.map(([x])=>x.id);
 }
-/* ---------- Günlük Toplantı: bugün konuşulacak projeler (veriden otomatik) ---------- */
+/* ---------- Daily Toplantı Notları: bugün konuşulacak projeler (veriden otomatik) ---------- */
 const DY_QUIET=7,DY_CAP=10,DY_NOTE_DAYS=3;
 // Dört kutu (Ana Sayfa gibi 2×2); her kutuda aynı 3 sütun, aynı genişlik: Proje · Ayrıntı · Zaman. Tıklama: go = nereye gidilir.
 function dyRows(rows,h2,h3,empty){
@@ -2842,7 +2842,7 @@ function dyGo(id,go){
 }
 async function renderDaily(){
   if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Projeler Yükleniyor</h2><p>Kayıtlı projeler buluttan getiriliyor.</p></div>';return;}
-  $('view').innerHTML='<section class="box"><h3>Günlük Toplantı<small>Yükleniyor…</small></h3></section>';
+  $('view').innerHTML='<section class="box"><h3>Daily Toplantı Notları<small>Yükleniyor…</small></h3></section>';
   let tasks=[],notes=[];
   if(mode==='cloud'){
     try{await loadTasks();tasks=pl.tasks||[];}catch(e){tasks=[];}
@@ -3851,5 +3851,5 @@ $('logoutBtn').onclick=async()=>{
 render();load();
 </script>
 
-<button type="button" id="dyBack" class="dy-back no-print" hidden><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg><span>Günlük Toplantı</span></button>
+<button type="button" id="dyBack" class="dy-back no-print" hidden><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg><span>Daily Toplantı Notları</span></button>
 </body></html>
