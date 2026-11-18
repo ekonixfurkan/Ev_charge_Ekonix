@@ -224,7 +224,7 @@ table.portfolio.act-tbl :is(th,td){min-width:0}
 :root{--wrap:2400px}
 main{padding:24px 28px;max-width:calc(var(--wrap) + 56px);width:100%}
 @media (min-width:701px){
-  body{display:grid;grid-template-columns:256px minmax(0,1fr);grid-template-rows:auto auto 1fr;min-height:100vh}
+  body{display:grid;grid-template-columns:224px minmax(0,1fr);grid-template-rows:auto auto 1fr;min-height:100vh}
   .shell{display:contents}
   body{grid-template-rows:auto auto auto 1fr}
   .zoom-note{grid-column:1/-1;grid-row:1}
@@ -237,7 +237,7 @@ main{padding:24px 28px;max-width:calc(var(--wrap) + 56px);width:100%}
   .sb-collapsed aside{overflow:visible;z-index:30;width:64px;justify-self:start}
   /* Daraltılmış menüde fare üstüne gelince menü genişler (içerik kaymaz, menü içeriğin üstüne açılır); fare çekilince geri daralır. */
   body.sb-peek{grid-template-columns:64px minmax(0,1fr)}
-  body.sb-peek aside{width:256px;justify-self:start;z-index:40;overflow-x:hidden;box-shadow:10px 0 30px rgba(0,0,0,.28)}
+  body.sb-peek aside{width:224px;justify-self:start;z-index:40;overflow-x:hidden;box-shadow:10px 0 30px rgba(0,0,0,.28)}
   aside .nav-item span,aside .logout span{white-space:nowrap}
   .sb-collapsed .brand{flex-direction:column;justify-content:flex-start;padding:12px 8px;gap:10px}
   .sb-collapsed .logobox{padding:4px}
