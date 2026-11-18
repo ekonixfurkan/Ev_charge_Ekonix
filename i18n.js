@@ -198,6 +198,9 @@
     'Yalnızca bu projeye ait analizler listelenir.': 'Only analyses belonging to this project are listed.',
     /* dosya klasör kutucukları */
     'Boş': 'Empty', 'Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.': 'There are no files in this folder. Use "Upload" or drag a file here.',
+    /* menü grupları */
+    'Toplantılar': 'Meetings',
+    'Satış ve Pazar': 'Sales & Market',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
