@@ -195,6 +195,7 @@
     'Kime Atanacak': 'Assign To', 'Son Tarih': 'Due Date', 'Görev Ekle': 'Add Task', 'Sorumlu seçin': 'Select an owner',
     'Görev metni boş olamaz.': 'Task text cannot be empty.', 'Kime atanacağını seçin.': 'Select who it is assigned to.', 'Görev listesine eklendi.': 'Added to the task list.',
 
+    'Yalnızca bu projeye ait analizler listelenir.': 'Only analyses belonging to this project are listed.',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',

@@ -3318,7 +3318,7 @@ function compSectionHtml(standalone){
       <label>Enlem<input id="compLat" type="text" inputmode="decimal" autocomplete="off" placeholder="41.088204 ya da 41°00'23.9&quot;N" value="${esc(comp.lat)}"></label>
       <label>Boylam<input id="compLon" type="text" inputmode="decimal" autocomplete="off" placeholder="29.018024 ya da 28°50'29.0&quot;E" value="${esc(comp.lon)}"></label>
       <label>Çap<select id="compRad">${[1000,2000,3000,5000].map(r=>`<option value="${r}" ${r===comp.rad?'selected':''}>${r/1000} km</option>`).join('')}</select></label>
-      <label class="span4">Ad / Not (isteğe bağlı)<input id="compLabel" type="text" maxlength="120" autocomplete="off" placeholder="Örn. Levent AVM önü" value="${esc(comp.label)}"></label>
+      <label class="span4">Ad / Not (isteğe bağlı)<input id="compLabel" type="text" maxlength="120" autocomplete="off" placeholder="Örn. Levent AVM önü" value="${esc(!standalone&&comp.labelAuto&&cur()?compAutoLabel(cur()):comp.label)}"></label>
       <div class="comp-act"><button type="button" class="primary" id="compGo">Analiz Et</button><button type="button" id="compCsv" hidden>Excel'e Aktar (CSV)</button></div>
     </div>
     <p class="note" id="compNote"></p>
@@ -3344,6 +3344,7 @@ function compApplyOpen(){
 }
 function compHistoryHtml(standalone){
   return `<section class="box comp-hist"><h3>Geçmiş Analizler<small id="chSummary"></small></h3>
+    ${standalone?'':'<p class="note no-print">Yalnızca bu projeye ait analizler listelenir.</p>'}
     <label class="lchk no-print"><input type="checkbox" id="chMine" ${comp.hist.mine?'checked':''}>Yalnızca benim analizlerim</label>
     <div class="scroll"><table class="portfolio comp-hist-tbl m-cards"><thead><tr><th>Tarih</th><th>Yapan</th><th>Ad</th><th>İl</th><th>İlçe</th><th>Mahalle</th><th>Cadde</th><th>Koordinat</th><th class="num">Çap</th><th class="num">İstasyon</th><th class="num">Soket</th><th class="num">Boş</th><th class="num">Dolu</th><th class="num">Doluluk</th><th></th></tr></thead><tbody id="chRows"><tr><td colspan="15" class="note" style="padding:20px;text-align:center">Yükleniyor…</td></tr></tbody></table></div>
     <div class="row-actions" id="chMore" hidden><button type="button" id="chMoreBtn">Daha Fazla Göster</button></div></section>`;
@@ -3355,9 +3356,11 @@ async function chApi(method,qs,body){
 }
 async function chLoad(more){
   const h=comp.hist;if(h.busy||!$('chRows'))return;h.busy=true;
+  // Proje sayfasında yalnızca o projenin analizleri; Rakip Analizi sayfasında hepsi.
+  const key=view==='site'&&cur()?cur().id:'';if(h.key!==key){h.key=key;h.rows=[];h.total=0;h.loaded=false;more=false;}
   try{
     const off=more?h.rows.length:0;
-    const d=await chApi('GET','list&'+new URLSearchParams({limit:'20',offset:String(off),mine:h.mine?'1':'0'}).toString());
+    const d=await chApi('GET','list&'+new URLSearchParams({limit:'20',offset:String(off),mine:h.mine?'1':'0',site:key}).toString());
     h.rows=more?h.rows.concat(d.rows):d.rows;h.total=d.total;h.me=d.me;h.owner=d.owner;h.loaded=true;chPaint();
   }catch(e){const t=$('chRows');if(t)t.innerHTML=`<tr><td colspan="15" class="note comp-warn" style="padding:20px;text-align:center">${esc(e.message)}</td></tr>`;}
   finally{h.busy=false;}
@@ -3404,7 +3407,13 @@ function coordOne(str){
 }
 function parseGps(v){const s=String(v||''),m=s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/(?:[?&](?:q|ll|query|destination)=)(-?\d+\.\d+)(?:,|%2C)\s*(-?\d+\.\d+)/)||s.match(/(-?\d{1,2}\.\d{3,})\s*[,; ]\s*(-?\d{1,3}\.\d{3,})/);if(m)return [m[1],m[2]];const d=dmsTokens(s);return d.length>=2?coordPair(s):null;}
 // Proje değişince alanlar GPS bilgisinden doldurulur; aynı projede kullanıcının yazdığı değerler korunur.
-function compPrime(s){if(comp.site===s.id)return;comp.site=s.id;const g=parseGps(s.survey&&s.survey.gps);comp.lat=g?g[0]:'';comp.lon=g?g[1]:'';comp.rad=3000;comp.res=null;}
+// Proje sayfasında: koordinat projenin GPS alanından otomatik dolar (GPS değişirse yeniden), ad otomatik "Proje adı · tarih saat" olur.
+const compAutoLabel=s=>((s&&s.name||'')+' · '+new Date().toLocaleString(LOC,{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})).slice(0,120);
+function compPrime(s){
+  const key=String(s.survey&&s.survey.gps||'');
+  if(comp.site!==s.id){comp.site=s.id;comp.rad=3000;comp.res=null;comp.label='';comp.labelAuto=true;comp.gpsKey=null;}
+  if(comp.gpsKey!==key){comp.gpsKey=key;const g=parseGps(key);if(g){comp.lat=g[0];comp.lon=g[1];}else if(comp.gpsKey!==null&&!comp.lat&&!comp.lon){comp.lat='';comp.lon='';}}
+}
 const compNum=v=>String(v||'').trim().replace(',','.');
 function compNormalize(){
   const la=$('compLat'),lo=$('compLon');if(!la||!lo)return false;
@@ -3438,6 +3447,7 @@ async function compRun(){
   if(mode!=='cloud'){note.textContent='Rakip analizi için sunucu bağlantısı gerekli.';note.className='note comp-warn';return;}
   comp.busy=true;const b=$('compGo');b.disabled=true;b.textContent='Çekiliyor…';note.textContent='';note.className='note';
   try{
+    if(view==='site'&&comp.labelAuto&&cur()){const lb0=$('compLabel');if(lb0)lb0.value=compAutoLabel(cur());}
     comp.label=($('compLabel')||{}).value||'';
     const r=await fetch('/api/sites?'+new URLSearchParams({ev:'1',lat,lon,radius:String(rad),label:comp.label,site:view==='site'?sid:comp.pick||''}),{credentials:'same-origin'});
     if(r.status===401){location.replace('/login.html');return;}
@@ -3480,7 +3490,7 @@ document.addEventListener('click',async e=>{
     try{
       const d=await chApi('GET',encodeURIComponent(id));
       if(cs){compCsv(d);}
-      else{comp.res=d;comp.lat=String(d.lat);comp.lon=String(d.lon);comp.rad=d.radius;comp.label=d.label||'';
+      else{comp.res=d;comp.lat=String(d.lat);comp.lon=String(d.lon);comp.rad=d.radius;comp.label=d.label||'';comp.labelAuto=false;
         const la=$('compLat'),lo=$('compLon'),ra=$('compRad'),lb=$('compLabel');if(la)la.value=comp.lat;if(lo)lo.value=comp.lon;if(ra)ra.value=String(d.radius);if(lb)lb.value=comp.label;
         const n=$('compNote');if(n){n.textContent='Kayıtlı analiz gösteriliyor ('+fmtTs(d.createdAt)+'). Güncel veri için “Analiz Et”e basın.';n.className='note';}
         comp.open='run';compApplyOpen();compPaint();const box=document.querySelector('.comp-box');if(box)box.scrollIntoView({behavior:'smooth',block:'start'});}
@@ -3511,7 +3521,7 @@ document.addEventListener('click',async e=>{
   }catch(x){toast(x.message);}
   finally{btn.disabled=false;}
 });
-document.addEventListener('input',e=>{const el=e.target;if(el.id==='compLat')comp.lat=el.value;else if(el.id==='compLon')comp.lon=el.value;else if(el.id==='compRad')comp.rad=+el.value;});
+document.addEventListener('input',e=>{const el=e.target;if(el.id==='compLabel'){comp.labelAuto=!el.value.trim();comp.label=el.value;}if(el.id==='compLat')comp.lat=el.value;else if(el.id==='compLon')comp.lon=el.value;else if(el.id==='compRad')comp.rad=+el.value;});
 document.addEventListener('change',e=>{if(e.target.id==='chMine'){comp.hist.mine=e.target.checked;chLoad(false);}});
 document.addEventListener('paste',e=>{if(e.target.id==='compLat'||e.target.id==='compLon')setTimeout(compNormalize,0);});
 document.addEventListener('change',e=>{
