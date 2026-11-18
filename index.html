@@ -364,6 +364,14 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .yearly.fl-tbl th.num,.yearly.fl-tbl td.num{text-align:right;white-space:nowrap}
 .fl-tbl th:nth-child(1){width:44%}.fl-tbl th:nth-child(2){width:10%}.fl-tbl th:nth-child(3){width:18%}.fl-tbl th:nth-child(4){width:15%}
 .fl-tbl a{color:var(--navy);font-weight:600;text-decoration:none}.fl-tbl a:hover{text-decoration:underline}
+.fl-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;padding:14px}
+.fl-pic{margin:0;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);overflow:hidden}
+.fl-pic>a{display:block;aspect-ratio:4/3;background:var(--soft)}
+.fl-pic img{display:block;width:100%;height:100%;object-fit:cover}
+.fl-pic figcaption{display:grid;gap:2px;padding:8px 10px}
+.fl-pic figcaption b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fl-pic figcaption small{color:var(--muted);font-size:12px}
+.fl-pic-act{display:flex;gap:10px;align-items:center;margin-top:4px}
 .fl-thumb{display:inline-block;vertical-align:middle;width:40px;height:40px;margin-right:8px;border:1px solid var(--hair-strong);border-radius:4px;overflow:hidden;background:var(--soft)}
 .fl-thumb img{display:block;width:100%;height:100%;object-fit:cover}
 .fl-ico{display:inline-block;min-width:34px;margin-right:8px;padding:1px 5px;border:1px solid var(--hair-strong);border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.04em;text-align:center;color:var(--muted)}
@@ -3116,6 +3124,12 @@ async function loadFiles(){
   catch(e){fl.err=e.message;}
   paintFiles();
 }
+// Saha fotoğrafları: büyük önizleme kartları (satırda 3-4 adet); tıklayınca tam boy açılır.
+function flPicHtml(f){
+  const can=!!fl.owner,u='/api/files?download='+esc(f.id);
+  return `<figure class="fl-pic" data-flid="${esc(f.id)}"><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><img src="${u}&inline=1" alt="${esc(f.name)}" loading="lazy" decoding="async"></a>
+    <figcaption><b title="${esc(f.name)}">${esc(f.name)}</b><small>${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><span class="fl-pic-act"><a class="btn-link" href="${u}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;
+}
 function flRowHtml(f){
   const can=!!fl.owner,view_=/^(pdf|jpg|jpeg|png)$/.test(flExt(f.name));
   const img=/^(jpg|jpeg|png)$/.test(flExt(f.name));
@@ -3143,7 +3157,9 @@ function paintFiles(){
         return `<button type="button" class="comp-tile fl-tile${on?' on':''}" data-flsel="${esc(name)}" data-flfolder="${esc(name)}" aria-expanded="${on}"><span class="ct-ic">${icon}${n?`<i class="ct-n">${n>99?'99+':n}</i>`:''}</span><span class="ct-tx"><b>${esc(name)}</b><small>${n?n+' dosya':'Boş'}</small></span></button>`;}).join('');
       const list=by[fl.sel]||[];
       const pane=fl.sel&&fl.folders.includes(fl.sel)?`<div class="fl-folder fl-pane" data-flfolder="${esc(fl.sel)}"><div class="fl-head"><strong>${esc(fl.sel)}</strong><small>${list.length} dosya</small><button type="button" class="ghost pick-btn" data-flup="${esc(fl.sel)}">Yükle</button></div>
-        ${list.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${list.map(flRowHtml).join('')}</tbody></table></div>`:'<p class="note" style="padding:14px 16px">Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.</p>'}</div>`:'';
+        ${(()=>{const pics=list.filter(f=>/^(jpg|jpeg|png)$/.test(flExt(f.name))),others=list.filter(f=>!pics.includes(f));
+          return (pics.length?`<div class="fl-gallery">${pics.map(flPicHtml).join('')}</div>`:'')+(others.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${others.map(flRowHtml).join('')}</tbody></table></div>`:'');})()}
+        ${list.length?'':'<p class="note" style="padding:14px 16px">Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.</p>'}</div>`:'';
       return `<div class="hub-tiles no-print">${tiles}</div>${pane}`;})()}`;
   paintUploads();
 }
