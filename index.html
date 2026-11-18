@@ -358,6 +358,8 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .yearly.fl-tbl th.num,.yearly.fl-tbl td.num{text-align:right;white-space:nowrap}
 .fl-tbl th:nth-child(1){width:44%}.fl-tbl th:nth-child(2){width:10%}.fl-tbl th:nth-child(3){width:18%}.fl-tbl th:nth-child(4){width:15%}
 .fl-tbl a{color:var(--navy);font-weight:600;text-decoration:none}.fl-tbl a:hover{text-decoration:underline}
+.fl-thumb{display:inline-block;vertical-align:middle;width:40px;height:40px;margin-right:8px;border:1px solid var(--hair-strong);border-radius:4px;overflow:hidden;background:var(--soft)}
+.fl-thumb img{display:block;width:100%;height:100%;object-fit:cover}
 .fl-ico{display:inline-block;min-width:34px;margin-right:8px;padding:1px 5px;border:1px solid var(--hair-strong);border-radius:4px;font-size:10px;font-weight:700;letter-spacing:.04em;text-align:center;color:var(--muted)}
 .fl-act{white-space:nowrap;text-align:right}.fl-act .btn-link{margin-right:6px;font-weight:500}
 .fl-bar-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
@@ -3110,7 +3112,9 @@ async function loadFiles(){
 }
 function flRowHtml(f){
   const can=!!fl.owner,view_=/^(pdf|jpg|jpeg|png)$/.test(flExt(f.name));
-  return `<tr data-flid="${esc(f.id)}"><td><span class="fl-ico">${flBadge(f.name)}</span>${view_?`<a href="/api/files?download=${esc(f.id)}&inline=1" target="_blank" rel="noopener">${esc(f.name)}</a>`:`<a href="/api/files?download=${esc(f.id)}">${esc(f.name)}</a>`}</td>
+  const img=/^(jpg|jpeg|png)$/.test(flExt(f.name));
+  const ico=img?`<a class="fl-thumb" href="/api/files?download=${esc(f.id)}&inline=1" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="/api/files?download=${esc(f.id)}&inline=1" alt="" loading="lazy" decoding="async" width="40" height="40"></a>`:`<span class="fl-ico">${flBadge(f.name)}</span>`;
+  return `<tr data-flid="${esc(f.id)}"><td>${ico}${view_?`<a href="/api/files?download=${esc(f.id)}&inline=1" target="_blank" rel="noopener">${esc(f.name)}</a>`:`<a href="/api/files?download=${esc(f.id)}">${esc(f.name)}</a>`}</td>
     <td class="num">${esc(flSize(f.size))}</td><td>${esc(f.uploadedByName||f.uploadedBy||'—')}</td><td class="num">${esc(fmtTs(f.uploadedAt))}</td>
     <td class="fl-act"><a class="btn-link" href="/api/files?download=${esc(f.id)}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></td></tr>`;
 }
