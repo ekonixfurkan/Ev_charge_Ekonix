@@ -346,6 +346,12 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 #notifRows tr.unread td{background:var(--teal-soft)}
 #notifRows tr.unread.grp-first td:first-child{box-shadow:inset 3px 0 0 var(--teal)}
 #notifRows tr:not(.grp-first) td:first-child{padding-left:8px;border-left:0}
+.hub-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin:0 0 14px}
+.hub-tiles .comp-tile{min-height:76px;padding:14px 16px}
+.hub-tiles .comp-tile.over,.comp-tile.over{border-color:var(--teal);background:var(--teal-soft)}
+.ct-ic{position:relative}
+.ct-n{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--teal);color:#fff;font:700 11px/20px var(--font);font-style:normal;text-align:center}
+.fl-pane{margin-top:0}
 .fl-folder{border:1px solid var(--hair);border-radius:var(--radius);margin:0 0 10px;background:var(--card)}
 .fl-folder.over{border-color:var(--teal);background:var(--teal-soft)}
 .fl-head{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--soft)}
@@ -3099,7 +3105,7 @@ const flBadge=n=>{const e=flExt(n);return e==='pdf'?'PDF':/^xls|csv/.test(e)?'XL
 function initFiles(){
   if(view!=='site'||!$('flBody'))return;
   if(mode!=='cloud'){$('flBody').innerHTML='<p class="note">Dosyalar için sunucu bağlantısı gerekli.</p>';return;}
-  if(fl.site!==activeId){fl={...fl,site:activeId,folders:[],files:[],loaded:false,collapsed:{},uploading:[],newOpen:false,err:''};}
+  if(fl.site!==activeId){fl={...fl,site:activeId,sel:undefined,folders:[],files:[],loaded:false,collapsed:{},uploading:[],newOpen:false,err:''};}
   paintFiles();
   if(!fl.loaded||(sub==='files'&&Date.now()-(fl.at||0)>20000))loadFiles();
 }
@@ -3130,9 +3136,15 @@ function paintFiles(){
   b.innerHTML=`<div class="fl-bar-top no-print"><p class="note">Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.</p>
     <div class="fl-new">${fl.newOpen?`<input id="flNewName" maxlength="60" placeholder="Klasör adı" aria-label="Klasör adı"><button type="button" class="primary" id="flNewOk">Ekle</button><button type="button" id="flNewCancel">Vazgeç</button>`:'<button type="button" id="flNewOpen">+ Yeni Klasör</button>'}</div></div>
     <div id="flUploads"></div>
-    ${fl.folders.map(name=>{const list=by[name]||[],open=fl.collapsed[name]===undefined?list.length>0:!fl.collapsed[name];
-      return `<div class="fl-folder${list.length?'':' empty'}" data-flfolder="${esc(name)}"><div class="fl-head"><button type="button" class="ct-tg" data-fltg="${esc(name)}" aria-expanded="${open}" aria-label="${esc(name)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><strong>${esc(name)}</strong><small>${list.length} dosya</small><button type="button" class="ghost pick-btn" data-flup="${esc(name)}">Yükle</button></div>
-      ${open&&list.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${list.map(flRowHtml).join('')}</tbody></table></div>`:''}</div>`;}).join('')}`;
+    ${(()=>{
+      if(fl.sel===undefined&&fl.loaded)fl.sel=(fl.folders.find(n=>(by[n]||[]).length)||'');
+      const icon='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>';
+      const tiles=fl.folders.map(name=>{const n=(by[name]||[]).length,on=fl.sel===name;
+        return `<button type="button" class="comp-tile fl-tile${on?' on':''}" data-flsel="${esc(name)}" data-flfolder="${esc(name)}" aria-expanded="${on}"><span class="ct-ic">${icon}${n?`<i class="ct-n">${n>99?'99+':n}</i>`:''}</span><span class="ct-tx"><b>${esc(name)}</b><small>${n?n+' dosya':'Boş'}</small></span></button>`;}).join('');
+      const list=by[fl.sel]||[];
+      const pane=fl.sel&&fl.folders.includes(fl.sel)?`<div class="fl-folder fl-pane" data-flfolder="${esc(fl.sel)}"><div class="fl-head"><strong>${esc(fl.sel)}</strong><small>${list.length} dosya</small><button type="button" class="ghost pick-btn" data-flup="${esc(fl.sel)}">Yükle</button></div>
+        ${list.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${list.map(flRowHtml).join('')}</tbody></table></div>`:'<p class="note" style="padding:14px 16px">Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.</p>'}</div>`:'';
+      return `<div class="hub-tiles no-print">${tiles}</div>${pane}`;})()}`;
   paintUploads();
 }
 async function flUploadFiles(folder,fileList){
@@ -3156,7 +3168,7 @@ async function flUploadFiles(folder,fileList){
 }
 document.addEventListener('click',async e=>{
   const up=e.target.closest('[data-flup]');if(up){fl.target=up.dataset.flup;$('flPick').value='';$('flPick').click();return;}
-  const tg=e.target.closest('[data-fltg]');if(tg){const k=tg.dataset.fltg,list=fl.files.filter(f=>f.folder===k),open=fl.collapsed[k]===undefined?list.length>0:!fl.collapsed[k];fl.collapsed[k]=open;paintFiles();return;}
+  const sl=e.target.closest('[data-flsel]');if(sl){fl.sel=fl.sel===sl.dataset.flsel?'':sl.dataset.flsel;paintFiles();return;}
   if(e.target.closest('#flNewOpen')){fl.newOpen=true;paintFiles();const i=$('flNewName');if(i)i.focus();return;}
   if(e.target.closest('#flNewCancel')){fl.newOpen=false;paintFiles();return;}
   if(e.target.closest('#flNewOk')){
@@ -3169,12 +3181,12 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('change',e=>{if(e.target.id==='flPick'&&e.target.files.length)flUploadFiles(fl.target,e.target.files);});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='flNewName'){e.preventDefault();$('flNewOk').click();}});
-['dragenter','dragover'].forEach(t=>document.addEventListener(t,e=>{const f=e.target.closest&&e.target.closest('.fl-folder');if(!f)return;e.preventDefault();f.classList.add('over');}));
-document.addEventListener('dragleave',e=>{const f=e.target.closest&&e.target.closest('.fl-folder');if(f&&!f.contains(e.relatedTarget))f.classList.remove('over');});
-document.addEventListener('drop',e=>{const f=e.target.closest&&e.target.closest('.fl-folder');if(!f)return;e.preventDefault();f.classList.remove('over');
+['dragenter','dragover'].forEach(t=>document.addEventListener(t,e=>{const f=e.target.closest&&e.target.closest('[data-flfolder]');if(!f)return;e.preventDefault();f.classList.add('over');}));
+document.addEventListener('dragleave',e=>{const f=e.target.closest&&e.target.closest('[data-flfolder]');if(f&&!f.contains(e.relatedTarget))f.classList.remove('over');});
+document.addEventListener('drop',e=>{const f=e.target.closest&&e.target.closest('[data-flfolder]');if(!f)return;e.preventDefault();f.classList.remove('over');
   if(e.dataTransfer&&e.dataTransfer.files.length)flUploadFiles(f.dataset.flfolder,e.dataTransfer.files);});
-window.addEventListener('dragover',e=>{if(!(e.target.closest&&e.target.closest('.fl-folder')))e.preventDefault();});
-window.addEventListener('drop',e=>{if(!(e.target.closest&&e.target.closest('.fl-folder')))e.preventDefault();});
+window.addEventListener('dragover',e=>{if(!(e.target.closest&&e.target.closest('[data-flfolder]')))e.preventDefault();});
+window.addEventListener('drop',e=>{if(!(e.target.closest&&e.target.closest('[data-flfolder]')))e.preventDefault();});
 
 /* ---------- Şirket içi bilgilendirme (proje notları) ---------- */
 const notesBy={};let notesOpen=false,notesFor=null;

@@ -21,3 +21,8 @@ Bu depoda değişiklik yaparken (insan ya da yapay zekâ) şunlara uy.
 - Sahip hesabı (`furkan.kece@ekonix.com.tr`) korumalıdır; kodda kaldırma/zayıflatma.
 - Proje dosyaları Vercel Blob'da (private mağaza `ekonix-files`, `BLOB_READ_WRITE_TOKEN`); yükleme tarayıcıdan doğrudan Blob'a gider (`/api/files` jeton verir ve kaydı yazar; Hobby planda en fazla 12 Vercel işlevi olduğu için ayrı dosya açma). `vendor/vercel-blob-client.js`, `@vercel/blob/client`ın esbuild ile paketlenmiş halidir (CDN kullanılmaz).
 - Her değişiklik `main`'e commit + push edilir, Vercel otomatik yayınlar.
+
+## Hub (kutucuklu bölüm seçimi)
+- Kullanıcı bir sayfanın içeriğini "kutucuklar" halinde ister: üstte tıklanabilir kutular (simge + başlık + alt satır), seçilen kutunun içeriği altında açılır. MKT Motors'ta aynı yapıya "hub" (HubCard) denir; burada da bu ad kullanılır: "hub yap" = bölümleri kutucuklara böl.
+- Uygulama: `.hub-tiles` ızgarası içinde `.comp-tile` kutuları (Rakip Analizi: Analiz Yap / Geçmiş Analizler; Dosyalar: klasörler). Seçili kutu `.on`; içerik sayısı varsa simgenin köşesinde `.ct-n` rozeti ve alt satırda "N dosya" gibi sayı gösterilir. Yeni renk/yazı tipi eklenmez.
+
