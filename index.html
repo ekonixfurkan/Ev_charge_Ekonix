@@ -3155,7 +3155,7 @@ function paintFiles(){
       const icon='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>';
       const tiles=fl.folders.map(name=>{const n=(by[name]||[]).length,on=fl.sel===name;
         return `<button type="button" class="comp-tile fl-tile${on?' on':''}" data-flsel="${esc(name)}" data-flfolder="${esc(name)}" aria-expanded="${on}"><span class="ct-ic">${icon}${n?`<i class="ct-n">${n>99?'99+':n}</i>`:''}</span><span class="ct-tx"><b>${esc(name)}</b><small>${n?n+' dosya':'Boş'}</small></span></button>`;}).join('');
-      const list=by[fl.sel]||[];
+      const list=(by[fl.sel]||[]).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr',{numeric:true,sensitivity:'base'})); // ada göre (A–Z, sayılar doğal sırada)
       const pane=fl.sel&&fl.folders.includes(fl.sel)?`<div class="fl-folder fl-pane" data-flfolder="${esc(fl.sel)}"><div class="fl-head"><strong>${esc(fl.sel)}</strong><small>${list.length} dosya</small><button type="button" class="ghost pick-btn" data-flup="${esc(fl.sel)}">Yükle</button></div>
         ${(()=>{const pics=list.filter(f=>/^(jpg|jpeg|png)$/.test(flExt(f.name))),others=list.filter(f=>!pics.includes(f));
           return (pics.length?`<div class="fl-gallery">${pics.map(flPicHtml).join('')}</div>`:'')+(others.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${others.map(flRowHtml).join('')}</tbody></table></div>`:'');})()}
