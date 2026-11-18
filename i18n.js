@@ -201,6 +201,7 @@
     /* menü grupları */
     'Toplantılar': 'Meetings',
     'Satış ve Pazar': 'Sales & Market',
+    'ROI Hesaplayıcı': 'ROI Calculator',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',

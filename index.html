@@ -1089,6 +1089,7 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 #ntDlg label{display:block;margin-top:8px}
 #ntDlg textarea{width:100%;box-sizing:border-box}
 html.ro .nt-task{display:none}
+.roi-frame{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0;background:var(--paper)}
 .dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:6px 18px;font-size:13px;font-weight:700;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 .dy-back:hover{background:var(--side-d);color:#fff}
 .dy-back:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
@@ -1131,7 +1132,7 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
       </section>
       <section class="nav-group" data-group="market">
         <button type="button" class="nav-head" aria-expanded="true">Satış ve Pazar</button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="leads"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span>Lead Havuzu</span></button><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Müşteri Bilgileri</span></button><button type="button" class="nav-item" data-nav="rakip"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Rakip Analizi</span></button></div>
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="leads"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span>Lead Havuzu</span></button><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Müşteri Bilgileri</span></button><button type="button" class="nav-item" data-nav="rakip"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Rakip Analizi</span></button><button type="button" class="nav-item" data-nav="roi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01M16 14v4"/></svg><span>ROI Hesaplayıcı</span></button></div>
       </section>
       <section class="nav-group" data-group="admin" id="adminGroup">
         <button type="button" class="nav-head" aria-expanded="true">Yönetim</button>
@@ -1453,8 +1454,8 @@ async function api(path,opts){
 }
 /* ---------- Sayfa adresi: yenileyince aynı sayfada kalmak için #/… ---------- */
 let routeOn=false;
-const ROUTE_VIEWS=['locations','users','activity','contacts','notifs','planner','daily'];
-const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip',leads:'leads',daily:'daily'};
+const ROUTE_VIEWS=['locations','users','activity','contacts','notifs','planner','daily','roi'];
+const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip',leads:'leads',daily:'daily',roi:'roi'};
 function routeHash(){
   if(view==='portfolio')return '#/'+sub;
   if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
@@ -1526,7 +1527,7 @@ async function poll(){
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads'&&view!=='daily')render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads'&&view!=='daily'&&view!=='roi')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -1658,7 +1659,7 @@ function legendHtml(){
   return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 // Üst başlık: proje sayfasında proje adı (altında il/ilçe), diğer sayfalarda uygulama adı.
-const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Daily Toplantı Notları'};
+const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Daily Toplantı Notları',roi:'ROI Hesaplayıcı'};
 // Üst başlık: proje sayfasında proje adı (altında kod ve il/ilçe), diğer sayfalarda seçilen menü başlığı.
 function setPageTitle(){
   const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
@@ -1814,12 +1815,12 @@ function render(){
   {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();
+  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();else if(view==='roi')renderRoi();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   dockBar();setPageTitle();
   {const b=$('dyBack');if(b)b.hidden=!(dyBack&&view!=='daily');}
@@ -2333,7 +2334,7 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','comp','credit','check','files'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['comp','Rakip Analizi'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
-  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='leads'?'leads':view==='daily'?'daily':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='leads'?'leads':view==='daily'?'daily':view==='roi'?'roi':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
 function goSite(key){
@@ -2356,6 +2357,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     else if(k==='contacts'){view='contacts';render();window.scrollTo(0,0);}
     else if(k==='notifs'){view='notifs';render();window.scrollTo(0,0);}
     else if(k==='daily'){view='daily';render();window.scrollTo(0,0);}
+    else if(k==='roi'){view='roi';render();window.scrollTo(0,0);}
     else if(k==='planner'){view='planner';render();window.scrollTo(0,0);}
     else if(k==='meetings'){view='meetings';render();window.scrollTo(0,0);}
     else if(k==='rakip'){view='rakip';render();window.scrollTo(0,0);}
@@ -2824,6 +2826,10 @@ function paintPlanner(){
   box.innerHTML=pi.rows.map(card).join('')||'<p class="note" style="padding:24px;text-align:center">Eşleşen görev yok.</p>';
   const e=$('plPagerTop');if(e)e.innerHTML=pagerHtml('pl',pi);
   paintPlanner.last=ordered.map(([x])=>x.id);
+}
+/* ---------- ROI Hesaplayıcı: ayrı sayfa (roi.html) aynı kaynaklı çerçevede açılır; kendi stili ve betiği kimlik/CSS çakışması yaratmaz ---------- */
+function renderRoi(){
+  $('view').innerHTML='<iframe id="roiFrame" class="roi-frame" src="/roi.html" title="ROI Hesaplayıcı"></iframe>';
 }
 /* ---------- Daily Toplantı Notları: bugün konuşulacak projeler (veriden otomatik) ---------- */
 const DY_QUIET=7,DY_CAP=10,DY_NOTE_DAYS=3;

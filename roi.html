@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="tr"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROI Hesaplayıcı</title>
+<link rel="stylesheet" href="/roi.css">
+<script src="/i18n.js"></script>
+</head><body>
+<div class="band" role="status" aria-live="polite">
+  <div class="wrap">
+    <div class="kpi"><div class="l">EPC firması geri dönüş</div><div class="v" id="k-pb">–</div><div class="s" id="k-pb-s"></div></div>
+    <div class="kpi"><div class="l">EPC IRR (USD)</div><div class="v" id="k-irr">–</div><div class="s" id="k-irr-s"></div></div>
+    <div class="kpi"><div class="l">StarCharge geri dönüş</div><div class="v" id="k-sc">–</div><div class="s" id="k-sc-s"></div></div>
+    <div class="kpi"><div class="l">Co-CPO net / ay</div><div class="v" id="k-cpo">–</div><div class="s" id="k-cpo-s"></div></div>
+    <div class="kpi"><div class="l">Net havuz / ay</div><div class="v" id="k-pool">–</div><div class="s" id="k-pool-s"></div></div>
+  </div>
+</div>
+
+
+<section class="wrap mixer-wrap" aria-label="Mikser">
+  <div class="mixer">
+    <div class="mx-top"><span class="mx-brand"><b>EKONİX</b> · GELİR MİKSERİ</span><div class="mx-decks" id="mx-decks"></div></div>
+    <div class="mx-body">
+      <div>
+        <div class="mx-ch" id="mx-ch"></div>
+        <div class="mx-note">Bir kanalı açınca fark StarCharge'tan düşer; StarCharge'ı açınca Ekonix+EPC'den. Kanal ışığı: yeşil masada, sarı sınırda, kırmızı masadan kalkar.</div>
+      </div>
+      <div class="mx-knobs" id="mx-knobs"></div>
+    </div>
+  </div>
+</section>
+<main class="wrap app">
+  <aside class="inputs" id="inputs">
+    <div class="presets">
+      <label class="lbl" for="preset">Hazır varsayım seti</label>
+      <select id="preset">
+        <option value="">Özel / mevcut değerler</option>
+                <option value="sezer">Statik senaryo (kurulum 225 bin ₺)</option>
+        <option value="sanayi">Oto sanayi · OSB (trafo dahil)</option>
+        <option value="otoyol">Otoyol · akaryakıt istasyonu</option>
+        <option value="avm">AVM · kapalı otopark</option>
+        <option value="filo">Filo · lojistik deposu</option>
+        <option value="sehir">Şehir içi cadde · otel</option>
+      </select>
+      <div class="actions"><button class="btn ghost" id="reset" type="button">Varsayılanlara dön</button></div>
+    </div>
+    <div class="presets" id="sitebox">
+      <label class="lbl" for="site-sel">Lokasyon</label>
+      <select id="site-sel"></select>
+      <div class="site-edit" id="site-edit">
+        <label class="lbl" for="site-name">Lokasyon adı</label>
+        <input type="text" id="site-name" autocomplete="off">
+      </div>
+      <div class="actions"><button class="btn ghost sm" id="site-add" type="button">+ Mevcut değerlerle lokasyon ekle</button><button class="btn ghost sm" id="site-del" type="button">Bu lokasyonu sil</button></div>
+      <div class="hint-s">Lokasyona özel: ünite sayısı, ünite gücü, EPC yatırımı, donanım $/kW, oturum/ay, kWh/oturum. Diğer tüm ayarlar ortak.</div>
+    </div>
+    <div id="groups"></div>
+  </aside>
+
+  <section class="results">
+    <div class="card">
+      <div class="verdict"><span class="pill" id="v-pill">–</span><p id="v-text"></p></div>
+    </div>
+
+    <div class="card">
+      <h2>Masadaki taraflar</h2>
+      <div class="sub" id="party-sub"></div>
+      <div class="parties" id="parties"></div>
+    </div>
+
+    <div class="card">
+      <h2>Model karşılaştırması</h2>
+      <div class="sub">Aynı lokasyon ve talep, üç farklı paylaşım kurgusu.</div>
+      <div class="tbl"><table class="cmp" id="cmp"></table></div>
+    </div>
+
+    <div class="card">
+      <h2>EPC firması ne zaman döner? (yıl)</h2>
+      <div class="sub" id="heat-sub"></div>
+      <div class="tbl"><table class="heat" id="heat"></table></div>
+      <div class="legend"><span><i class="c-good"></i>≤ 3 yıl</span><span><i class="c-ok"></i>3–4 yıl</span><span><i class="c-warn"></i>4–6 yıl</span><span><i class="c-bad"></i>&gt; 6 yıl / dönmüyor</span></div>
+    </div>
+
+    <div class="card chart">
+      <h2>Kümülatif nakit · lokasyon başına</h2>
+      <div class="sub">USD, vergi öncesi. Çizginin sıfırı kestiği ay başa baş noktasıdır.</div>
+      <div id="chart"></div>
+      <div class="legend"><span><i style="background:var(--c-epc)"></i>EPC firması (saha yatırımı)</span><span><i style="background:var(--c-fin)"></i>StarCharge (donanım)</span><span><i style="background:var(--c-cpo)"></i>Co-CPO (işletme, net)</span></div>
+    </div>
+
+    <div class="card">
+      <h2>1 kWh'lik satışın dağılımı · 1. yıl</h2>
+      <div class="sub" id="bk-sub"></div>
+      <div class="stack" id="stack"></div>
+      <div class="bk" id="bk"></div>
+    </div>
+
+    <div class="card">
+      <h2>Yıllık döküm · lokasyon başına</h2>
+      <div class="sub">₺ tutarlar aylık ortalama, KDV hariç, nominal.</div>
+      <div class="tbl"><table id="yt"></table></div>
+    </div>
+
+    <div class="card" id="sites-card" hidden>
+      <h2 id="sites-h">Lokasyonlar</h2>
+      <div class="sub">1. yıl aylık ortalama. Satıra dokununca o lokasyon düzenlenir.</div>
+      <div class="opts">
+        <span class="lbl">Co-CPO gideri</span><div class="seg" id="opt-cpo"><button type="button" data-v="site">Her lokasyonda</button><button type="button" data-v="shared">Toplamda bir kez</button></div>
+        <span class="lbl">Kademe eşiği</span><div class="seg" id="opt-tier"><button type="button" data-v="site">Lokasyon başına</button><button type="button" data-v="total">Toplam oturum</button></div>
+      </div>
+      <div class="tbl"><table id="sites-t"></table></div>
+    </div>
+
+    <div class="card">
+      <h2>Ölçek · benzer lokasyonlar</h2>
+      <div class="sub" id="pf-sub"></div>
+      <div class="grid2" id="pf"></div>
+    </div>
+
+    <div class="card">
+      <h2>Özet</h2>
+      <div class="sub">WhatsApp veya e-postaya yapıştırmak için.</div>
+      <textarea id="summary" readonly aria-label="Özet"></textarea>
+      <div class="actions" style="margin-top:8px"><button class="btn" id="copy" type="button">Özeti kopyala</button><span class="toast" id="toast"></span></div>
+    </div>
+
+    <div class="card src">
+      <strong>Hesap ve varsayımlar.</strong> Değerler örnek varsayımdır. Net havuz = satış (KDV hariç) − elektrik alışı (verim kaybı dahil). Yüzdeler bu havuza uygulanır. Co-CPO işletme maliyeti (teknisyen payı + platform) Co-CPO'nun kendi payından; ödeme komisyonu ve diğer sabit giderler StarCharge payından düşülür. Kapasite kullanımı = aylık kWh / (DC güç × 730 saat). Geri dönüş süreleri USD bazındadır; TL nominal hesap enflasyon nedeniyle daha kısa görünür. Satış fiyatı aralığı: Ekim 2026 itibarıyla büyük ağlarda DC tarifeleri yaklaşık 11,99–16,49 ₺/kWh. Pazar ölçeği: EPDK Eylül 2026 verisine göre 21.307 DC soket ve aylık 83.253 MWh şarj; kabaca soket başına ~110 kWh/gün, yani 3 ünitelik bir lokasyon için ayda ~400 oturum (25 kWh). Donanım 105 USD/kW grup bütçe varsayımıdır. Vergi, amortisman ve finansman maliyeti dahil değildir.
+    </div>
+  </section>
+</main>
+<script>
+
+const DEFAULTS = {
+  units:3, kw:120, hwPerKw:105, epcTl:1500000, sites:50,
+  demandMode:'sess', sessMonth:500, carsPerDay:5, sessionKwh:25, powerRatio:55, growth:12, maxOcc:30, ramp:0, uptime:97,
+  compYear:0, compLoss:15,
+  price:12.99, elec:4.20, eff:95, fee:3, cpoOpexTl:17500, otherUsd:150, rentAlt:15000,
+  fx0:50.0, fxDep:20, priceEsc:20, elecEsc:22,
+  model:'fixed', sc:50, ll:20, cpo:20, ekx:10, firm:50,
+  tierA:500, tierB:2000, ekx1:15, ekx2:10, ekx3:7, tierMarg:true, hurdle:0,
+  avansPct:0, mahsup:false,
+  llBonus:false, llUth:15, llStep:5, llMax:25, cpoCostMode:'site', tierScope:'site',
+  term:10, disc:12
+};
+const MODEL_NAMES={fixed:'Sabit oranlar',tier:'Kademeli (oturum)',capital:'Sermaye oranlı'};
+
+function tierRate(p,s){
+  const r=[p.ekx1,p.ekx2,p.ekx3], A=p.tierA, B=Math.max(p.tierB,p.tierA);
+  if(!p.tierMarg||s<=0) return s<=A?r[0]:s<=B?r[1]:r[2];
+  const a=Math.min(s,A), b=Math.min(Math.max(s-A,0),B-A), c=Math.max(s-B,0);
+  return (a*r[0]+b*r[1]+c*r[2])/s;
+}
+
+function simulate(p){
+  const months=Math.round(p.term*12);
+  const hw=p.units*p.kw*p.hwPerKw, epc=p.epcTl/p.fx0;
+  const fullDay=p.kw*24*p.powerRatio/100;
+  const d0=p.demandMode==='sess'?p.sessMonth*p.sessionKwh/(p.units*30.42):p.carsPerDay*p.sessionKwh;
+  const cap=Math.max(d0,p.maxOcc/100*fullDay);
+  const upF=p.demandMode==='sess'?1:p.uptime/100;
+  const avU=epc*p.avansPct/100, epcNet=epc-avU, scCap=hw+avU;   // avans: StarCharge/AMG peşin öder
+  const scW=p.mahsup?hw:scCap, fW=p.mahsup?epc:epcNet, capTot=scW+fW;
+  const thr=(p.mahsup?epc:epcNet)*(1+p.hurdle/100);
+  let owe=p.mahsup?avU:0;
+  let cF=-epcNet, cS=-scCap, cC=0, recv=0, pbF=epcNet<=0?0:null, pbS=null, capitalEnd=null;
+  const mF=[-epcNet], mS=[-scCap], cumF=[cF], cumS=[cS], cumC=[0], yrs=[];
+  for(let m=0;m<months;m++){
+    const y=Math.floor(m/12);
+    const fx=p.fx0*Math.pow(1+p.fxDep/100,(m+0.5)/12);
+    const pg=p.price*Math.pow(1+p.priceEsc/100,y), pn=pg/1.2;
+    const elec=p.elec*Math.pow(1+p.elecEsc/100,y);
+    let d=Math.min(d0*Math.pow(1+p.growth/100,y),cap);
+    if(p.compYear>0&&y+1>=p.compYear) d*=1-p.compLoss/100;
+    const ramp=p.ramp>0?Math.min(1,0.4+0.6*(m+0.5)/p.ramp):1;
+    const kwh=d*p.units*30.42*ramp*upF, sess=kwh/p.sessionKwh;
+    const rev=kwh*pn, kdv=kwh*(pg-pn), el=kwh/(p.eff/100)*elec, fee=rev*p.fee/100;
+    const pool=Math.max(0,rev-el);                       // net = satış (KDV hariç) − elektrik alışı
+    const U=kwh/(p.units*p.kw*730)*100;                  // aylık kapasite kullanımı %
+    const bonus=p.llBonus?Math.max(0,Math.min(p.llMax-p.ll,(U-p.llUth)/p.llStep)):0;
+    let cpoS, ekxTot;
+    if(p.model==='tier'){const tot=p.cpo+p.ekx, r=Math.min(tot,tierRate(p,sess*(p._tierMult||1))); ekxTot=r; cpoS=tot-r;}
+    else {cpoS=p.cpo; ekxTot=p.ekx;}
+    const llS=p.ll+bonus;
+    let firmS=ekxTot*p.firm/100; const ekxS=ekxTot-firmS;
+    let scS=p.sc-bonus;
+    const inCap=p.model==='capital'&&recv<thr;
+    if(inCap){const cp=100-llS-cpoS-ekxS; scS=cp*scW/capTot; firmS=cp*fW/capTot;}
+    else if(p.model==='capital'&&capitalEnd===null) capitalEnd=m;
+    const LL=pool*llS/100, SC=pool*scS/100, CPO=pool*cpoS/100, EKX=pool*ekxS/100, FIRM=pool*firmS/100;
+    const cpoCost=p.cpoOpexTl*(p._cpoShare??1)*Math.pow(1+p.priceEsc/100,y), other=p.otherUsd*fx;
+    const SCn=SC-other-fee, CPOn=CPO-cpoCost;
+    let fU=FIRM/fx, sU=SCn/fx; const cU=CPOn/fx;
+    recv+=fU;
+    let pay=0; if(owe>0){pay=Math.min(fU,owe); owe-=pay; fU-=pay; sU+=pay;}
+    const pf=cF; cF+=fU; if(pbF===null&&pf<0&&cF>=0) pbF=m+(-pf)/fU;
+    const ps=cS; cS+=sU; if(pbS===null&&ps<0&&cS>=0&&sU>0) pbS=m+(-ps)/sU;
+    cC+=cU;
+    mF.push(fU); mS.push(sU); cumF.push(cF); cumS.push(cS); cumC.push(cC);
+    if(!yrs[y]) yrs[y]={y:y+1,n:0,kwh:0,sess:0,rev:0,kdv:0,el:0,fee:0,pool:0,LL:0,SC:0,SCn:0,CPO:0,CPOn:0,cpoCost:0,other:0,EKX:0,FIRM:0,fU:0,sU:0,cU:0,fxs:0,firmS:0,ekxS:0,cpoS:0,scS:0,llS:0,U:0};
+    const Y=yrs[y];
+    Y.n++; Y.kwh+=kwh; Y.sess+=sess; Y.rev+=rev; Y.kdv+=kdv; Y.el+=el; Y.fee+=fee; Y.pool+=pool; Y.LL+=LL; Y.SC+=SC; Y.SCn+=SCn;
+    Y.pay=(Y.pay||0)+pay*fx; Y.CPO+=CPO; Y.CPOn+=CPOn; Y.cpoCost+=cpoCost; Y.other+=other; Y.EKX+=EKX; Y.FIRM+=FIRM; Y.fU+=fU; Y.sU+=sU; Y.cU+=cU; Y.fxs+=fx;
+    Y.llS+=llS; Y.U+=U; Y.firmS+=firmS; Y.ekxS+=ekxS; Y.cpoS+=cpoS; Y.scS+=scS; Y.cumF=cF; Y.cumS=cS; Y.cumC=cC;
+  }
+  yrs.forEach(Y=>{Y.fx=Y.fxs/Y.n; ['firmS','ekxS','cpoS','scS','llS','U'].forEach(k=>Y[k]/=Y.n);
+    Y.mo=k=>Y[k]/Y.n;});
+  const irr=cf=>{const npv=r=>cf.reduce((a,c,i)=>a+c/Math.pow(1+r,i),0);
+    if(npv(0)<=0) return null; let lo=0,hi=0.5; for(let i=0;i<100;i++){const mid=(lo+hi)/2; npv(mid)>0?lo=mid:hi=mid;} return Math.pow(1+lo,12)-1;};
+  const rm=Math.pow(1+p.disc/100,1/12)-1;
+  const npvF=mF.reduce((a,c,i)=>a+c/Math.pow(1+rm,i),0);
+  const totF=mF.slice(1).reduce((a,b)=>a+b,0);
+  return {hw,epc,avU,epcNet,scCap,owe,pbF,pbS,irrF:epcNet<=0?'na':irr(mF),irrS:irr(mS),npvF,totF,netF:totF-epcNet,moic:epcNet>0?totF/epcNet:null,
+    margin:(avU+totF-epc)/epc,totC:cC,cumF,cumS,cumC,yrs,months,capitalEnd};
+}
+
+</script>
+<script>
+
+const $=id=>document.getElementById(id);
+const nf=(v,d=0)=>Number(v).toLocaleString(window.LOC||'tr',{minimumFractionDigits:d,maximumFractionDigits:d});
+const usd=v=>(v<0?'−':'')+'$'+nf(Math.abs(v));
+const usdk=v=>(v<0?'−':'')+'$'+(Math.abs(v)>=1e6?nf(Math.abs(v)/1e6,2)+' M':nf(Math.abs(v)/1e3,1)+' k');
+const tl=v=>(v<0?'−':'')+nf(Math.abs(v))+' ₺';
+const tlk=v=>(v<0?'−':'')+(Math.abs(v)>=1e6?nf(Math.abs(v)/1e6,2)+' M₺':nf(Math.abs(v)/1e3,0)+' bin ₺');
+const yrsTxt=m=>m===null?'Dönmüyor':m===0?'Avansla peşin':nf(m/12,1)+' yıl';
+const pctTxt=v=>v==='na'?'Sermaye yok':v===null?'< 0%':nf(v*100,1)+'%';
+
+const PRESETS={
+  sezer:{demandMode:'sess',units:3,epcTl:225000,sessMonth:500,sessionKwh:25,growth:0,ramp:0,compYear:0,fxDep:0,priceEsc:0,elecEsc:0,price:12.99,elec:4.20,cpoOpexTl:17500},
+  sanayi:{demandMode:'sess',units:3,epcTl:1250000,sessMonth:500,sessionKwh:25,growth:14,ramp:6,compYear:4,compLoss:10,price:12.99,fxDep:20,priceEsc:20,elecEsc:22},
+  otoyol:{demandMode:'sess',units:4,epcTl:2000000,sessMonth:900,sessionKwh:30,growth:12,ramp:6,compYear:3,compLoss:15,price:13.99,fxDep:20,priceEsc:20,elecEsc:22},
+  avm:{demandMode:'sess',units:3,epcTl:1400000,sessMonth:450,sessionKwh:22,growth:12,ramp:6,compYear:3,compLoss:10,price:12.99,fxDep:20,priceEsc:20,elecEsc:22},
+  filo:{demandMode:'sess',units:2,epcTl:1100000,sessMonth:650,sessionKwh:35,growth:8,ramp:3,compYear:0,price:11.49,fxDep:20,priceEsc:20,elecEsc:22},
+  sehir:{demandMode:'sess',units:2,epcTl:1000000,sessMonth:300,sessionKwh:22,growth:14,ramp:6,compYear:2,compLoss:20,price:12.99,fxDep:20,priceEsc:20,elecEsc:22}
+};
+
+const total=p=>p.sc+p.ll+p.cpo+p.ekx;
+const GROUPS=[
+ {t:'Paylaşım modeli',open:true,f:[
+  {seg:'model',l:'Kurgu',opts:[['fixed','Sabit'],['tier','Kademeli'],['capital','Sermaye oranlı']],
+   hint:p=>({fixed:'Her ay aynı yüzdeler.',tier:'Ekonix ile Co-CPO arasındaki pay, aylık oturum sayısına göre kayar. StarCharge ve lokasyon sahibi sabit.',capital:'Lokasyon sahibi, Co-CPO ve Ekonix payları ödenir; kalan pay, EPC yatırımı geri dönene kadar StarCharge ile EPC firması arasında koydukları sermaye oranında bölünür. Sonra sabit oranlara geçilir.'})[p.model]},
+  {k:'sc',l:'StarCharge (Üst CPO · donanım)',min:0,max:80,step:1,u:'%',hint:p=>p.model==='capital'?'Sermaye oranlı kurguda bu oran EPC geri döndükten sonra geçerli.':'Standart %50.'},
+  {k:'ll',l:'Lokasyon sahibi (baz)',min:0,max:40,step:1,u:'%'},
+  {chk:'llBonus',l:'Lokasyon sahibine performans primi (kullanıma bağlı)'},
+  {k:'llUth',l:'Prim başlangıcı: kapasite kullanımı',min:0,max:50,step:1,u:'%',show:p=>p.llBonus},
+  {k:'llStep',l:'+1 puan için kullanım artışı',min:1,max:20,step:1,u:'puan',show:p=>p.llBonus},
+  {k:'llMax',l:'Lokasyon payı üst sınırı',min:0,max:50,step:1,u:'%',show:p=>p.llBonus,hint:p=>'Pay = %'+p.ll+' + min[%'+(p.llMax-p.ll)+'; (kullanım − %'+p.llUth+') / '+p.llStep+']. Prim StarCharge payından karşılanır.'},
+  {k:'cpo',l:'Co-CPO (alt CPO)',min:0,max:40,step:1,u:'%',hint:p=>p.model==='tier'?'Kademeli modelde Co-CPO + Ekonix toplamı %'+(p.cpo+p.ekx)+' sabit kalır.':''},
+  {k:'ekx',l:'Ekonix + EPC firması',min:0,max:40,step:1,u:'%',show:p=>p.model!=='tier',hint:p=>'EPC firması: %'+nf(p.ekx*p.firm/100,1)+' · Ekonix: %'+nf(p.ekx*(100-p.firm)/100,1)},
+  {sum:true},
+  {k:'firm',l:'EPC firmasının bu paydaki oranı',min:0,max:100,step:5,u:'%',hint:()=>'100 = Ekonix sahayı kendisi finanse ediyor.'},
+  {k:'tierA',l:'1. kademe üst sınırı',min:100,max:3000,step:50,u:'oturum',show:p=>p.model==='tier'},
+  {k:'tierB',l:'2. kademe üst sınırı',min:200,max:6000,step:100,u:'oturum',show:p=>p.model==='tier'},
+  {k:'ekx1',l:'Ekonix payı · 1. kademe',min:0,max:30,step:1,u:'%',show:p=>p.model==='tier'},
+  {k:'ekx2',l:'Ekonix payı · 2. kademe',min:0,max:30,step:1,u:'%',show:p=>p.model==='tier'},
+  {k:'ekx3',l:'Ekonix payı · 3. kademe',min:0,max:30,step:1,u:'%',show:p=>p.model==='tier',hint:p=>'Co-CPO: %'+(p.cpo+p.ekx-p.ekx1)+' / %'+(p.cpo+p.ekx-p.ekx2)+' / %'+(p.cpo+p.ekx-p.ekx3)+' · StarCharge: %'+p.sc},
+  {chk:'tierMarg',l:'Marjinal kademe (vergi dilimi gibi)',show:p=>p.model==='tier'},
+  {k:'hurdle',l:'Geri ödeme eşiği: yatırım +',min:0,max:100,step:5,u:'%',show:p=>p.model==='capital'},
+  {k:'term',l:'Sözleşme süresi',min:3,max:15,step:1,u:'yıl'}
+ ]},
+ {t:'Talep',open:true,f:[
+  {seg:'demandMode',l:'Talep girişi',opts:[['sess','Oturum / ay / lokasyon'],['cars','Araç / ünite / gün']]},
+  {k:'sessMonth',l:'Oturum / ay (1. yıl)',min:50,max:4000,step:25,u:'oturum',show:p=>p.demandMode==='sess',hint:p=>'Günde '+nf(p.sessMonth/30.42,1)+' araç · ünite başına '+nf(p.sessMonth/30.42/p.units,1)+' · Türkiye ortalaması 3 ünitede ~400/ay'},
+  {k:'carsPerDay',l:'Araç / ünite / gün (1. yıl)',min:0.5,max:30,step:0.5,u:'araç',show:p=>p.demandMode==='cars',hint:p=>'≈ '+nf(p.carsPerDay*p.units*30.42*p.uptime/100)+' oturum/ay'},
+  {k:'sessionKwh',l:'Ortalama şarj / oturum',min:10,max:80,step:1,u:'kWh'},
+  {k:'growth',l:'Yıllık talep artışı',min:0,max:50,step:1,u:'%'},
+  {k:'ramp',l:'Açılış dönemi (talep %40 → %100)',min:0,max:24,step:1,u:'ay'},
+  {k:'compYear',l:'Yakına rakip DC açılışı (yıl, 0 = yok)',min:0,max:10,step:1,u:'yıl'},
+  {k:'compLoss',l:'Rakip sonrası talep kaybı',min:0,max:60,step:1,u:'%',show:p=>p.compYear>0},
+  {k:'uptime',l:'Erişilebilirlik (uptime)',min:80,max:100,step:0.5,u:'%',show:p=>p.demandMode==='cars'},
+  {k:'powerRatio',l:'Ortalama çekilen güç / nominal',min:25,max:95,step:1,u:'%'},
+  {k:'maxOcc',l:'Doluluk tavanı (büyüme sınırı)',min:10,max:60,step:1,u:'%'}
+ ]},
+ {t:'Lokasyon ve yatırım',open:true,f:[
+  {k:'units',l:'Ünite sayısı / lokasyon',min:1,max:10,step:1,u:'adet'},
+  {k:'kw',l:'Ünite gücü',min:30,max:480,step:10,u:'kW'},
+  {k:'epcTl',l:'EPC saha yatırımı',min:50000,max:4000000,step:25000,u:'₺',hint:p=>'≈ '+usd(p.epcTl/p.fx0)+'. Trafo/OG bağlantısı dahilse genelde 1 M₺ üzeri; sadece montaj 150–300 bin ₺.'},
+  {k:'avansPct',l:'EPC avansı (StarCharge peşin öder)',min:0,max:100,step:5,u:'%',hint:p=>{const a=p.epcTl*p.avansPct/100;return 'Peşin '+tlk(a)+' · kalan '+tlk(p.epcTl-a)+' EPC\'nin riski, gelir paylaşımıyla döner. Avans StarCharge sermayesine eklenir.';}},
+  {chk:'mahsup',l:'Avans, EPC\'nin gelir payından mahsup edilsin',show:p=>p.avansPct>0},
+  {k:'hwPerKw',l:'Donanım maliyeti (StarCharge)',min:50,max:250,step:5,u:'$/kW',hint:p=>'Lokasyon donanımı ≈ '+usd(p.units*p.kw*p.hwPerKw)+' (≈ '+tlk(p.units*p.kw*p.hwPerKw*p.fx0)+')'},
+  {k:'sites',l:'Portföydeki lokasyon sayısı',min:1,max:300,step:1,u:'adet'}
+ ]},
+ {t:'Fiyat ve maliyetler',open:true,f:[
+  {k:'price',l:'Satış fiyatı (KDV dahil)',min:8,max:22,step:0.01,u:'₺/kWh',hint:()=>'Ekim 2026 piyasa: 11,99–16,49 ₺/kWh'},
+  {k:'elec',l:'Elektrik alış (KDV hariç, her şey dahil)',min:2,max:10,step:0.05,u:'₺/kWh'},
+  {k:'eff',l:'Şarj verimi',min:85,max:99,step:0.5,u:'%'},
+  {k:'fee',l:'Ödeme / roaming komisyonu (StarCharge öder)',min:0,max:12,step:0.5,u:'%'},
+  {k:'cpoOpexTl',l:'Co-CPO işletme maliyeti / ay',min:0,max:60000,step:500,u:'₺',hint:()=>'Teknisyen payı + platform aboneliği. Co-CPO\'nun kendi payından.'},
+  {k:'otherUsd',l:'Diğer sabit gider / ay (StarCharge)',min:0,max:1000,step:10,u:'$',hint:()=>'Sigorta, iletişim, yedek parça. StarCharge payından.'},
+  {k:'rentAlt',l:'Lokasyon sahibinin alternatif kira geliri / ay',min:0,max:100000,step:1000,u:'₺',hint:()=>'Lokasyon sahibinin tek riski, kira yerine bu modeli seçmesi.'}
+ ]},
+ {t:'Makro (kur ve enflasyon)',open:false,f:[
+  {k:'fx0',l:'USD/TL başlangıç',min:30,max:90,step:0.1,u:'₺'},
+  {k:'fxDep',l:'Yıllık kur artışı',min:0,max:60,step:1,u:'%'},
+  {k:'priceEsc',l:'Yıllık satış fiyatı ve TL gider artışı',min:0,max:60,step:1,u:'%',hint:p=>{const g=p.priceEsc-p.fxDep;return g<0?'Fiyat kurun '+nf(-g)+' puan gerisinde: USD bazında gelir eriyor.':'Fiyat kuru takip ediyor.'}},
+  {k:'elecEsc',l:'Yıllık elektrik maliyeti artışı',min:0,max:60,step:1,u:'%'},
+  {k:'disc',l:'İskonto oranı (USD)',min:0,max:30,step:1,u:'%'}
+ ]}
+];
+
+const KEY='ekonix-epc-sim-v2';
+const SITE_KEYS=['units','kw','epcTl','sessMonth','sessionKwh','hwPerKw'];
+let SITES=[], ACTIVE=-1;
+try{const s=JSON.parse(localStorage.getItem(KEY+'-sites')||'null'); if(s){SITES=s.sites||[]; ACTIVE=s.active??-1;}}catch(e){}
+const saveSites=()=>{try{localStorage.setItem(KEY+'-sites',JSON.stringify({sites:SITES,active:ACTIVE}));}catch(e){}};
+const pick=(o,ks)=>Object.fromEntries(ks.map(k=>[k,o[k]]));
+function siteParams(site){
+  const n=SITES.length, tot=SITES.reduce((a,x)=>a+x.sessMonth,0);
+  return Object.assign({},P,pick(site,SITE_KEYS),{demandMode:'sess',
+    _cpoShare:P.cpoCostMode==='shared'&&n>0?1/n:1, _tierMult:P.tierScope==='total'&&site.sessMonth>0?tot/site.sessMonth:1});
+}
+const mp=()=>ACTIVE>=0&&SITES[ACTIVE]?siteParams(Object.assign({},SITES[ACTIVE],pick(P,SITE_KEYS))):P;
+let P=Object.assign({},DEFAULTS);
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) P=Object.assign({},DEFAULTS,s);}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}};
+
+function buildInputs(){
+  const host=$('groups'); host.innerHTML='';
+  GROUPS.forEach(g=>{
+    const d=document.createElement('details'); d.className='grp'; d.open=g.open;
+    d.innerHTML='<summary>'+g.t+'</summary><div class="fields"></div>';
+    const box=d.querySelector('.fields');
+    g.f.forEach(f=>{
+      const el=document.createElement('div'); el.className='f'; el._f=f;
+      if(f.sum){
+        el.innerHTML='<div class="sumrow"><span class="sumtxt"></span><span class="sumbtns"><button type="button" class="btn ghost sm" data-to="ekx">Farkı Ekonix+EPC\'ye</button><button type="button" class="btn ghost sm" data-to="sc">Farkı StarCharge\'a</button></span></div>';
+        el.querySelectorAll('button').forEach(b=>b.onclick=()=>{const d=100-total(P); P[b.dataset.to]=Math.max(0,P[b.dataset.to]+d); $('preset').value=''; refresh();});
+      }else if(f.seg){
+        el.innerHTML='<span class="lbl">'+f.l+'</span><div class="seg" role="group">'+f.opts.map(o=>'<button type="button" data-v="'+o[0]+'">'+o[1]+'</button>').join('')+'</div><span class="hint"></span>';
+        el.querySelectorAll('button').forEach(b=>b.onclick=()=>{P[f.seg]=b.dataset.v; $('preset').value=''; refresh();});
+      }else if(f.chk){
+        el.innerHTML='<label class="chk"><input type="checkbox" id="in-'+f.chk+'"> '+f.l+'</label>';
+        el.querySelector('input').onchange=e=>{P[f.chk]=e.target.checked; refresh();};
+      }else{
+        el.innerHTML='<div class="row"><label for="n-'+f.k+'">'+f.l+'</label><span class="val"><input type="number" id="n-'+f.k+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="u">'+f.u+'</span></span></div><input type="range" id="r-'+f.k+'" aria-label="'+f.l+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="hint"></span>';
+        const n=el.querySelector('input[type=number]'), r=el.querySelector('input[type=range]');
+        r.oninput=()=>{P[f.k]=+r.value; n.value=r.value; $('preset').value=''; refresh(true);};
+        n.onchange=()=>{let v=+n.value; if(isNaN(v)) v=P[f.k]; P[f.k]=v; $('preset').value=''; refresh();};
+      }
+      box.appendChild(el);
+    });
+    host.appendChild(d);
+  });
+}
+function syncInputs(skipVals){
+  document.querySelectorAll('.f').forEach(el=>{
+    const f=el._f;
+    el.hidden=f.show?!f.show(P):false;
+    if(f.sum){const t=total(P), ok=Math.abs(t-100)<0.01; el.querySelector('.sumtxt').innerHTML='Toplam: <b class="'+(ok?'ok':'bad')+'">%'+nf(t)+'</b>'+(ok?' ✓':' — %100 olmalı'); el.querySelector('.sumbtns').hidden=ok;}
+    else if(f.seg) el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(P[f.seg]===b.dataset.v)));
+    else if(f.chk) el.querySelector('input').checked=!!P[f.chk];
+    else if(!skipVals){el.querySelector('input[type=number]').value=P[f.k]; el.querySelector('input[type=range]').value=P[f.k];}
+    const h=el.querySelector('.hint'); if(h) h.textContent=f.hint?f.hint(P):'';
+  });
+}
+
+const pbCls=(m,a,b)=>m===null?'bad':m/12<=a?'good':m/12<=b?'warn':'bad';
+const LBL={good:'Masada',warn:'Sınırda',bad:'Masadan kalkar',info:'Bilgi'};
+
+function parties(r){
+  const Y=r.yrs[0], mo=k=>Y[k]/Y.n;
+  const sess=mo('sess');
+  $('party-sub').textContent=(ACTIVE>=0&&SITES[ACTIVE]?SITES[ACTIVE].name+' · ':'')+'1. yıl aylık ortalama · '+nf(sess)+' oturum/ay · kapasite kullanımı %'+nf(Y.U,1)+' · net havuz '+tl(mo('pool'))+'/ay (oturum başına '+tl(mo('pool')/sess)+').';
+  const cpoRatio=mo('cpoCost')>0?mo('CPOn')/mo('cpoCost'):1;
+  const llRatio=P.rentAlt>0?mo('LL')/P.rentAlt:2;
+  const list=[
+    {n:'StarCharge',role:'Üst CPO · donanım',c:'var(--c-fin)',share:Y.scS,v:mo('SCn'),
+     lines:['Pay: '+tl(mo('SC'))+' − komisyon ve gider '+tl(mo('other')+mo('fee'))+(mo('pay')>0?' + mahsup '+tl(mo('pay')):''),'Donanım'+(r.avU>0?' + EPC avansı':'')+': '+usd(r.scCap)+' · geri dönüş '+yrsTxt(r.pbS)],
+     st:pbCls(r.pbS,4,6)},
+    {n:'Co-CPO',role:'Alt CPO · işletme',c:'var(--c-cpo)',share:Y.cpoS,v:mo('CPOn'),
+     lines:['Pay: '+tl(mo('CPO'))+' − işletme '+tl(mo('cpoCost')),'Kâr / maliyet: %'+nf(cpoRatio*100)],
+     st:cpoRatio>=0.5?'good':cpoRatio>=0?'warn':'bad'},
+    {n:'Lokasyon sahibi',role:'Yer · bağlantı'+(Y.llS-P.ll>0.05?' · prim +'+nf(Y.llS-P.ll,1)+' p':''),c:'var(--c-ll)',share:Y.llS,v:mo('LL'),
+     lines:['Operasyonel maliyeti yok','Alternatif kira: '+tl(P.rentAlt)+' → '+(P.rentAlt>0?nf(llRatio,2)+' kat':'–')],
+     st:llRatio>=1?'good':llRatio>=0.7?'warn':'bad'},
+    {n:'Ekonix',role:'Koordinasyon',c:'var(--c-ekx)',share:Y.ekxS,v:mo('EKX'),
+     lines:['Sermaye koymuyor','Portföyde ('+P.sites+' lok.): '+tlk(mo('EKX')*P.sites)+'/ay'],st:'info'},
+    {n:'EPC firması',role:'Saha yatırımı',c:'var(--c-epc)',share:Y.firmS,v:mo('FIRM'),
+     lines:[r.avU>0?'Yatırım '+tlk(P.epcTl)+' · avans '+tlk(P.epcTl*P.avansPct/100)+' · risk '+tlk(P.epcTl*(1-P.avansPct/100)):'Yatırım: '+tlk(P.epcTl)+' ('+usd(r.epc)+')',
+       'Geri dönüş '+yrsTxt(r.pbF)+' · IRR '+pctTxt(r.irrF),'Toplam marj ('+P.term+' yıl): %'+nf(r.margin*100)+(mo('pay')>0?' · mahsup '+tl(mo('pay'))+'/ay':'')],
+     st:pbCls(r.pbF,3,5)}
+  ];
+  $('parties').innerHTML=list.map(x=>'<div class="pt"><div class="pt-h"><span class="sw" style="background:'+x.c+'"></span><div><h3>'+x.n+'</h3><div class="role">'+x.role+' · %'+nf(x.share,1)+'</div></div><span class="pill '+x.st+'">'+LBL[x.st]+'</span></div><div class="pt-v'+(x.v<0?' neg':'')+'">'+tl(x.v)+'<small> /ay</small></div>'+x.lines.map(l=>'<div class="pt-l">'+l+'</div>').join('')+'</div>').join('');
+}
+
+function compare(){
+  const rows=[['EPC firması geri dönüş',r=>yrsTxt(r.pbF)],['EPC firması IRR',r=>pctTxt(r.irrF)],['EPC toplam marj ('+P.term+' yıl)',r=>'%'+nf(r.margin*100)],['StarCharge geri dönüş',r=>yrsTxt(r.pbS)],
+    ['Co-CPO net ₺/ay (1. yıl)',r=>tl(r.yrs[0].CPOn/r.yrs[0].n)],['Ekonix ₺/ay (1. yıl)',r=>tl(r.yrs[0].EKX/r.yrs[0].n)],
+    ['EPC firması ₺/ay (1. yıl)',r=>tl(r.yrs[0].FIRM/r.yrs[0].n)],['Lokasyon ₺/ay (1. yıl)',r=>tl(r.yrs[0].LL/r.yrs[0].n)]];
+  const ms=['fixed','tier','capital'], res=ms.map(m=>simulate(Object.assign({},mp(),{model:m})));
+  let h='<thead><tr><th></th>'+ms.map(m=>'<th class="'+(m===P.model?'cur':'')+'">'+MODEL_NAMES[m]+'</th>').join('')+'</tr></thead><tbody>';
+  rows.forEach(([l,f])=>{h+='<tr><td>'+l+'</td>'+res.map((r,i)=>'<td class="'+(ms[i]===P.model?'cur':'')+'">'+f(r)+'</td>').join('')+'</tr>';});
+  $('cmp').innerHTML=h+'</tbody>';
+}
+
+function heat(){
+  const rows=[250,400,500,750,1000,1500,2000,3000], cols=[150000,300000,500000,750000,1000000,1500000,2000000];
+  $('heat-sub').textContent='Satırlar: lokasyon başına aylık oturum (1. yıl). Sütunlar: EPC saha yatırımı. Model: '+MODEL_NAMES[P.model]+', diğer varsayımlar sabit.';
+  let h='<thead><tr><th>Oturum/ay</th>'+cols.map(c=>'<th>'+(c>=1e6?nf(c/1e6,c%1e6?1:0)+' M₺':nf(c/1e3)+' bin')+'</th>').join('')+'</tr></thead><tbody>';
+  rows.forEach(rv=>{
+    h+='<tr><td class="h">'+nf(rv)+' <span style="opacity:.7">· '+nf(rv/30.42,0)+'/gün</span></td>';
+    cols.forEach(c=>{
+      const r=simulate(Object.assign({},mp(),{demandMode:'sess',sessMonth:rv,epcTl:c,_tierMult:1}));
+      const y=r.pbF===null?null:r.pbF/12;
+      const k=y===null?'c-bad':y<=3?'c-good':y<=4?'c-ok':y<=6?'c-warn':'c-bad';
+      const cur=(P.demandMode==='sess'&&P.sessMonth===rv&&P.epcTl===c)?' cur':'';
+      h+='<td class="num '+k+cur+'">'+(y===null?'—':nf(y,1))+'</td>';
+    });
+    h+='</tr>';
+  });
+  $('heat').innerHTML=h+'</tbody>';
+}
+
+function niceStep(raw){const p=Math.pow(10,Math.floor(Math.log10(raw||1)));const f=raw/p;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p;}
+function chart(r){
+  const W=640,H=250,L=56,R=12,T=12,B=30;
+  const all=r.cumF.concat(r.cumS,r.cumC);
+  let mn=Math.min(0,...all), mx=Math.max(0,...all);
+  const step=niceStep((mx-mn)/5); mn=Math.floor(mn/step)*step; mx=Math.ceil(mx/step)*step;
+  const n=r.cumF.length-1;
+  const x=i=>L+(W-L-R)*i/n, y=v=>T+(H-T-B)*(mx-v)/(mx-mn);
+  let g='';
+  for(let v=mn;v<=mx+1e-6;v+=step){g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="var(--line)" stroke-width="'+(Math.abs(v)<1e-6?1.6:0.8)+'"'+(Math.abs(v)<1e-6?'':' stroke-dasharray="2 4"')+'/><text x="'+(L-6)+'" y="'+(y(v)+4)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-num)">'+usdk(v)+'</text>';}
+  for(let k=0;k<=n/12;k++){g+='<text x="'+x(k*12)+'" y="'+(H-12)+'" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-num)">'+k+'</text>';}
+  const path=(a,c)=>'<path d="'+a.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join('')+'" fill="none" stroke="'+c+'" stroke-width="2.4" stroke-linejoin="round"/>';
+  let marks='';
+  [[r.pbF,'var(--c-epc)'],[r.pbS,'var(--c-fin)']].forEach(([pb,c],i)=>{if(pb!==null){const xx=x(pb);marks+='<line x1="'+xx+'" x2="'+xx+'" y1="'+T+'" y2="'+y(0)+'" stroke="'+c+'" stroke-dasharray="3 3"/><circle cx="'+xx+'" cy="'+y(0)+'" r="4.5" fill="'+c+'" stroke="var(--surface)" stroke-width="2"/><text x="'+Math.min(xx+5,W-R-60)+'" y="'+(T+12+i*14)+'" font-size="11" fill="'+c+'" font-family="var(--f-num)">'+nf(pb/12,1)+' yıl</text>';}});
+  $('chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Kümülatif nakit grafiği">'+g+path(r.cumC,'var(--c-cpo)')+path(r.cumS,'var(--c-fin)')+path(r.cumF,'var(--c-epc)')+marks+'<text x="'+((L+W-R)/2)+'" y="'+H+'" text-anchor="middle" font-size="10" fill="var(--muted)">yıl</text></svg>';
+}
+
+function breakdown(r){
+  const Y=r.yrs[0], k=Y.kwh, gross=(Y.rev+Y.kdv)/k;
+  const items=[['KDV','var(--c-kdv)',Y.kdv/k],['Elektrik alışı','var(--c-el)',Y.el/k],['Komisyon','var(--c-fee)',Y.fee/k],
+    ['Lokasyon sahibi','var(--c-ll)',Y.LL/k],['StarCharge','var(--c-fin)',Y.SC/k],['Co-CPO','var(--c-cpo)',Y.CPO/k],
+    ['Ekonix','var(--c-ekx)',Y.EKX/k],['EPC firması','var(--c-epc)',Y.FIRM/k]];
+  $('bk-sub').textContent='1. yıl satış fiyatı '+nf(gross,2)+' ₺/kWh (KDV dahil). Net havuz (satış − alış) '+nf(Y.pool/k,2)+' ₺/kWh. Komisyon StarCharge payından ödenir; paylar tarafların kendi giderleri düşülmeden önceki tutarlardır.';
+  $('stack').innerHTML=items.filter(i=>i[2]>0).map(i=>'<div title="'+i[0]+'" style="flex:'+i[2]+';background:'+i[1]+'"></div>').join('');
+  $('bk').innerHTML=items.map(i=>'<span class="sw" style="background:'+i[1]+'"></span><span>'+i[0]+'</span><span class="n">'+nf(i[2],2)+' ₺</span><span class="p">'+nf(i[2]/gross*100,0)+'%</span>').join('');
+}
+
+function yearTable(r){
+  let h='<thead><tr><th>Yıl</th><th>Oturum/ay</th><th>Net havuz</th><th>StarCharge</th><th>Lokasyon</th><th>Co-CPO net</th><th>Ekonix</th><th>EPC firması</th><th>EPC kümülatif $</th><th>StarCharge kümülatif $</th></tr></thead><tbody>';
+  r.yrs.forEach((Y,i)=>{
+    const mo=k=>Y[k]/Y.n;
+    const be=Y.cumF>=0&&(i===0||r.yrs[i-1].cumF<0);
+    h+='<tr'+(be?' class="be"':'')+'><td>'+Y.y+'</td><td>'+nf(mo('sess'))+'</td><td>'+tl(mo('pool'))+'</td><td>'+tl(mo('SCn'))+'</td><td>'+tl(mo('LL'))+'</td><td style="color:var(--'+(mo('CPOn')<0?'bad':'ink')+')">'+tl(mo('CPOn'))+'</td><td>'+tl(mo('EKX'))+'</td><td>'+tl(mo('FIRM')-(Y.pay||0)/Y.n)+'</td><td style="color:var(--'+(Y.cumF>=0?'good':'bad')+')">'+usd(Y.cumF)+'</td><td>'+usd(Y.cumS)+'</td></tr>';
+  });
+  $('yt').innerHTML=h+'</tbody>';
+}
+
+function portfolio(r){
+  const S=P.sites, Y=r.yrs[0], mo=k=>Y[k]/Y.n;
+  $('pf-sub').textContent=S+' lokasyon, '+nf(S*P.units)+' ünite. 1. yıl aylık ortalamalar.';
+  const st=[['Toplam EPC yatırımı',tlk(S*P.epcTl)+' · '+usdk(S*r.epc)],['Toplam donanım',usdk(S*r.hw)],
+    ['Net havuz / ay',tlk(S*mo('pool'))],['StarCharge / ay',tlk(S*mo('SCn'))],['Co-CPO net / ay',tlk(S*mo('CPOn'))],
+    ['Ekonix / ay',tlk(S*mo('EKX'))],['EPC firmaları / ay',tlk(S*mo('FIRM'))],['EPC firmaları net ('+P.term+' yıl)',usdk(S*r.netF)]];
+  $('pf').innerHTML=st.map(s=>'<div class="stat"><div class="l">'+s[0]+'</div><div class="v">'+s[1]+'</div></div>').join('');
+}
+
+function verdict(r){
+  const c=pbCls(r.pbF,3,5), pill=$('v-pill'); pill.className='pill '+c;
+  pill.textContent={good:'EPC masada',warn:'EPC sınırda',bad:'EPC masadan kalkar'}[c];
+  const Y=r.yrs[0], mo=k=>Y[k]/Y.n;
+  const risk=P.epcTl*(1-P.avansPct/100);
+  const tt=total(P); if(Math.abs(tt-100)>0.01){pill.className='pill warn'; pill.textContent='Toplam %'+nf(tt); $('v-text').textContent='Paylar toplamı %'+nf(tt)+'; %100 olmadan sonuçlar anlamlı değil. Sol paneldeki "Farkı ..." düğmeleriyle tamamlayın.'; return;}
+  let t=MODEL_NAMES[P.model]+' kurguda EPC firması ayda '+tl(mo('FIRM')-(Y.pay||0)/Y.n)+' alıyor. ';
+  if(r.avU>0) t+=tlk(P.epcTl)+' yatırımın '+tlk(P.epcTl-risk)+'\'i avansla peşin ödeniyor'+(P.mahsup?' ve payından mahsup ediliyor':'')+'. ';
+  t+=risk<=0?'EPC sermaye riski taşımıyor; '+P.term+' yılda maliyetinin üzerine %'+nf(r.margin*100)+' marj topluyor.':('Kendi riskindeki '+tlk(risk)+'\'yi '+(r.pbF===null?P.term+' yıl içinde geri alamıyor':nf(r.pbF/12,1)+' yılda geri alıyor')+'.');
+  t+=' Aynı lokasyonda StarCharge donanımı '+(r.pbS===null?'süre içinde dönmüyor':nf(r.pbS/12,1)+' yılda dönüyor')+'.';
+  if(mo('CPOn')<0) t+=' Co-CPO işletme maliyetini karşılayamıyor (ayda '+tl(mo('CPOn'))+').';
+  if(r.pbF!==null&&r.pbS!==null&&r.pbF>r.pbS*2) t+=' Riskin büyüğü EPC\'de, getirinin büyüğü StarCharge\'da.';
+  $('v-text').textContent=t;
+}
+
+function summary(r){
+  const Y=r.yrs[0], mo=k=>Y[k]/Y.n;
+  const shares=P.model==='tier'?('Lokasyon %'+P.ll+', StarCharge %'+P.sc+', Ekonix kademeli %'+P.ekx1+'/%'+P.ekx2+'/%'+P.ekx3+' ('+P.tierA+' / '+P.tierB+' oturum eşikleri'+(P.tierMarg?', marjinal':'')+'), Co-CPO kalan')
+    :('Lokasyon %'+P.ll+', Co-CPO %'+P.cpo+', Ekonix+EPC %'+P.ekx+' (EPC firması bunun %'+P.firm+'\'i), StarCharge %'+P.sc+(P.model==='capital'?'; EPC geri dönene kadar kalan pay sermaye oranında':''));
+  return ['EKONİX · DC şarj gelir paylaşımı simülasyonu (lokasyon başına)','',
+    'Kurgu: '+MODEL_NAMES[P.model]+'. '+shares+'.',
+    'Lokasyon: '+P.units+' × '+P.kw+' kW · '+nf(mo('sess'))+' oturum/ay · '+P.sessionKwh+' kWh/oturum · satış '+nf(P.price,2)+' ₺ · alış '+nf(P.elec,2)+' ₺',
+    'Net havuz: '+tl(mo('pool'))+'/ay ('+tl(mo('pool')/mo('sess'))+'/oturum)','',
+    'Aylık (1. yıl):',
+    '• StarCharge: '+tl(mo('SCn'))+' → donanım '+usd(r.hw)+', geri dönüş '+yrsTxt(r.pbS),
+    '• Co-CPO: '+tl(mo('CPO'))+' − işletme '+tl(mo('cpoCost'))+' = '+tl(mo('CPOn')),
+    '• Lokasyon sahibi: '+tl(mo('LL')),
+    '• Ekonix: '+tl(mo('EKX')),
+    '• EPC firması: '+tl(mo('FIRM')-(Y.pay||0)/Y.n)+' → yatırım '+tlk(P.epcTl)+(r.avU>0?' (avans %'+P.avansPct+(P.mahsup?', paydan mahsup':'')+')':'')+', geri dönüş '+yrsTxt(r.pbF)+', '+P.term+' yılda toplam marj %'+nf(r.margin*100),'',
+    'Not: Geri dönüş USD bazında, '+P.term+' yıllık sözleşme, yıllık %'+P.growth+' talep artışı varsayımıyla.'].join('\n');
+}
+
+function refresh(fromRange){
+  syncInputs(fromRange);
+  if(ACTIVE>=0&&SITES[ACTIVE]){Object.assign(SITES[ACTIVE],pick(P,SITE_KEYS)); P.demandMode='sess'; saveSites();}
+  const r=simulate(mp()), Y=r.yrs[0], mo=k=>Y[k]/Y.n;
+  sitesUI(); sitesTable();
+  const c=pbCls(r.pbF,3,5);
+  $('k-pb').textContent=yrsTxt(r.pbF); $('k-pb').className='v '+c; $('k-pb-s').textContent=tl(mo('FIRM'))+'/ay';
+  $('k-irr').textContent=pctTxt(r.irrF); $('k-irr-s').textContent=r.moic===null?'toplam marj %'+nf(r.margin*100):nf(r.moic,2)+'x yatırım çarpanı';
+  $('k-sc').textContent=yrsTxt(r.pbS); $('k-sc').className='v '+pbCls(r.pbS,4,6); $('k-sc-s').textContent=tl(mo('SCn'))+'/ay';
+  $('k-cpo').textContent=tl(mo('CPOn')); $('k-cpo').className='v '+(mo('CPOn')<0?'bad':''); $('k-cpo-s').textContent='işletme '+tl(mo('cpoCost'))+' sonrası';
+  $('k-pool').textContent=tl(mo('pool')); $('k-pool-s').textContent=nf(mo('sess'))+' oturum/ay';
+  syncMixer(r); verdict(r); parties(r); chart(r); breakdown(r); yearTable(r); portfolio(r); $('summary').value=summary(r);
+  clearTimeout(refresh._t); refresh._t=setTimeout(()=>{heat();compare();},fromRange?150:0);
+  save();
+}
+
+$('preset').onchange=e=>{const v=e.target.value;
+  if(v){P=Object.assign({},P,PRESETS[v]); refresh();}
+  e.target.value=v;};
+$('reset').onclick=()=>{P=Object.assign({},DEFAULTS); ACTIVE=-1; saveSites(); $('preset').value=''; refresh();};
+$('copy').onclick=()=>{const t=$('summary'); const done=()=>{$('toast').textContent='Kopyalandı'; setTimeout(()=>$('toast').textContent='',2000);};
+  try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();$('toast').textContent='Metin seçildi, kopyalayın';});}catch(e){t.select();$('toast').textContent='Metin seçildi, kopyalayın';}};
+
+
+/* ---------- Mikser ---------- */
+const CH=[
+  {k:'sc',n:'StarCharge',c:'var(--c-fin)'},
+  {k:'ll',n:'Lokasyon',c:'var(--c-ll)'},
+  {k:'cpo',n:'Co-CPO',c:'var(--c-cpo)'},
+  {k:'ekx',n:'Ekonix + EPC',c:'var(--c-epc)'}
+];
+const FMAX=80;
+const KN=[
+  {k:'sessMonth',l:'Oturum / ay',min:50,max:4000,step:25,f:v=>nf(v),onSet:()=>{P.demandMode='sess';}},
+  {k:'sessionKwh',l:'kWh / oturum',min:10,max:80,step:1,f:v=>nf(v)},
+  {k:'price',l:'Satış ₺/kWh',min:8,max:22,step:0.1,f:v=>nf(v,2)},
+  {k:'elec',l:'Alış ₺/kWh',min:2,max:10,step:0.05,f:v=>nf(v,2)},
+  {k:'epcTl',l:'EPC yatırım',min:50000,max:4000000,step:25000,f:v=>tlk(v)},
+  {k:'avansPct',l:'Avans',min:0,max:100,step:5,f:v=>'%'+nf(v)},
+  {k:'firm',l:'EPC / Ekonix',min:0,max:100,step:5,f:v=>nf(v)+'/'+nf(100-v)},
+  {k:'cpoOpexTl',l:'Co-CPO gider',min:0,max:60000,step:500,f:v=>tlk(v)},
+  {k:'growth',l:'Talep artışı',min:0,max:50,step:1,f:v=>'%'+nf(v)},
+  {k:'term',l:'Süre (yıl)',min:3,max:15,step:1,f:v=>nf(v)}
+];
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const snap=(v,o)=>{const s=o.step; return clamp(Math.round((v-o.min)/s)*s+o.min,o.min,o.max);};
+
+function setChannel(k,v){
+  v=clamp(Math.round(v),0,FMAX); const d=v-P[k]; if(!d) return;
+  const abs=k==='sc'?'ekx':'sc';
+  let na=P[abs]-d;
+  if(na<0){v+=na; na=0;} else if(na>FMAX){v+=na-FMAX; na=FMAX;}
+  P[k]=v; P[abs]=na; $('preset').value=''; refresh(true);
+}
+function setKnob(o,v){
+  v=snap(v,o); if(v===P[o.k]) return;
+  P[o.k]=+v.toFixed(4); if(o.onSet) o.onSet(); $('preset').value=''; refresh(true);
+}
+function dragCtl(el,getV,setV,o,mode){
+  let sy=0,sv=0,active=false,rect=null;
+  el.addEventListener('pointerdown',e=>{active=true; el.setPointerCapture(e.pointerId); sy=e.clientY; sv=getV(); rect=el.getBoundingClientRect();
+    if(mode==='fader'){const fr=1-(e.clientY-rect.top-6)/(rect.height-12); setV(o.min+fr*(o.max-o.min));} e.preventDefault();});
+  el.addEventListener('pointermove',e=>{if(!active) return;
+    if(mode==='fader'){const fr=1-(e.clientY-rect.top-6)/(rect.height-12); setV(o.min+fr*(o.max-o.min));}
+    else{const k=e.shiftKey?600:180; setV(sv+(sy-e.clientY)/k*(o.max-o.min));}});
+  const end=()=>{if(active){active=false; refresh();}};
+  el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+  el.addEventListener('wheel',e=>{e.preventDefault(); setV(getV()-Math.sign(e.deltaY)*o.step); clearTimeout(el._w); el._w=setTimeout(()=>refresh(),200);},{passive:false});
+  el.addEventListener('keydown',e=>{const m={ArrowUp:1,ArrowRight:1,ArrowDown:-1,ArrowLeft:-1,PageUp:10,PageDown:-10}[e.key];
+    if(m){e.preventDefault(); setV(getV()+m*o.step); refresh();}
+    else if(e.key==='Home'){e.preventDefault(); setV(o.min); refresh();} else if(e.key==='End'){e.preventDefault(); setV(o.max); refresh();}});
+  el.addEventListener('dblclick',()=>{setV(DEFAULTS[o.k]); refresh();});
+}
+function knobSvg(fr,col){
+  const a0=135, a=a0+270*fr, R=24, cx=31, cy=31;
+  const pt=(deg,r)=>[cx+r*Math.cos(deg*Math.PI/180), cy+r*Math.sin(deg*Math.PI/180)];
+  const arc=(from,to,r)=>{const [x1,y1]=pt(from,r),[x2,y2]=pt(to,r); return 'M'+x1.toFixed(2)+' '+y1.toFixed(2)+' A'+r+' '+r+' 0 '+((to-from)>180?1:0)+' 1 '+x2.toFixed(2)+' '+y2.toFixed(2);};
+  const [px,py]=pt(a,15), [qx,qy]=pt(a,6);
+  let ticks=''; for(let i=0;i<=10;i++){const d=a0+27*i,[x1,y1]=pt(d,28.5),[x2,y2]=pt(d,30.5); ticks+='<line x1="'+x1.toFixed(2)+'" y1="'+y1.toFixed(2)+'" x2="'+x2.toFixed(2)+'" y2="'+y2.toFixed(2)+'" stroke="rgba(255,255,255,.35)" stroke-width="1"/>';}
+  return '<svg viewBox="0 0 62 62" aria-hidden="true">'+ticks+
+    '<path d="'+arc(a0,a0+270,R)+'" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="4" stroke-linecap="round"/>'+
+    (fr>0.002?'<path d="'+arc(a0,a,R)+'" fill="none" stroke="'+col+'" stroke-width="4" stroke-linecap="round"/>':'')+
+    '<circle cx="31" cy="31" r="18" fill="rgba(255,255,255,.12)" stroke="var(--side-d)" stroke-width="1.5"/><circle cx="31" cy="31" r="15" fill="rgba(255,255,255,.2)"/>'+
+    '<line x1="'+qx.toFixed(2)+'" y1="'+qy.toFixed(2)+'" x2="'+px.toFixed(2)+'" y2="'+py.toFixed(2)+'" stroke="var(--side-ink)" stroke-width="2.5" stroke-linecap="round"/></svg>';
+}
+function buildMixer(){
+  $('mx-decks').innerHTML=Object.entries(MODEL_NAMES).map(([k,n])=>'<button type="button" class="mx-deck" data-m="'+k+'">'+n+'</button>').join('');
+  $('mx-decks').querySelectorAll('button').forEach(b=>b.onclick=()=>{P.model=b.dataset.m; $('preset').value=''; refresh();});
+  const seg=n=>Array.from({length:n},()=>'<i></i>').join('');
+  $('mx-ch').innerHTML=CH.map(c=>'<div class="ch" data-k="'+c.k+'" style="--chc:'+c.c+';--mc:'+c.c+'"><span class="ch-led"></span><div class="ch-name">'+c.n+'</div>'+
+    '<div class="ch-row"><div class="ch-meter">'+seg(14)+'</div><div class="fader" tabindex="0" role="slider" aria-label="'+c.n+' payı" aria-valuemin="0" aria-valuemax="'+FMAX+'"><span class="ticks"></span><span class="fill"></span><span class="cap"></span></div></div>'+
+    '<div class="ch-val"></div><div class="ch-tl"></div></div>').join('')+
+    '<div class="ch master"><span class="ch-led"></span><div class="ch-name">Master<br>net havuz</div><div class="ch-row"><div class="ch-meter" style="width:14px">'+seg(14)+'</div></div><div class="ch-val"></div><div class="ch-tl"></div></div>';
+  CH.forEach(c=>{const el=document.querySelector('.ch[data-k="'+c.k+'"] .fader'); const o={k:c.k,min:0,max:FMAX,step:1};
+    dragCtl(el,()=>P[c.k],v=>setChannel(c.k,v),o,'fader');});
+  $('mx-knobs').innerHTML=KN.map((o,i)=>'<div class="knob" data-i="'+i+'" tabindex="0" role="slider" aria-label="'+o.l+'" aria-valuemin="'+o.min+'" aria-valuemax="'+o.max+'"><span class="ksvg"></span><span class="kv"></span><span class="kl">'+o.l+'</span></div>').join('');
+  KN.forEach((o,i)=>{const el=document.querySelector('.knob[data-i="'+i+'"]'); dragCtl(el,()=>P[o.k],v=>setKnob(o,v),o,'knob');});
+}
+function syncMixer(r){
+  document.querySelectorAll('.mx-deck').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.m===P.model)));
+  const Y=r.yrs[0], mo=k=>Y[k]/Y.n;
+  const cpoRatio=mo('cpoCost')>0?mo('CPOn')/mo('cpoCost'):1, llRatio=P.rentAlt>0?mo('LL')/P.rentAlt:2;
+  const firmNet=mo('FIRM')-(Y.pay||0)/Y.n;
+  const st={sc:pbCls(r.pbS,4,6), ll:llRatio>=1?'good':llRatio>=0.7?'warn':'bad', cpo:cpoRatio>=0.5?'good':cpoRatio>=0?'warn':'bad', ekx:pbCls(r.pbF,3,5)};
+  const money={sc:mo('SCn'), ll:mo('LL'), cpo:mo('CPOn'), ekx:mo('EKX')+firmNet};
+  const shown={sc:Y.scS, ll:Y.llS, cpo:Y.cpoS, ekx:Y.ekxS+Y.firmS};
+  const mx=Math.max(1,...Object.values(money).map(Math.abs));
+  CH.forEach(c=>{
+    const ch=document.querySelector('.ch[data-k="'+c.k+'"]'); const v=P[c.k], fr=v/FMAX;
+    const fd=ch.querySelector('.fader'); fd.setAttribute('aria-valuenow',v); fd.setAttribute('aria-valuetext','%'+v);
+    ch.querySelector('.cap').style.top='calc(6px + '+((1-fr)*100).toFixed(2)+'% - '+((1-fr)*12).toFixed(2)+'px)';
+    ch.querySelector('.fill').style.height='calc('+(fr*100).toFixed(2)+'% - '+(fr*12).toFixed(2)+'px)';
+    const eff=Math.abs(shown[c.k]-v)>0.05?' <span style="color:var(--mx-dim);font-size:.65rem">→'+nf(shown[c.k],0)+'</span>':'';
+    ch.querySelector('.ch-val').innerHTML='%'+nf(v)+eff;
+    const t=ch.querySelector('.ch-tl'); t.textContent=tlk(money[c.k])+'/ay'; t.className='ch-tl'+(money[c.k]<0?' neg':'');
+    ch.querySelector('.ch-led').className='ch-led '+st[c.k];
+    const lit=Math.round(Math.max(0,money[c.k])/mx*14);
+    ch.querySelectorAll('.ch-meter i').forEach((m,i)=>m.classList.toggle('on',i<lit));
+  });
+  const ms=document.querySelector('.ch.master'), tt=total(P), ok=Math.abs(tt-100)<0.01;
+  ms.querySelector('.ch-led').className='ch-led '+(ok?'good':'bad');
+  ms.querySelector('.ch-val').textContent='%'+nf(tt); ms.querySelector('.ch-val').className='ch-val '+(ok?'ok':'bad');
+  ms.querySelector('.ch-tl').textContent=tlk(mo('pool'))+'/ay';
+  const lp=Math.round(clamp(mo('sess')/2000,0,1)*14);
+  ms.querySelectorAll('.ch-meter i').forEach((m,i)=>{m.classList.toggle('on',i<lp); m.style.setProperty('--mc',i>=11?'var(--mx-amb)':'var(--mx-on)');});
+  KN.forEach((o,i)=>{
+    const el=document.querySelector('.knob[data-i="'+i+'"]'), v=P[o.k], fr=(v-o.min)/(o.max-o.min);
+    el.querySelector('.ksvg').innerHTML=knobSvg(clamp(fr,0,1),o.k==='epcTl'||o.k==='avansPct'||o.k==='firm'?'var(--teal)':o.k==='cpoOpexTl'?'var(--p-star)':'var(--stg-04)');
+    el.querySelector('.kv').textContent=o.f(v);
+    el.setAttribute('aria-valuenow',v); el.setAttribute('aria-valuetext',o.f(v));
+    el.classList.toggle('dim',(o.k==='sessMonth'&&P.demandMode!=='sess')||(o.k==='avansPct'&&false));
+  });
+}
+
+/* ---------- Lokasyonlar ---------- */
+function pbFromCum(a){for(let i=1;i<a.length;i++){if(a[i-1]<0&&a[i]>=0) return i-1+(-a[i-1])/(a[i]-a[i-1]);} return a[0]>=0?0:null;}
+function sitesUI(){
+  const sel=$('site-sel');
+  sel.innerHTML=(SITES.length?'<option value="-1">— Lokasyon seçin —</option>':'<option value="-1">Henüz lokasyon yok</option>')+SITES.map((x,i)=>'<option value="'+i+'">'+x.name.replace(/</g,'&lt;')+'</option>').join('');
+  sel.value=String(ACTIVE);
+  $('site-edit').hidden=ACTIVE<0; $('site-del').hidden=ACTIVE<0; 
+  if(ACTIVE>=0&&document.activeElement!==$('site-name')) $('site-name').value=SITES[ACTIVE].name;
+  document.querySelectorAll('#opt-cpo button').forEach(b=>b.setAttribute('aria-pressed',String(P.cpoCostMode===b.dataset.v)));
+  document.querySelectorAll('#opt-tier button').forEach(b=>b.setAttribute('aria-pressed',String(P.tierScope===b.dataset.v)));
+}
+function sitesTable(){
+  const card=$('sites-card'); card.hidden=SITES.length===0; if(!SITES.length) return;
+  $('sites-h').textContent='Lokasyonlar · '+SITES.length+' saha';
+  const res=SITES.map((x,i)=>simulate(siteParams(i===ACTIVE?Object.assign({},x,pick(P,SITE_KEYS)):x)));
+  const cols=['Lokasyon','DC kW','EPC yatırım','Oturum/ay','Kullanım','Net havuz','Lokasyon sahibi','StarCharge','Co-CPO net','Ekonix','EPC firması','EPC geri dönüş','SC geri dönüş'];
+  let h='<thead><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>';
+  const T={kw:0,epc:0,sess:0,kwh:0,pool:0,LL:0,SCn:0,CPOn:0,EKX:0,F:0};
+  res.forEach((r,i)=>{
+    const x=SITES[i], Y=r.yrs[0], mo=k=>Y[k]/Y.n, F=mo('FIRM')-(Y.pay||0)/Y.n;
+    T.kw+=x.units*x.kw; T.epc+=x.epcTl; T.sess+=mo('sess'); T.kwh+=mo('kwh'); T.pool+=mo('pool'); T.LL+=mo('LL'); T.SCn+=mo('SCn'); T.CPOn+=mo('CPOn'); T.EKX+=mo('EKX'); T.F+=F;
+    h+='<tr class="srow'+(i===ACTIVE?' act':'')+'" data-i="'+i+'"><td>'+x.name.replace(/</g,'&lt;')+'</td><td>'+nf(x.units*x.kw)+'</td><td>'+tlk(x.epcTl)+'</td><td>'+nf(mo('sess'))+'</td><td>%'+nf(Y.U,1)+'</td><td>'+tl(mo('pool'))+'</td><td>'+tl(mo('LL'))+' <span class="mut">%'+nf(Y.llS,1)+'</span></td><td>'+tl(mo('SCn'))+'</td><td class="'+(mo('CPOn')<0?'neg':'')+'">'+tl(mo('CPOn'))+'</td><td>'+tl(mo('EKX'))+'</td><td>'+tl(F)+'</td><td class="'+pbCls(r.pbF,3,5)+'-t">'+yrsTxt(r.pbF)+'</td><td class="'+pbCls(r.pbS,4,6)+'-t">'+yrsTxt(r.pbS)+'</td></tr>';
+  });
+  const n=res[0].cumF.length, sumArr=k=>Array.from({length:n},(_,j)=>res.reduce((a,r)=>a+r[k][j],0));
+  const pbF=pbFromCum(sumArr('cumF')), pbS=pbFromCum(sumArr('cumS'));
+  h+='<tr class="tot"><td>Toplam</td><td>'+nf(T.kw)+'</td><td>'+tlk(T.epc)+'</td><td>'+nf(T.sess)+'</td><td>%'+nf(T.kwh/(T.kw*730)*100,1)+'</td><td>'+tl(T.pool)+'</td><td>'+tl(T.LL)+'</td><td>'+tl(T.SCn)+'</td><td class="'+(T.CPOn<0?'neg':'')+'">'+tl(T.CPOn)+'</td><td>'+tl(T.EKX)+'</td><td>'+tl(T.F)+'</td><td class="'+pbCls(pbF,3,5)+'-t">'+yrsTxt(pbF)+'</td><td class="'+pbCls(pbS,4,6)+'-t">'+yrsTxt(pbS)+'</td></tr>';
+  $('sites-t').innerHTML=h+'</tbody>';
+  document.querySelectorAll('#sites-t tr.srow').forEach(tr=>tr.onclick=()=>selectSite(+tr.dataset.i));
+}
+function selectSite(i){
+  ACTIVE=i;
+  if(i>=0){Object.assign(P,pick(SITES[i],SITE_KEYS)); P.demandMode='sess';}
+  saveSites(); refresh();
+}
+$('site-sel').onchange=e=>selectSite(+e.target.value);
+$('site-name').oninput=e=>{if(ACTIVE>=0){SITES[ACTIVE].name=e.target.value||'Lokasyon'; saveSites(); sitesUI(); sitesTable();}};
+$('site-add').onclick=()=>{SITES.push(Object.assign({name:'Lokasyon '+(SITES.length+1)},pick(Object.assign({},P,{demandMode:'sess'}),SITE_KEYS))); selectSite(SITES.length-1);};
+$('site-del').onclick=()=>{if(ACTIVE<0) return; SITES.splice(ACTIVE,1); ACTIVE=SITES.length?0:-1; if(ACTIVE>=0) Object.assign(P,pick(SITES[0],SITE_KEYS)); saveSites(); refresh();};
+document.querySelectorAll('#opt-cpo button').forEach(b=>b.onclick=()=>{P.cpoCostMode=b.dataset.v; refresh();});
+document.querySelectorAll('#opt-tier button').forEach(b=>b.onclick=()=>{P.tierScope=b.dataset.v; refresh();});
+buildInputs(); buildMixer(); refresh();
+
+</script>
+</body></html>
