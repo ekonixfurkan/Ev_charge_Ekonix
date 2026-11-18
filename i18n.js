@@ -190,6 +190,11 @@
     'Gelir payı ile: finansör yatırımını kendi gelir payından geri alır. Kredi: geri ödeyen taraf eşit yıllık taksit öder; taksit onun nakdinden düşülür ve finansöre gider.':
       'Via revenue share: the financier recovers its investment from its own revenue share. Loan: the repaying party pays equal annual installments; the installment is deducted from its cash and goes to the financier.',
 
+    /* nottan göreve */
+    'Görev Listesine Ekle': 'Add to Task List', 'Görev listesine ekle': 'Add to task list', 'Göreve eklendi (tekrar ekle)': 'Added as task (add again)',
+    'Kime Atanacak': 'Assign To', 'Son Tarih': 'Due Date', 'Görev Ekle': 'Add Task', 'Sorumlu seçin': 'Select an owner',
+    'Görev metni boş olamaz.': 'Task text cannot be empty.', 'Kime atanacağını seçin.': 'Select who it is assigned to.', 'Görev listesine eklendi.': 'Added to the task list.',
+
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',

@@ -1058,6 +1058,12 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   tr,.kpi{break-inside:avoid}
 }
 /* Açılır geri dönüş düğmesi: sayfa düzenine girmez (fixed), kenar çubuğu renginde çerçeveli */
+.nt-task{display:inline-flex;align-items:center;vertical-align:middle;padding:2px 4px;margin-left:4px;border:1px solid transparent;border-radius:var(--radius);background:transparent;color:var(--muted);cursor:pointer}
+.nt-task:hover{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.nt-task.done{color:var(--ok)}
+#ntDlg label{display:block;margin-top:8px}
+#ntDlg textarea{width:100%;box-sizing:border-box}
+html.ro .nt-task{display:none}
 .dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:6px 18px;font-size:14px;font-weight:700;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 .dy-back:hover{background:var(--side-d);color:#fff}
 .dy-back:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
@@ -1140,6 +1146,12 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
   <label>Grup başlığı<input id="grpName" list="grpNames" maxlength="60" autocomplete="off" placeholder="ör. IKEA Lokasyonları"></label><datalist id="grpNames"></datalist>
   <p class="alert" id="grpErr" role="alert" hidden></p>
   <div class="row"><button type="button" id="grpCancel">Vazgeç</button><button type="button" class="save" id="grpSave">Gruplandır</button></div></dialog>
+<dialog id="ntDlg"><h3 style="margin:0 0 6px">Görev Listesine Ekle</h3><p id="ntInfo" class="note" style="margin:0 0 10px"></p>
+  <label>Görev<textarea id="ntTitle" rows="3" maxlength="200"></textarea></label>
+  <label>Kime Atanacak<select id="ntAssignee" aria-label="Kime Atanacak"></select></label>
+  <label>Son Tarih<input type="date" id="ntDue"></label>
+  <p class="alert" id="ntErr" role="alert" hidden></p>
+  <div class="row"><button type="button" id="ntCancel">Vazgeç</button><button type="button" class="primary" id="ntSave">Görev Ekle</button></div></dialog>
 <dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:15px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
 <dialog id="dlg">
   <form id="dlgForm">
@@ -3166,11 +3178,35 @@ async function loadNotes(id){
   if(activeId===id){paintNotesBadge();if(notesOpen)paintNotes();}
 }
 function paintNotesBadge(){const b=$('notesCount');if(!b)return;const n=(notesBy[activeId]||[]).length;b.textContent=n>99?'99+':n;b.hidden=!n;}
+// Notu tek tıkla görev listesine çevir: açılır pencerede kime atanacağı ve son tarih sorulur.
+const ntDone=new Set();let ntNote=null;
+function ntOpen(id){
+  const n=(notesBy[activeId]||[]).find(x=>String(x.id)===String(id));if(!n)return;
+  ntNote=n;
+  if(!people.length)loadPeople();
+  const sel=me.email||'';
+  $('ntInfo').textContent=(cur()?cur().name:'')+' · '+(n.author_name||n.author)+' · '+fmtTs(n.created_at);
+  $('ntTitle').value=String(n.body||'').replace(/\s+/g,' ').trim().slice(0,200);
+  $('ntAssignee').innerHTML='<option value="">Sorumlu seçin</option>'+plAssigneeOptions(sel);
+  $('ntAssignee').value=people.some(x=>x.email===sel)?sel:'';
+  $('ntDue').value='';$('ntErr').hidden=true;$('ntSave').disabled=false;
+  $('ntDlg').showModal();$('ntAssignee').focus();
+}
+async function ntSave(){
+  const title=$('ntTitle').value.replace(/\s+/g,' ').trim(),assignee=$('ntAssignee').value,due=$('ntDue').value;
+  const err=m=>{$('ntErr').textContent=m;$('ntErr').hidden=false;};
+  if(!title)return err('Görev metni boş olamaz.');
+  if(!assignee)return err('Kime atanacağını seçin.');
+  $('ntSave').disabled=true;
+  try{await plApi('POST','',{site:activeId,title,assignee,due});}
+  catch(e){$('ntSave').disabled=false;return err(e.message);}
+  ntDone.add(String(ntNote.id));$('ntDlg').close();pl.loaded=false;toast('Görev listesine eklendi.');paintNotes();
+}
 function paintNotes(){
   const x=cur(),list=notesBy[activeId]||[];
   $('npSite').textContent=x?x.name:'';
   $('npList').innerHTML=list.length?list.map(n=>{const can=!!me.owner;
-    return `<div class="np-note"><div class="np-meta"><b>${esc(n.author_name||n.author)}</b><span>${esc(fmtTs(n.created_at))}${can?` <button type="button" class="ghost" data-delnote="${n.id}" title="Notu sil">Sil</button>`:''}</span></div><p>${esc(n.body)}</p></div>`;}).join(''):'<div class="np-empty">Bu proje için henüz not yok.<br>İlk notu aşağıdan yazın.</div>';
+    return `<div class="np-note"><div class="np-meta"><b>${esc(n.author_name||n.author)}</b><span>${esc(fmtTs(n.created_at))} <button type="button" class="nt-task${ntDone.has(String(n.id))?' done':''}" data-note2task="${n.id}" title="${ntDone.has(String(n.id))?'Göreve eklendi (tekrar ekle)':'Görev listesine ekle'}" aria-label="Görev listesine ekle"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></button>${can?` <button type="button" class="ghost" data-delnote="${n.id}" title="Notu sil">Sil</button>`:''}</span></div><p>${esc(n.body)}</p></div>`;}).join(''):'<div class="np-empty">Bu proje için henüz not yok.<br>İlk notu aşağıdan yazın.</div>';
   const l=$('npList');l.scrollTop=l.scrollHeight;
 }
 function openNotes(){notesOpen=true;const p=$('notesPanel');p.hidden=false;requestAnimationFrame(()=>p.classList.add('open'));paintNotes();loadNotes(activeId);$('npText').focus();const b=$('notesBtn');if(b)b.setAttribute('aria-pressed','true');}
@@ -3186,6 +3222,9 @@ document.addEventListener('click',async e=>{
   if(e.target.closest('#notesBtn')){notesOpen?closeNotes():openNotes();return;}
   if(e.target.closest('#npClose')){closeNotes();return;}
   if(e.target.closest('#npSend')){sendNote();return;}
+  const nt=e.target.closest('[data-note2task]');if(nt){ntOpen(nt.dataset.note2task);return;}
+  if(e.target.closest('#ntCancel')){$('ntDlg').close();return;}
+  if(e.target.closest('#ntSave')){ntSave();return;}
   const d=e.target.closest('[data-delnote]');
   if(d){if(!await ask('Bu not silinsin mi?','Sil'))return;try{await notesApi('DELETE','?id='+encodeURIComponent(d.dataset.delnote));await loadNotes(activeId);}catch(x){toast(x.message);}}
 });
