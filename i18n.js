@@ -211,6 +211,7 @@
     'Karttaki elle yazılan metinler silinip projeden gelen otomatik değerlere dönülsün mü?': 'Discard the hand-written text and return to the automatic values from the project?',
     'En fazla 4 fotoğraf seçilebilir.': 'You can select up to 4 photos.', 'Bu hesap salt okunurdur; kart kaydedilemez.': 'This account is read-only; the card cannot be saved.',
 
+    'Uygulamayı Yükle': 'Install App', 'Uygulama yüklendi.': 'App installed.',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',

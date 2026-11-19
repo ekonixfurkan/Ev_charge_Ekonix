@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ekonix — Bağlantı Yok</title>
+<style>
+  @font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:200 800;font-display:swap;src:url(/fonts/plus-jakarta-sans-latin-ext.woff2) format("woff2")}
+  :root{color-scheme:light dark}
+  body{margin:0;min-height:100dvh;display:grid;place-items:center;background:#f2f5f8;color:#10202e;font:14px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+  @media (prefers-color-scheme:dark){body{background:#0c1620;color:#e6edf3}}
+  main{text-align:center;padding:24px;max-width:380px}
+  img{width:72px;height:72px;margin-bottom:16px;border-radius:6px}
+  h1{font-size:19px;margin:0 0 8px}
+  p{margin:0 0 20px;opacity:.75}
+  button{background:#0b2e57;color:#fff;border:0;border-radius:6px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
+</style>
+</head>
+<body>
+<main>
+  <img src="/icons/icon-192.png" alt="">
+  <h1>Bağlantı Yok</h1>
+  <p>İnternete ulaşılamıyor. Bağlantı gelince Ekonix kaldığınız yerden devam eder.</p>
+  <button onclick="location.reload()">Tekrar Dene</button>
+</main>
+</body>
+</html>
