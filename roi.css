@@ -321,3 +321,64 @@ details.grp[open]>summary::after{content:none}
   .inputs>#sitebox{grid-column:3;grid-row:3}
   .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* ---------- Tüm sekmeler: Varsayımlar ile aynı şablon (kutu başlığı + alt çizgi, küçük başlık + gri kutu, eşit biten kutular) ---------- */
+.card h2{padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--hair)}
+.card h2+.sub{margin:-4px 0 12px;padding-bottom:0;border-bottom:0;font-size:10.5px}
+.card .sub{font-size:10.5px}
+/* tablolar: uygulamadaki tablo başlığı */
+table{font-size:12px}
+th{background:var(--soft);color:var(--ink2);font-size:9.5px;font-weight:700;letter-spacing:.07em;white-space:nowrap;padding:9px 10px;border-bottom:1px solid var(--hair-strong)}
+td{padding:8px 10px;border-bottom:1px solid var(--hair)}
+tr.tot td{font-weight:700;background:var(--soft)}
+/* küçük başlık + gri kutu: ölçek rakamları ve taraf kartları */
+.grid2{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px}
+.stat{display:flex;flex-direction:column;gap:5px;min-width:0}
+.stat .l{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.stat .v{padding:8px 10px;min-height:36px;display:flex;align-items:center;background:var(--soft);border:1px solid var(--hair);border-radius:var(--radius);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.parties{grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-items:stretch}
+.pt{background:var(--soft);border:1px solid var(--hair);border-radius:var(--radius);padding:12px 14px}
+.pt h3{font-size:12px;font-weight:700}
+.pt .role{font-size:10px}
+.pt-v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.pt-l{font-size:10.5px}
+.pill{border-radius:var(--radius);font-size:9.5px;letter-spacing:.07em}
+.verdict p{font-size:12.5px;max-width:none}
+.bk{font-size:12px}
+.legend{font-size:10.5px}
+/* Özet: sonuç ve taraflar tam satır; grafik ile dağılım yan yana, eşit boyda */
+body[data-rt="ozet"] .results{align-items:stretch}
+/* Özet Metni: iki kutu yan yana, eşit boyda */
+body[data-rt="metin"] .results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+textarea{min-height:300px;font:500 12px/1.5 var(--font);background:var(--soft);border:1px solid var(--hair);border-radius:var(--radius)}
+.src{font-size:11px;line-height:1.6;color:var(--ink2)}
+.btn{border-radius:var(--radius);background:var(--navy);color:#fff;font-size:12px;padding:9px 14px}
+.btn.ghost{background:var(--card);color:var(--ink2);border:1px solid var(--hair-strong)}
+.seg{border-radius:var(--radius);border-color:var(--hair-strong)}
+.seg button{font-size:12px;background:var(--card)}
+.seg button[aria-pressed="true"]{background:var(--navy)}
+/* Gelir Mikseri: koyu "ses masası" yerine açık kutu */
+.mixer{--mx-bg:var(--card);--mx-panel:var(--soft);--mx-well:var(--soft);--mx-line:var(--hair-strong);--mx-text:var(--ink);--mx-dim:var(--muted);--mx-on:var(--teal);--mx-amb:var(--stg-08);--mx-red:var(--no);--mx-cap:var(--navy);
+  position:relative;background:var(--card);color:var(--ink);border:1px solid var(--hair);border-radius:var(--radius);padding:18px 20px;box-shadow:none}
+.mixer::before{content:"";position:absolute;top:-1px;left:-1px;width:12px;height:12px;border-top:2px solid var(--teal);border-left:2px solid var(--teal);border-top-left-radius:var(--radius);pointer-events:none}
+.mx-top{padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--hair)}
+.mx-title{font-size:13px;font-weight:700;margin:0}
+.mx-deck{font:600 11px/1.2 var(--font);letter-spacing:.04em;color:var(--ink2);background:var(--card);border:1px solid var(--hair-strong);border-radius:var(--radius);padding:8px 12px}
+.mx-deck::before{content:none}
+.mx-deck[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.mx-body{grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:16px;align-items:stretch}
+.mx-ch,.mx-knobs{background:var(--soft);border:1px solid var(--hair);border-radius:var(--radius)}
+.mx-ch{padding:14px 12px}
+.ch-name,.knob .kl{font:600 9.5px/1.2 var(--font);letter-spacing:.07em;color:var(--muted)}
+.ch-val,.knob .kv{font:700 13px/1.2 var(--font);font-variant-numeric:tabular-nums;color:var(--ink)}
+.ch-tl{font-size:10.5px;color:var(--muted)}
+.ch-led{background:var(--hair-strong);box-shadow:none!important}
+.ch-meter i{background:var(--hair)}
+.ch-meter i.on{box-shadow:none}
+.fader::before{background:var(--hair-strong);box-shadow:none}
+.fader .ticks{background:repeating-linear-gradient(180deg,var(--hair-strong) 0 1px,transparent 1px 10%)}
+.fader .cap{background:var(--card);border:1px solid var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.ch.master{border-left:1px solid var(--hair-strong)}
+.mx-note{font-size:10.5px;color:var(--muted);margin-top:10px}
+.mx-knobs{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));padding:16px 10px;align-content:start}
+@media (max-width:1100px){.parties{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}body[data-rt="metin"] .results{grid-template-columns:minmax(0,1fr)}}
