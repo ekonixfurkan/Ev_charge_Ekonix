@@ -309,3 +309,15 @@ details.grp[open]>summary::after{content:none}
 @media (max-width:900px){.inputs{grid-template-columns:minmax(0,1fr)}}
 /* iki satıra taşan başlıklarda da kutular aynı hizada başlasın */
 .f .row label{min-height:2.7em;display:flex;align-items:flex-end}
+/* Varsayımlar: satırda üç kutu. 1. satır: Paylaşım · Talep · Lokasyon ve Yatırım; 2. satır: Fiyat · Makro · (Hazır Set üstte, Lokasyon altta) */
+@media (min-width:1101px){
+  .inputs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #groups>details.grp:nth-child(1){grid-column:1;grid-row:1}
+  #groups>details.grp:nth-child(2){grid-column:2;grid-row:1}
+  #groups>details.grp:nth-child(3){grid-column:3;grid-row:1}
+  #groups>details.grp:nth-child(4){grid-column:1;grid-row:2/span 2}
+  #groups>details.grp:nth-child(5){grid-column:2;grid-row:2/span 2}
+  .inputs>.presets:first-child{grid-column:3;grid-row:2}
+  .inputs>#sitebox{grid-column:3;grid-row:3}
+  .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
