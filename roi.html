@@ -316,6 +316,21 @@ let P=Object.assign({},DEFAULTS);
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s) P=Object.assign({},DEFAULTS,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}};
 
+// Sayı kutuları sistemdeki biçimle gösterilir (tr: 1.500.000,00 · en: 1,500,000.00). Para alanları (₺, $) iki ondalıklı; diğerleri adımına göre.
+const stepDec=st=>{const t=String(st); return t.includes('.')?t.split('.')[1].length:0;};
+function fmtIn(v,f){
+  const money=/[₺$]/.test(f.u), d=money?2:stepDec(f.step);
+  return Number(v).toLocaleString(window.LOC||'tr',{minimumFractionDigits:money?2:0,maximumFractionDigits:Math.max(d,money?2:0)});
+}
+// "1.500.000,5" · "1,500,000.5" · "12.99" · "12,99" hepsini okur; sayı değilse null.
+function parseIn(txt){
+  let t=String(txt||'').replace(/[^0-9.,\-]/g,''); if(!t) return null;
+  const tr=!String(window.LOC||'tr').startsWith('en'), ld=t.lastIndexOf('.'), lc=t.lastIndexOf(',');
+  if(ld>=0&&lc>=0){ if(ld>lc) t=t.replace(/,/g,''); else t=t.replace(/\./g,'').replace(',','.'); }
+  else if(ld>=0){ if(tr&&/^-?\d{1,3}(\.\d{3})+$/.test(t)) t=t.replace(/\./g,''); }
+  else if(lc>=0){ if(!tr&&/^-?\d{1,3}(,\d{3})+$/.test(t)) t=t.replace(/,/g,''); else t=t.replace(',','.'); }
+  const v=parseFloat(t); return isNaN(v)?null:v;
+}
 function buildInputs(){
   const host=$('groups'); host.innerHTML='';
   GROUPS.forEach(g=>{
@@ -334,10 +349,12 @@ function buildInputs(){
         el.innerHTML='<label class="chk"><input type="checkbox" id="in-'+f.chk+'"> '+f.l+'</label>';
         el.querySelector('input').onchange=e=>{P[f.chk]=e.target.checked; refresh();};
       }else{
-        el.innerHTML='<div class="row"><label for="n-'+f.k+'">'+f.l+' ('+f.u+')</label><span class="val"><input type="number" id="n-'+f.k+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"></span></div><input type="range" id="r-'+f.k+'" aria-label="'+f.l+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="hint"></span>';
-        const n=el.querySelector('input[type=number]'), r=el.querySelector('input[type=range]');
-        r.oninput=()=>{P[f.k]=+r.value; n.value=r.value; $('preset').value=''; refresh(true);};
-        n.onchange=()=>{let v=+n.value; if(isNaN(v)) v=P[f.k]; P[f.k]=v; $('preset').value=''; refresh();};
+        el.innerHTML='<div class="row"><label for="n-'+f.k+'">'+f.l+' ('+f.u+')</label><span class="val"><input type="text" inputmode="decimal" autocomplete="off" class="num-in" id="n-'+f.k+'"></span></div><input type="range" id="r-'+f.k+'" aria-label="'+f.l+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="hint"></span>';
+        const n=el.querySelector('input.num-in'), r=el.querySelector('input[type=range]');
+        r.oninput=()=>{P[f.k]=+r.value; n.value=fmtIn(P[f.k],f); $('preset').value=''; refresh(true);};
+        n.onfocus=()=>{n.select();};
+        n.onchange=()=>{let v=parseIn(n.value); if(v===null) v=P[f.k]; P[f.k]=v; n.value=fmtIn(v,f); $('preset').value=''; refresh();};
+        n.onkeydown=e=>{if(e.key==='Enter') n.blur();};
       }
       box.appendChild(el);
     });
@@ -351,7 +368,7 @@ function syncInputs(skipVals){
     if(f.sum){const t=total(P), ok=Math.abs(t-100)<0.01; el.querySelector('.sumtxt').innerHTML='Toplam: <b class="'+(ok?'ok':'bad')+'">%'+nf(t)+'</b>'+(ok?' ✓':' — %100 olmalı'); el.querySelector('.sumbtns').hidden=ok;}
     else if(f.seg) el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(P[f.seg]===b.dataset.v)));
     else if(f.chk) el.querySelector('input').checked=!!P[f.chk];
-    else if(!skipVals){el.querySelector('input[type=number]').value=P[f.k]; el.querySelector('input[type=range]').value=P[f.k];}
+    else if(!skipVals){const ni=el.querySelector('input.num-in'); if(document.activeElement!==ni) ni.value=fmtIn(P[f.k],f); el.querySelector('input[type=range]').value=P[f.k];}
     const h=el.querySelector('.hint'); if(h) h.textContent=f.hint?f.hint(P):'';
   });
 }

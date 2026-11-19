@@ -301,8 +301,8 @@ details.grp[open]>summary::after{content:none}
 .f .row{flex-direction:column;align-items:stretch;gap:5px;min-height:0}
 .f label,.f .lbl,.presets .lbl{display:block;font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);line-height:1.35}
 .f .val{display:block}
-.f input[type=number],.presets select,.presets input[type=text]{width:100%;text-align:left;padding:8px 10px;min-height:36px;font:500 12px/1.3 var(--font);font-variant-numeric:tabular-nums;color:var(--ink);border:1px solid var(--hair);border-radius:var(--radius);background:var(--soft)}
-.f input[type=number]:focus,.presets select:focus,.presets input[type=text]:focus{outline:2px solid var(--teal);outline-offset:1px;background:var(--card)}
+.f input.num-in,.f input[type=number],.presets select,.presets input[type=text]{width:100%;text-align:left;padding:8px 10px;min-height:36px;font:500 12px/1.3 var(--font);font-variant-numeric:tabular-nums;color:var(--ink);border:1px solid var(--hair);border-radius:var(--radius);background:var(--soft)}
+.f input.num-in:focus,.f input[type=number]:focus,.presets select:focus,.presets input[type=text]:focus{outline:2px solid var(--teal);outline-offset:1px;background:var(--card)}
 .f:has(.seg),.f:has(.chk),.f:has(.sumrow){grid-column:1/-1}
 .f .chk{display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:12px;font-weight:500;color:var(--ink)}
 .f .hint{font-size:10.5px;line-height:1.35}
