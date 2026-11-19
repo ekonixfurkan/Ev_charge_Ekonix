@@ -3309,12 +3309,17 @@ function notifChanges(n){
   const parts=String(n.summary||'').split('; ').map(p=>/^(.+?): (.*) → (.*)$/.exec(p));
   return parts.length&&parts.every(Boolean)?parts.map(m=>({alan:m[1],eski:m[2],yeni:m[3]})):null;
 }
+// Bildirime tıklayınca değişikliğin yapıldığı sekme açılır (alan adı → sekme; Finansman'da alt sekme de).
+const NOTIF_TAB={'Şarj Üniteleri':'units','Saha Keşfi':'infra','Trafo kVA':'infra','Finansman Kalemleri':'credit:yapi','Gelir Modeli / Paylaşım':'credit:gelir','Skor Hesaplama':'check'};
+const NOTIF_ACT_TAB=a=>/^dosya-/.test(a)?'files':/^gorev-/.test(a)?'task':'';
 function notifGroupHtml(n){
   const ch=notifChanges(n),k=ch?ch.length:1,cls=(n.unread||bell.newIds.has(n.id))?' unread':'';
   const attrs=`data-bellent="${esc(n.entity||'lokasyon')}" data-bellsite="${esc(n.entity_id||'')}" data-bellact="${esc(n.action)}" tabindex="0"`;
   const head=`<td rowspan="${k}" style="white-space:nowrap">${esc(fmtTs(n.at))}</td><td rowspan="${k}">${actWho(n)}</td><td rowspan="${k}" class="c-code">${esc(n.site_code||'—')}</td><td rowspan="${k}"><span class="p1">${esc(n.entity_name||'—')}</span></td>`;
-  if(!ch)return `<tr class="grp-first${cls}" ${attrs}>${head}<td colspan="3">${esc((NOTIF_MSG[n.action]||n.summary||'')+(/^(dosya|gorev|toplanti)-/.test(n.action)&&n.summary?': '+n.summary:''))}</td></tr>`;
-  return ch.map((c,i)=>`<tr class="${i?'':'grp-first'}${cls}" ${attrs}>${i?'':head}<td>${esc(c.alan)}</td><td class="nv-old">${esc(c.eski)}</td><td class="nv-new">${esc(c.yeni)}</td></tr>`).join('');
+  if(!ch)return `<tr class="grp-first${cls}" ${attrs} data-belltab="${NOTIF_ACT_TAB(n.action)}">${head}<td colspan="3">${esc((NOTIF_MSG[n.action]||n.summary||'')+(/^(dosya|gorev|toplanti)-/.test(n.action)&&n.summary?': '+n.summary:''))}</td></tr>`;
+  // İlk satırın sol hücreleri (zaman, kişi, proje) tüm satırları kapsar; oraya tıklanınca ilk "Genel dışı" değişikliğin sekmesi açılır.
+  const first=(ch.map(c=>NOTIF_TAB[c.alan]).find(Boolean))||'';
+  return ch.map((c,i)=>`<tr class="${i?'':'grp-first'}${cls}" ${attrs} data-belltab="${NOTIF_TAB[c.alan]||''}" data-bellfirst="${first}">${i?'':head}<td>${esc(c.alan)}</td><td class="nv-old">${esc(c.eski)}</td><td class="nv-new">${esc(c.yeni)}</td></tr>`).join('');
 }
 function paintNotifRows(){
   const t=$('notifRows');if(!t)return;
@@ -3348,7 +3353,14 @@ document.addEventListener('click',e=>{
   const it=e.target.closest('#notifRows [data-bellact]');
   if(it){const id=it.dataset.bellsite,act=it.dataset.bellact,ent=it.dataset.bellent;
     if(ent==='kisi'){guard(()=>{view='contacts';render();window.scrollTo(0,0);});return;}
-    if(id&&act!=='sil'&&db.sites.some(x=>x.id===id)){openSite(id);if(act==='not-ekle')setTimeout(()=>{if(view==='site'&&activeId===id)openNotes();},250);}
+    if(id&&act!=='sil'&&db.sites.some(x=>x.id===id)){
+      // Tıklanan hücre o satırın "Alan/Eski/Yeni" hücresiyse o alanın sekmesi; soldaki ortak hücrelerse grubun ilk özel sekmesi.
+      const cell=e.target.closest('td'),own=cell&&!cell.hasAttribute('rowspan');
+      const tab=(own?it.dataset.belltab:'')||it.dataset.bellfirst||it.dataset.belltab||'';
+      if(tab==='task'){pl.f.site=id;pl.f.status='open';pl.f.assignee='';pl.f.range='';pl.f.hideEmpty=false;guard(()=>{view='planner';render();window.scrollTo(0,0);});return;}
+      openSite(id);
+      if(tab){const [t,fs]=tab.split(':');setTimeout(()=>{if(view!=='site'||activeId!==id)return;if(fs)fsub=fs;sub=t;render();window.scrollTo({top:0});},0);}
+      if(act==='not-ekle')setTimeout(()=>{if(view==='site'&&activeId===id)openNotes();},250);}
     else if(act==='sil')toast('Bu kayıt silinmiş.');
     else toast('Proje bulunamadı.');}
 });
