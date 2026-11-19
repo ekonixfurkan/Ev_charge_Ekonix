@@ -202,6 +202,15 @@
     'Toplantılar': 'Meetings',
     'Satış ve Pazar': 'Sales & Market',
     'ROI Hesaplayıcı': 'ROI Calculator',
+    /* saha bilgi kartı (araç çubuğu; belge metni Türkçe kalır) */
+    'Saha Kartı': 'Site Card', 'Saha Bilgi Kartı': 'Site Information Card', 'Fotoğraf Seç': 'Choose Photos', 'Otomatik Değerlere Dön': 'Reset to Automatic Values',
+    'Yazdır / PDF Kaydet': 'Print / Save PDF', 'Kaydetmeden Kapat': 'Close Without Saving', 'Saha kartı kaydedildi.': 'Site card saved.',
+    'Metinlere tıklayıp düzenleyebilirsiniz. Altyapı maliyeti ve gelir paylaşımı bilerek boş gelir.': 'Click any text to edit it. Infrastructure cost and revenue share are left blank on purpose.',
+    'Salt okunur: kart görüntülenir ve yazdırılır.': 'Read-only: the card can be viewed and printed.',
+    'Karttaki değişiklikler kaydedilmedi. Kaydetmeden kapatılsın mı?': 'Changes to the card are not saved. Close without saving?',
+    'Karttaki elle yazılan metinler silinip projeden gelen otomatik değerlere dönülsün mü?': 'Discard the hand-written text and return to the automatic values from the project?',
+    'En fazla 4 fotoğraf seçilebilir.': 'You can select up to 4 photos.', 'Bu hesap salt okunurdur; kart kaydedilemez.': 'This account is read-only; the card cannot be saved.',
+
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',

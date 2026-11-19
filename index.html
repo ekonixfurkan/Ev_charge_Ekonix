@@ -1098,6 +1098,55 @@ html.ro .nt-task{display:none}
   .vcell{padding:7px 8px}
   .edit-actions{gap:5px}.edit-actions button{padding:0 10px}
 }
+/* ---------- Saha Bilgi Kartı (ekranda A4 önizleme, yazdırınca yalnız kart) ---------- */
+#skView{position:fixed;inset:0;z-index:80;overflow:auto;background:var(--paper)}
+.sk-bar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--hair)}
+.sk-bar strong{font-size:15px}.sk-hint{font-size:11.5px;color:var(--muted)}
+.sk-acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.sk-picker{max-width:210mm;margin:16px auto 0;padding:14px 16px;background:var(--card);border:1px solid var(--hair);border-radius:var(--radius)}
+.sk-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:10px}
+.sk-thumb{display:flex;flex-direction:column;gap:4px;padding:4px;border:2px solid var(--hair);border-radius:var(--radius);background:var(--card);cursor:pointer;font-size:10.5px;color:var(--muted);overflow:hidden}
+.sk-thumb img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:3px}.sk-thumb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sk-thumb.on{border-color:var(--teal);background:var(--teal-soft);color:var(--ink)}
+.sk-doc{padding:20px 0 40px}
+/* Belge her zaman açık temadadır (koyu modda da kâğıt beyaz): açık tema jeton değerleri */
+.sk-page{--ink:#10202e;--ink2:#38485a;--muted:#5b6a7a;--hair:#dde4eb;--hair-strong:#c3ced9;--navy:#0b2e57;--navy-soft:#e6edf6;--teal:#13a08a;--soft:#edf1f5;
+  box-sizing:border-box;width:210mm;min-height:297mm;margin:0 auto 20px;padding:14mm 16mm 12mm;display:flex;flex-direction:column;background:#fff;color:var(--ink);font:400 11.5px/1.5 var(--font);box-shadow:0 2px 14px rgba(0,0,0,.14)}
+.sk-top{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;margin-bottom:18px;border-bottom:1px solid var(--hair);font-size:10px;color:var(--muted)}
+.sk-top img{height:26px;width:auto}
+.sk-eyebrow{margin:0 0 6px;font-size:9.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--teal)}
+.sk-title{margin:0 0 16px;font-size:28px;font-weight:700;line-height:1.15;color:var(--navy)}.sk-title.sm{font-size:22px}
+.sk-h2{margin:14px 0 8px;font-size:15px;font-weight:700;color:var(--navy)}
+.sk-page table{width:100%;border-collapse:collapse;font-size:11.5px}
+.sk-meta{margin-bottom:18px;border-top:2px solid var(--navy);border-bottom:2px solid var(--navy)}
+.sk-meta th{width:1%;white-space:nowrap;padding:8px 12px;background:var(--navy-soft);color:var(--navy);font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-align:left}
+.sk-meta td{padding:8px 12px;font-weight:700}
+.sk-tbl th{padding:8px 10px;background:var(--navy-soft);color:var(--navy);font-size:10.5px;font-weight:700;text-align:left;white-space:nowrap;border-bottom:2px solid var(--navy)}
+.sk-tbl td{padding:8px 10px;vertical-align:top;border-bottom:1px solid var(--hair);overflow-wrap:anywhere}
+.sk-tbl .sk-no{width:34px;text-align:center;font-weight:700;color:var(--teal)}
+.sk-tbl .sk-k{width:32%;font-weight:700;color:var(--navy)}
+.sk-tbl .sk-x{width:28px;padding:4px;border-bottom:0}.sk-tbl .sk-x button{padding:0 7px;min-height:24px}
+.sk-add{margin:6px 0 0}
+.sk-page [contenteditable]{outline:0;border-radius:3px;cursor:text}
+.sk-page [contenteditable]:hover{background:var(--soft)}
+.sk-page [contenteditable]:focus{background:var(--navy-soft);box-shadow:0 0 0 2px var(--teal)}
+.sk-page [contenteditable]:empty::before{content:attr(data-ph);color:var(--hair-strong);font-weight:400}
+.sk-pics{display:grid;gap:8px;margin-bottom:6px}.sk-pics.n1{grid-template-columns:1fr}.sk-pics.n2,.sk-pics.n3,.sk-pics.n4{grid-template-columns:1fr 1fr}
+.sk-pics img{width:100%;max-height:78mm;object-fit:cover;border-radius:3px;display:block}.sk-pics.n3 img,.sk-pics.n4 img{max-height:48mm}
+.sk-cap,.sk-note{margin:0;font-size:10.5px;color:var(--muted)}.sk-note{margin-top:14px;font-size:11.5px;color:var(--ink2)}
+.sk-foot{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--hair);font-size:9.5px;color:var(--muted)}.sk-foot b{color:var(--navy)}
+body.sk-open{overflow:hidden}
+@media print{
+  body.sk-open{display:block!important;overflow:visible!important;background:#fff!important}
+  body.sk-open>*:not(#skView){display:none!important}
+  body.sk-open #skView{position:static!important;overflow:visible!important;background:#fff!important}
+  body.sk-open .sk-doc{padding:0!important}
+  body.sk-open .sk-page{margin:0!important;box-shadow:none!important;width:auto!important;min-height:0!important;height:273mm;padding:0!important;break-after:page;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.sk-open .sk-page:last-child{break-after:auto;page-break-after:auto}
+  body.sk-open .sk-page table{font-size:11.5px!important}
+  body.sk-open .sk-tbl th,body.sk-open .sk-tbl td,body.sk-open .sk-meta th,body.sk-open .sk-meta td{padding:8px 10px!important}
+  body.sk-open .sk-page [contenteditable]:empty::before{content:""}
+}
 .roi-frame{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0;background:var(--paper)}
 .dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:6px 18px;font-size:13px;font-weight:700;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 .dy-back:hover{background:var(--side-d);color:#fff}
@@ -1956,7 +2005,7 @@ const ICON_X='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke
 function editBarHtml(){
   return siteEdit
     ?`${me.owner?`<button type="button" class="danger" id="delSite">Sil</button>`:''}<button type="button" class="save" id="editSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="editCancel">${ICON_X}İptal</button>`
-    :`<button type="button" class="print-btn" id="printBtn" title="A4 dikey yazdır">${ICON_PRINT}Yazdır</button><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
+    :`<button type="button" id="skBtn" title="Müşteriye verilecek Saha Bilgi Kartı'nı hazırla"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M8 13h8M8 17h5"/></svg>Saha Kartı</button><button type="button" class="print-btn" id="printBtn" title="A4 dikey yazdır">${ICON_PRINT}Yazdır</button><button type="button" class="primary" id="editStart">${ICON_EDIT}Düzenle</button>`;
 }
 const MUTATORS='[data-preset],#addTr,[data-deltr],#applyAll,.seg button,#addDC,#addAC,#addCab,#addCat,[data-del]';
 function applyEditState(){
@@ -2000,6 +2049,7 @@ window.addEventListener('beforeprint',()=>{
 });
 window.addEventListener('afterprint',()=>{delete document.body.dataset.print;});
 document.addEventListener('click',e=>{
+  if(e.target.closest('#skBtn')){skOpen();return;}
   if(e.target.closest('#printBtn')){window.print();return;}
   const b=e.target.closest('#editStart,#editSave,#editCancel');if(!b)return;
   if(b.id==='editStart')startEdit();else if(b.id==='editSave')saveEdit();else cancelEdit();
@@ -2836,6 +2886,114 @@ function paintPlanner(){
   const e=$('plPagerTop');if(e)e.innerHTML=pagerHtml('pl',pi);
   paintPlanner.last=ordered.map(([x])=>x.id);
 }
+
+/* ---------- Saha Bilgi Kartı: müşteriye verilen iki sayfalık keşif kartı; satırlar projeden otomatik dolar, metinler düzenlenebilir, PDF yazdırılır ---------- */
+const SK_ROWS=[['guc','Güç Bilgileri'],['soket','Soket ve Park Yeri'],['adres','Özet Adres'],['mekan','Mekân Bilgileri'],['enerji','Enerji Alınacak Nokta'],['uzaklik','Şarj Cihazının Enerji Alınacak Noktaya Uzaklığı'],['abonelik','Münferit Abonelik / İç Tesisat'],['altyapi','Altyapı Maliyeti'],['yatirimci','Yatırımcı'],['yogunluk','Yoğunluk Sebebi'],['gelir','Gelir Paylaşım Oranı'],['sure','Sözleşme Süresi'],['konum','Konum Bilgileri (WGS84)']];
+// Gizli tutulan satırlar: sistemdeki rakamlar bu satırlara HİÇBİR ZAMAN otomatik yazılmaz; yalnızca elle girilen metin çıkar.
+const SK_SECRET=['altyapi','gelir'];
+const SK_ROLES=[['Ekonix','Saha geliştirme, yer sağlayıcı ilişkisi ve proje koordinasyonu'],['StarCharge','Cihaz çözümü, ağ işletimi, kullanıcı hizmetleri, teknik destek ve mutabık kalınan yatırım kapsamı'],['Co-CPO / EPC','Donanım dışındaki taahhüt işleri, abonelik ve güç artışı başvurusu, bakım, tahsilat ve operasyon raporlaması'],['Yer sağlayıcı','Alan tahsisi, erişim ve saha koordinasyonu'],['Netleştirilecek','Enerji tedariki, bakım ve entegrasyon sorumlulukları']];
+const SK_STEPS=[['Teknik ve ticari ön değerlendirme','Co-CPO / EPC'],['Ticari model ve görev paylaşımının netleştirilmesi','Tüm taraflar'],['Niyet mektubu (LOI)','Ekonix, StarCharge, Co-CPO / EPC'],['Dağıtım şirketi başvurusu, proje onayı ve kurulum','Ekonix, StarCharge, Co-CPO / EPC'],['OCPP entegrasyon testleri, EPDK kaydı ve devreye alma','Co-CPO / EPC, StarCharge']];
+const SK_NOTE='İlk adım: ön değerlendirme sonrası ilgi beyanı ve teknik ekiplerin tanışma toplantısı.';
+const sk={id:'',d:null,dirty:false,files:[],pick:false};
+function skAuto(s){
+  const t=totals(s),v=s.survey||{},g=parseGps(v.gps)||(s.lat!==''&&s.lng!==''&&s.lat!=null&&s.lng!=null?[s.lat,s.lng]:null),n=x=>nf.format(+x||0);
+  const dcU=s.units.filter(u=>u.kind==='DC'),parts=[];
+  if(t.dcUnits)parts.push(`${n(t.dcUnits)} adet DC ünite`+(dcU.length?` (${dcU.map(u=>`${n(u.qty)} × ${n(u.kw)} kW`).join(', ')})`:''));
+  if(t.acUnits)parts.push(`${n(t.acUnits)} adet AC ünite`);
+  const park=[v.parkDed?`${n(v.parkDed)} ayrılmış park yeri`:'',v.parkTotal?`toplam ${n(v.parkTotal)} park yeri`:''].filter(Boolean).join(' · ');
+  const en=[+s.gridKva>0?`Trafo gücü ${n(s.gridKva)} kVA`:'',+v.availKw>0?`kullanılabilir güç ${n(v.availKw)} kW/kVA`:'',v.connType?`bağlantı şekli ${v.connType}`:'',v.voltage?`gerilim ${v.voltage} V`:'',v.connPoint?`bağlantı noktası: ${v.connPoint}`:''].filter(Boolean).join(' · ');
+  return {
+    guc:parts.length?parts.join(' + ')+`; toplam nominal şarj çıkışı ${n(t.kw)} kW`:'',
+    soket:[t.dcSock?`${n(t.dcSock)} DC`:'',t.acSock?`${n(t.acSock)} AC`:''].filter(Boolean).join(' + ')+(t.sockets?' soket':'')+(park?(t.sockets?' · ':'')+park:''),
+    adres:[s.address,[s.district,s.city].filter(Boolean).join(' / ')].filter(Boolean).join(', '),
+    mekan:(s.type==='Other'||typeLabel(s.type)==='—')?'':typeLabel(s.type),
+    enerji:en,
+    uzaklik:+v.cableM>0?`${n(v.cableM)} m`:'',
+    abonelik:'',altyapi:'',yatirimci:'',yogunluk:'',gelir:'',
+    sure:(s.contractBase!==''&&s.contractBase!=null)?`${s.contractBase}${s.contractExt!==''&&s.contractExt!=null&&+s.contractExt>0?' + '+s.contractExt:''} yıl`:'',
+    konum:g?`Enlem: ${g[0]}, Boylam: ${g[1]}`:''
+  };
+}
+const skBlank=()=>({rows:{},roles:null,steps:null,note:null,photos:[],caption:'',date:'',cust:''});
+function skOpen(){
+  const s=cur();if(!s)return;
+  sk.id=s.id;sk.d=Object.assign(skBlank(),JSON.parse(JSON.stringify(s.card||{})));sk.dirty=false;sk.files=[];sk.pick=false;
+  document.body.classList.add('sk-open');$('skView').hidden=false;skPaint();window.scrollTo(0,0);
+  if(mode==='cloud')fetch('/api/files?site='+encodeURIComponent(s.id),{credentials:'same-origin'}).then(r=>r.ok?r.json():{files:[]}).then(d=>{sk.files=(d.files||[]).filter(f=>/\.(jpe?g|png)$/i.test(f.name));if(sk.id===s.id&&!$('skView').hidden)skPaint();}).catch(()=>{});
+}
+function skClose(force){
+  const go=()=>{document.body.classList.remove('sk-open');$('skView').hidden=true;$('skView').innerHTML='';sk.id='';};
+  if(sk.dirty&&!force){ask('Karttaki değişiklikler kaydedilmedi. Kaydetmeden kapatılsın mı?','Kaydetmeden Kapat').then(ok=>{if(ok)go();});return;}
+  go();
+}
+function skSave(){
+  const s=db.sites.find(x=>x.id===sk.id);if(!s)return;
+  if(isRO()){toast('Bu hesap salt okunurdur; kart kaydedilemez.');return;}
+  s.card=JSON.parse(JSON.stringify(sk.d));touched(s);sk.dirty=false;toast('Saha kartı kaydedildi.');skPaint();
+}
+function skPaint(){
+  const s=db.sites.find(x=>x.id===sk.id);if(!s)return;
+  const a=skAuto(s),d=sk.d,t=totals(s),ro=isRO(),ce=ro?'':'contenteditable="plaintext-only" spellcheck="false"';
+  const rows=SK_ROWS.map(([k,l],i)=>{const ov=d.rows[k],val=ov!=null?ov:a[k],auto=ov==null&&!!a[k];
+    return `<tr><td class="sk-no">${i+1}</td><td class="sk-k">${esc(l)}</td><td class="sk-v${auto?'':' own'}" ${ce} data-skrow="${k}" data-ph="${SK_SECRET.includes(k)?'Boş bırakılır (gizli). Gerekirse elle yazın.':'Yazmak için tıklayın'}">${esc(val)}</td></tr>`;}).join('');
+  const roles=d.roles||SK_ROLES,steps=d.steps||SK_STEPS,note=d.note!=null?d.note:SK_NOTE;
+  const date=d.date||fmtDay(s.survey&&s.survey.date)||fmtDay(todayStr());
+  const cust=d.cust||(s.name+(t.dcKw?` – ${nf.format(t.dcKw)} kW DC`:''));
+  const pics=d.photos.map(id=>sk.files.find(f=>f.id===id)).filter(Boolean);
+  const del=ro?'':'<td class="sk-x no-print"><button type="button" class="ghost" data-skdel title="Satırı sil">×</button></td>';
+  const head=`<div class="sk-top"><span>Saha Keşif Raporu · ${esc(s.name)}</span><img src="/ekonix-logo.jpeg" alt="Ekonix"></div>`;
+  const foot=n=>`<div class="sk-foot"><span>Gizli · Görüşme ve değerlendirme amaçlıdır · Hazırlayan: Ekonix İş Geliştirme</span><b>${n} / 2</b></div>`;
+  $('skView').innerHTML=`<div class="sk-bar no-print">
+      <strong>Saha Bilgi Kartı</strong><span class="sk-hint">${ro?'Salt okunur: kart görüntülenir ve yazdırılır.':'Metinlere tıklayıp düzenleyebilirsiniz. Altyapı maliyeti ve gelir paylaşımı bilerek boş gelir.'}</span>
+      <span class="sk-acts">${ro?'':`<button type="button" id="skPick">Fotoğraf Seç${d.photos.length?` (${d.photos.length})`:''}</button><button type="button" id="skReset" class="ghost">Otomatik Değerlere Dön</button><button type="button" id="skSave" class="save"${sk.dirty?'':' disabled'}>Kaydet</button>`}<button type="button" id="skPrint" class="primary">Yazdır / PDF Kaydet</button><button type="button" id="skClose">Kapat</button></span>
+    </div>
+    ${sk.pick?`<div class="sk-picker no-print"><p class="note">${sk.files.length?'Karta girecek fotoğrafları seçin (en fazla 4). Fotoğraflar projenin Dosyalar sekmesinden gelir.':'Bu projede JPG/PNG dosya yok. Önce Dosyalar sekmesine saha fotoğrafı yükleyin.'}</p><div class="sk-thumbs">${sk.files.map(f=>`<button type="button" class="sk-thumb${d.photos.includes(f.id)?' on':''}" data-skpic="${esc(f.id)}" title="${esc(f.name)}"><img src="/api/files?download=${esc(f.id)}&inline=1" alt="" loading="lazy"><span>${esc(f.name)}</span></button>`).join('')}</div></div>`:''}
+    <div class="sk-doc" translate="no">
+      <section class="sk-page">${head}
+        <p class="sk-eyebrow">Saha Bilgi Kartı · ${esc(s.name)}</p>
+        <h1 class="sk-title">${esc(s.name)}</h1>
+        <table class="sk-meta"><tr><th>Müşteri</th><td ${ce} data-skf="cust">${esc(cust)}</td><th>Tarih</th><td ${ce} data-skf="date">${esc(date)}</td></tr></table>
+        <table class="sk-tbl"><thead><tr><th class="sk-no">No</th><th>Konu Başlığı</th><th>Açıklama</th></tr></thead><tbody>${rows}</tbody></table>
+        ${pics.length?`<p class="sk-eyebrow">Resimler</p><div class="sk-pics n${Math.min(pics.length,4)}">${pics.map(f=>`<img src="/api/files?download=${esc(f.id)}&inline=1" alt="${esc(f.name)}">`).join('')}</div><p class="sk-cap" ${ce} data-skf="caption" data-ph="Resim açıklaması (isteğe bağlı)">${esc(d.caption)}</p>`:''}
+        ${foot(1)}</section>
+      <section class="sk-page">${head}
+        <p class="sk-eyebrow">Proje Çerçevesi</p>
+        <h1 class="sk-title sm">Görev Paylaşımı ve Sonraki Adımlar</h1>
+        <h2 class="sk-h2">Görev Paylaşımı</h2>
+        <table class="sk-tbl" data-sktbl="roles"><thead><tr><th>Taraf</th><th>Önerilen Sorumluluk</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${roles.map(x=>`<tr><td class="sk-k" ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
+        ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="roles">+ Satır Ekle</button></p>'}
+        <h2 class="sk-h2">Sonraki Adımlar</h2>
+        <table class="sk-tbl" data-sktbl="steps"><thead><tr><th class="sk-no">Adım</th><th>İş</th><th>Sorumlu</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${steps.map((x,i)=>`<tr><td class="sk-no">${i+1}</td><td ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
+        ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="steps">+ Satır Ekle</button></p>'}
+        <p class="sk-note" ${ce} data-skf="note" data-ph="Kapanış notu (isteğe bağlı)">${esc(note)}</p>
+        ${foot(2)}</section>
+    </div>`;
+}
+const fmtDay=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(v));return m?`${m[3]}.${m[2]}.${m[1]}`:String(v);};
+// Düzenlenen hücreler duruma yazılır; tablo (görev/adım) hücreleri satır sırasıyla okunur.
+function skRead(){
+  const s=db.sites.find(x=>x.id===sk.id);if(!s)return;const a=skAuto(s),d=sk.d,tx=el=>el.textContent.replace(/\s+/g,' ').trim();
+  document.querySelectorAll('#skView [data-skrow]').forEach(el=>{const k=el.dataset.skrow,v=tx(el);if(v===(a[k]||''))delete d.rows[k];else d.rows[k]=v;});
+  document.querySelectorAll('#skView [data-skf]').forEach(el=>{d[el.dataset.skf]=tx(el);});
+  const tbl=k=>[...document.querySelectorAll('#skView [data-sktbl="'+k+'"] tbody tr')].map(tr=>[...tr.querySelectorAll('td[contenteditable]')].map(tx));
+  if($('skView').querySelector('[data-sktbl]')&&!isRO()){d.roles=tbl('roles');d.steps=tbl('steps');}
+}
+document.addEventListener('input',e=>{if(!e.target.closest||!e.target.closest('#skView .sk-doc'))return;skRead();if(!sk.dirty){sk.dirty=true;const b=$('skSave');if(b)b.disabled=false;}});
+document.addEventListener('click',e=>{
+  if(!sk.id||!e.target.closest('#skView'))return;
+  if(e.target.closest('#skClose')){skClose();return;}
+  if(e.target.closest('#skPrint')){window.print();return;}
+  if(e.target.closest('#skSave')){skRead();skSave();return;}
+  if(e.target.closest('#skPick')){skRead();sk.pick=!sk.pick;skPaint();return;}
+  if(e.target.closest('#skReset')){ask('Karttaki elle yazılan metinler silinip projeden gelen otomatik değerlere dönülsün mü?','Otomatik Değerlere Dön').then(ok=>{if(!ok)return;const keep=sk.d.photos;sk.d=skBlank();sk.d.photos=keep;sk.dirty=true;skPaint();});return;}
+  const pc=e.target.closest('[data-skpic]');
+  if(pc){skRead();const id=pc.dataset.skpic,i=sk.d.photos.indexOf(id);if(i>=0)sk.d.photos.splice(i,1);else if(sk.d.photos.length<4)sk.d.photos.push(id);else{toast('En fazla 4 fotoğraf seçilebilir.');return;}sk.dirty=true;skPaint();return;}
+  const ad=e.target.closest('[data-skadd]');
+  if(ad){skRead();const k=ad.dataset.skadd;sk.d[k]=(sk.d[k]||(k==='roles'?SK_ROLES:SK_STEPS)).map(x=>x.slice());sk.d[k].push(['','']);sk.dirty=true;skPaint();return;}
+  const dl=e.target.closest('[data-skdel]');
+  if(dl){const tr=dl.closest('tr'),tb=tr.closest('[data-sktbl]'),k=tb.dataset.sktbl,i=[...tr.parentElement.children].indexOf(tr);skRead();sk.d[k].splice(i,1);sk.dirty=true;skPaint();return;}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sk.id&&!$('skView').hidden&&!document.querySelector('dialog[open]'))skClose();});
 /* ---------- ROI Hesaplayıcı: ayrı sayfa (roi.html) aynı kaynaklı çerçevede açılır; kendi stili ve betiği kimlik/CSS çakışması yaratmaz ---------- */
 function renderRoi(){
   $('view').innerHTML='<iframe id="roiFrame" class="roi-frame" src="/roi.html" title="ROI Hesaplayıcı"></iframe>';
@@ -3885,4 +4043,5 @@ render();load();
 </script>
 
 <button type="button" id="dyBack" class="dy-back no-print" hidden><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7M19 12H5"/></svg><span>Daily Toplantı Notları</span></button>
+<div id="skView" hidden></div>
 </body></html>
