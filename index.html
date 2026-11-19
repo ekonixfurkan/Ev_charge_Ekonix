@@ -1140,6 +1140,14 @@ html.ro .nt-task{display:none}
 .sk-page [contenteditable]:hover{background:var(--soft)}
 .sk-page [contenteditable]:focus{background:var(--navy-soft);box-shadow:0 0 0 2px var(--teal)}
 .sk-page [contenteditable]:empty::before{content:attr(data-ph);color:var(--hair-strong);font-weight:400}
+/* Dört fotoğraf "yonca" düzeninde: 2×2, hepsi aynı boyda kare; fotoğrafın kendi boyutu ve oranı ne olursa olsun kutuyu doldurur */
+.sk-clover{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:6px 0 10px}
+.sk-clover figure{position:relative;margin:0;aspect-ratio:1/1;overflow:hidden;border-radius:4px;background:var(--soft);border:1px solid var(--hair)}
+.sk-clover figure.empty{background:transparent;border:1px dashed var(--hair)}
+.sk-clover img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+.fl-skshow{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink2);cursor:pointer}
+.fl-skshow input{width:auto;min-height:0}
+html.ro .fl-skshow{display:none}
 .sk-pics{display:grid;gap:8px;margin-bottom:6px}.sk-pics.n1{grid-template-columns:1fr}.sk-pics.n2,.sk-pics.n3,.sk-pics.n4{grid-template-columns:1fr 1fr}
 .sk-pics img{width:100%;max-height:78mm;object-fit:cover;border-radius:3px;display:block}.sk-pics.n3 img,.sk-pics.n4 img{max-height:48mm}
 .sk-cap,.sk-note{margin:0;font-size:10.5px;color:var(--muted)}.sk-note{margin-top:14px;font-size:11.5px;color:var(--ink2)}
@@ -1155,6 +1163,7 @@ body.sk-open{overflow:hidden}
   body.sk-open .sk-page table{font-size:11.5px!important}
   body.sk-open .sk-tbl th,body.sk-open .sk-tbl td,body.sk-open .sk-meta th,body.sk-open .sk-meta td{padding:8px 10px!important}
   body.sk-open .sk-page [contenteditable]:empty::before{content:""}
+  body.sk-open .sk-clover figure.empty{border:0!important}
 }
 .roi-frame{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0;background:var(--paper)}
 .dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:6px 18px;font-size:13px;font-weight:700;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
@@ -2951,19 +2960,19 @@ function skPaint(){
   const pics=d.photos.map(id=>sk.files.find(f=>f.id===id)).filter(Boolean);
   const del=ro?'':'<td class="sk-x no-print"><button type="button" class="ghost" data-skdel title="Satırı sil">×</button></td>';
   const head=`<div class="sk-top"><span>Saha Keşif Raporu · ${esc(s.name)}</span><img src="/ekonix-logo.jpeg" alt="Ekonix"></div>`;
-  const foot=n=>`<div class="sk-foot"><span>Gizli · Görüşme ve değerlendirme amaçlıdır · Hazırlayan: Ekonix İş Geliştirme</span><b>${n} / 2</b></div>`;
+  const pages=pics.length?3:2;
+  const foot=n=>`<div class="sk-foot"><span>Gizli · Görüşme ve değerlendirme amaçlıdır · Hazırlayan: Ekonix İş Geliştirme</span><b>${n} / ${pages}</b></div>`;
   $('skView').innerHTML=`<div class="sk-bar no-print">
       <strong>Saha Bilgi Kartı</strong><span class="sk-hint">${ro?'Salt okunur: kart görüntülenir ve yazdırılır.':'Metinlere tıklayıp düzenleyebilirsiniz. Altyapı maliyeti ve gelir paylaşımı bilerek boş gelir.'}</span>
       <span class="sk-acts">${ro?'':`<button type="button" id="skPick">Fotoğraf Seç${d.photos.length?` (${d.photos.length})`:''}</button><button type="button" id="skReset" class="ghost">Otomatik Değerlere Dön</button><button type="button" id="skSave" class="save"${sk.dirty?'':' disabled'}>Kaydet</button>`}<button type="button" id="skPrint" class="primary">Yazdır / PDF Kaydet</button><button type="button" id="skClose">Kapat</button></span>
     </div>
-    ${sk.pick?`<div class="sk-picker no-print"><p class="note">${sk.files.length?'Karta girecek fotoğrafları seçin (en fazla 4). Fotoğraflar projenin Dosyalar sekmesinden gelir.':'Bu projede JPG/PNG dosya yok. Önce Dosyalar sekmesine saha fotoğrafı yükleyin.'}</p><div class="sk-thumbs">${sk.files.map(f=>`<button type="button" class="sk-thumb${d.photos.includes(f.id)?' on':''}" data-skpic="${esc(f.id)}" title="${esc(f.name)}"><img src="/api/files?download=${esc(f.id)}&inline=1" alt="" loading="lazy"><span>${esc(f.name)}</span></button>`).join('')}</div></div>`:''}
+    ${sk.pick?`<div class="sk-picker no-print"><p class="note">${sk.files.length?'Son sayfada gösterilecek fotoğrafları seçin (en fazla 4). Aynı seçim Dosyalar sekmesindeki &quot;Saha Kartında Göster&quot; kutusuyla da yapılır.':'Bu projede JPG/PNG dosya yok. Önce Dosyalar sekmesine saha fotoğrafı yükleyin.'}</p><div class="sk-thumbs">${sk.files.map(f=>`<button type="button" class="sk-thumb${d.photos.includes(f.id)?' on':''}" data-skpic="${esc(f.id)}" title="${esc(f.name)}"><img src="/api/files?download=${esc(f.id)}&inline=1" alt="" loading="lazy"><span>${esc(f.name)}</span></button>`).join('')}</div></div>`:''}
     <div class="sk-doc" translate="no">
       <section class="sk-page">${head}
         <p class="sk-eyebrow">Saha Bilgi Kartı · ${esc(s.name)}</p>
         <h1 class="sk-title">${esc(s.name)}</h1>
         <table class="sk-meta"><tr><th>Müşteri</th><td ${ce} data-skf="cust">${esc(cust)}</td><th>Tarih</th><td ${ce} data-skf="date">${esc(date)}</td></tr></table>
         <table class="sk-tbl"><thead><tr><th class="sk-no">No</th><th>Konu Başlığı</th><th>Açıklama</th></tr></thead><tbody>${rows}</tbody></table>
-        ${pics.length?`<p class="sk-eyebrow">Resimler</p><div class="sk-pics n${Math.min(pics.length,4)}">${pics.map(f=>`<img src="/api/files?download=${esc(f.id)}&inline=1" alt="${esc(f.name)}">`).join('')}</div><p class="sk-cap" ${ce} data-skf="caption" data-ph="Resim açıklaması (isteğe bağlı)">${esc(d.caption)}</p>`:''}
         ${foot(1)}</section>
       <section class="sk-page">${head}
         <p class="sk-eyebrow">Proje Çerçevesi</p>
@@ -2976,6 +2985,12 @@ function skPaint(){
         ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="steps">+ Satır Ekle</button></p>'}
         <p class="sk-note" ${ce} data-skf="note" data-ph="Kapanış notu (isteğe bağlı)">${esc(note)}</p>
         ${foot(2)}</section>
+      ${pics.length?`<section class="sk-page">${head}
+        <p class="sk-eyebrow">Resimler</p>
+        <h1 class="sk-title sm">Saha Fotoğrafları</h1>
+        <div class="sk-clover">${[0,1,2,3].map(i=>pics[i]?`<figure><img src="/api/files?download=${esc(pics[i].id)}&inline=1" alt="${esc(pics[i].name)}"></figure>`:'<figure class="empty"></figure>').join('')}</div>
+        <p class="sk-cap" ${ce} data-skf="caption" data-ph="Resim açıklaması (isteğe bağlı)">${esc(d.caption)}</p>
+        ${foot(3)}</section>`:''}
     </div>`;
 }
 const fmtDay=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(v));return m?`${m[3]}.${m[2]}.${m[1]}`:String(v);};
@@ -3313,10 +3328,22 @@ async function loadFiles(){
   paintFiles();
 }
 // Saha fotoğrafları: büyük önizleme kartları (satırda 3-4 adet); tıklayınca tam boy açılır.
+// Saha Bilgi Kartı'nda gösterilecek fotoğraflar projede saklanır (card.photos, en fazla 4).
+const SK_MAX=4;
+const skHas=id=>{const s=cur();return !!(s&&s.card&&Array.isArray(s.card.photos)&&s.card.photos.includes(id));};
+document.addEventListener('change',e=>{
+  const c=e.target.closest&&e.target.closest('[data-skshow]');if(!c)return;
+  const s=cur();if(!s)return;
+  if(isRO()){c.checked=!c.checked;toast('Bu hesap salt okunurdur; değişiklik yapamaz.');return;}
+  s.card=s.card||{};const ph=Array.isArray(s.card.photos)?s.card.photos.slice():[],id=c.dataset.skshow,i=ph.indexOf(id);
+  if(c.checked){if(i<0){if(ph.length>=SK_MAX){c.checked=false;toast('Saha kartına en fazla 4 fotoğraf seçilebilir. Önce birinin işaretini kaldırın.');return;}ph.push(id);}}
+  else if(i>=0)ph.splice(i,1);
+  s.card.photos=ph;touched(s);toast(c.checked?'Fotoğraf saha kartına eklendi ('+ph.length+'/'+SK_MAX+').':'Fotoğraf saha kartından çıkarıldı.');
+});
 function flPicHtml(f){
   const can=!!fl.owner,u='/api/files?download='+esc(f.id);
   return `<figure class="fl-pic" data-flid="${esc(f.id)}"><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><img src="${u}&inline=1" alt="${esc(f.name)}" loading="lazy" decoding="async"></a>
-    <figcaption><b title="${esc(f.name)}">${esc(f.name)}</b><small>${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><span class="fl-pic-act"><a class="btn-link" href="${u}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;
+    <figcaption><b title="${esc(f.name)}">${esc(f.name)}</b><small>${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><label class="lchk fl-skshow" title="Saha Bilgi Kartı'nın son sayfasında gösterilir (en fazla 4 fotoğraf)"><input type="checkbox" data-skshow="${esc(f.id)}" ${skHas(f.id)?'checked':''}>Saha Kartında Göster</label><span class="fl-pic-act"><a class="btn-link" href="${u}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;
 }
 function flRowHtml(f){
   const can=!!fl.owner,view_=/^(pdf|jpg|jpeg|png)$/.test(flExt(f.name));

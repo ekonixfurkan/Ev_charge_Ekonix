@@ -212,6 +212,9 @@
     'En fazla 4 fotoğraf seçilebilir.': 'You can select up to 4 photos.', 'Bu hesap salt okunurdur; kart kaydedilemez.': 'This account is read-only; the card cannot be saved.',
 
     'Uygulamayı Yükle': 'Install App', 'Uygulama yüklendi.': 'App installed.',
+    'Saha Kartında Göster': 'Show on Site Card', 'Fotoğraf saha kartından çıkarıldı.': 'Photo removed from the site card.',
+    'Saha kartına en fazla 4 fotoğraf seçilebilir. Önce birinin işaretini kaldırın.': 'Up to 4 photos can be selected for the site card. Uncheck one first.',
+    'Bu hesap salt okunurdur; değişiklik yapamaz.': 'This account is read-only and cannot make changes.',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
