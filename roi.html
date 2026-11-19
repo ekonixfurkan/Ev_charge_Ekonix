@@ -6,18 +6,19 @@
 <link rel="stylesheet" href="/roi.css">
 <script src="/i18n.js"></script>
 </head><body>
-<div class="band" role="status" aria-live="polite">
-  <div class="wrap">
-    <div class="kpi"><div class="l">EPC firması geri dönüş</div><div class="v" id="k-pb">–</div><div class="s" id="k-pb-s"></div></div>
-    <div class="kpi"><div class="l">EPC IRR (USD)</div><div class="v" id="k-irr">–</div><div class="s" id="k-irr-s"></div></div>
-    <div class="kpi"><div class="l">StarCharge geri dönüş</div><div class="v" id="k-sc">–</div><div class="s" id="k-sc-s"></div></div>
-    <div class="kpi"><div class="l">Co-CPO net / ay</div><div class="v" id="k-cpo">–</div><div class="s" id="k-cpo-s"></div></div>
-    <div class="kpi"><div class="l">Net havuz / ay</div><div class="v" id="k-pool">–</div><div class="s" id="k-pool-s"></div></div>
+<div class="rt-bar" role="status" aria-live="polite">
+  <div class="rt-tabs" role="tablist" aria-label="ROI bölümleri">
+    <button type="button" role="tab" data-rtab="ozet">Özet</button>
+    <button type="button" role="tab" data-rtab="vars">Varsayımlar</button>
+    <button type="button" role="tab" data-rtab="mixer">Gelir Mikseri</button>
+    <button type="button" role="tab" data-rtab="cmp">Karşılaştırma</button>
+    <button type="button" role="tab" data-rtab="yil">Yıllık Döküm</button>
+    <button type="button" role="tab" data-rtab="metin">Özet Metni</button>
   </div>
+  <div class="rt-kpis"><div class="kpi vcell"><div class="l">EPC Geri Dönüş</div><div class="v" id="k-pb">–</div><div class="s" id="k-pb-s"></div></div><div class="kpi vcell"><div class="l">EPC IRR (USD)</div><div class="v" id="k-irr">–</div><div class="s" id="k-irr-s"></div></div><div class="kpi vcell"><div class="l">StarCharge Geri Dönüş</div><div class="v" id="k-sc">–</div><div class="s" id="k-sc-s"></div></div><div class="kpi vcell"><div class="l">Co-CPO Net / Ay</div><div class="v" id="k-cpo">–</div><div class="s" id="k-cpo-s"></div></div><div class="kpi vcell"><div class="l">Net Havuz / Ay</div><div class="v" id="k-pool">–</div><div class="s" id="k-pool-s"></div></div></div>
 </div>
 
-
-<section class="wrap mixer-wrap" aria-label="Mikser">
+<section class="mixer-wrap" aria-label="Mikser" data-rt="mixer">
   <div class="mixer">
     <div class="mx-top"><span class="mx-brand"><b>EKONİX</b> · GELİR MİKSERİ</span><div class="mx-decks" id="mx-decks"></div></div>
     <div class="mx-body">
@@ -29,8 +30,8 @@
     </div>
   </div>
 </section>
-<main class="wrap app">
-  <aside class="inputs" id="inputs">
+<main class="app">
+  <aside class="inputs" id="inputs" data-rt="vars">
     <div class="presets">
       <label class="lbl" for="preset">Hazır varsayım seti</label>
       <select id="preset">
@@ -58,50 +59,50 @@
   </aside>
 
   <section class="results">
-    <div class="card">
+    <div data-rt="ozet" class="card">
       <div class="verdict"><span class="pill" id="v-pill">–</span><p id="v-text"></p></div>
     </div>
 
-    <div class="card">
-      <h2>Masadaki taraflar</h2>
+    <div data-rt="ozet" class="card">
+      <h2>Masadaki Taraflar</h2>
       <div class="sub" id="party-sub"></div>
       <div class="parties" id="parties"></div>
     </div>
 
-    <div class="card">
-      <h2>Model karşılaştırması</h2>
+    <div data-rt="cmp" class="card">
+      <h2>Model Karşılaştırması</h2>
       <div class="sub">Aynı lokasyon ve talep, üç farklı paylaşım kurgusu.</div>
       <div class="tbl"><table class="cmp" id="cmp"></table></div>
     </div>
 
-    <div class="card">
-      <h2>EPC firması ne zaman döner? (yıl)</h2>
+    <div data-rt="cmp" class="card">
+      <h2>EPC Firması Ne Zaman Döner? (Yıl)</h2>
       <div class="sub" id="heat-sub"></div>
       <div class="tbl"><table class="heat" id="heat"></table></div>
       <div class="legend"><span><i class="c-good"></i>≤ 3 yıl</span><span><i class="c-ok"></i>3–4 yıl</span><span><i class="c-warn"></i>4–6 yıl</span><span><i class="c-bad"></i>&gt; 6 yıl / dönmüyor</span></div>
     </div>
 
-    <div class="card chart">
-      <h2>Kümülatif nakit · lokasyon başına</h2>
+    <div data-rt="ozet" class="card chart">
+      <h2>Kümülatif Nakit · Lokasyon Başına</h2>
       <div class="sub">USD, vergi öncesi. Çizginin sıfırı kestiği ay başa baş noktasıdır.</div>
       <div id="chart"></div>
       <div class="legend"><span><i style="background:var(--c-epc)"></i>EPC firması (saha yatırımı)</span><span><i style="background:var(--c-fin)"></i>StarCharge (donanım)</span><span><i style="background:var(--c-cpo)"></i>Co-CPO (işletme, net)</span></div>
     </div>
 
-    <div class="card">
-      <h2>1 kWh'lik satışın dağılımı · 1. yıl</h2>
+    <div data-rt="ozet" class="card">
+      <h2>1 kWh'lik Satışın Dağılımı · 1. Yıl</h2>
       <div class="sub" id="bk-sub"></div>
       <div class="stack" id="stack"></div>
       <div class="bk" id="bk"></div>
     </div>
 
-    <div class="card">
-      <h2>Yıllık döküm · lokasyon başına</h2>
+    <div data-rt="yil" class="card">
+      <h2>Yıllık Döküm · Lokasyon Başına</h2>
       <div class="sub">₺ tutarlar aylık ortalama, KDV hariç, nominal.</div>
       <div class="tbl"><table id="yt"></table></div>
     </div>
 
-    <div class="card" id="sites-card" hidden>
+    <div data-rt="yil" class="card" id="sites-card" hidden>
       <h2 id="sites-h">Lokasyonlar</h2>
       <div class="sub">1. yıl aylık ortalama. Satıra dokununca o lokasyon düzenlenir.</div>
       <div class="opts">
@@ -111,20 +112,20 @@
       <div class="tbl"><table id="sites-t"></table></div>
     </div>
 
-    <div class="card">
-      <h2>Ölçek · benzer lokasyonlar</h2>
+    <div data-rt="yil" class="card">
+      <h2>Ölçek · Benzer Lokasyonlar</h2>
       <div class="sub" id="pf-sub"></div>
       <div class="grid2" id="pf"></div>
     </div>
 
-    <div class="card">
-      <h2>Özet</h2>
+    <div data-rt="metin" class="card">
+      <h2>Özet Metni</h2>
       <div class="sub">WhatsApp veya e-postaya yapıştırmak için.</div>
       <textarea id="summary" readonly aria-label="Özet"></textarea>
       <div class="actions" style="margin-top:8px"><button class="btn" id="copy" type="button">Özeti kopyala</button><span class="toast" id="toast"></span></div>
     </div>
 
-    <div class="card src">
+    <div data-rt="metin" class="card src">
       <strong>Hesap ve varsayımlar.</strong> Değerler örnek varsayımdır. Net havuz = satış (KDV hariç) − elektrik alışı (verim kaybı dahil). Yüzdeler bu havuza uygulanır. Co-CPO işletme maliyeti (teknisyen payı + platform) Co-CPO'nun kendi payından; ödeme komisyonu ve diğer sabit giderler StarCharge payından düşülür. Kapasite kullanımı = aylık kWh / (DC güç × 730 saat). Geri dönüş süreleri USD bazındadır; TL nominal hesap enflasyon nedeniyle daha kısa görünür. Satış fiyatı aralığı: Ekim 2026 itibarıyla büyük ağlarda DC tarifeleri yaklaşık 11,99–16,49 ₺/kWh. Pazar ölçeği: EPDK Eylül 2026 verisine göre 21.307 DC soket ve aylık 83.253 MWh şarj; kabaca soket başına ~110 kWh/gün, yani 3 ünitelik bir lokasyon için ayda ~400 oturum (25 kWh). Donanım 105 USD/kW grup bütçe varsayımıdır. Vergi, amortisman ve finansman maliyeti dahil değildir.
     </div>
   </section>
@@ -237,7 +238,7 @@ const PRESETS={
 
 const total=p=>p.sc+p.ll+p.cpo+p.ekx;
 const GROUPS=[
- {t:'Paylaşım modeli',open:true,f:[
+ {t:'Paylaşım Modeli',open:true,f:[
   {seg:'model',l:'Kurgu',opts:[['fixed','Sabit'],['tier','Kademeli'],['capital','Sermaye oranlı']],
    hint:p=>({fixed:'Her ay aynı yüzdeler.',tier:'Ekonix ile Co-CPO arasındaki pay, aylık oturum sayısına göre kayar. StarCharge ve lokasyon sahibi sabit.',capital:'Lokasyon sahibi, Co-CPO ve Ekonix payları ödenir; kalan pay, EPC yatırımı geri dönene kadar StarCharge ile EPC firması arasında koydukları sermaye oranında bölünür. Sonra sabit oranlara geçilir.'})[p.model]},
   {k:'sc',l:'StarCharge (Üst CPO · donanım)',min:0,max:80,step:1,u:'%',hint:p=>p.model==='capital'?'Sermaye oranlı kurguda bu oran EPC geri döndükten sonra geçerli.':'Standart %50.'},
@@ -272,7 +273,7 @@ const GROUPS=[
   {k:'powerRatio',l:'Ortalama çekilen güç / nominal',min:25,max:95,step:1,u:'%'},
   {k:'maxOcc',l:'Doluluk tavanı (büyüme sınırı)',min:10,max:60,step:1,u:'%'}
  ]},
- {t:'Lokasyon ve yatırım',open:true,f:[
+ {t:'Lokasyon ve Yatırım',open:true,f:[
   {k:'units',l:'Ünite sayısı / lokasyon',min:1,max:10,step:1,u:'adet'},
   {k:'kw',l:'Ünite gücü',min:30,max:480,step:10,u:'kW'},
   {k:'epcTl',l:'EPC saha yatırımı',min:50000,max:4000000,step:25000,u:'₺',hint:p=>'≈ '+usd(p.epcTl/p.fx0)+'. Trafo/OG bağlantısı dahilse genelde 1 M₺ üzeri; sadece montaj 150–300 bin ₺.'},
@@ -281,7 +282,7 @@ const GROUPS=[
   {k:'hwPerKw',l:'Donanım maliyeti (StarCharge)',min:50,max:250,step:5,u:'$/kW',hint:p=>'Lokasyon donanımı ≈ '+usd(p.units*p.kw*p.hwPerKw)+' (≈ '+tlk(p.units*p.kw*p.hwPerKw*p.fx0)+')'},
   {k:'sites',l:'Portföydeki lokasyon sayısı',min:1,max:300,step:1,u:'adet'}
  ]},
- {t:'Fiyat ve maliyetler',open:true,f:[
+ {t:'Fiyat ve Maliyetler',open:true,f:[
   {k:'price',l:'Satış fiyatı (KDV dahil)',min:8,max:22,step:0.01,u:'₺/kWh',hint:()=>'Ekim 2026 piyasa: 11,99–16,49 ₺/kWh'},
   {k:'elec',l:'Elektrik alış (KDV hariç, her şey dahil)',min:2,max:10,step:0.05,u:'₺/kWh'},
   {k:'eff',l:'Şarj verimi',min:85,max:99,step:0.5,u:'%'},
@@ -290,7 +291,7 @@ const GROUPS=[
   {k:'otherUsd',l:'Diğer sabit gider / ay (StarCharge)',min:0,max:1000,step:10,u:'$',hint:()=>'Sigorta, iletişim, yedek parça. StarCharge payından.'},
   {k:'rentAlt',l:'Lokasyon sahibinin alternatif kira geliri / ay',min:0,max:100000,step:1000,u:'₺',hint:()=>'Lokasyon sahibinin tek riski, kira yerine bu modeli seçmesi.'}
  ]},
- {t:'Makro (kur ve enflasyon)',open:false,f:[
+ {t:'Makro (Kur ve Enflasyon)',open:false,f:[
   {k:'fx0',l:'USD/TL başlangıç',min:30,max:90,step:0.1,u:'₺'},
   {k:'fxDep',l:'Yıllık kur artışı',min:0,max:60,step:1,u:'%'},
   {k:'priceEsc',l:'Yıllık satış fiyatı ve TL gider artışı',min:0,max:60,step:1,u:'%',hint:p=>{const g=p.priceEsc-p.fxDep;return g<0?'Fiyat kurun '+nf(-g)+' puan gerisinde: USD bazında gelir eriyor.':'Fiyat kuru takip ediyor.'}},
@@ -318,7 +319,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}};
 function buildInputs(){
   const host=$('groups'); host.innerHTML='';
   GROUPS.forEach(g=>{
-    const d=document.createElement('details'); d.className='grp'; d.open=g.open;
+    const d=document.createElement('details'); d.className='grp'; d.open=true;
     d.innerHTML='<summary>'+g.t+'</summary><div class="fields"></div>';
     const box=d.querySelector('.fields');
     g.f.forEach(f=>{
@@ -664,6 +665,17 @@ $('site-add').onclick=()=>{SITES.push(Object.assign({name:'Lokasyon '+(SITES.len
 $('site-del').onclick=()=>{if(ACTIVE<0) return; SITES.splice(ACTIVE,1); ACTIVE=SITES.length?0:-1; if(ACTIVE>=0) Object.assign(P,pick(SITES[0],SITE_KEYS)); saveSites(); refresh();};
 document.querySelectorAll('#opt-cpo button').forEach(b=>b.onclick=()=>{P.cpoCostMode=b.dataset.v; refresh();});
 document.querySelectorAll('#opt-tier button').forEach(b=>b.onclick=()=>{P.tierScope=b.dataset.v; refresh();});
+/* ---------- Sekmeler (proje sayfasındaki gibi) ---------- */
+const RT_KEY=KEY+'-tab', RT_TABS=['ozet','vars','mixer','cmp','yil','metin'];
+function setTab(t){
+  if(!RT_TABS.includes(t)) t='ozet';
+  document.body.dataset.rt=t;
+  document.querySelectorAll('[data-rtab]').forEach(b=>{const on=b.dataset.rtab===t; b.setAttribute('aria-pressed',String(on)); b.setAttribute('aria-selected',String(on));});
+  try{localStorage.setItem(RT_KEY,t);}catch(e){}
+}
+document.querySelectorAll('[data-rtab]').forEach(b=>b.onclick=()=>{setTab(b.dataset.rtab); window.scrollTo(0,0);});
+let rt0='ozet'; try{rt0=new URLSearchParams(location.search).get('tab')||localStorage.getItem(RT_KEY)||'ozet';}catch(e){}
+setTab(rt0);
 buildInputs(); buildMixer(); refresh();
 
 </script>
