@@ -291,3 +291,21 @@ details.grp[open]>summary::after{content:none}
 .inputs>.presets,.inputs details.grp{break-inside:avoid;margin:0 0 16px;display:block}
 .inputs>.presets{display:flex}
 .f .row{min-height:30px}
+/* Varsayımlar: proje kartı şablonu — üstte küçük başlık, altında kutu; kutular ikişerli satırlarda eşit boyda biter */
+.inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch;columns:auto}
+.inputs>.presets,.inputs details.grp{margin:0;display:block}
+.inputs>.presets{display:flex}
+.inputs details.grp:last-child{grid-column:1/-1}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;align-items:start}
+.f{gap:5px;min-width:0}
+.f .row{flex-direction:column;align-items:stretch;gap:5px;min-height:0}
+.f label,.f .lbl,.presets .lbl{display:block;font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);line-height:1.35}
+.f .val{display:block}
+.f input[type=number],.presets select,.presets input[type=text]{width:100%;text-align:left;padding:8px 10px;min-height:36px;font:500 12px/1.3 var(--font);font-variant-numeric:tabular-nums;color:var(--ink);border:1px solid var(--hair);border-radius:var(--radius);background:var(--soft)}
+.f input[type=number]:focus,.presets select:focus,.presets input[type=text]:focus{outline:2px solid var(--teal);outline-offset:1px;background:var(--card)}
+.f:has(.seg),.f:has(.chk),.f:has(.sumrow){grid-column:1/-1}
+.f .chk{display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:12px;font-weight:500;color:var(--ink)}
+.f .hint{font-size:10.5px;line-height:1.35}
+@media (max-width:900px){.inputs{grid-template-columns:minmax(0,1fr)}}
+/* iki satıra taşan başlıklarda da kutular aynı hizada başlasın */
+.f .row label{min-height:2.7em;display:flex;align-items:flex-end}

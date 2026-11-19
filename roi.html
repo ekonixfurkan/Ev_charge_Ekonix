@@ -334,7 +334,7 @@ function buildInputs(){
         el.innerHTML='<label class="chk"><input type="checkbox" id="in-'+f.chk+'"> '+f.l+'</label>';
         el.querySelector('input').onchange=e=>{P[f.chk]=e.target.checked; refresh();};
       }else{
-        el.innerHTML='<div class="row"><label for="n-'+f.k+'">'+f.l+'</label><span class="val"><input type="number" id="n-'+f.k+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="u">'+f.u+'</span></span></div><input type="range" id="r-'+f.k+'" aria-label="'+f.l+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="hint"></span>';
+        el.innerHTML='<div class="row"><label for="n-'+f.k+'">'+f.l+' ('+f.u+')</label><span class="val"><input type="number" id="n-'+f.k+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"></span></div><input type="range" id="r-'+f.k+'" aria-label="'+f.l+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="hint"></span>';
         const n=el.querySelector('input[type=number]'), r=el.querySelector('input[type=range]');
         r.oninput=()=>{P[f.k]=+r.value; n.value=r.value; $('preset').value=''; refresh(true);};
         n.onchange=()=>{let v=+n.value; if(isNaN(v)) v=P[f.k]; P[f.k]=v; $('preset').value=''; refresh();};
