@@ -15,9 +15,11 @@
     <button type="button" role="tab" data-rtab="yil">Yıllık Döküm</button>
     <button type="button" role="tab" data-rtab="metin">Özet Metni</button>
   </div>
+  <span class="pill warn" id="sample-pill" hidden>Örnek Senaryo</span>
   <div class="rt-kpis"><div class="kpi vcell"><div class="l">EPC Geri Dönüş</div><div class="v" id="k-pb">–</div><div class="s" id="k-pb-s"></div></div><div class="kpi vcell"><div class="l">EPC IRR (USD)</div><div class="v" id="k-irr">–</div><div class="s" id="k-irr-s"></div></div><div class="kpi vcell"><div class="l">StarCharge Geri Dönüş</div><div class="v" id="k-sc">–</div><div class="s" id="k-sc-s"></div></div><div class="kpi vcell"><div class="l">Co-CPO Net / Ay</div><div class="v" id="k-cpo">–</div><div class="s" id="k-cpo-s"></div></div><div class="kpi vcell"><div class="l">Net Havuz / Ay</div><div class="v" id="k-pool">–</div><div class="s" id="k-pool-s"></div></div></div>
 </div>
 
+<div class="card gate" id="gate" hidden></div>
 <section class="mixer-wrap" aria-label="Mikser" data-rt="mixer">
   <div class="mixer">
     <div class="mx-top"><h2 class="mx-title">Gelir Mikseri</h2><div class="mx-decks" id="mx-decks"></div></div>
@@ -43,7 +45,7 @@
         <option value="filo">Filo · lojistik deposu</option>
         <option value="sehir">Şehir içi cadde · otel</option>
       </select>
-      <div class="actions"><button class="btn ghost" id="reset" type="button">Varsayılanlara dön</button></div>
+      <div class="actions"><button class="btn ghost" id="reset" type="button">Temizle</button></div>
     </div>
     <div class="presets" id="sitebox">
       <label class="lbl" for="site-sel">Lokasyon</label>
@@ -126,13 +128,13 @@
     </div>
 
     <div data-rt="metin" class="card src">
-      <strong>Hesap ve varsayımlar.</strong> Değerler örnek varsayımdır. Net havuz = satış (KDV hariç) − elektrik alışı (verim kaybı dahil). Yüzdeler bu havuza uygulanır. Co-CPO işletme maliyeti (teknisyen payı + platform) Co-CPO'nun kendi payından; ödeme komisyonu ve diğer sabit giderler StarCharge payından düşülür. Kapasite kullanımı = aylık kWh / (DC güç × 730 saat). Geri dönüş süreleri USD bazındadır; TL nominal hesap enflasyon nedeniyle daha kısa görünür. Satış fiyatı aralığı: Ekim 2026 itibarıyla büyük ağlarda DC tarifeleri yaklaşık 11,99–16,49 ₺/kWh. Pazar ölçeği: EPDK Eylül 2026 verisine göre 21.307 DC soket ve aylık 83.253 MWh şarj; kabaca soket başına ~110 kWh/gün, yani 3 ünitelik bir lokasyon için ayda ~400 oturum (25 kWh). Donanım 105 USD/kW grup bütçe varsayımıdır. Vergi, amortisman ve finansman maliyeti dahil değildir.
+      <strong>Hesap ve varsayımlar.</strong> Değerler örnek varsayımdır. Net havuz = satış (KDV hariç) − elektrik alışı (verim kaybı dahil). Yüzdeler bu havuza uygulanır. Havuz eksiye düşerse paylaşılacak gelir yoktur ve zarar, elektriği ödeyen StarCharge'a yazılır. Lokasyon primi doluluk oranına (ünitelerin şarj vererek geçirdiği süre) göre hesaplanır. Co-CPO işletme maliyeti (teknisyen payı + platform) Co-CPO'nun kendi payından; ödeme komisyonu ve diğer sabit giderler StarCharge payından düşülür. Kapasite kullanımı = aylık kWh / (DC güç × 730 saat). Geri dönüş süreleri USD bazındadır; TL nominal hesap enflasyon nedeniyle daha kısa görünür. Satış fiyatı aralığı: Ekim 2026 itibarıyla büyük ağlarda DC tarifeleri yaklaşık 11,99–16,49 ₺/kWh. Pazar ölçeği: EPDK Eylül 2026 verisine göre 21.307 DC soket ve aylık 83.253 MWh şarj; kabaca soket başına ~110 kWh/gün, yani 3 ünitelik bir lokasyon için ayda ~400 oturum (25 kWh). Donanım 105 USD/kW grup bütçe varsayımıdır. Vergi, amortisman ve finansman maliyeti dahil değildir.
     </div>
   </section>
 </main>
 <script>
 
-const DEFAULTS = {
+const SAMPLE = {
   units:3, kw:120, hwPerKw:105, epcTl:1500000, sites:50,
   demandMode:'sess', sessMonth:500, carsPerDay:5, sessionKwh:25, powerRatio:55, growth:12, maxOcc:30, ramp:0, uptime:97,
   compYear:0, compLoss:15,
@@ -144,6 +146,10 @@ const DEFAULTS = {
   llBonus:false, llUth:15, llStep:5, llMax:25, cpoCostMode:'site', tierScope:'site',
   term:10, disc:12
 };
+// Projeye özgü zorunlu alanlar: girilmeden sonuç gösterilmez. Teknik/makro alanlar standart değerle dolu gelir.
+const REQ_BASE=['units','kw','epcTl','sessionKwh','price','elec','sc','ll','cpo','ekx'];
+const reqKeys=p=>REQ_BASE.concat(p.demandMode==='cars'?['carsPerDay']:['sessMonth']).filter(k=>!(k==='ekx'&&p.model==='tier'));
+const DEFAULTS=Object.assign({},SAMPLE,{units:null,kw:null,epcTl:null,sessMonth:null,carsPerDay:null,sessionKwh:null,price:null,elec:null,sc:null,ll:null,cpo:null,ekx:null,preset:''});
 const MODEL_NAMES={fixed:'Sabit oranlar',tier:'Kademeli (oturum)',capital:'Sermaye oranlı'};
 
 function tierRate(p,s){
@@ -176,9 +182,11 @@ function simulate(p){
     const ramp=p.ramp>0?Math.min(1,0.4+0.6*(m+0.5)/p.ramp):1;
     const kwh=d*p.units*30.42*ramp*upF, sess=kwh/p.sessionKwh;
     const rev=kwh*pn, kdv=kwh*(pg-pn), el=kwh/(p.eff/100)*elec, fee=rev*p.fee/100;
-    const pool=Math.max(0,rev-el);                       // net = satış (KDV hariç) − elektrik alışı
+    const poolRaw=rev-el, pool=Math.max(0,poolRaw);      // net = satış (KDV hariç) − elektrik alışı
+    const loss=Math.min(0,poolRaw);                      // havuz eksiye düşerse paylaşılacak gelir yoktur; zarar elektriği ödeyen StarCharge'a yazılır
     const U=kwh/(p.units*p.kw*730)*100;                  // aylık kapasite kullanımı %
-    const bonus=p.llBonus?Math.max(0,Math.min(p.llMax-p.ll,(U-p.llUth)/p.llStep)):0;
+    const occ=U/(p.powerRatio/100);                      // doluluk %: ünitelerin şarj vererek geçirdiği süre (doluluk tavanı ile aynı ölçü)
+    const bonus=p.llBonus?Math.max(0,Math.min(p.llMax-p.ll,(occ-p.llUth)/p.llStep)):0;
     let cpoS, ekxTot;
     if(p.model==='tier'){const tot=p.cpo+p.ekx, r=Math.min(tot,tierRate(p,sess*(p._tierMult||1))); ekxTot=r; cpoS=tot-r;}
     else {cpoS=p.cpo; ekxTot=p.ekx;}
@@ -190,7 +198,7 @@ function simulate(p){
     else if(p.model==='capital'&&capitalEnd===null) capitalEnd=m;
     const LL=pool*llS/100, SC=pool*scS/100, CPO=pool*cpoS/100, EKX=pool*ekxS/100, FIRM=pool*firmS/100;
     const cpoCost=p.cpoOpexTl*(p._cpoShare??1)*Math.pow(1+p.priceEsc/100,y), other=p.otherUsd*fx;
-    const SCn=SC-other-fee, CPOn=CPO-cpoCost;
+    const SCn=SC-other-fee+loss, CPOn=CPO-cpoCost;
     let fU=FIRM/fx, sU=SCn/fx; const cU=CPOn/fx;
     recv+=fU;
     let pay=0; if(owe>0){pay=Math.min(fU,owe); owe-=pay; fU-=pay; sU+=pay;}
@@ -200,7 +208,7 @@ function simulate(p){
     mF.push(fU); mS.push(sU); cumF.push(cF); cumS.push(cS); cumC.push(cC);
     if(!yrs[y]) yrs[y]={y:y+1,n:0,kwh:0,sess:0,rev:0,kdv:0,el:0,fee:0,pool:0,LL:0,SC:0,SCn:0,CPO:0,CPOn:0,cpoCost:0,other:0,EKX:0,FIRM:0,fU:0,sU:0,cU:0,fxs:0,firmS:0,ekxS:0,cpoS:0,scS:0,llS:0,U:0};
     const Y=yrs[y];
-    Y.n++; Y.kwh+=kwh; Y.sess+=sess; Y.rev+=rev; Y.kdv+=kdv; Y.el+=el; Y.fee+=fee; Y.pool+=pool; Y.LL+=LL; Y.SC+=SC; Y.SCn+=SCn;
+    Y.n++; Y.kwh+=kwh; Y.sess+=sess; Y.rev+=rev; Y.kdv+=kdv; Y.el+=el; Y.fee+=fee; Y.pool+=pool; Y.loss=(Y.loss||0)+loss; Y.LL+=LL; Y.SC+=SC; Y.SCn+=SCn;
     Y.pay=(Y.pay||0)+pay*fx; Y.CPO+=CPO; Y.CPOn+=CPOn; Y.cpoCost+=cpoCost; Y.other+=other; Y.EKX+=EKX; Y.FIRM+=FIRM; Y.fU+=fU; Y.sU+=sU; Y.cU+=cU; Y.fxs+=fx;
     Y.llS+=llS; Y.U+=U; Y.firmS+=firmS; Y.ekxS+=ekxS; Y.cpoS+=cpoS; Y.scS+=scS; Y.cumF=cF; Y.cumS=cS; Y.cumC=cC;
   }
@@ -244,9 +252,9 @@ const GROUPS=[
   {k:'sc',l:'StarCharge (Üst CPO · donanım)',min:0,max:80,step:1,u:'%',hint:p=>p.model==='capital'?'Sermaye oranlı kurguda bu oran EPC geri döndükten sonra geçerli.':'Standart %50.'},
   {k:'ll',l:'Lokasyon sahibi (baz)',min:0,max:40,step:1,u:'%'},
   {chk:'llBonus',l:'Lokasyon sahibine performans primi (kullanıma bağlı)'},
-  {k:'llUth',l:'Prim başlangıcı: kapasite kullanımı',min:0,max:50,step:1,u:'%',show:p=>p.llBonus},
-  {k:'llStep',l:'+1 puan için kullanım artışı',min:1,max:20,step:1,u:'puan',show:p=>p.llBonus},
-  {k:'llMax',l:'Lokasyon payı üst sınırı',min:0,max:50,step:1,u:'%',show:p=>p.llBonus,hint:p=>'Pay = %'+p.ll+' + min[%'+(p.llMax-p.ll)+'; (kullanım − %'+p.llUth+') / '+p.llStep+']. Prim StarCharge payından karşılanır.'},
+  {k:'llUth',l:'Prim başlangıcı: doluluk',min:0,max:50,step:1,u:'%',show:p=>p.llBonus},
+  {k:'llStep',l:'+1 puan için doluluk artışı',min:1,max:20,step:1,u:'puan',show:p=>p.llBonus},
+  {k:'llMax',l:'Lokasyon payı üst sınırı',min:0,max:50,step:1,u:'%',show:p=>p.llBonus,hint:p=>'Pay = %'+p.ll+' + min[%'+(p.llMax-p.ll)+'; (doluluk − %'+p.llUth+') / '+p.llStep+']. Doluluk tavanı %'+p.maxOcc+'. Prim StarCharge payından karşılanır.'},
   {k:'cpo',l:'Co-CPO (alt CPO)',min:0,max:40,step:1,u:'%',hint:p=>p.model==='tier'?'Kademeli modelde Co-CPO + Ekonix toplamı %'+(p.cpo+p.ekx)+' sabit kalır.':''},
   {k:'ekx',l:'Ekonix + EPC firması',min:0,max:40,step:1,u:'%',show:p=>p.model!=='tier',hint:p=>'EPC firması: %'+nf(p.ekx*p.firm/100,1)+' · Ekonix: %'+nf(p.ekx*(100-p.firm)/100,1)},
   {sum:true},
@@ -300,7 +308,7 @@ const GROUPS=[
  ]}
 ];
 
-const KEY='ekonix-epc-sim-v2';
+const KEY='ekonix-epc-sim-v3';
 const SITE_KEYS=['units','kw','epcTl','sessMonth','sessionKwh','hwPerKw'];
 let SITES=[], ACTIVE=-1;
 try{const s=JSON.parse(localStorage.getItem(KEY+'-sites')||'null'); if(s){SITES=s.sites||[]; ACTIVE=s.active??-1;}}catch(e){}
@@ -319,6 +327,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(P));}catch(e){}};
 // Sayı kutuları sistemdeki biçimle gösterilir (tr: 1.500.000,00 · en: 1,500,000.00). Para alanları (₺, $) iki ondalıklı; diğerleri adımına göre.
 const stepDec=st=>{const t=String(st); return t.includes('.')?t.split('.')[1].length:0;};
 function fmtIn(v,f){
+  if(v===null||v===undefined||v==='') return '';
   const money=/[₺$]/.test(f.u), d=money?2:stepDec(f.step);
   return Number(v).toLocaleString(window.LOC||'tr',{minimumFractionDigits:money?2:0,maximumFractionDigits:Math.max(d,money?2:0)});
 }
@@ -341,19 +350,19 @@ function buildInputs(){
       const el=document.createElement('div'); el.className='f'; el._f=f;
       if(f.sum){
         el.innerHTML='<div class="sumrow"><span class="sumtxt"></span><span class="sumbtns"><button type="button" class="btn ghost sm" data-to="ekx">Farkı Ekonix+EPC\'ye</button><button type="button" class="btn ghost sm" data-to="sc">Farkı StarCharge\'a</button></span></div>';
-        el.querySelectorAll('button').forEach(b=>b.onclick=()=>{const d=100-total(P); P[b.dataset.to]=Math.max(0,P[b.dataset.to]+d); $('preset').value=''; refresh();});
+        el.querySelectorAll('button').forEach(b=>b.onclick=()=>{const d=100-total(P); P[b.dataset.to]=Math.max(0,P[b.dataset.to]+d); $('preset').value=''; P.preset=''; refresh();});
       }else if(f.seg){
         el.innerHTML='<span class="lbl">'+f.l+'</span><div class="seg" role="group">'+f.opts.map(o=>'<button type="button" data-v="'+o[0]+'">'+o[1]+'</button>').join('')+'</div><span class="hint"></span>';
-        el.querySelectorAll('button').forEach(b=>b.onclick=()=>{P[f.seg]=b.dataset.v; $('preset').value=''; refresh();});
+        el.querySelectorAll('button').forEach(b=>b.onclick=()=>{P[f.seg]=b.dataset.v; $('preset').value=''; P.preset=''; refresh();});
       }else if(f.chk){
         el.innerHTML='<label class="chk"><input type="checkbox" id="in-'+f.chk+'"> '+f.l+'</label>';
         el.querySelector('input').onchange=e=>{P[f.chk]=e.target.checked; refresh();};
       }else{
         el.innerHTML='<div class="row"><label for="n-'+f.k+'">'+f.l+' ('+f.u+')</label><span class="val"><input type="text" inputmode="decimal" autocomplete="off" class="num-in" id="n-'+f.k+'"></span></div><input type="range" id="r-'+f.k+'" aria-label="'+f.l+'" min="'+f.min+'" max="'+f.max+'" step="'+f.step+'"><span class="hint"></span>';
         const n=el.querySelector('input.num-in'), r=el.querySelector('input[type=range]');
-        r.oninput=()=>{P[f.k]=+r.value; n.value=fmtIn(P[f.k],f); $('preset').value=''; refresh(true);};
+        r.oninput=()=>{P[f.k]=+r.value; n.value=fmtIn(P[f.k],f); $('preset').value=''; P.preset=''; refresh(true);};
         n.onfocus=()=>{n.select();};
-        n.onchange=()=>{let v=parseIn(n.value); if(v===null) v=P[f.k]; P[f.k]=v; n.value=fmtIn(v,f); $('preset').value=''; refresh();};
+        n.onchange=()=>{let v=parseIn(n.value); if(v===null) v=(n.value.trim()===''&&REQ_BASE.concat(['sessMonth','carsPerDay']).includes(f.k))?null:P[f.k]; P[f.k]=v; n.value=fmtIn(v,f); $('preset').value=''; P.preset=''; refresh();};
         n.onkeydown=e=>{if(e.key==='Enter') n.blur();};
       }
       box.appendChild(el);
@@ -369,7 +378,8 @@ function syncInputs(skipVals){
     else if(f.seg) el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(P[f.seg]===b.dataset.v)));
     else if(f.chk) el.querySelector('input').checked=!!P[f.chk];
     else if(!skipVals){const ni=el.querySelector('input.num-in'); if(document.activeElement!==ni) ni.value=fmtIn(P[f.k],f); el.querySelector('input[type=range]').value=P[f.k];}
-    const h=el.querySelector('.hint'); if(h) h.textContent=f.hint?f.hint(P):'';
+    const h=el.querySelector('.hint'); if(h){let t=''; if(f.hint&&!gateInfo(P).blocked){try{t=f.hint(P);}catch(e){t='';}} h.textContent=t;}
+    if(f.k){el.classList.toggle('req',reqKeys(P).includes(f.k)); el.classList.toggle('miss',reqKeys(P).includes(f.k)&&P[f.k]==null);}
   });
 }
 
@@ -487,6 +497,7 @@ function verdict(r){
   t+=risk<=0?'EPC sermaye riski taşımıyor; '+P.term+' yılda maliyetinin üzerine %'+nf(r.margin*100)+' marj topluyor.':('Kendi riskindeki '+tlk(risk)+'\'yi '+(r.pbF===null?P.term+' yıl içinde geri alamıyor':nf(r.pbF/12,1)+' yılda geri alıyor')+'.');
   t+=' Aynı lokasyonda StarCharge donanımı '+(r.pbS===null?'süre içinde dönmüyor':nf(r.pbS/12,1)+' yılda dönüyor')+'.';
   if(mo('CPOn')<0) t+=' Co-CPO işletme maliyetini karşılayamıyor (ayda '+tl(mo('CPOn'))+').';
+  if((Y.loss||0)<0) t+=' Elektrik maliyeti satış gelirini aşıyor: paylaşılacak net havuz yok, ayda '+tl(-mo('loss'))+' zarar StarCharge\'a yazıldı.';
   if(r.pbF!==null&&r.pbS!==null&&r.pbF>r.pbS*2) t+=' Riskin büyüğü EPC\'de, getirinin büyüğü StarCharge\'da.';
   $('v-text').textContent=t;
 }
@@ -508,8 +519,29 @@ function summary(r){
     'Not: Geri dönüş USD bazında, '+P.term+' yıllık sözleşme, yıllık %'+P.growth+' talep artışı varsayımıyla.'].join('\n');
 }
 
+// Zorunlu alanlar eksikse ya da paylar %100 etmiyorsa hesap yapılmaz, sonuç gösterilmez.
+const REQ_LBL={units:'Ünite sayısı',kw:'Ünite gücü',epcTl:'EPC saha yatırımı',sessMonth:'Oturum / ay',carsPerDay:'Araç / ünite / gün',sessionKwh:'Ortalama şarj / oturum',price:'Satış fiyatı',elec:'Elektrik alış',sc:'StarCharge payı',ll:'Lokasyon sahibi payı',cpo:'Co-CPO payı',ekx:'Ekonix + EPC payı'};
+function gateInfo(p){
+  const miss=reqKeys(p).filter(k=>p[k]==null||p[k]===''||isNaN(p[k]));
+  const tt=total(p), sumBad=!miss.some(k=>['sc','ll','cpo','ekx'].includes(k))&&Math.abs(tt-100)>0.01;
+  return {miss,sumBad,tt,blocked:miss.length>0||sumBad};
+}
+function paintGate(g){
+  document.body.classList.toggle('gated',g.blocked);
+  $('sample-pill').hidden=!P.preset||g.blocked;
+  const box=$('gate'); box.hidden=!g.blocked; if(!g.blocked) return;
+  let h='<h2>Sonuç İçin Varsayımları Tamamlayın</h2>';
+  if(g.miss.length) h+='<p>Sonuçlar yalnızca girdiğiniz değerlerden hesaplanır. Şu alanlar boş:</p><ul>'+g.miss.map(k=>'<li>'+REQ_LBL[k]+'</li>').join('')+'</ul>';
+  if(g.sumBad) h+='<p>Paylar toplamı %'+nf(g.tt)+'; %100 olmalı.</p>';
+  h+='<div class="actions"><button type="button" class="btn" id="gate-go">Varsayımlar\'a Git</button><span class="hint-s">Hızlı denemek için Varsayımlar\'daki "Hazır Varsayım Seti"nden bir örnek senaryo seçebilirsiniz.</span></div>';
+  box.innerHTML=h; $('gate-go').onclick=()=>setTab('vars');
+  ['k-pb','k-irr','k-sc','k-cpo','k-pool'].forEach(i=>{$(i).textContent='–'; $(i).className='v'; $(i+'-s').textContent='';});
+}
 function refresh(fromRange){
+  const g=gateInfo(P);
   syncInputs(fromRange);
+  paintGate(g);
+  if(g.blocked){sitesUI(); save(); return;}
   if(ACTIVE>=0&&SITES[ACTIVE]){Object.assign(SITES[ACTIVE],pick(P,SITE_KEYS)); P.demandMode='sess'; saveSites();}
   const r=simulate(mp()), Y=r.yrs[0], mo=k=>Y[k]/Y.n;
   sitesUI(); sitesTable();
@@ -525,9 +557,11 @@ function refresh(fromRange){
 }
 
 $('preset').onchange=e=>{const v=e.target.value;
-  if(v){P=Object.assign({},P,PRESETS[v]); refresh();}
+  if(v){const base=Object.assign({},P); reqKeys(Object.assign({},P,PRESETS[v])).forEach(k=>{if(base[k]==null) base[k]=SAMPLE[k];});
+    ['units','kw','epcTl','sessMonth','carsPerDay','sessionKwh','price','elec','sc','ll','cpo','ekx'].forEach(k=>{if(base[k]==null) base[k]=SAMPLE[k];});
+    P=Object.assign(base,PRESETS[v],{preset:v}); refresh();}
   e.target.value=v;};
-$('reset').onclick=()=>{P=Object.assign({},DEFAULTS); ACTIVE=-1; saveSites(); $('preset').value=''; refresh();};
+$('reset').onclick=()=>{P=Object.assign({},DEFAULTS); ACTIVE=-1; saveSites(); $('preset').value=''; P.preset=''; refresh();};
 $('copy').onclick=()=>{const t=$('summary'); const done=()=>{$('toast').textContent='Kopyalandı'; setTimeout(()=>$('toast').textContent='',2000);};
   try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();$('toast').textContent='Metin seçildi, kopyalayın';});}catch(e){t.select();$('toast').textContent='Metin seçildi, kopyalayın';}};
 
@@ -560,11 +594,11 @@ function setChannel(k,v){
   const abs=k==='sc'?'ekx':'sc';
   let na=P[abs]-d;
   if(na<0){v+=na; na=0;} else if(na>FMAX){v+=na-FMAX; na=FMAX;}
-  P[k]=v; P[abs]=na; $('preset').value=''; refresh(true);
+  P[k]=v; P[abs]=na; $('preset').value=''; P.preset=''; refresh(true);
 }
 function setKnob(o,v){
   v=snap(v,o); if(v===P[o.k]) return;
-  P[o.k]=+v.toFixed(4); if(o.onSet) o.onSet(); $('preset').value=''; refresh(true);
+  P[o.k]=+v.toFixed(4); if(o.onSet) o.onSet(); $('preset').value=''; P.preset=''; refresh(true);
 }
 function dragCtl(el,getV,setV,o,mode){
   let sy=0,sv=0,active=false,rect=null;
@@ -595,7 +629,7 @@ function knobSvg(fr,col){
 }
 function buildMixer(){
   $('mx-decks').innerHTML=Object.entries(MODEL_NAMES).map(([k,n])=>'<button type="button" class="mx-deck" data-m="'+k+'">'+n+'</button>').join('');
-  $('mx-decks').querySelectorAll('button').forEach(b=>b.onclick=()=>{P.model=b.dataset.m; $('preset').value=''; refresh();});
+  $('mx-decks').querySelectorAll('button').forEach(b=>b.onclick=()=>{P.model=b.dataset.m; $('preset').value=''; P.preset=''; refresh();});
   const seg=n=>Array.from({length:n},()=>'<i></i>').join('');
   $('mx-ch').innerHTML=CH.map(c=>'<div class="ch" data-k="'+c.k+'" style="--chc:'+c.c+';--mc:'+c.c+'"><span class="ch-led"></span><div class="ch-name">'+c.n+'</div>'+
     '<div class="ch-row"><div class="ch-meter">'+seg(14)+'</div><div class="fader" tabindex="0" role="slider" aria-label="'+c.n+' payı" aria-valuemin="0" aria-valuemax="'+FMAX+'"><span class="ticks"></span><span class="fill"></span><span class="cap"></span></div></div>'+
@@ -678,7 +712,7 @@ function selectSite(i){
 }
 $('site-sel').onchange=e=>selectSite(+e.target.value);
 $('site-name').oninput=e=>{if(ACTIVE>=0){SITES[ACTIVE].name=e.target.value||'Lokasyon'; saveSites(); sitesUI(); sitesTable();}};
-$('site-add').onclick=()=>{SITES.push(Object.assign({name:'Lokasyon '+(SITES.length+1)},pick(Object.assign({},P,{demandMode:'sess'}),SITE_KEYS))); selectSite(SITES.length-1);};
+$('site-add').onclick=()=>{if(gateInfo(P).blocked){setTab('vars');return;} SITES.push(Object.assign({name:'Lokasyon '+(SITES.length+1)},pick(Object.assign({},P,{demandMode:'sess'}),SITE_KEYS))); selectSite(SITES.length-1);};
 $('site-del').onclick=()=>{if(ACTIVE<0) return; SITES.splice(ACTIVE,1); ACTIVE=SITES.length?0:-1; if(ACTIVE>=0) Object.assign(P,pick(SITES[0],SITE_KEYS)); saveSites(); refresh();};
 document.querySelectorAll('#opt-cpo button').forEach(b=>b.onclick=()=>{P.cpoCostMode=b.dataset.v; refresh();});
 document.querySelectorAll('#opt-tier button').forEach(b=>b.onclick=()=>{P.tierScope=b.dataset.v; refresh();});
@@ -693,7 +727,7 @@ function setTab(t){
 document.querySelectorAll('[data-rtab]').forEach(b=>b.onclick=()=>{setTab(b.dataset.rtab); window.scrollTo(0,0);});
 let rt0='ozet'; try{rt0=new URLSearchParams(location.search).get('tab')||localStorage.getItem(RT_KEY)||'ozet';}catch(e){}
 setTab(rt0);
-buildInputs(); buildMixer(); refresh();
+buildInputs(); buildMixer(); try{$('preset').value=P.preset||'';}catch(e){} refresh();
 
 </script>
 </body></html>

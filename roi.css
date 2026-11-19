@@ -382,3 +382,13 @@ textarea{min-height:300px;font:500 12px/1.5 var(--font);background:var(--soft);b
 .mx-note{font-size:10.5px;color:var(--muted);margin-top:10px}
 .mx-knobs{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));padding:16px 10px;align-content:start}
 @media (max-width:1100px){.parties{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}body[data-rt="metin"] .results{grid-template-columns:minmax(0,1fr)}}
+/* Kapı: zorunlu varsayımlar eksikken sonuçlar gizlenir */
+body.gated .results,body.gated .mixer-wrap{display:none!important}
+body.gated[data-rt="vars"] .gate{margin-bottom:16px}
+.gate h2{border-bottom:1px solid var(--hair)}
+.gate p{margin:0 0 8px;font-size:12px}
+.gate ul{margin:0 0 12px;padding-left:18px;font-size:12px;columns:3 200px}
+#sample-pill{align-self:center;background:var(--risk)}
+.f.req label::after{content:" *";color:var(--no)}
+.f.miss input.num-in{border-color:var(--no);background:var(--no-soft)}
+body[data-rt="vars"] #gate-go{display:none}
