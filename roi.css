@@ -285,3 +285,9 @@ details.grp>summary::after{content:none}
 [hidden]{display:none!important}
 #groups{display:contents}
 details.grp[open]>summary::after{content:none}
+/* Varsayımlar: kaydırma çubuğu yok (yalnız sayı kutusu); kutular sütunlara dizilir, boş alan kalmaz */
+.f input[type=range]{display:none}
+.inputs{display:block;columns:330px;column-gap:16px}
+.inputs>.presets,.inputs details.grp{break-inside:avoid;margin:0 0 16px;display:block}
+.inputs>.presets{display:flex}
+.f .row{min-height:30px}
