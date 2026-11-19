@@ -558,15 +558,6 @@ input[data-locked]{background:var(--soft);color:var(--ink2);border-style:dashed;
 .edit-actions{display:flex;gap:8px;align-items:stretch}
 .edit-actions button{display:inline-flex;align-items:center;gap:6px;padding:0 20px;font-size:13px}
 .eb-note-line{margin:0 0 12px;font-size:11.5px;font-weight:600;color:var(--risk);text-align:right}
-/* Menü açıkken içerik alanı daralır: proje çubuğu (sekmeler + kutular) tek satırda kalsın diye orta genişlikte sıkılaştırılır */
-@media (min-width:1101px) and (max-width:2150px){
-  .site-bar{gap:10px 12px}
-  .sitetabs{gap:6px}.sitetabs button{padding:0 11px;font-size:12px}
-  .sitetabs .notes-tab{padding:0 9px;font-size:10.5px}
-  .site-head,.verdict{gap:7px}
-  .vcell{padding:7px 10px;min-width:0}.vcell strong{font-size:18.5px}
-  .edit-actions{gap:6px}.edit-actions button{padding:0 13px;font-size:12px}
-}
 /* Proje bölümleri: tıklanabilir olduğu belli olsun diye kutu düğmeler */
 .sitetabs{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:0;overflow:visible}
 .sitetabs button{display:inline-flex;align-items:center;padding:0 18px;border:1px solid var(--hair-strong);border-radius:var(--radius);background:var(--card);color:var(--ink2);font-weight:600}
@@ -1089,6 +1080,24 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 #ntDlg label{display:block;margin-top:8px}
 #ntDlg textarea{width:100%;box-sizing:border-box}
 html.ro .nt-task{display:none}
+/* Menü açıkken içerik alanı daralır: proje çubuğu (sekmeler + kutular) tek satırda kalsın diye orta genişlikte sıkılaştırılır */
+@media (min-width:1101px) and (max-width:2150px){
+  .site-bar{gap:10px 12px}
+  .sitetabs{gap:6px}.sitetabs button{padding:0 11px;font-size:12px}
+  .sitetabs .notes-tab{padding:0 9px;font-size:10.5px}
+  .site-head,.verdict{gap:7px}
+  .vcell{padding:7px 10px;min-width:0}.vcell strong{font-size:18.5px}
+  .edit-actions{gap:6px}.edit-actions button{padding:0 13px;font-size:12px}
+}
+/* 1366 piksellik ekranda (%75 yakınlaştırma ≈ 1821 px) menü açıkken de tek satır kalsın */
+@media (min-width:1101px) and (max-width:1900px){
+  .site-bar{gap:8px 10px}
+  .sitetabs{gap:5px}.sitetabs button{padding:0 8px}
+  .sitetabs .notes-tab{padding:0 7px}
+  .site-head,.verdict{gap:5px}
+  .vcell{padding:7px 8px}
+  .edit-actions{gap:5px}.edit-actions button{padding:0 10px}
+}
 .roi-frame{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0;background:var(--paper)}
 .dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:6px 18px;font-size:13px;font-weight:700;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 .dy-back:hover{background:var(--side-d);color:#fff}
