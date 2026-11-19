@@ -12,3 +12,6 @@ node_modules
 
 # Lead verisi (kişisel/iş verisi) repoya girmesin
 leads_out/
+
+# Müşteri belgeleri (gizli): depoya girmez
+*.pdf
