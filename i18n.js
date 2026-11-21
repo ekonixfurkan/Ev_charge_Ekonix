@@ -326,6 +326,9 @@
     'Henüz kayıtlı saha kartı yok. Sağ üstteki "Saha Kartı" düğmesiyle kartı açıp "Dosyalara Kaydet"e basın.': 'No saved site cards yet. Open the card with the "Site Card" button at the top right and press "Save to Files".',
     'Bu kayıtlı saha kartı silinsin mi? Bu işlem geri alınamaz.': 'Delete this saved site card? This cannot be undone.',
     'Kayıtlı saha kartı silindi.': 'Saved site card deleted.',
+    'Saha kartından çıkar': 'Remove from site card',
+    'Saha kartına ekle (son sayfada gösterilir, en fazla 4)': 'Add to site card (shown on the last page, up to 4)',
+    'Saha kartına ekle': 'Add to site card',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
@@ -513,6 +516,7 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^(.*) · (\d+)\/(\d+) saha kartında$/, function (m) { return sub(m[1]) + ' · ' + m[2] + '/' + m[3] + ' on site card'; }],
     [/^(\d+) kart$/, function (m) { return m[1] + (m[1] === '1' ? ' card' : ' cards'); }],
     [/^([\d.,]+) proje · ([\d.,]+) aktif$/, function (m) { return m[1] + ' projects · ' + m[2] + ' active'; }],
     [/^([\d.,]+) açık görev(?: · ([\d.,]+) gecikmiş)?$/, function (m) { return m[1] + ' open tasks' + (m[2] ? ' · ' + m[2] + ' overdue' : ''); }],
