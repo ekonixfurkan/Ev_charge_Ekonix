@@ -1,21 +1,24 @@
-/* EKONIX · Türkçe / English dil desteği.
+/* EKONIX · Türkçe / English / 中文 dil desteği.
    Kaynak dil Türkçe. İngilizce seçilince ekrandaki Türkçe metinler bu sözlükten çevrilir
    (metin düğümleri + placeholder/title/aria-label). Sözlükte olmayan metin Türkçe kalır.
-   Dil tercihi tarayıcıda saklanır (localStorage "lang"); değiştirince sayfa yenilenir. */
+   Dil tercihi tarayıcıda saklanır (localStorage "lang"); değiştirince sayfa yenilenir.
+   Çince (zh) sözlüğü ayrı dosyadadır (i18n.zh.js) ve yalnızca Çince seçiliyken yüklenir; Çincesi olmayan metin İngilizce gösterilir. */
 (function () {
   'use strict';
   var LANG = 'tr';
-  try { var saved = localStorage.getItem('lang'); if (saved === 'en' || saved === 'tr') LANG = saved; } catch (e) {}
+  try { var saved = localStorage.getItem('lang'); if (saved === 'en' || saved === 'tr' || saved === 'zh') LANG = saved; } catch (e) {}
 
-  var I18N = { lang: LANG, loc: LANG === 'en' ? 'en-US' : 'tr-TR' };
+  var I18N = { lang: LANG, loc: LANG === 'en' ? 'en-US' : LANG === 'zh' ? 'zh-CN' : 'tr-TR' };
   window.I18N = I18N;
   window.LOC = I18N.loc;
   I18N.set = function (l) {
     try { localStorage.setItem('lang', l); } catch (e) {}
     location.reload();
   };
-  document.documentElement.lang = LANG;
-  if (LANG !== 'en') { I18N.t = function (s) { return s; }; return; }
+  document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : LANG;
+  if (LANG === 'tr') { I18N.t = function (s) { return s; }; return; }
+  // Çince sözlük bu betikten hemen sonra, sayfa gövdesi işlenmeden yüklenir.
+  if (LANG === 'zh') { try { document.write('<script src="/i18n.zh.js"><\/script>'); } catch (e) {} }
 
   /* ---------- Sözlük (tam eşleşme) ---------- */
   var D = {
@@ -503,7 +506,17 @@
   Object.keys(V).forEach(function (k) { if (!D[k]) D[k] = V[k]; });
 
   /* ---------- Çeviri ---------- */
+  // Çince: sözlük yüklendiğinde İngilizce sözlüğün üstüne yazılır, Çince kurallar öne alınır (eksik kalan metin İngilizce çıkar).
+  var zhPending = LANG === 'zh';
+  function zhMerge() {
+    var Z = window.I18N_ZH;
+    if (!Z) return;
+    zhPending = false;
+    Object.keys(Z.D || {}).forEach(function (k) { D[k] = Z.D[k]; });
+    try { if (Z.rules) P = Z.rules(sub).concat(P); } catch (e) { (window.__i18nErr = window.__i18nErr || []).push('zh rules: ' + String(e && e.message)); }
+  }
   tr = function (s) {
+    if (zhPending) zhMerge();
     if (s == null) return s;
     var key = String(s);
     if (Object.prototype.hasOwnProperty.call(D, key)) return D[key];
