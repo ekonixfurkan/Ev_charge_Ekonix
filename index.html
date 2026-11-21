@@ -2914,23 +2914,25 @@ const SK_ROLES=[['Ekonix','Saha geliştirme, yer sağlayıcı ilişkisi ve proje
 const SK_STEPS=[['Teknik ve ticari ön değerlendirme','Co-CPO / EPC'],['Ticari model ve görev paylaşımının netleştirilmesi','Tüm taraflar'],['Niyet mektubu (LOI)','Ekonix, StarCharge, Co-CPO / EPC'],['Dağıtım şirketi başvurusu, proje onayı ve kurulum','Ekonix, StarCharge, Co-CPO / EPC'],['OCPP entegrasyon testleri, EPDK kaydı ve devreye alma','Co-CPO / EPC, StarCharge']];
 const SK_NOTE='İlk adım: ön değerlendirme sonrası ilgi beyanı ve teknik ekiplerin tanışma toplantısı.';
 const sk={id:'',d:null,dirty:false,files:[],pick:false};
+// Kart metinleri arayüz diline göre çıkar (belge translate="no"; çeviri kaynakta yapılır, elle yazılan metne dokunulmaz).
+const skT=k=>I18N.t(k),skTf=(k,...a)=>I18N.t(k).replace(/\{(\d)\}/g,(m,i)=>a[+i]??'');
 function skAuto(s){
   const t=totals(s),v=s.survey||{},g=parseGps(v.gps)||(s.lat!==''&&s.lng!==''&&s.lat!=null&&s.lng!=null?[s.lat,s.lng]:null),n=x=>nf.format(+x||0);
   const dcU=s.units.filter(u=>u.kind==='DC'),parts=[];
-  if(t.dcUnits)parts.push(`${n(t.dcUnits)} adet DC ünite`+(dcU.length?` (${dcU.map(u=>`${n(u.qty)} × ${n(u.kw)} kW`).join(', ')})`:''));
-  if(t.acUnits)parts.push(`${n(t.acUnits)} adet AC ünite`);
-  const park=[v.parkDed?`${n(v.parkDed)} ayrılmış park yeri`:'',v.parkTotal?`toplam ${n(v.parkTotal)} park yeri`:''].filter(Boolean).join(' · ');
-  const en=[+s.gridKva>0?`Trafo gücü ${n(s.gridKva)} kVA`:'',+v.availKw>0?`kullanılabilir güç ${n(v.availKw)} kW/kVA`:'',v.connType?`bağlantı şekli ${v.connType}`:'',v.voltage?`gerilim ${v.voltage} V`:'',v.connPoint?`bağlantı noktası: ${v.connPoint}`:''].filter(Boolean).join(' · ');
+  if(t.dcUnits)parts.push(skTf('{0} adet DC ünite',n(t.dcUnits))+(dcU.length?` (${dcU.map(u=>`${n(u.qty)} × ${n(u.kw)} kW`).join(', ')})`:''));
+  if(t.acUnits)parts.push(skTf('{0} adet AC ünite',n(t.acUnits)));
+  const park=[v.parkDed?skTf('{0} ayrılmış park yeri',n(v.parkDed)):'',v.parkTotal?skTf('toplam {0} park yeri',n(v.parkTotal)):''].filter(Boolean).join(' · ');
+  const en=[+s.gridKva>0?skTf('Trafo gücü {0} kVA',n(s.gridKva)):'',+v.availKw>0?skTf('kullanılabilir güç {0} kW/kVA',n(v.availKw)):'',v.connType?skTf('bağlantı şekli {0}',v.connType):'',v.voltage?skTf('gerilim {0} V',v.voltage):'',v.connPoint?skTf('bağlantı noktası: {0}',v.connPoint):''].filter(Boolean).join(' · ');
   return {
-    guc:parts.length?parts.join(' + ')+`; toplam nominal şarj çıkışı ${n(t.kw)} kW`:'',
-    soket:[t.dcSock?`${n(t.dcSock)} DC`:'',t.acSock?`${n(t.acSock)} AC`:''].filter(Boolean).join(' + ')+(t.sockets?' soket':'')+(park?(t.sockets?' · ':'')+park:''),
+    guc:parts.length?parts.join(' + ')+skTf('; toplam nominal şarj çıkışı {0} kW',n(t.kw)):'',
+    soket:(t.sockets?skTf('{0} soket',[t.dcSock?`${n(t.dcSock)} DC`:'',t.acSock?`${n(t.acSock)} AC`:''].filter(Boolean).join(' + ')):'')+(park?(t.sockets?' · ':'')+park:''),
     adres:[s.address,[s.district,s.city].filter(Boolean).join(' / ')].filter(Boolean).join(', '),
-    mekan:(s.type==='Other'||typeLabel(s.type)==='—')?'':typeLabel(s.type),
+    mekan:(s.type==='Other'||typeLabel(s.type)==='—')?'':skT(typeLabel(s.type)),
     enerji:en,
     uzaklik:+v.cableM>0?`${n(v.cableM)} m`:'',
     abonelik:'',altyapi:'',yatirimci:'',yogunluk:'',gelir:'',
-    sure:(s.contractBase!==''&&s.contractBase!=null)?`${s.contractBase}${s.contractExt!==''&&s.contractExt!=null&&+s.contractExt>0?' + '+s.contractExt:''} yıl`:'',
-    konum:g?`Enlem: ${g[0]}, Boylam: ${g[1]}`:''
+    sure:(s.contractBase!==''&&s.contractBase!=null)?skTf('{0} yıl',`${s.contractBase}${s.contractExt!==''&&s.contractExt!=null&&+s.contractExt>0?' + '+s.contractExt:''}`):'',
+    konum:g?skTf('Enlem: {0}, Boylam: {1}',g[0],g[1]):''
   };
 }
 const skBlank=()=>({rows:{},roles:null,steps:null,note:null,photos:[],caption:'',date:'',cust:''});
@@ -2954,15 +2956,15 @@ function skPaint(){
   const s=db.sites.find(x=>x.id===sk.id);if(!s)return;
   const a=skAuto(s),d=sk.d,t=totals(s),ro=isRO(),ce=ro?'':'contenteditable="plaintext-only" spellcheck="false"';
   const rows=SK_ROWS.map(([k,l],i)=>{const ov=d.rows[k],val=ov!=null?ov:a[k],auto=ov==null&&!!a[k];
-    return `<tr><td class="sk-no">${i+1}</td><td class="sk-k">${esc(l)}</td><td class="sk-v${auto?'':' own'}" ${ce} data-skrow="${k}" data-ph="${SK_SECRET.includes(k)?'Boş bırakılır (gizli). Gerekirse elle yazın.':'Yazmak için tıklayın'}">${esc(val)}</td></tr>`;}).join('');
-  const roles=d.roles||SK_ROLES,steps=d.steps||SK_STEPS,note=d.note!=null?d.note:SK_NOTE;
+    return `<tr><td class="sk-no">${i+1}</td><td class="sk-k">${esc(skT(l))}</td><td class="sk-v${auto?'':' own'}" ${ce} data-skrow="${k}" data-ph="${esc(skT(SK_SECRET.includes(k)?'Boş bırakılır (gizli). Gerekirse elle yazın.':'Yazmak için tıklayın'))}">${esc(val)}</td></tr>`;}).join('');
+  const roles=d.roles||SK_ROLES.map(x=>x.map(skT)),steps=d.steps||SK_STEPS.map(x=>x.map(skT)),note=d.note!=null?d.note:skT(SK_NOTE);
   const date=d.date||fmtDay(s.survey&&s.survey.date)||fmtDay(todayStr());
   const cust=d.cust||(s.name+(t.dcKw?` – ${nf.format(t.dcKw)} kW DC`:''));
   const pics=d.photos.map(id=>sk.files.find(f=>f.id===id)).filter(Boolean);
   const del=ro?'':'<td class="sk-x no-print"><button type="button" class="ghost" data-skdel title="Satırı sil">×</button></td>';
-  const head=`<div class="sk-top"><span>Saha Keşif Raporu · ${esc(s.name)}</span><img src="/ekonix-logo.jpeg" alt="Ekonix"></div>`;
+  const head=`<div class="sk-top"><span>${esc(skT('Saha Keşif Raporu'))} · ${esc(s.name)}</span><img src="/ekonix-logo.jpeg" alt="Ekonix"></div>`;
   const pages=pics.length?3:2;
-  const foot=n=>`<div class="sk-foot"><span>Gizli · Görüşme ve değerlendirme amaçlıdır · Hazırlayan: Ekonix İş Geliştirme</span><b>${n} / ${pages}</b></div>`;
+  const foot=n=>`<div class="sk-foot"><span>${esc(skT('Gizli · Görüşme ve değerlendirme amaçlıdır · Hazırlayan: Ekonix İş Geliştirme'))}</span><b>${n} / ${pages}</b></div>`;
   $('skView').innerHTML=`<div class="sk-bar no-print">
       <strong>Saha Bilgi Kartı</strong><span class="sk-hint">${ro?'Salt okunur: kart görüntülenir ve yazdırılır.':'Metinlere tıklayıp düzenleyebilirsiniz. Altyapı maliyeti ve gelir paylaşımı bilerek boş gelir.'}</span>
       <span class="sk-acts">${ro?'':`<button type="button" id="skPick">Fotoğraf Seç${d.photos.length?` (${d.photos.length})`:''}</button><button type="button" id="skReset" class="ghost">Otomatik Değerlere Dön</button><button type="button" id="skSave" class="save"${sk.dirty?'':' disabled'}>Kaydet</button>`}<button type="button" id="skPrint" class="primary">Yazdır / PDF Kaydet</button><button type="button" id="skClose">Kapat</button></span>
@@ -2970,27 +2972,27 @@ function skPaint(){
     ${sk.pick?`<div class="sk-picker no-print"><p class="note">${sk.files.length?'Son sayfada gösterilecek fotoğrafları seçin (en fazla 4). Aynı seçim Dosyalar sekmesindeki &quot;Saha Kartında Göster&quot; kutusuyla da yapılır.':'Bu projede JPG/PNG dosya yok. Önce Dosyalar sekmesine saha fotoğrafı yükleyin.'}</p><div class="sk-thumbs">${sk.files.map(f=>`<button type="button" class="sk-thumb${d.photos.includes(f.id)?' on':''}" data-skpic="${esc(f.id)}" title="${esc(f.name)}"><img src="/api/files?download=${esc(f.id)}&inline=1" alt="" loading="lazy"><span>${esc(f.name)}</span></button>`).join('')}</div></div>`:''}
     <div class="sk-doc" translate="no">
       <section class="sk-page">${head}
-        <p class="sk-eyebrow">Saha Bilgi Kartı · ${esc(s.name)}</p>
+        <p class="sk-eyebrow">${esc(skT('Saha Bilgi Kartı'))} · ${esc(s.name)}</p>
         <h1 class="sk-title">${esc(s.name)}</h1>
-        <table class="sk-meta"><tr><th>Müşteri</th><td ${ce} data-skf="cust">${esc(cust)}</td><th>Tarih</th><td ${ce} data-skf="date">${esc(date)}</td></tr></table>
-        <table class="sk-tbl"><thead><tr><th class="sk-no">No</th><th>Konu Başlığı</th><th>Açıklama</th></tr></thead><tbody>${rows}</tbody></table>
+        <table class="sk-meta"><tr><th>${esc(skT('Müşteri'))}</th><td ${ce} data-skf="cust">${esc(cust)}</td><th>${esc(skT('Tarih'))}</th><td ${ce} data-skf="date">${esc(date)}</td></tr></table>
+        <table class="sk-tbl"><thead><tr><th class="sk-no">No</th><th>${esc(skT('Konu Başlığı'))}</th><th>${esc(skT('Açıklama'))}</th></tr></thead><tbody>${rows}</tbody></table>
         ${foot(1)}</section>
       <section class="sk-page">${head}
-        <p class="sk-eyebrow">Proje Çerçevesi</p>
-        <h1 class="sk-title sm">Görev Paylaşımı ve Sonraki Adımlar</h1>
-        <h2 class="sk-h2">Görev Paylaşımı</h2>
-        <table class="sk-tbl" data-sktbl="roles"><thead><tr><th>Taraf</th><th>Önerilen Sorumluluk</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${roles.map(x=>`<tr><td class="sk-k" ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
+        <p class="sk-eyebrow">${esc(skT('Proje Çerçevesi'))}</p>
+        <h1 class="sk-title sm">${esc(skT('Görev Paylaşımı ve Sonraki Adımlar'))}</h1>
+        <h2 class="sk-h2">${esc(skT('Görev Paylaşımı'))}</h2>
+        <table class="sk-tbl" data-sktbl="roles"><thead><tr><th>${esc(skT('Taraf'))}</th><th>${esc(skT('Önerilen Sorumluluk'))}</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${roles.map(x=>`<tr><td class="sk-k" ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
         ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="roles">+ Satır Ekle</button></p>'}
-        <h2 class="sk-h2">Sonraki Adımlar</h2>
-        <table class="sk-tbl" data-sktbl="steps"><thead><tr><th class="sk-no">Adım</th><th>İş</th><th>Sorumlu</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${steps.map((x,i)=>`<tr><td class="sk-no">${i+1}</td><td ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
+        <h2 class="sk-h2">${esc(skT('Sonraki Adımlar'))}</h2>
+        <table class="sk-tbl" data-sktbl="steps"><thead><tr><th class="sk-no">${esc(skT('Adım'))}</th><th>${esc(skT('İş'))}</th><th>${esc(skT('Sorumlu'))}</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${steps.map((x,i)=>`<tr><td class="sk-no">${i+1}</td><td ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
         ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="steps">+ Satır Ekle</button></p>'}
-        <p class="sk-note" ${ce} data-skf="note" data-ph="Kapanış notu (isteğe bağlı)">${esc(note)}</p>
+        <p class="sk-note" ${ce} data-skf="note" data-ph="${esc(skT('Kapanış notu (isteğe bağlı)'))}">${esc(note)}</p>
         ${foot(2)}</section>
       ${pics.length?`<section class="sk-page">${head}
-        <p class="sk-eyebrow">Resimler</p>
-        <h1 class="sk-title sm">Saha Fotoğrafları</h1>
+        <p class="sk-eyebrow">${esc(skT('Resimler'))}</p>
+        <h1 class="sk-title sm">${esc(skT('Saha Fotoğrafları'))}</h1>
         <div class="sk-clover">${[0,1,2,3].map(i=>pics[i]?`<figure><img src="/api/files?download=${esc(pics[i].id)}&inline=1" alt="${esc(pics[i].name)}"></figure>`:'<figure class="empty"></figure>').join('')}</div>
-        <p class="sk-cap" ${ce} data-skf="caption" data-ph="Resim açıklaması (isteğe bağlı)">${esc(d.caption)}</p>
+        <p class="sk-cap" ${ce} data-skf="caption" data-ph="${esc(skT('Resim açıklaması (isteğe bağlı)'))}">${esc(d.caption)}</p>
         ${foot(3)}</section>`:''}
     </div>`;
 }
