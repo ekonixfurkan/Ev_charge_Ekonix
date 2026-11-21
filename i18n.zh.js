@@ -1096,10 +1096,25 @@ window.I18N_ZH = {
    "Sistemde yapılan işlemlerin kaydı.": "系统操作记录。",
    "Bu bölümde görebileceğiniz sayfa yok.": "此栏目下没有您可查看的页面。",
    "+ Satır Ekle": "+ 添加行",
-   "Satırı sil": "删除该行"
+   "Satırı sil": "删除该行",
+   "Dosyalara Kaydet": "保存到文件",
+   "Kartın şu anki hâlini tarihli bir sürüm olarak projenin Dosyalar sekmesine ekler": "将卡片当前状态作为带日期的版本添加到项目的“文件”页",
+   "Saha kartı Dosyalar sekmesine kaydedildi.": "站点卡片已保存到“文件”页。",
+   "Fotoğraflar yükleniyor; birazdan tekrar deneyin.": "照片加载中，请稍后重试。",
+   "Kayıtlı sürüm": "已保存版本",
+   "Saha Kartları": "站点卡片",
+   "Kart": "卡片",
+   "Dil": "语言",
+   "Oluşturan": "创建人",
+   "Aç": "打开",
+   "Kartı sil": "删除卡片",
+   "Henüz kayıtlı saha kartı yok. Sağ üstteki \"Saha Kartı\" düğmesiyle kartı açıp \"Dosyalara Kaydet\"e basın.": "尚无已保存的站点卡片。请点击右上角“站点卡片”按钮打开卡片，再点“保存到文件”。",
+   "Bu kayıtlı saha kartı silinsin mi? Bu işlem geri alınamaz.": "删除此已保存的站点卡片？此操作无法撤销。",
+   "Kayıtlı saha kartı silindi.": "已删除已保存的站点卡片。"
   },
   rules: function (sub) {
     var PZ = [
+      [/^(\d+) kart$/, function (m) { return m[1] + ' 张卡片'; }],
       [/^([\d.,]+) proje · ([\d.,]+) aktif$/, function (m) { return m[1] + ' 个项目 · ' + m[2] + ' 个进行中'; }],
       [/^([\d.,]+) açık görev(?: · ([\d.,]+) gecikmiş)?$/, function (m) { return m[1] + ' 项未完成任务' + (m[2] ? ' · ' + m[2] + ' 项逾期' : ''); }],
       [/^([\d.,]+) gecikmiş görev$/, function (m) { return m[1] + ' 项逾期任务'; }],

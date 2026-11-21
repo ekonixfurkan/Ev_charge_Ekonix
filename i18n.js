@@ -313,6 +313,19 @@
     'Sistemde yapılan işlemlerin kaydı.': 'Log of actions taken in the system.',
     'Bu bölümde görebileceğiniz sayfa yok.': 'There are no pages you can see in this section.',
     '+ Satır Ekle': '+ Add Row', 'Satırı sil': 'Delete row',
+    'Dosyalara Kaydet': 'Save to Files',
+    'Kartın şu anki hâlini tarihli bir sürüm olarak projenin Dosyalar sekmesine ekler': 'Adds the current state of the card to the project\'s Files tab as a dated version',
+    'Saha kartı Dosyalar sekmesine kaydedildi.': 'Site card saved to the Files tab.',
+    'Fotoğraflar yükleniyor; birazdan tekrar deneyin.': 'Photos are loading; try again in a moment.',
+    'Kayıtlı sürüm': 'Saved version',
+    'Saha Kartları': 'Site Cards',
+    'Kart': 'Card',
+    'Dil': 'Language',
+    'Oluşturan': 'Created By',
+    'Kartı sil': 'Delete card',
+    'Henüz kayıtlı saha kartı yok. Sağ üstteki "Saha Kartı" düğmesiyle kartı açıp "Dosyalara Kaydet"e basın.': 'No saved site cards yet. Open the card with the "Site Card" button at the top right and press "Save to Files".',
+    'Bu kayıtlı saha kartı silinsin mi? Bu işlem geri alınamaz.': 'Delete this saved site card? This cannot be undone.',
+    'Kayıtlı saha kartı silindi.': 'Saved site card deleted.',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
@@ -500,6 +513,7 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^(\d+) kart$/, function (m) { return m[1] + (m[1] === '1' ? ' card' : ' cards'); }],
     [/^([\d.,]+) proje · ([\d.,]+) aktif$/, function (m) { return m[1] + ' projects · ' + m[2] + ' active'; }],
     [/^([\d.,]+) açık görev(?: · ([\d.,]+) gecikmiş)?$/, function (m) { return m[1] + ' open tasks' + (m[2] ? ' · ' + m[2] + ' overdue' : ''); }],
     [/^([\d.,]+) gecikmiş görev$/, function (m) { return m[1] + ' overdue tasks'; }],
