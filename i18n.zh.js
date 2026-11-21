@@ -1082,10 +1082,25 @@ window.I18N_ZH = {
    "Kapanış notu (isteğe bağlı)": "结语（可选）",
    "Resim açıklaması (isteğe bağlı)": "照片说明（可选）",
    "Boş bırakılır (gizli). Gerekirse elle yazın.": "留空（保密）。如有需要请手动填写。",
-   "Yazmak için tıklayın": "点击填写"
+   "Yazmak için tıklayın": "点击填写",
+   "Yeni bir saha projesi kaydı açın.": "新建一个站点项目记录。",
+   "Tüm projeler: aşama, durum, güç ve skor.": "全部项目：阶段、状态、功率与评分。",
+   "Projelere bağlı görevler, sorumlular ve terminler.": "与项目关联的任务、负责人与期限。",
+   "Bugün konuşulacaklar: gecikmiş görevler, yeni notlar, güncellenmeyen projeler.": "今日议题：逾期任务、新备注、长期未更新的项目。",
+   "Yapılan toplantıların kayıtları.": "已召开会议的记录。",
+   "Aranacak firma listesi ve arama notları.": "待联系企业名单与通话备注。",
+   "Şirketler ve iletişim kişileri.": "公司与联系人。",
+   "Çevredeki şarj istasyonları ve anlık doluluk.": "周边充电站与实时占用情况。",
+   "Gelir paylaşımı ve geri dönüş senaryoları.": "收益分成与回本情景测算。",
+   "Hesaplar, roller ve şifreler.": "账户、角色与密码。",
+   "Sistemde yapılan işlemlerin kaydı.": "系统操作记录。",
+   "Bu bölümde görebileceğiniz sayfa yok.": "此栏目下没有您可查看的页面。"
   },
   rules: function (sub) {
     var PZ = [
+      [/^([\d.,]+) proje · ([\d.,]+) aktif$/, function (m) { return m[1] + ' 个项目 · ' + m[2] + ' 个进行中'; }],
+      [/^([\d.,]+) açık görev(?: · ([\d.,]+) gecikmiş)?$/, function (m) { return m[1] + ' 项未完成任务' + (m[2] ? ' · ' + m[2] + ' 项逾期' : ''); }],
+      [/^([\d.,]+) gecikmiş görev$/, function (m) { return m[1] + ' 项逾期任务'; }],
       [/^Fotoğraf Seç \((\d+)\)$/, function (m) { return '选择照片（' + m[1] + '）'; }],
       [/^İç Verim \((\d+) Yıl\)$/, function (m) { return '内部收益率（' + m[1] + ' 年）'; }],
       [/^Elektrik sonrası (.+)$/, function (m) { return '扣除电费后 ' + m[1]; }],

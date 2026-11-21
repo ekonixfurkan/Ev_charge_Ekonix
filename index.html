@@ -1166,6 +1166,17 @@ body.sk-open{overflow:hidden}
   body.sk-open .sk-page [contenteditable]:empty::before{content:""}
   body.sk-open .sk-clover figure.empty{border:0!important}
 }
+.hub-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,290px));gap:18px;align-items:stretch}
+.hub-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:190px;padding:24px 22px;text-align:left;background:var(--card);border:1px solid var(--hair-strong);border-radius:var(--radius);color:var(--ink);font-weight:400;cursor:pointer;transition:border-color .12s,background .12s,transform .12s}
+.hub-card::before{content:"";position:absolute;top:-1px;left:-1px;width:12px;height:12px;border-top:2px solid var(--teal);border-left:2px solid var(--teal);border-top-left-radius:var(--radius);pointer-events:none}
+.hub-card:hover{border-color:var(--navy);background:var(--navy-soft);transform:translateY(-1px)}
+.hub-card:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.hub-card .hc-ic{display:grid;place-items:center;width:56px;height:56px;margin-bottom:6px;border-radius:50%;background:var(--navy-soft);color:var(--navy)}
+.hub-card:hover .hc-ic{background:var(--navy);color:#fff}
+.hub-card .hc-ic svg{width:26px;height:26px}
+.hub-card b{font-size:16px;font-weight:700;line-height:1.25}
+.hub-card small{font-size:12px;color:var(--muted);line-height:1.45}
+.hub-card em{margin-top:auto;font-style:normal;font-size:12px;font-weight:700;color:var(--teal);min-height:1.2em}
 .roi-frame{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0;background:var(--paper)}
 .dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:6px 18px;font-size:13px;font-weight:700;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 .dy-back:hover{background:var(--side-d);color:#fff}
@@ -1195,25 +1206,8 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
   <aside>
     <div class="brand"><span class="logobox"><span class="logoimg"><img src="/ekonix-logo.jpeg" alt="Ekonix Logo" width="289" height="93"></span></span><button type="button" id="sbToggle" class="sb-toggle" aria-label="Menüyü daralt" aria-expanded="true"><svg class="tg-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg><svg class="tg-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg><span class="tg-m">Menü</span></button></div>
     <nav class="nav" aria-label="Ana gezinme">
-            <section class="nav-group" data-group="main">
-        <button type="button" class="nav-head" aria-expanded="true">Ana menü</button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="notifs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button></div>
-      </section>
-      <section class="nav-group" data-group="tracker" id="trackerGroup">
-        <button type="button" class="nav-head" aria-expanded="true">Projeler</button>
-        <div class="nav-body"><button type="button" class="nav-item" id="addSite" data-nav="add"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>Yeni Proje Ekle</span></button><button type="button" class="nav-item" data-nav="list"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Proje Listesi</span></button><button type="button" class="nav-item" data-nav="planner"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><span>Proje Görev Listesi</span></button></div>
-      </section>
-      <section class="nav-group" data-group="meet">
-        <button type="button" class="nav-head" aria-expanded="true">Toplantılar</button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="daily"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg><span>Daily Toplantı Notları</span></button><button type="button" class="nav-item" data-nav="meetings"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg><span>Toplantı Notları</span></button></div>
-      </section>
-      <section class="nav-group" data-group="market">
-        <button type="button" class="nav-head" aria-expanded="true">Satış ve Pazar</button>
-        <div class="nav-body"><button type="button" class="nav-item" data-nav="leads"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span>Lead Havuzu</span></button><button type="button" class="nav-item" data-nav="contacts"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 2v2"/><path d="M8 2v2"/><rect width="16" height="20" x="4" y="2" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7.5 18a5 5 0 0 1 9 0"/></svg><span>Müşteri Bilgileri</span></button><button type="button" class="nav-item" data-nav="rakip"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg><span>Rakip Analizi</span></button><button type="button" class="nav-item" data-nav="roi"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01M16 14v4"/></svg><span>ROI Hesaplayıcı</span></button></div>
-      </section>
-      <section class="nav-group" data-group="admin" id="adminGroup">
-        <button type="button" class="nav-head" aria-expanded="true">Yönetim</button>
-        <div class="nav-body"><button type="button" class="nav-item" id="usersNav" data-nav="users" hidden><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Kullanıcı Yönetimi</span></button><button type="button" class="nav-item" id="actNav" data-nav="activity" hidden><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>İşlem Geçmişi</span></button></div>
+                  <section class="nav-group" data-group="main">
+        <div class="nav-body"><button type="button" class="nav-item" data-nav="ovw"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></button><button type="button" class="nav-item" id="bellBtn" data-nav="notifs"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Bildirimler</span><i class="cnt" id="bellCount" hidden></i></button><button type="button" class="nav-item" data-nav="hub:proj"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg><span>Projeler</span></button><button type="button" class="nav-item" data-nav="hub:meet"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg><span>Toplantılar</span></button><button type="button" class="nav-item" data-nav="hub:market"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span>Satış ve Pazar</span></button><button type="button" class="nav-item" data-nav="hub:admin" id="adminHubNav" hidden><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Yönetim</span></button></div>
       </section>
     </nav>
     <div class="sb-user"><div class="lang-sw" translate="no" role="group" aria-label="Dil / Language"><button type="button" data-lang="tr" aria-pressed="true" title="Türkçe"><svg class="flag" viewBox="0 0 30 20" width="18" height="12" aria-hidden="true"><rect width="30" height="20" fill="#e30a17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#e30a17"/><polygon points="19.30,10.00 17.49,10.65 17.43,12.57 16.26,11.05 14.42,11.59 15.50,10.00 14.42,8.41 16.26,8.95 17.43,7.43 17.49,9.35" fill="#fff"/></svg><span>TR</span></button><button type="button" data-lang="en" aria-pressed="false" title="English"><svg class="flag" viewBox="0 0 60 30" width="18" height="12" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" stroke="#c8102e" stroke-width="2.5"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#c8102e" stroke-width="6"/></svg><span>EN</span></button><button type="button" data-lang="zh" aria-pressed="false" title="中文"><svg class="flag" viewBox="0 0 30 20" width="18" height="12" aria-hidden="true"><rect width="30" height="20" fill="#de2910"/><g fill="#ffde00"><polygon points="5.00,2.00 5.67,4.07 7.85,4.07 6.09,5.35 6.76,7.43 5.00,6.15 3.24,7.43 3.91,5.35 2.15,4.07 4.33,4.07"/><polygon points="10.50,1.13 10.35,1.84 10.98,2.21 10.26,2.28 10.10,2.99 9.81,2.33 9.09,2.41 9.63,1.92 9.33,1.26 9.96,1.62"/><polygon points="12.77,3.36 12.38,3.97 12.85,4.53 12.14,4.35 11.76,4.97 11.71,4.25 11.00,4.07 11.68,3.80 11.63,3.07 12.09,3.63"/><polygon points="12.00,6.00 12.22,6.69 12.95,6.69 12.36,7.12 12.59,7.81 12.00,7.38 11.41,7.81 11.64,7.12 11.05,6.69 11.78,6.69"/><polygon points="10.50,8.13 10.35,8.84 10.98,9.21 10.26,9.28 10.10,9.99 9.81,9.33 9.09,9.41 9.63,8.92 9.33,8.26 9.96,8.62"/></g></svg><span>中文</span></button></div><div id="saveStatus" role="status">Yükleniyor…</div><span class="whoami" id="whoami" hidden></span><button type="button" class="install" id="installBtn" data-tip="Uygulamayı Yükle" aria-label="Uygulamayı Yükle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><span>Uygulamayı Yükle</span></button><button type="button" class="logout" id="logoutBtn" data-tip="Çıkış Yap" aria-label="Çıkış Yap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg><span>Çıkış Yap</span></button></div>
@@ -1536,6 +1530,7 @@ const ROUTE_NAMES={locations:'list',users:'users',activity:'activity',contacts:'
 function routeHash(){
   if(view==='portfolio')return '#/'+sub;
   if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
+  if(view==='hub')return '#/hub/'+hubKey;
   return '#/'+(ROUTE_NAMES[view]||'ovw');
 }
 function saveRoute(){
@@ -1571,6 +1566,7 @@ function restoreRoute(){
   const parts=location.hash.replace(/^#\/?/,'').split('/').map(x=>{try{return decodeURIComponent(x);}catch(e){return x;}});
   const [a,b,c]=parts;if(!a)return;
   if(a==='ovw'||a==='port'){view='portfolio';sub='ovw';return;}
+  if(a==='hub'){if(HUBS[b]){view='hub';hubKey=b;}return;}
   const name=Object.keys(ROUTE_NAMES).find(k=>ROUTE_NAMES[k]===a);
   if(name){view=name;return;}
   if(a==='site'&&b&&db.sites.some(x=>x.id===b)){view='site';activeId=b;sub=SITE_SUBS.includes(c)?c:'info';}
@@ -1604,7 +1600,7 @@ async function poll(){
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
   if(!pending.size)status('Sunucuda kayıtlı · '+clock());
-  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads'&&view!=='daily'&&view!=='roi')render();
+  if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads'&&view!=='daily'&&view!=='roi'&&view!=='hub')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
 async function flush(){
@@ -1740,7 +1736,7 @@ const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Liste
 // Üst başlık: proje sayfasında proje adı (altında kod ve il/ilçe), diğer sayfalarda seçilen menü başlığı.
 function setPageTitle(){
   const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
-  const pt=x?(x.name||'Adsız Proje'):(PAGE_TITLES[view==='portfolio'?sub:view]||'Saha Değerlendirme');
+  const pt=x?(x.name||'Adsız Proje'):view==='hub'?HUBS[hubKey].t:(PAGE_TITLES[view==='portfolio'?sub:view]||'Saha Değerlendirme');
   $('pageTitle').textContent=pt;
   $('pageSub').textContent=sub2;$('pageSub').hidden=!sub2;
   document.title=pt+' · Saha Değerlendirme';
@@ -1883,8 +1879,7 @@ function lockRO(){
 new MutationObserver(lockRO).observe(document.documentElement,{childList:true,subtree:true});
 function applyRestricted(){
   // Kayıtlar kutusuna giren üç sayfa (Müşteri Bilgileri, Toplantı Notları, Lead Havuzu) menüden kalkar; boşalan başlık da kaldırılır.
-  document.querySelectorAll('aside .nav-item').forEach(b=>{if(REC_NAV.includes(b.dataset.nav))b.remove();});
-  document.querySelectorAll('aside .nav-group').forEach(g=>{if(!g.querySelector('.nav-item'))g.remove();});
+  // Menüde yalnız ana başlıklar var; Kayıtlar sayfalarının kutucukları hub'da hubCan() ile gizlenir.
   if(REC_VIEWS.includes(view)){view='portfolio';sub='ovw';render();}
 }
 function render(){
@@ -1892,15 +1887,15 @@ function render(){
   {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi')?'':sub;
+  $('view').dataset.sub=(view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='hub')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();else if(view==='roi')renderRoi();
+  document.querySelector('.pipeline').hidden=view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='hub'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();else if(view==='roi')renderRoi();else if(view==='hub')renderHub();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   dockBar();setPageTitle();
-  {const b=$('dyBack');if(b)b.hidden=!(dyBack&&view!=='daily');}
+  {const b=$('dyBack');if(b){const t=backTarget();b.hidden=!t;if(t)b.querySelector('span').textContent=I18N.t(t.label);}}
   saveRoute();
   if(view!=='site'&&notesOpen)closeNotes();
 }
@@ -2307,7 +2302,6 @@ function openAdd(){guard(()=>{
   $('dlgForm').reset();$('dlgCity').innerHTML=ilOptions('');$('dlgDistrict').innerHTML=ilceOptions('','');$('dlgDistrict').disabled=true;$('dlgTotal').value='';$('dlgDate').value=todayStr();clearDlgErr();
   $('dlg').showModal();$('dlgName').focus();
 });}
-$('addSite').onclick=openAdd;
 $('dlgCancel').onclick=()=>$('dlg').close();
 $('dlgForm').onsubmit=async e=>{e.preventDefault();
   const v=id=>$(id).value.trim(),name=v('dlgName');
@@ -2412,9 +2406,11 @@ const FIN_TABS=[['ozet','Özet'],['gelir','Gelir Modeli'],['yapi','Finansman Yap
 const SITE_SUBS=['info','units','infra','comp','credit','check','files'],PORT_SUBS=['ovw','port'];
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['comp','Rakip Analizi'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 function paintNav(){
-  const key=view==='users'?'users':view==='activity'?'activity':view==='contacts'?'contacts':view==='planner'?'planner':view==='meetings'?'meetings':view==='rakip'?'rakip':view==='leads'?'leads':view==='daily'?'daily':view==='roi'?'roi':view==='notifs'?'notifs':view==='locations'?'list':view==='portfolio'?sub:(sub==='info'?'list':sub);
+  const h=view==='hub'?hubKey:view==='site'?'proj':hubOf(view);
+  const key=h?'hub:'+h:view==='notifs'?'notifs':view==='portfolio'?sub:'';
   document.querySelectorAll('.nav-item[data-nav]').forEach(b=>{const on=b.dataset.nav===key;b.classList.toggle('active',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
 }
+
 function goSite(key){
   if(!db.sites.length){toast('Önce bir proje ekleyin.');return;}
   if(!db.sites.find(x=>x.id===activeId))activeId=(visibleSites()[0]||db.sites[0]).id;
@@ -2426,6 +2422,7 @@ document.querySelector('aside').addEventListener('click',e=>{
     try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');st[g.dataset.group]=c;localStorage.setItem('saha-nav',JSON.stringify(st));}catch(x){}return;}
   const b=e.target.closest('.nav-item[data-nav]');if(!b)return;
   const k=b.dataset.nav;dyBack=false;
+  if(k.startsWith('hub:')){openHub(k.slice(4));return;}
   if(SITE_SUBS.includes(k)&&view==='site'){sub=k;render();window.scrollTo(0,0);return;}
   guard(()=>{
     if(PORT_SUBS.includes(k)){view='portfolio';sub=k;render();window.scrollTo(0,0);}
@@ -2493,7 +2490,7 @@ function peek(on){
   as.addEventListener('mouseenter',()=>peek(true));as.addEventListener('mouseleave',()=>peek(false));
   as.addEventListener('focusin',()=>peek(true));as.addEventListener('focusout',e=>{if(!as.contains(e.relatedTarget))peek(false);});}
 try{if(!mobileNav()&&localStorage.getItem('saha-sidebar')==='1')setSidebar(true);}catch(x){}
-try{const st=JSON.parse(localStorage.getItem('saha-nav')||'{}');for(const g in st)if(st[g]){const el=document.querySelector(`.nav-group[data-group="${g}"]`);if(el){el.classList.add('collapsed');el.querySelector('.nav-head').setAttribute('aria-expanded','false');}}}catch(x){}
+try{localStorage.removeItem('saha-nav');}catch(x){} // menü grupları kalktı; eski "kapalı grup" tercihi menüyü gizlemesin
 
 
 
@@ -3021,6 +3018,44 @@ document.addEventListener('click',e=>{
   if(dl){const tr=dl.closest('tr'),tb=tr.closest('[data-sktbl]'),k=tb.dataset.sktbl,i=[...tr.parentElement.children].indexOf(tr);skRead();sk.d[k].splice(i,1);sk.dirty=true;skPaint();return;}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sk.id&&!$('skView').hidden&&!document.querySelector('dialog[open]'))skClose();});
+const NAV_ICON={"ovw": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></svg>", "notifs": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"/><path d=\"M10.3 21a1.94 1.94 0 0 0 3.4 0\"/></svg>", "add": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M8 12h8M12 8v8\"/></svg>", "list": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>", "planner": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 2v4\"/><path d=\"M16 2v4\"/><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"/><path d=\"M3 10h18\"/><path d=\"m9 16 2 2 4-4\"/></svg>", "daily": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 2v4M16 2v4\"/><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"/><path d=\"M3 10h18M8 14h.01M12 14h.01M16 14h.01\"/></svg>", "meetings": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\"/><path d=\"M9 12h6\"/><path d=\"M9 16h4\"/></svg>", "leads": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z\"/></svg>", "contacts": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 2v2\"/><path d=\"M8 2v2\"/><rect width=\"16\" height=\"20\" x=\"4\" y=\"2\" rx=\"2\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M7.5 18a5 5 0 0 1 9 0\"/></svg>", "rakip": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M13 2 4 14h7l-1 8 9-12h-7z\"/></svg>", "roi": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"16\" height=\"20\" x=\"4\" y=\"2\" rx=\"2\"/><line x1=\"8\" x2=\"16\" y1=\"6\" y2=\"6\"/><path d=\"M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01M16 14v4\"/></svg>", "users": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>", "activity": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 8v4l3 2\"/><circle cx=\"12\" cy=\"12\" r=\"9\"/></svg>"};
+/* ---------- Hub: menüde az sayıda ana başlık; başlığa basınca alt sayfaların kutucukları açılır (MKT Motors'taki hub ile aynı mantık) ---------- */
+const HUBS={
+  proj:{t:'Projeler',items:[['add','Yeni Proje Ekle','Yeni bir saha projesi kaydı açın.'],['list','Proje Listesi','Tüm projeler: aşama, durum, güç ve skor.'],['planner','Proje Görev Listesi','Projelere bağlı görevler, sorumlular ve terminler.']]},
+  meet:{t:'Toplantılar',items:[['daily','Daily Toplantı Notları','Bugün konuşulacaklar: gecikmiş görevler, yeni notlar, güncellenmeyen projeler.'],['meetings','Toplantı Notları','Yapılan toplantıların kayıtları.']]},
+  market:{t:'Satış ve Pazar',items:[['leads','Lead Havuzu','Aranacak firma listesi ve arama notları.'],['contacts','Müşteri Bilgileri','Şirketler ve iletişim kişileri.'],['rakip','Rakip Analizi','Çevredeki şarj istasyonları ve anlık doluluk.'],['roi','ROI Hesaplayıcı','Gelir paylaşımı ve geri dönüş senaryoları.']]},
+  admin:{t:'Yönetim',items:[['users','Kullanıcı Yönetimi','Hesaplar, roller ve şifreler.'],['activity','İşlem Geçmişi','Sistemde yapılan işlemlerin kaydı.']]}
+};
+const HUB_VIEW={list:'locations',planner:'planner',daily:'daily',meetings:'meetings',leads:'leads',contacts:'contacts',rakip:'rakip',roi:'roi',users:'users',activity:'activity'};
+let hubKey='proj';
+// Hesabın görebildiği kutucuklar (Kısıtlı Kullanıcı Kayıtlar sayfalarını ve yazma işlemlerini görmez).
+const hubCan=k=>k==='users'?me.role==='admin':k==='activity'?!!me.owner:k==='add'?!isRO():REC_NAV.includes(k)?!isRestricted():true;
+const hubItems=h=>(HUBS[h]?HUBS[h].items:[]).filter(x=>hubCan(x[0]));
+const hubOf=v=>{const k=Object.keys(HUB_VIEW).find(x=>HUB_VIEW[x]===v);return k?Object.keys(HUBS).find(h=>HUBS[h].items.some(x=>x[0]===k)):'';};
+function hubGo(k){
+  if(k==='add'){openAdd();return;}
+  guard(()=>{view=HUB_VIEW[k];render();window.scrollTo(0,0);});
+}
+function openHub(h){
+  const it=hubItems(h);
+  if(it.length===1&&it[0][0]!=='add'){hubGo(it[0][0]);return;}   // tek kutu kaldıysa doğrudan o sayfa
+  guard(()=>{view='hub';hubKey=h;render();window.scrollTo(0,0);});
+}
+function hubStat(k){
+  if(k==='list'&&loaded){const n=db.sites.length;return n?nf.format(n)+' proje · '+nf.format(db.sites.filter(isOpen).length)+' aktif':'';}
+  if((k==='planner'||k==='daily')&&pl.loaded){const t=todayStr(),op=pl.tasks.filter(x=>!x.done),late=op.filter(x=>x.due&&x.due<t).length;
+    return k==='planner'?nf.format(op.length)+' açık görev'+(late?' · '+nf.format(late)+' gecikmiş':''):(late?nf.format(late)+' gecikmiş görev':'');}
+  return '';
+}
+function renderHub(){
+  if(!HUBS[hubKey])hubKey='proj';
+  const it=hubItems(hubKey);
+  $('view').innerHTML=it.length?`<div class="hub-cards">${it.map(([k,t,d])=>`<button type="button" class="hub-card" data-hubgo="${k}"><span class="hc-ic">${NAV_ICON[k]||''}</span><b>${esc(t)}</b><small>${esc(d)}</small><em data-hubstat="${k}">${esc(hubStat(k))}</em></button>`).join('')}</div>`
+    :'<section class="box"><p class="note">Bu bölümde görebileceğiniz sayfa yok.</p></section>';
+  // Görev sayıları sunucudan gelince kutucuklara yazılır.
+  if(mode==='cloud'&&!pl.loaded&&it.some(x=>x[0]==='planner'||x[0]==='daily'))loadTasks().then(()=>{if(view==='hub')document.querySelectorAll('[data-hubstat]').forEach(e=>{e.textContent=hubStat(e.dataset.hubstat);});}).catch(()=>{});
+}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-hubgo]');if(c&&view==='hub')hubGo(c.dataset.hubgo);});
 /* ---------- ROI Hesaplayıcı: ayrı sayfa (roi.html) aynı kaynaklı çerçevede açılır; kendi stili ve betiği kimlik/CSS çakışması yaratmaz ---------- */
 function renderRoi(){
   $('view').innerHTML='<iframe id="roiFrame" class="roi-frame" src="/roi.html" title="ROI Hesaplayıcı"></iframe>';
@@ -3037,6 +3072,14 @@ function dyRows(rows,h2,h3,empty){
 }
 // Satıra tıklayınca ilgili yere gider: görev → Proje Görev Listesi (o proje), not → proje + Şirket İçi Notlar paneli, diğerleri → proje.
 let dyBack=false;
+// Sağ üstteki geri düğmesi: Daily'den bir projeye/göreve gelindiyse Daily'ye; proje sayfasındaysa Proje Listesi'ne; alt sayfadaysa üst başlığın kutucuklarına döner.
+function backTarget(){
+  if(dyBack&&view!=='daily')return {label:'Daily Toplantı Notları',go:()=>{dyBack=false;view='daily';}};
+  if(view==='site')return {label:'Proje Listesi',go:()=>{view='locations';}};
+  const h=hubOf(view);
+  if(h&&hubItems(h).length>1)return {label:HUBS[h].t,go:()=>{view='hub';hubKey=h;}};
+  return null;
+}
 function dyGo(id,go){
   dyBack=true;
   if(go==='task'){pl.f.site=id;pl.f.status='open';pl.f.assignee='';pl.f.range='';pl.f.hideEmpty=false;guard(()=>{view='planner';render();window.scrollTo(0,0);});return;}
@@ -3078,7 +3121,7 @@ async function renderDaily(){
     +sec('3. Güncellenmeyen Projeler',DY_QUIET+'+ gündür',quiet.length,dyRows(quiet,'İl','Güncelleme','Bütün açık projeler güncel.'))
     +sec('4. Son 24 Saatte Güncellenenler','Dünden beri',fresh.length,dyRows(fresh,'İl','Güncelleme','Son 24 saatte güncellenen proje yok.'))+'</div>';
 }
-document.addEventListener('click',e=>{if(e.target.closest('#dyBack')){guard(()=>{dyBack=false;if(notesOpen)closeNotes();view='daily';render();window.scrollTo(0,0);});return;}
+document.addEventListener('click',e=>{if(e.target.closest('#dyBack')){const t=backTarget();if(t)guard(()=>{if(notesOpen)closeNotes();t.go();render();window.scrollTo(0,0);});return;}
   const r=e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const r=e.target.closest&&e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
 async function renderPlanner(){
@@ -4061,11 +4104,9 @@ const meReady=(async()=>{
     const r=await fetch('/api/auth/me',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
-      me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};if(d.role==='admin')$('usersNav').hidden=false;
+      me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};$('adminHubNav').hidden=!(d.role==='admin'||d.owner);
       document.documentElement.classList.toggle('ro',isRO());if(isRestricted())applyRestricted();
       // İşlem Geçmişi yalnızca sahip hesaba açık (sunucu da 403 verir).
-      if(me.owner)$('actNav').hidden=false;
-      { const g=$('usersNav').closest('.nav-group'); if(g)g.hidden=$('usersNav').hidden&&$('actNav').hidden; }
       if(!me.owner&&view==='activity'){view='portfolio';sub='ovw';render();}
       else if(view==='site')render();}
   }catch(e){/* çevrimdışı: yerel kayıtla devam */}

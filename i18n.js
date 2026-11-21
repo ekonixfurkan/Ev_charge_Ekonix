@@ -299,6 +299,19 @@
     'Resim açıklaması (isteğe bağlı)': 'Photo caption (optional)',
     'Boş bırakılır (gizli). Gerekirse elle yazın.': 'Left blank (confidential). Type manually if needed.',
     'Yazmak için tıklayın': 'Click to write',
+    /* hub kutucukları */
+    'Yeni bir saha projesi kaydı açın.': 'Open a new site project record.',
+    'Tüm projeler: aşama, durum, güç ve skor.': 'All projects: stage, status, power and score.',
+    'Projelere bağlı görevler, sorumlular ve terminler.': 'Tasks linked to projects, owners and due dates.',
+    'Bugün konuşulacaklar: gecikmiş görevler, yeni notlar, güncellenmeyen projeler.': 'Today\'s agenda: overdue tasks, new notes, stale projects.',
+    'Yapılan toplantıların kayıtları.': 'Records of meetings held.',
+    'Aranacak firma listesi ve arama notları.': 'List of companies to call and call notes.',
+    'Şirketler ve iletişim kişileri.': 'Companies and contact persons.',
+    'Çevredeki şarj istasyonları ve anlık doluluk.': 'Nearby charging stations and live occupancy.',
+    'Gelir paylaşımı ve geri dönüş senaryoları.': 'Revenue sharing and payback scenarios.',
+    'Hesaplar, roller ve şifreler.': 'Accounts, roles and passwords.',
+    'Sistemde yapılan işlemlerin kaydı.': 'Log of actions taken in the system.',
+    'Bu bölümde görebileceğiniz sayfa yok.': 'There are no pages you can see in this section.',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
@@ -486,6 +499,9 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^([\d.,]+) proje · ([\d.,]+) aktif$/, function (m) { return m[1] + ' projects · ' + m[2] + ' active'; }],
+    [/^([\d.,]+) açık görev(?: · ([\d.,]+) gecikmiş)?$/, function (m) { return m[1] + ' open tasks' + (m[2] ? ' · ' + m[2] + ' overdue' : ''); }],
+    [/^([\d.,]+) gecikmiş görev$/, function (m) { return m[1] + ' overdue tasks'; }],
     [/^Fotoğraf Seç \((\d+)\)$/, function (m) { return 'Choose Photos (' + m[1] + ')'; }],
     [/^İç Verim \((\d+) Yıl\)$/, function (m) { return 'IRR (' + m[1] + ' Years)'; }],
     [/^Elektrik sonrası (.+)$/, function (m) { return 'After electricity ' + m[1]; }],
