@@ -2959,7 +2959,7 @@ function skPaint(){
   const date=d.date||fmtDay(s.survey&&s.survey.date)||fmtDay(todayStr());
   const cust=d.cust||(s.name+(t.dcKw?` – ${nf.format(t.dcKw)} kW DC`:''));
   const pics=d.photos.map(id=>sk.files.find(f=>f.id===id)).filter(Boolean);
-  const del=ro?'':'<td class="sk-x no-print"><button type="button" class="ghost" data-skdel title="Satırı sil">×</button></td>';
+  const del=ro?'':'<td class="sk-x no-print"><button type="button" class="ghost" data-skdel title="'+esc(skT('Satırı sil'))+'">×</button></td>';
   const head=`<div class="sk-top"><span>${esc(skT('Saha Keşif Raporu'))} · ${esc(s.name)}</span><img src="/ekonix-logo.jpeg" alt="Ekonix"></div>`;
   const pages=pics.length?3:2;
   const foot=n=>`<div class="sk-foot"><span>${esc(skT('Gizli · Görüşme ve değerlendirme amaçlıdır · Hazırlayan: Ekonix İş Geliştirme'))}</span><b>${n} / ${pages}</b></div>`;
@@ -2980,10 +2980,10 @@ function skPaint(){
         <h1 class="sk-title sm">${esc(skT('Görev Paylaşımı ve Sonraki Adımlar'))}</h1>
         <h2 class="sk-h2">${esc(skT('Görev Paylaşımı'))}</h2>
         <table class="sk-tbl" data-sktbl="roles"><thead><tr><th>${esc(skT('Taraf'))}</th><th>${esc(skT('Önerilen Sorumluluk'))}</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${roles.map(x=>`<tr><td class="sk-k" ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
-        ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="roles">+ Satır Ekle</button></p>'}
+        ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="roles">'+esc(skT('+ Satır Ekle'))+'</button></p>'}
         <h2 class="sk-h2">${esc(skT('Sonraki Adımlar'))}</h2>
         <table class="sk-tbl" data-sktbl="steps"><thead><tr><th class="sk-no">${esc(skT('Adım'))}</th><th>${esc(skT('İş'))}</th><th>${esc(skT('Sorumlu'))}</th>${ro?'':'<th class="no-print"></th>'}</tr></thead><tbody>${steps.map((x,i)=>`<tr><td class="sk-no">${i+1}</td><td ${ce}>${esc(x[0])}</td><td ${ce}>${esc(x[1])}</td>${del}</tr>`).join('')}</tbody></table>
-        ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="steps">+ Satır Ekle</button></p>'}
+        ${ro?'':'<p class="no-print sk-add"><button type="button" class="ghost" data-skadd="steps">'+esc(skT('+ Satır Ekle'))+'</button></p>'}
         <p class="sk-note" ${ce} data-skf="note" data-ph="${esc(skT('Kapanış notu (isteğe bağlı)'))}">${esc(note)}</p>
         ${foot(2)}</section>
       ${pics.length?`<section class="sk-page">${head}

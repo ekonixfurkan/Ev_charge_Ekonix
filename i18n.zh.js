@@ -1094,7 +1094,9 @@ window.I18N_ZH = {
    "Gelir paylaşımı ve geri dönüş senaryoları.": "收益分成与回本情景测算。",
    "Hesaplar, roller ve şifreler.": "账户、角色与密码。",
    "Sistemde yapılan işlemlerin kaydı.": "系统操作记录。",
-   "Bu bölümde görebileceğiniz sayfa yok.": "此栏目下没有您可查看的页面。"
+   "Bu bölümde görebileceğiniz sayfa yok.": "此栏目下没有您可查看的页面。",
+   "+ Satır Ekle": "+ 添加行",
+   "Satırı sil": "删除该行"
   },
   rules: function (sub) {
     var PZ = [

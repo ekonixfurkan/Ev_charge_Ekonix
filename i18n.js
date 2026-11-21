@@ -257,7 +257,7 @@
     'Sözleşme Süresi': 'Contract Term',
     'Konum Bilgileri (WGS84)': 'Location (WGS84)',
     'Netleştirilecek': 'To be clarified',
-    'Saha geliştirme, yer sağlayıcı ilişkisi ve proje koordinasyonu': 'Site development, site host relations and project coordination',
+    'Saha geliştirme, yer sağlayıcı ilişkisi ve proje koordinasyonu': 'Site development, landowner relations and project coordination',
     'Cihaz çözümü, ağ işletimi, kullanıcı hizmetleri, teknik destek ve mutabık kalınan yatırım kapsamı': 'Equipment solution, network operation, user services, technical support and the agreed investment scope',
     'Donanım dışındaki taahhüt işleri, abonelik ve güç artışı başvurusu, bakım, tahsilat ve operasyon raporlaması': 'Contracting works other than hardware, subscription and power increase applications, maintenance, collection and operations reporting',
     'Alan tahsisi, erişim ve saha koordinasyonu': 'Space allocation, access and on-site coordination',
@@ -312,6 +312,7 @@
     'Hesaplar, roller ve şifreler.': 'Accounts, roles and passwords.',
     'Sistemde yapılan işlemlerin kaydı.': 'Log of actions taken in the system.',
     'Bu bölümde görebileceğiniz sayfa yok.': 'There are no pages you can see in this section.',
+    '+ Satır Ekle': '+ Add Row', 'Satırı sil': 'Delete row',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
