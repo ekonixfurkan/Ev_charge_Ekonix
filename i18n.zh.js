@@ -1185,7 +1185,11 @@ window.I18N_ZH = {
    "Sevkiyat No": "发运编号",
    "Sevkiyat no": "发运编号",
    "Sevkiyat no, konteyner no, tedarikçi, gemi, ürün, proje…": "发运编号、集装箱号、供应商、船名、产品、项目…",
-   "ör. MSMU7898053 (sonradan da girilebilir)": "例如 MSMU7898053（也可稍后填写）"
+   "ör. MSMU7898053 (sonradan da girilebilir)": "例如 MSMU7898053（也可稍后填写）",
+   "Tahmini Depo Teslim": "预计入库时间",
+   "Tahmini depo teslim": "预计入库时间",
+   "Depo teslim tarihi": "入库日期",
+   "Sevkiyat no, konteyner no, ürün, proje…": "发运编号、集装箱号、产品、项目…"
   },
   rules: function (sub) {
     var PZ = [

@@ -1283,10 +1283,8 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
 <dialog id="shnDlg"><h3 style="margin:0 0 10px">Yeni Sevkiyat</h3>
   <label>Sevkiyat No<input id="shnCode" readonly data-locked tabindex="-1" value="—" title="Sunucu tarafından verilir; değiştirilemez"></label>
   <label>Konteyner No<input id="shnNo" maxlength="60" autocomplete="off" placeholder="ör. MSMU7898053 (sonradan da girilebilir)"></label>
-  <label>Tedarikçi<input id="shnSupplier" maxlength="140" autocomplete="off"></label>
-  <label>Gemi<input id="shnVessel" maxlength="80" autocomplete="off"></label>
   <label>Durum<select id="shnStatus"><option value="hazirlaniyor">Hazırlanıyor</option><option value="yolda" selected>Yolda</option><option value="gumrukte">Gümrükte</option><option value="depoda">Depoda</option><option value="teslim">Teslim Edildi</option></select></label>
-  <label>Tahmini Varış<input id="shnEta" type="date"></label>
+  <label>Tahmini Depo Teslim<input id="shnEta" type="date"></label>
   <label>Sorumlu<select id="shnOwner"></select></label>
   <p class="alert" id="shnErr" role="alert" hidden></p>
   <div class="row"><button type="button" id="shnCancel">Vazgeç</button><button type="button" class="primary" id="shnSave">Oluştur</button></div></dialog>
@@ -1778,7 +1776,7 @@ function setPageTitle(){
   const shx=view==='ship'?shGet(sh.id):null;
   const pt=x?(x.name||'Adsız Proje'):view==='ship'?(shx?(shx.code||shx.no||'Sevkiyat'):'Sevkiyat'):view==='hub'?HUBS[hubKey].t:(PAGE_TITLES[view==='portfolio'?sub:view]||'Saha Değerlendirme');
   $('pageTitle').textContent=pt;
-  const sub3=view==='ship'&&shx?[shx.no,shx.supplier,[shx.vessel,shx.voyage].filter(Boolean).join(' / ')].filter(Boolean).join(' · '):sub2;
+  const sub3=view==='ship'&&shx?shx.no||'':sub2;
   $('pageSub').textContent=sub3;$('pageSub').hidden=!sub3;
   document.title=pt+' · Saha Değerlendirme';
 }
@@ -3169,34 +3167,34 @@ function renderShips(){
   const opt=(v,c,t)=>`<option value="${esc(v)}" ${v===c?'selected':''}>${esc(t??v)}</option>`;
   $('view').innerHTML=`<section class="box">
     <div class="locbar no-print">
-      <label class="lf lq">Ara<input type="search" id="shQ" value="${esc(sh.f.q)}" placeholder="Sevkiyat no, konteyner no, tedarikçi, gemi, ürün, proje…" autocomplete="off"></label>
+      <label class="lf lq">Ara<input type="search" id="shQ" value="${esc(sh.f.q)}" placeholder="Sevkiyat no, konteyner no, ürün, proje…" autocomplete="off"></label>
       <label class="lf">Durum<select id="shFStatus"><option value="">Tümü</option>${SH_STATUS.map(([k,t])=>opt(k,sh.f.status,t)).join('')}</select></label>
       <label class="lf">Sorumlu<select id="shFOwner"><option value="">Tümü</option>${[...new Set(sh.list.map(x=>x.owner).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr')).map(o=>opt(o,sh.f.owner)).join('')}</select></label>
       <button type="button" id="shClear" class="ghost" ${sh.f.q||sh.f.status||sh.f.owner?'':'hidden'}>Filtreleri Temizle</button>
       ${shRO()?'':'<button type="button" id="shNew" class="primary">+ Yeni Sevkiyat</button>'}
     </div>
     <div id="shTiles"></div>
-    <div class="scroll"><table class="portfolio loctbl sh-list m-cards"><colgroup><col style="width:11%"><col style="width:12%"><col style="width:16%"><col style="width:14%"><col style="width:9%"><col style="width:9%"><col style="width:5%"><col style="width:11%"><col style="width:8%"><col style="width:5%"></colgroup><thead><tr><th>Sevkiyat No</th><th>Konteyner No</th><th>Tedarikçi</th><th>Gemi / Sefer</th><th>Durum</th><th>Tahmini Varış</th><th class="num">Ürün</th><th>Atama</th><th>Sorumlu</th><th class="num">Belge</th></tr></thead><tbody id="shRows"></tbody></table></div>
+    <div class="scroll"><table class="portfolio loctbl sh-list m-cards"><colgroup><col style="width:13%"><col style="width:15%"><col style="width:13%"><col style="width:16%"><col style="width:7%"><col style="width:13%"><col style="width:15%"><col style="width:8%"></colgroup><thead><tr><th>Sevkiyat No</th><th>Konteyner No</th><th>Durum</th><th>Tahmini Depo Teslim</th><th class="num">Ürün</th><th>Atama</th><th>Sorumlu</th><th class="num">Belge</th></tr></thead><tbody id="shRows"></tbody></table></div>
     <p class="note" id="shNote"></p></section>`;
   paintShips();
 }
 function shMatch(x){
   const f=sh.f;if(f.status&&x.status!==f.status)return false;if(f.owner&&x.owner!==f.owner)return false;
-  if(f.q){const hay=norm([x.code,x.no,x.supplier,x.vessel,x.voyage,x.invoiceNo,x.owner,...(x.items||[]).map(i=>i.model),...(x.items||[]).flatMap(i=>(i.alloc||[]).map(a=>shSiteLabel(a.site)))].join(' '));if(!hay.includes(norm(f.q)))return false;}
+  if(f.q){const hay=norm([x.code,x.no,x.invoiceNo,x.owner,...(x.items||[]).map(i=>i.model),...(x.items||[]).flatMap(i=>(i.alloc||[]).map(a=>shSiteLabel(a.site)))].join(' '));if(!hay.includes(norm(f.q)))return false;}
   return true;
 }
 function paintShips(){
   const t=$('shRows');if(!t)return;
-  if(sh.err&&!sh.list.length){t.innerHTML=`<tr><td colspan="10" class="note comp-warn" style="padding:20px;text-align:center">${esc(sh.err)}</td></tr>`;return;}
+  if(sh.err&&!sh.list.length){t.innerHTML=`<tr><td colspan="8" class="note comp-warn" style="padding:20px;text-align:center">${esc(sh.err)}</td></tr>`;return;}
   const rows=sh.list.filter(shMatch).sort((a,b)=>String(b.eta||b.updatedAt).localeCompare(String(a.eta||a.updatedAt)));
   const open=sh.list.filter(x=>x.status!=='teslim'),free=sh.list.reduce((n,x)=>n+Math.max(0,shTot(x).free),0);
   const tile=(l,v,c)=>`<div class="dk" style="border-left-color:${c}"><span>${esc(l)}</span><strong>${v}</strong></div>`;
   $('shTiles').innerHTML=`<div class="sh-tiles">${tile('Yolda',sh.list.filter(x=>x.status==='yolda').length,'var(--s-inceleme)')}${tile('Gümrükte',sh.list.filter(x=>x.status==='gumrukte').length,'var(--stg-09)')}${tile('Depoda',sh.list.filter(x=>x.status==='depoda').length,'var(--stg-08)')}${tile('Henüz Atanmamış Ürün',nf.format(free),free?'var(--risk)':'var(--ok)')}</div>`;
   t.innerHTML=rows.map(x=>{const st=shStat(x.status),T=shTot(x);
     const asg=T.q?`<span class="sh-asg ${T.over?'bad':T.free===0?'ok':'part'}">${nf.format(T.a)} / ${nf.format(T.q)} atandı</span>`:'<span class="note">—</span>';
-    return `<tr data-shopen="${esc(x.id)}" tabindex="0"><td class="c-code">${esc(x.code||'—')}</td><td><b>${esc(x.no||'—')}</b></td><td>${esc(x.supplier||'—')}</td><td>${esc([x.vessel,x.voyage].filter(Boolean).join(' / ')||'—')}</td>
+    return `<tr data-shopen="${esc(x.id)}" tabindex="0"><td class="c-code">${esc(x.code||'—')}</td><td><b>${esc(x.no||'—')}</b></td>
       <td><span class="badge" style="--c:${st[2]}">${esc(st[1])}</span></td><td>${x.eta?esc(fmtDay(x.eta)):'—'}</td><td class="num">${T.q?nf.format(T.q):'—'}</td><td>${asg}</td><td>${esc(x.owner||'—')}</td><td class="num">${x.files?nf.format(x.files):'—'}</td></tr>`;}).join('')
-    ||`<tr><td colspan="10" class="note" style="padding:24px;text-align:center">${sh.list.length?'Filtreye uyan sevkiyat yok.':'Henüz sevkiyat yok. "Yeni Sevkiyat" ile ilk konteyneri ekleyin.'}</td></tr>`;
+    ||`<tr><td colspan="8" class="note" style="padding:24px;text-align:center">${sh.list.length?'Filtreye uyan sevkiyat yok.':'Henüz sevkiyat yok. "Yeni Sevkiyat" ile ilk konteyneri ekleyin.'}</td></tr>`;
   $('shNote').textContent=sh.list.length?nf.format(rows.length)+' / '+nf.format(sh.list.length)+' sevkiyat':'';
 }
 document.addEventListener('input',e=>{if(e.target.id==='shQ'){sh.f.q=e.target.value;paintShips();}});
@@ -3207,7 +3205,7 @@ document.addEventListener('change',e=>{
 function shOpen(id){guard(()=>{sh.id=id;sh.sub=sh.sub||'urun';sh.files=null;view='ship';render();window.scrollTo(0,0);});}
 /* --- yeni sevkiyat --- */
 function shNewOpen(){
-  $('shnNo').value='';$('shnSupplier').value='';$('shnVessel').value='';$('shnStatus').value='yolda';$('shnEta').value='';
+  $('shnNo').value='';$('shnStatus').value='yolda';$('shnEta').value='';
   $('shnOwner').innerHTML='<option value="">Seçin</option>'+shOwners().map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
   $('shnErr').hidden=true;$('shnSave').disabled=false;$('shnCode').value='—';
   shApi('GET','shipnext=1').then(d=>{if($('shnDlg').open)$('shnCode').value=d.code||'—';}).catch(()=>{});
@@ -3216,7 +3214,7 @@ function shNewOpen(){
 async function shNewSave(){
   const no=$('shnNo').value.trim();
   if(no&&sh.list.some(x=>norm(x.no)===norm(no))){$('shnErr').textContent='Bu konteyner numarası zaten kayıtlı.';$('shnErr').hidden=false;return;}
-  const x={id:uid(),no,supplier:$('shnSupplier').value.trim(),vessel:$('shnVessel').value.trim(),voyage:'',invoiceNo:'',origin:'',port:'',status:$('shnStatus').value,eta:$('shnEta').value,arrived:'',owner:$('shnOwner').value,note:'',items:[],files:0,createdAt:now(),updatedAt:now()};
+  const x={id:uid(),no,invoiceNo:'',origin:'',port:'',status:$('shnStatus').value,eta:$('shnEta').value,arrived:'',owner:$('shnOwner').value,note:'',items:[],files:0,createdAt:now(),updatedAt:now()};
   $('shnSave').disabled=true;
   try{const d=await shApi('PUT','ship=1',x);if(d&&d.ship)Object.assign(x,d.ship);sh.list.unshift(x);$('shnDlg').close();toast((x.code?x.code+' ':'')+'oluşturuldu.');sh.sub='urun';shOpen(x.id);}
   catch(e){$('shnSave').disabled=false;$('shnErr').textContent=e.message;$('shnErr').hidden=false;}
@@ -3248,9 +3246,9 @@ function paintShipBody(){
 function shGenelHtml(x){
   const ro=shRO(),dis=ro?'disabled':'',f=(k,l,type='text',extra='')=>`<label${extra}>${l}<input data-shf="${k}" type="${type}" value="${esc(x[k]||'')}" ${dis}></label>`;
   return `<section class="box"><h3>Sevkiyat Bilgileri</h3><div class="grid infogrid">
-    <label>Sevkiyat no<input value="${esc(x.code||'—')}" readonly data-locked tabindex="-1" title="Sunucu tarafından verilir; değiştirilemez"></label>${f('no','Konteyner no')}${f('supplier','Tedarikçi')}${f('vessel','Gemi')}${f('voyage','Sefer no')}${f('invoiceNo','Fatura no')}
+    <label>Sevkiyat no<input value="${esc(x.code||'—')}" readonly data-locked tabindex="-1" title="Sunucu tarafından verilir; değiştirilemez"></label>${f('no','Konteyner no')}${f('invoiceNo','Fatura no')}
     <label>Durum<select data-shf="status" ${dis}>${SH_STATUS.map(([k,t])=>`<option value="${k}" ${k===x.status?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
-    ${f('origin','Çıkış limanı')}${f('port','Varış limanı')}${f('eta','Tahmini varış','date')}${f('arrived','Teslim tarihi','date')}
+    ${f('origin','Çıkış limanı')}${f('port','Varış limanı')}${f('eta','Tahmini depo teslim','date')}${f('arrived','Depo teslim tarihi','date')}
     <label>Sorumlu<select data-shf="owner" ${dis}><option value="">Seçin</option>${[...new Set([x.owner,...shOwners()].filter(Boolean))].map(o=>`<option value="${esc(o)}" ${o===x.owner?'selected':''}>${esc(o)}</option>`).join('')}</select></label>
     <label class="span4">Not<textarea data-shf="note" rows="3" ${dis}>${esc(x.note||'')}</textarea></label></div></section>`;
 }
