@@ -1209,7 +1209,10 @@ window.I18N_ZH = {
    "Klasör": "文件夹",
    "Başlık boş olamaz.": "标题不能为空。",
    "Dosya güncellendi.": "文件已更新。",
-   "Sevkiyat kaydedildi.": "发运记录已保存。"
+   "Sevkiyat kaydedildi.": "发运记录已保存。",
+   "Bu konteynerde henüz ürün yok.": "该集装箱内暂无产品。",
+   "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
+   "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。"
   },
   rules: function (sub) {
     var PZ = [

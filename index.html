@@ -1197,6 +1197,24 @@ body.sk-open{overflow:hidden}
 .sh-bar{width:100%;min-width:90px;height:8px;border-radius:4px;background:var(--hair);overflow:hidden}.sh-bar i{display:block;height:100%;background:var(--ok)}.sh-bar i.over{background:var(--no)}
 table.yearly.sh-sum{width:100%;min-width:100%;display:table}.sh-sum th,.sh-sum td{text-align:left;vertical-align:middle;white-space:normal}.sh-sum th.num,.sh-sum td.num{text-align:right}.sh-sum th{white-space:nowrap}.sh-sum1 td:last-child{width:46%}.sh-sum2 th:last-child{width:14%}
 .sh-h2{margin:22px 0 10px;font-size:14px;font-weight:700;color:var(--ink)}
+.sh-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:16px;align-items:start}
+.sh-main .box,.sh-side{margin-bottom:12px}.sh-side{position:sticky;top:12px}
+.sh-item{padding:14px 18px}
+.sh-ih{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.sh-ico{display:grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:var(--navy-soft);color:var(--navy)}
+.sh-model{flex:1;min-width:0;font-size:14px;font-weight:700}
+.sh-qty{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}.sh-qty small{margin-left:4px;font-size:11px;font-weight:500;color:var(--muted)}
+.sh-ih.edit{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:12px;align-items:start}
+.sh-prog{display:flex;align-items:center;gap:12px;margin-bottom:10px}.sh-prog .sh-bar{flex:1}.sh-pt{flex:none;font-size:11.5px;color:var(--ink2);white-space:nowrap}
+.sh-chips{display:flex;flex-wrap:wrap;gap:2px}
+.sh-alg{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.sh-alg .sh-al{margin:0;grid-template-columns:minmax(0,1fr) 90px 30px}
+.sh-acts{display:flex;gap:10px;margin-top:10px}
+.sh-addbtn{margin:0 0 4px}
+.sh-empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:34px 20px;text-align:center}.sh-empty p{margin:0}
+.sh-side h3{margin-bottom:10px}.sh-prow{padding:10px 0;border-top:1px solid var(--hair)}.sh-prow:first-of-type{border-top:0;padding-top:2px}
+.sh-pn{display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;font-size:12.5px}.sh-pn span{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+@media (max-width:1100px){.sh-grid{grid-template-columns:minmax(0,1fr)}.sh-side{position:static}.sh-alg{grid-template-columns:minmax(0,1fr)}}
 .sh-head{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:14px;margin-bottom:12px}
 .sh-sub{margin:4px 0 8px;font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .sh-al{display:grid;grid-template-columns:minmax(0,1fr) 110px auto;gap:10px;align-items:center;margin-bottom:8px}
@@ -1579,7 +1597,7 @@ function routeHash(){
   if(view==='portfolio')return '#/'+sub;
   if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
   if(view==='hub')return '#/hub/'+hubKey;
-  if(view==='ship')return '#/ship/'+encodeURIComponent(sh.id||'')+'/'+(sh.sub||'urun');
+  if(view==='ship')return '#/ship/'+encodeURIComponent(sh.id||'')+'/'+(sh.sub||'genel');
   return '#/'+(ROUTE_NAMES[view]||'ovw');
 }
 function saveRoute(){
@@ -1616,7 +1634,7 @@ function restoreRoute(){
   const [a,b,c]=parts;if(!a)return;
   if(a==='ovw'||a==='port'){view='portfolio';sub='ovw';return;}
   if(a==='hub'){if(HUBS[b]){view='hub';hubKey=b;}return;}
-  if(a==='ship'&&b){view='ship';sh.id=b;sh.sub=['urun','genel','belge'].includes(c)?c:'urun';return;}
+  if(a==='ship'&&b){view='ship';sh.id=b;sh.sub=['urun','genel','belge'].includes(c)?c:'genel';return;}
   const name=Object.keys(ROUTE_NAMES).find(k=>ROUTE_NAMES[k]===a);
   if(name){view=name;return;}
   if(a==='site'&&b&&db.sites.some(x=>x.id===b)){view='site';activeId=b;sub=SITE_SUBS.includes(c)?c:'info';}
@@ -1935,7 +1953,7 @@ function applyRestricted(){
   if(REC_VIEWS.includes(view)){view='portfolio';sub='ovw';render();}
 }
 function render(){
-  if(view!=='ship'&&typeof sh!=='undefined'&&sh.dirty)shFlush();
+  if(view!=='ship'&&typeof sh!=='undefined'&&sh.edit)shModeCancel(true);
   if(isRestricted()&&REC_VIEWS.includes(view)){view='portfolio';sub='ovw';}
   {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
@@ -2106,6 +2124,10 @@ function cancelEdit(quiet){
 }
 // Kaydedilmemiş değişiklik varken başka sayfaya geçişi onaya bağlar.
 function guard(fn){
+  if(view==='ship'&&sh.edit){
+    if(!sh.dirty){shModeCancel(true);fn();return;}
+    ask('Kaydedilmemiş değişiklikler var. Vazgeçip çıkılsın mı?','Değişiklikleri At').then(ok=>{if(!ok)return;shModeCancel(true);fn();});return;
+  }
   if(!siteEdit||!editDirty){if(siteEdit)exitEdit();fn();return;}
   ask('Kaydedilmemiş değişiklikler var. Vazgeçip çıkılsın mı?','Değişiklikleri At').then(ok=>{if(!ok)return;cancelEdit(true);fn();});
 }
@@ -3148,7 +3170,7 @@ const SH_STATUS=[['hazirlaniyor','Hazırlanıyor','var(--s-aday)'],['yolda','Yol
 const SH_KIND=[['beyanname','Gümrük Beyannameleri'],['sigorta','Nakliyat Sigortası'],['fatura','Faturalar'],['liman','Liman ve Ardiye'],['denetim','Denetim (TSE vb.)'],['uygunluk','Uygunluk Belgeleri (TPS / BTK)'],['nakliye','Nakliye ve Konşimento'],['diger','Diğer']];
 const shKindName=k=>(SH_KIND.find(x=>x[0]===k)||SH_KIND[SH_KIND.length-1])[1];
 const shStat=k=>SH_STATUS.find(x=>x[0]===k)||SH_STATUS[1];
-const sh={list:[],loaded:false,busy:false,err:'',f:{q:'',status:'',owner:''},owner:false,id:'',sub:'urun',files:null,fileBusy:false,up:[],timer:null,state:''};
+const sh={edit:false,snap:null,list:[],loaded:false,busy:false,err:'',f:{q:'',status:'',owner:''},owner:false,id:'',sub:'genel',files:null,fileBusy:false,up:[],timer:null,state:''};
 async function shApi(method,qs,body){
   const r=await fetch('/api/files?'+qs,{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
   if(r.status===401){location.replace('/login.html');throw new Error('401');}
@@ -3165,10 +3187,22 @@ const shGet=id=>sh.list.find(x=>x.id===id);
 const shTot=x=>{const it=x.items||[];const q=it.reduce((a,i)=>a+(+i.qty||0),0),a=it.reduce((n,i)=>n+(i.alloc||[]).reduce((m,l)=>m+(l.site?+l.qty||0:0),0),0);return {q,a,free:q-a,over:it.some(i=>(i.alloc||[]).reduce((m,l)=>m+(+l.qty||0),0)>(+i.qty||0))};};
 const shSiteLabel=id=>{const s=db.sites.find(x=>x.id===id);return s?[s.code,s.name].filter(Boolean).join(' · '):'(silinmiş proje)';};
 const shRO=()=>isRO();
+// Projelerdeki gibi: sevkiyat önce salt okunur açılır; sağ üstteki "Düzenle" düzenleme modunu açar, değişiklikler "Değişiklikleri Kaydet"e basana kadar sunucuya gitmez.
+const shLock=()=>shRO()||!sh.edit;
 // Kayıt: yazdıkça değişiklik işaretlenir ve 1,2 sn sonra kendiliğinden gönderilir; "Kaydet" düğmesi hemen gönderir. Sayfadan çıkınca bekleyen değişiklik de gönderilir.
 function shTouch(x){
   x.updatedAt=now();sh.dirty=x;sh.state='Kaydedilmemiş değişiklikler var';shPaintState();
-  clearTimeout(sh.timer);sh.timer=setTimeout(()=>shFlush(),1200);
+}
+function shModeStart(){const x=shGet(sh.id);if(!x||shRO())return;sh.snap=JSON.parse(JSON.stringify(x));sh.edit=true;sh.dirty=null;sh.state='';renderShip();}
+function shModeCancel(quiet){
+  const x=shGet(sh.id);if(x&&sh.snap){const i=sh.list.findIndex(v=>v.id===x.id);if(i>=0)sh.list[i]=Object.assign({},sh.snap,{files:x.files});}
+  sh.edit=false;sh.snap=null;sh.dirty=null;sh.state='';
+  if(!quiet){renderShip();toast('Düzenleme iptal edildi.');}
+}
+async function shModeSave(){
+  if(!sh.dirty){sh.edit=false;sh.snap=null;renderShip();return;}
+  const ok=await shFlush(true);if(!ok)return;
+  sh.edit=false;sh.snap=null;renderShip();
 }
 async function shFlush(manual){
   clearTimeout(sh.timer);const x=sh.dirty;if(!x)return true;
@@ -3176,9 +3210,9 @@ async function shFlush(manual){
   try{await shApi('PUT','ship=1',x);sh.state='Kaydedildi';if(manual)toast('Sevkiyat kaydedildi.');shPaintState();setTimeout(()=>{if(sh.state==='Kaydedildi'&&!sh.dirty){sh.state='';shPaintState();}},2500);return true;}
   catch(e){if(!sh.dirty)sh.dirty=x;sh.state='Kaydedilemedi';toast(e.message);shPaintState();return false;}
 }
-window.addEventListener('beforeunload',e=>{if(sh.dirty){shFlush();e.preventDefault();e.returnValue='';}});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&sh.dirty)shFlush();});
-const shPaintState=()=>{const e=$('shState');if(e){e.textContent=sh.state;e.className='sh-state'+(sh.dirty?' dirty':sh.state==='Kaydedilemedi'?' err':'');}const b=$('shSave');if(b)b.disabled=!sh.dirty;};
+window.addEventListener('beforeunload',e=>{if(sh.edit&&sh.dirty){e.preventDefault();e.returnValue='';}});
+
+const shPaintState=()=>{const e=$('shState');if(e){e.textContent=sh.state;e.className='sh-state'+(sh.dirty?' dirty':sh.state==='Kaydedilemedi'?' err':'');}};
 const shOwners=()=>[...new Set([...sh.list.map(x=>x.owner).filter(Boolean),...(typeof people!=='undefined'?people.map(p=>p.name||p.email):[])])].sort((a,b)=>String(a).localeCompare(String(b),'tr'));
 
 /* --- liste --- */
@@ -3222,7 +3256,7 @@ document.addEventListener('change',e=>{
   if(e.target.id==='shFStatus'){sh.f.status=e.target.value;renderShips();}
   else if(e.target.id==='shFOwner'){sh.f.owner=e.target.value;renderShips();}
 });
-function shOpen(id){guard(()=>{sh.id=id;sh.sub=sh.sub||'urun';sh.files=null;sh.sel=undefined;view='ship';render();window.scrollTo(0,0);});}
+function shOpen(id){guard(()=>{sh.edit=false;sh.snap=null;sh.dirty=null;sh.id=id;sh.sub=sh.sub||'genel';sh.files=null;sh.sel=undefined;view='ship';render();window.scrollTo(0,0);});}
 /* --- yeni sevkiyat --- */
 function shNewOpen(){
   $('shnNo').value='';$('shnStatus').value='yolda';$('shnEta').value='';
@@ -3236,11 +3270,11 @@ async function shNewSave(){
   if(no&&sh.list.some(x=>norm(x.no)===norm(no))){$('shnErr').textContent='Bu konteyner numarası zaten kayıtlı.';$('shnErr').hidden=false;return;}
   const x={id:uid(),no,invoiceNo:'',origin:'',port:'',status:$('shnStatus').value,eta:$('shnEta').value,arrived:'',owner:$('shnOwner').value,note:'',items:[],files:0,createdAt:now(),updatedAt:now()};
   $('shnSave').disabled=true;
-  try{const d=await shApi('PUT','ship=1',x);if(d&&d.ship)Object.assign(x,d.ship);sh.list.unshift(x);$('shnDlg').close();toast((x.code?x.code+' ':'')+'oluşturuldu.');sh.sub='urun';shOpen(x.id);}
+  try{const d=await shApi('PUT','ship=1',x);if(d&&d.ship)Object.assign(x,d.ship);sh.list.unshift(x);$('shnDlg').close();toast((x.code?x.code+' ':'')+'oluşturuldu.');sh.sub='genel';shOpen(x.id);}
   catch(e){$('shnSave').disabled=false;$('shnErr').textContent=e.message;$('shnErr').hidden=false;}
 }
 /* --- detay --- */
-const SH_TABS=[['urun','Ürünler ve Atama'],['genel','Genel'],['belge','Dosyalar']];
+const SH_TABS=[['genel','Genel'],['urun','Ürünler ve Atama'],['belge','Dosyalar']];
 function renderShip(){
   if(!sh.loaded){$('view').innerHTML='<section class="box"><h3>Sevkiyat<small>Yükleniyor…</small></h3></section>';shLoad();return;}
   const x=shGet(sh.id);
@@ -3253,7 +3287,10 @@ function renderShip(){
       <div class="vcell"><span>Ürün</span><strong>${nf.format(T.q)}</strong></div>
       <div class="vcell"><span>Atanan</span><strong>${nf.format(T.a)}</strong></div>
       <div class="vcell"><span>Boşta</span><strong style="color:${T.over?'var(--no)':T.free?'var(--risk)':'var(--ok)'}">${nf.format(T.free)}</strong></div>
-    </div><div class="edit-actions no-print"><span id="shState" class="sh-state" role="status"></span>${ro?'':'<button type="button" class="save" id="shSave" disabled>Kaydet</button>'}${ro||!sh.owner?'':'<button type="button" class="danger" id="shDel">Sil</button>'}</div></div></div>
+    </div><div class="edit-actions no-print"><span id="shState" class="sh-state" role="status"></span>${ro?'':sh.edit
+      ?`${sh.owner?'<button type="button" class="danger" id="shDel">Sil</button>':''}<button type="button" class="save" id="shSave">${ICON_SAVE}Değişiklikleri Kaydet</button><button type="button" id="shCancel">${ICON_X}İptal</button>`
+      :`<button type="button" class="primary" id="shEdit">${ICON_EDIT}Düzenle</button>`}</div></div></div>
+    ${sh.edit?'<p class="eb-note-line no-print">Düzenleme modu: değişiklikler Kaydet\'e basana kadar sunucuya gönderilmez.</p>':''}
     <div id="shBody"></div>`;
   paintShipBody();
 }
@@ -3264,7 +3301,7 @@ function paintShipBody(){
   shPaintState();
 }
 function shGenelHtml(x){
-  const ro=shRO(),dis=ro?'disabled':'',f=(k,l,type='text',extra='')=>`<label${extra}>${l}<input data-shf="${k}" type="${type}" value="${esc(x[k]||'')}" ${dis}></label>`;
+  const ro=shLock(),dis=ro?'disabled':'',f=(k,l,type='text',extra='')=>`<label${extra}>${l}<input data-shf="${k}" type="${type}" value="${esc(x[k]||'')}" ${dis}></label>`;
   return `<section class="box"><h3>Sevkiyat Bilgileri</h3><div class="grid infogrid">
     <label>Sevkiyat no<input value="${esc(x.code||'—')}" readonly data-locked tabindex="-1" title="Sunucu tarafından verilir; değiştirilemez"></label>${f('no','Konteyner no')}${f('invoiceNo','Fatura no')}
     <label>Durum<select data-shf="status" ${dis}>${SH_STATUS.map(([k,t])=>`<option value="${k}" ${k===x.status?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
@@ -3272,42 +3309,37 @@ function shGenelHtml(x){
     <label>Sorumlu<select data-shf="owner" ${dis}><option value="">Seçin</option>${[...new Set([x.owner,...shOwners()].filter(Boolean))].map(o=>`<option value="${esc(o)}" ${o===x.owner?'selected':''}>${esc(o)}</option>`).join('')}</select></label>
     <label class="span4">Not<textarea data-shf="note" rows="3" ${dis}>${esc(x.note||'')}</textarea></label></div></section>`;
 }
+// Ürünler ve Atama: solda kalem kartları (ürün, adet, ilerleme çubuğu, hangi projeye), sağda "Projelere Göre Dağılım". Seri numarası yok.
+const SH_PKG='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>';
+const shChip=(t,n,cls='')=>`<span class="sh-chip ${cls}">${esc(t)} <b>× ${nf.format(n)}</b></span>`;
 function shModelSelect(it,dis){
   const rows=catFlat(),lab=r=>catLabel(r),cur=it.model||'',inCat=rows.some(r=>lab(r)===cur);
   const groups=new Map();rows.forEach(r=>{const g=r.p.type+' · '+r.p.form;if(!groups.has(g))groups.set(g,[]);groups.get(g).push(r);});
   return `<select data-shmodel ${dis} aria-label="Ürün"><option value="">Ürün seçin…</option>${[...groups].map(([g,l])=>`<optgroup label="${esc(g)}">${l.map(r=>`<option value="${esc(lab(r))}" ${lab(r)===cur?'selected':''}>${esc(lab(r))}</option>`).join('')}</optgroup>`).join('')}<option value="__other" ${cur&&!inCat?'selected':''}>Diğer (elle yaz)</option></select>
     <input data-shmodeltxt value="${esc(cur)}" placeholder="Ürün adı" aria-label="Ürün adı" ${cur&&!inCat?'':'hidden'} ${dis} style="margin-top:6px">`;
 }
-// Konteynerde ne var, nereye gidecek: iki özet tablo (ürüne göre, projeye göre) ve altında düzenlenecek kalemler.
-function shSummaryHtml(x){
-  const its=(x.items||[]).filter(i=>i.model||i.qty);
-  if(!its.length)return '';
-  const chip=(t,n,cls='')=>`<span class="sh-chip ${cls}">${esc(t)} <b>× ${nf.format(n)}</b></span>`;
-  const rows=its.map(it=>{const q=+it.qty||0,al=(it.alloc||[]).filter(l=>l.site&&+l.qty>0),a=al.reduce((m,l)=>m+(+l.qty||0),0),free=q-a,pct=q?Math.min(100,a/q*100):0;
-    return `<tr><td><b>${esc(it.model||'Ürün seçilmedi')}</b></td><td class="num">${nf.format(q)}</td><td class="num">${nf.format(a)}</td><td class="num"><b class="${free<0?'sh-over':free>0?'sh-free':'sh-done'}">${nf.format(free)}</b></td>
-      <td><div class="sh-bar" title="${nf.format(a)} / ${nf.format(q)}"><i class="${a>q?'over':''}" style="width:${pct.toFixed(0)}%"></i></div></td>
-      <td>${al.map(l=>chip(shSiteLabel(l.site),l.qty)).join(' ')}${free>0?' '+chip('Atanmamış',free,'free'):''}${free<0?' '+chip('Fazla atanmış',-free,'over'):''}${!al.length&&free<=0?'<span class="note">—</span>':''}</td></tr>`;}).join('');
-  const by=new Map();its.forEach(it=>(it.alloc||[]).forEach(l=>{if(!l.site||!(+l.qty>0))return;if(!by.has(l.site))by.set(l.site,[]);by.get(l.site).push([it.model||'Ürün seçilmedi',+l.qty]);}));
-  const prow=[...by].sort((a,b)=>shSiteLabel(a[0]).localeCompare(shSiteLabel(b[0]),'tr')).map(([id,l])=>`<tr><td><b>${esc(shSiteLabel(id))}</b></td><td>${l.map(([m,q])=>chip(m,q)).join(' ')}</td><td class="num">${nf.format(l.reduce((m,v)=>m+v[1],0))}</td></tr>`).join('');
-  return `<section class="box"><h3>Konteyner İçeriği ve Dağılım<small>Hangi ürün, kaç adet, nereye gidecek</small></h3>
-    <div class="scroll"><table class="yearly sh-sum sh-sum1 m-cards"><thead><tr><th>Ürün</th><th class="num">Adet</th><th class="num">Atanan</th><th class="num">Boşta</th><th>Atama Durumu</th><th>Hangi Projeye</th></tr></thead><tbody>${rows}</tbody></table></div></section>
-    <section class="box"><h3>Projelere Göre Dağılım<small>${by.size?nf.format(by.size)+' proje':''}</small></h3>
-    ${prow?`<div class="scroll"><table class="yearly sh-sum sh-sum2 m-cards"><thead><tr><th>Proje</th><th>Bu Konteynerden Gelecek Ürünler</th><th class="num">Toplam Adet</th></tr></thead><tbody>${prow}</tbody></table></div>`:'<p class="note">Henüz hiçbir ürün bir projeye atanmadı. Aşağıdaki kalemlerde "+ Projeye Ata" ile atama yapın.</p>'}</section>
-    <h2 class="sh-h2">Kalemleri Düzenle</h2>`;
-}
 function shUrunHtml(x){
-  const ro=shRO(),dis=ro?'disabled':'';
-  const cards=(x.items||[]).map((it,i)=>{
-    const asg=(it.alloc||[]).reduce((m,l)=>m+(+l.qty||0),0),free=(+it.qty||0)-asg;
-    const al=(it.alloc||[]).map((l,j)=>`<div class="sh-al" data-shal="${j}"><select data-shsite ${dis} aria-label="Proje"><option value="">Proje seçin…</option>${[...db.sites].sort((a,b)=>String(a.code).localeCompare(String(b.code))).map(s=>`<option value="${esc(s.id)}" ${s.id===l.site?'selected':''}>${esc([s.code,s.name].filter(Boolean).join(' · '))}</option>`).join('')}${l.site&&!db.sites.some(s=>s.id===l.site)?`<option value="${esc(l.site)}" selected>${esc(shSiteLabel(l.site))}</option>`:''}</select>
-      <input data-shalqty type="number" min="1" step="1" value="${esc(l.qty)}" aria-label="Adet" ${dis}>${ro?'':'<button type="button" class="ghost" data-shaldel title="Atamayı kaldır">×</button>'}</div>`).join('');
-    const nser=String(it.serials||'').split('\n').filter(v=>v.trim()).length;
-    return `<section class="box sh-item" data-shit="${i}"><h3><span>Kalem ${i+1}${it.model?' · '+esc(it.model):''}</span><small>${esc(`${nf.format(asg)} / ${nf.format(+it.qty||0)} atandı`)}${free>0?` · <b class="sh-free">${nf.format(free)} boşta</b>`:free<0?` · <b class="sh-over">${nf.format(-free)} fazla atanmış</b>`:` · <b class="sh-done">tamamı atandı</b>`}</small></h3>
-      <div class="sh-head"><label>Ürün${shModelSelect(it,dis)}</label><label>Adet<input data-shqty type="number" min="1" step="1" value="${esc(it.qty||'')}" ${dis}></label></div>
-      <div class="sh-sub">Hangi projeye gidecek</div>${al||'<p class="note">Henüz projeye atanmadı.</p>'}
-      ${ro?'':`<p class="sh-addrow"><button type="button" class="ghost" data-shaladd>+ Projeye Ata</button>${i>=0?'<button type="button" class="ghost danger" data-shitdel>Kalemi Sil</button>':''}</p>`}
-      <details class="sh-ser" ${nser?'open':''}><summary>Seri numaraları <small>(isteğe bağlı${nser?' · '+nf.format(nser)+' kayıt':''})</small></summary><textarea data-shser rows="4" placeholder="Her satıra bir seri numarası" ${dis}>${esc(it.serials||'')}</textarea></details></section>`;}).join('');
-  return shSummaryHtml(x)+(cards||'<section class="box"><p class="note">Bu konteynerde henüz ürün kalemi yok. "+ Ürün Kalemi Ekle" ile konteynerin içindeki ürünleri girin.</p></section>')+(ro?'':'<p class="sh-add"><button type="button" class="primary" id="shAddItem">+ Ürün Kalemi Ekle</button></p>');
+  const lock=shLock(),dis=lock?'disabled':'',items=x.items||[];
+  const sites=[...db.sites].sort((a,b)=>String(a.code).localeCompare(String(b.code)));
+  const cards=items.map((it,i)=>{
+    const q=+it.qty||0,al=it.alloc||[],a=al.reduce((m,l)=>m+(l.site?+l.qty||0:0),0),free=q-a,pct=q?Math.min(100,a/q*100):0;
+    const stat=free<0?`<b class="sh-over">${nf.format(-free)} fazla atanmış</b>`:free>0?`<b class="sh-free">${nf.format(free)} boşta</b>`:`<b class="sh-done">tamamı atandı</b>`;
+    const head=lock
+      ?`<div class="sh-ih"><span class="sh-ico">${SH_PKG}</span><b class="sh-model">${esc(it.model||'Ürün seçilmedi')}</b><span class="sh-qty">${nf.format(q)}<small>adet</small></span></div>`
+      :`<div class="sh-ih edit"><label>Ürün${shModelSelect(it,dis)}</label><label class="sh-qtyl">Adet<input data-shqty type="number" min="1" step="1" value="${esc(it.qty||'')}"></label></div>`;
+    const bar=`<div class="sh-prog"><div class="sh-bar" title="${nf.format(a)} / ${nf.format(q)}"><i class="${a>q?'over':''}" style="width:${pct.toFixed(0)}%"></i></div><span class="sh-pt">${nf.format(a)} / ${nf.format(q)} atandı · ${stat}</span></div>`;
+    const body=lock
+      ?`<div class="sh-chips">${al.filter(l=>l.site&&+l.qty>0).map(l=>shChip(shSiteLabel(l.site),l.qty)).join('')}${free>0?shChip('Atanmamış',free,'free'):''}${free<0?shChip('Fazla atanmış',-free,'over'):''}${!al.length&&free<=0?'<span class="note">—</span>':''}</div>`
+      :`<div class="sh-alg">${al.map((l,j)=>`<div class="sh-al" data-shal="${j}"><select data-shsite aria-label="Proje"><option value="">Proje seçin…</option>${sites.map(v=>`<option value="${esc(v.id)}" ${v.id===l.site?'selected':''}>${esc([v.code,v.name].filter(Boolean).join(' · '))}</option>`).join('')}${l.site&&!db.sites.some(v=>v.id===l.site)?`<option value="${esc(l.site)}" selected>${esc(shSiteLabel(l.site))}</option>`:''}</select><input data-shalqty type="number" min="1" step="1" value="${esc(l.qty)}" aria-label="Adet"><button type="button" class="ghost" data-shaldel title="Atamayı kaldır">×</button></div>`).join('')}</div>
+        <div class="sh-acts"><button type="button" class="ghost" data-shaladd>+ Projeye Ata</button><button type="button" class="ghost danger" data-shitdel>Kalemi Sil</button></div>`;
+    return `<section class="box sh-item" data-shit="${i}">${head}${bar}${body}</section>`;}).join('');
+  // sağ sütun: projelere göre
+  const by=new Map();items.forEach(it=>(it.alloc||[]).forEach(l=>{if(!l.site||!(+l.qty>0))return;if(!by.has(l.site))by.set(l.site,[]);by.get(l.site).push([it.model||'Ürün seçilmedi',+l.qty]);}));
+  const prow=[...by].sort((a,b)=>shSiteLabel(a[0]).localeCompare(shSiteLabel(b[0]),'tr')).map(([id,l])=>`<div class="sh-prow"><div class="sh-pn"><b>${esc(shSiteLabel(id))}</b><span>${nf.format(l.reduce((m,v)=>m+v[1],0))}</span></div><div class="sh-chips">${l.map(([m,q])=>shChip(m,q)).join('')}</div></div>`).join('');
+  const side=`<div class="box sh-side"><h3>Projelere Göre Dağılım<small>${by.size?nf.format(by.size)+' proje':''}</small></h3>${prow||'<p class="note">Henüz hiçbir ürün bir projeye atanmadı.</p>'}</div>`;
+  const add=lock?'':'<button type="button" class="primary sh-addbtn" id="shAddItem">+ Ürün Kalemi Ekle</button>';
+  const empty=`<section class="box sh-empty"><span class="sh-ico">${SH_PKG}</span><p>Bu konteynerde henüz ürün yok.</p>${lock?(shRO()?'':'<p class="note">Ürün eklemek için sağ üstteki "Düzenle"ye basın.</p>'):''}</section>`;
+  return `<div class="sh-grid"><div class="sh-main">${cards||empty}${add}</div>${side}</div>`;
 }
 /* --- belgeler --- */
 // Dosya adından klasör tahmini. EAS… (liman e-arşiv serisi), GIB… (Ticaret Bakanlığı / Tareks), NASE… (belge alım faturası) bu şirketin kullandığı bilinen belge serileridir.
@@ -3376,7 +3408,10 @@ async function shUpload(fileList,kind){
   if(kind&&ok)sh.sel=kind;
   sh.files=null;await shLoad0(x.id);
 }
-async function shLoad0(id){try{const d=await shApi('GET','ships=1');sh.list=d.ships||sh.list;}catch(e){}if(view==='ship'&&sh.id===id){renderShip();}}
+async function shLoad0(id){try{const d=await shApi('GET','ships=1'),lst=d.ships||sh.list,cur=shGet(id);
+    // Düzenleme modundayken yerel (kaydedilmemiş) değişiklikler korunur; yalnızca dosya sayısı güncellenir.
+    if(sh.edit&&cur){const i=lst.findIndex(v=>v.id===id);if(i>=0){cur.files=lst[i].files;lst[i]=cur;}}
+    sh.list=lst;}catch(e){}if(view==='ship'&&sh.id===id){renderShip();}}
 /* --- tıklamalar --- */
 document.addEventListener('click',async e=>{
   const t=e.target;
@@ -3390,10 +3425,12 @@ document.addEventListener('click',async e=>{
   if(view!=='ship')return;
   const x=shGet(sh.id);if(!x)return;
   const tab=t.closest('[data-shsub]');if(tab){sh.sub=tab.dataset.shsub;paintShipBody();return;}
-  if(t.closest('#shSave')){shFlush(true);return;}
+  if(t.closest('#shEdit')){shModeStart();return;}
+  if(t.closest('#shCancel')){if(sh.dirty){if(!await ask('Kaydedilmemiş değişiklikler var. Vazgeçip çıkılsın mı?','Değişiklikleri At'))return;}shModeCancel();return;}
+  if(t.closest('#shSave')){shModeSave();return;}
   if(t.closest('#shDel')){if(!await ask(`${x.code||x.no} sevkiyatı ve belgeleri silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.`,'Sevkiyatı Sil'))return;
     try{await shApi('DELETE','ship='+encodeURIComponent(x.id));sh.list=sh.list.filter(v=>v.id!==x.id);toast('Sevkiyat silindi.');view='ships';render();}catch(err){toast(err.message);}return;}
-  if(t.closest('#shAddItem')){x.items=x.items||[];x.items.push({id:uid(),model:'',qty:1,serials:'',note:'',alloc:[]});shTouch(x);paintShipBody();return;}
+  if(t.closest('#shAddItem')){x.items=x.items||[];x.items.push({id:uid(),model:'',qty:1,note:'',alloc:[]});shTouch(x);paintShipBody();return;}
   const card=t.closest('[data-shit]');
   if(card){const it=(x.items||[])[+card.dataset.shit];if(!it)return;
     if(t.closest('[data-shitdel]')){if(!await ask('Bu ürün kalemi ve atamaları silinsin mi?','Kalemi Sil'))return;x.items.splice(+card.dataset.shit,1);shTouch(x);renderShip();return;}
@@ -3412,7 +3449,7 @@ document.addEventListener('input',e=>{
   if(view!=='ship')return;const el=e.target,x=shGet(sh.id);if(!x||!el.dataset)return;
   if(el.dataset.shf&&el.tagName!=='SELECT'){x[el.dataset.shf]=el.value;shTouch(x);return;}
   const card=el.closest&&el.closest('[data-shit]');if(!card)return;const it=(x.items||[])[+card.dataset.shit];if(!it)return;
-  if(el.matches('[data-shser]')){it.serials=el.value;shTouch(x);}else if(el.matches('[data-shmodeltxt]')){it.model=el.value.trim();shTouch(x);}
+  if(el.matches('[data-shmodeltxt]')){it.model=el.value.trim();shTouch(x);}
 });
 document.addEventListener('change',async e=>{
   if(view==='ship'&&e.target.id==='shPick'&&e.target.files.length){shUpload(e.target.files,sh.upKind||sh.sel);return;}
@@ -3424,7 +3461,6 @@ document.addEventListener('change',async e=>{
     if(el.matches('[data-shmodel]')){const tx=card.querySelector('[data-shmodeltxt]');if(el.value==='__other'){tx.hidden=false;tx.focus();return;}tx.hidden=true;it.model=el.value;tx.value=el.value;shTouch(x);return;}
     if(el.matches('[data-shmodeltxt]')){it.model=el.value.trim();shTouch(x);return;}
     if(el.matches('[data-shqty]')){it.qty=Math.max(1,Math.floor(+el.value)||1);shTouch(x);renderShip();return;}
-    if(el.matches('[data-shser]')){it.serials=el.value;shTouch(x);return;}
     const al=el.closest('[data-shal]');
     if(al){const l=it.alloc[+al.dataset.shal];if(!l)return;if(el.matches('[data-shsite]'))l.site=el.value;else if(el.matches('[data-shalqty]'))l.qty=Math.max(1,Math.floor(+el.value)||1);shTouch(x);renderShip();return;}}
 });
