@@ -1281,7 +1281,8 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
   <p class="alert" id="ntErr" role="alert" hidden></p>
   <div class="row"><button type="button" id="ntCancel">Vazgeç</button><button type="button" class="primary" id="ntSave">Görev Ekle</button></div></dialog>
 <dialog id="shnDlg"><h3 style="margin:0 0 10px">Yeni Sevkiyat</h3>
-  <label>Konteyner No<input id="shnNo" maxlength="60" autocomplete="off" placeholder="ör. MSMU7898053"></label>
+  <label>Sevkiyat No<input id="shnCode" readonly data-locked tabindex="-1" value="—" title="Sunucu tarafından verilir; değiştirilemez"></label>
+  <label>Konteyner No<input id="shnNo" maxlength="60" autocomplete="off" placeholder="ör. MSMU7898053 (sonradan da girilebilir)"></label>
   <label>Tedarikçi<input id="shnSupplier" maxlength="140" autocomplete="off"></label>
   <label>Gemi<input id="shnVessel" maxlength="80" autocomplete="off"></label>
   <label>Durum<select id="shnStatus"><option value="hazirlaniyor">Hazırlanıyor</option><option value="yolda" selected>Yolda</option><option value="gumrukte">Gümrükte</option><option value="depoda">Depoda</option><option value="teslim">Teslim Edildi</option></select></label>
@@ -3208,14 +3209,16 @@ function shOpen(id){guard(()=>{sh.id=id;sh.sub=sh.sub||'urun';sh.files=null;view
 function shNewOpen(){
   $('shnNo').value='';$('shnSupplier').value='';$('shnVessel').value='';$('shnStatus').value='yolda';$('shnEta').value='';
   $('shnOwner').innerHTML='<option value="">Seçin</option>'+shOwners().map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
-  $('shnErr').hidden=true;$('shnSave').disabled=false;$('shnDlg').showModal();$('shnNo').focus();
+  $('shnErr').hidden=true;$('shnSave').disabled=false;$('shnCode').value='—';
+  shApi('GET','shipnext=1').then(d=>{if($('shnDlg').open)$('shnCode').value=d.code||'—';}).catch(()=>{});
+  $('shnDlg').showModal();$('shnNo').focus();
 }
 async function shNewSave(){
-  const no=$('shnNo').value.trim();if(!no){$('shnErr').textContent='Konteyner numarası gerekli.';$('shnErr').hidden=false;return;}
-  if(sh.list.some(x=>norm(x.no)===norm(no))){$('shnErr').textContent='Bu konteyner numarası zaten kayıtlı.';$('shnErr').hidden=false;return;}
+  const no=$('shnNo').value.trim();
+  if(no&&sh.list.some(x=>norm(x.no)===norm(no))){$('shnErr').textContent='Bu konteyner numarası zaten kayıtlı.';$('shnErr').hidden=false;return;}
   const x={id:uid(),no,supplier:$('shnSupplier').value.trim(),vessel:$('shnVessel').value.trim(),voyage:'',invoiceNo:'',origin:'',port:'',status:$('shnStatus').value,eta:$('shnEta').value,arrived:'',owner:$('shnOwner').value,note:'',items:[],files:0,createdAt:now(),updatedAt:now()};
   $('shnSave').disabled=true;
-  try{const d=await shApi('PUT','ship=1',x);if(d&&d.ship)Object.assign(x,d.ship);sh.list.unshift(x);$('shnDlg').close();toast('Sevkiyat oluşturuldu.');sh.sub='urun';shOpen(x.id);}
+  try{const d=await shApi('PUT','ship=1',x);if(d&&d.ship)Object.assign(x,d.ship);sh.list.unshift(x);$('shnDlg').close();toast((x.code?x.code+' ':'')+'oluşturuldu.');sh.sub='urun';shOpen(x.id);}
   catch(e){$('shnSave').disabled=false;$('shnErr').textContent=e.message;$('shnErr').hidden=false;}
 }
 /* --- detay --- */

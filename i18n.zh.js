@@ -1184,7 +1184,8 @@ window.I18N_ZH = {
    "(silinmiş proje)": "（已删除的项目）",
    "Sevkiyat No": "发运编号",
    "Sevkiyat no": "发运编号",
-   "Sevkiyat no, konteyner no, tedarikçi, gemi, ürün, proje…": "发运编号、集装箱号、供应商、船名、产品、项目…"
+   "Sevkiyat no, konteyner no, tedarikçi, gemi, ürün, proje…": "发运编号、集装箱号、供应商、船名、产品、项目…",
+   "ör. MSMU7898053 (sonradan da girilebilir)": "例如 MSMU7898053（也可稍后填写）"
   },
   rules: function (sub) {
     var PZ = [

@@ -400,6 +400,7 @@
     '(silinmiş proje)': '(deleted project)',
     'Sevkiyat No': 'Shipment No.', 'Sevkiyat no': 'Shipment no.',
     'Sevkiyat no, konteyner no, tedarikçi, gemi, ürün, proje…': 'Shipment no., container no., supplier, vessel, product, project…',
+    'ör. MSMU7898053 (sonradan da girilebilir)': 'e.g. MSMU7898053 (can be entered later)',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
