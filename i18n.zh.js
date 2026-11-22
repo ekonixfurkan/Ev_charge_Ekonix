@@ -1181,7 +1181,10 @@ window.I18N_ZH = {
    "Bu sevkiyata henüz belge yüklenmedi.": "该发运尚未上传文件。",
    "Belge güncellendi.": "文件已更新。",
    "Belge silindi.": "文件已删除。",
-   "(silinmiş proje)": "（已删除的项目）"
+   "(silinmiş proje)": "（已删除的项目）",
+   "Sevkiyat No": "发运编号",
+   "Sevkiyat no": "发运编号",
+   "Sevkiyat no, konteyner no, tedarikçi, gemi, ürün, proje…": "发运编号、集装箱号、供应商、船名、产品、项目…"
   },
   rules: function (sub) {
     var PZ = [

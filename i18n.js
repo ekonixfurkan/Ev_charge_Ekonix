@@ -398,6 +398,8 @@
     'Belge güncellendi.': 'Document updated.',
     'Belge silindi.': 'Document deleted.',
     '(silinmiş proje)': '(deleted project)',
+    'Sevkiyat No': 'Shipment No.', 'Sevkiyat no': 'Shipment no.',
+    'Sevkiyat no, konteyner no, tedarikçi, gemi, ürün, proje…': 'Shipment no., container no., supplier, vessel, product, project…',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
