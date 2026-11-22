@@ -25,6 +25,6 @@ Bu depoda değişiklik yaparken (insan ya da yapay zekâ) şunlara uy.
 
 ## Hub (kutucuklu bölüm seçimi)
 - Kullanıcı bir sayfanın içeriğini "kutucuklar" halinde ister: üstte tıklanabilir kutular (simge + başlık + alt satır), seçilen kutunun içeriği altında açılır. MKT Motors'ta aynı yapıya "hub" (HubCard) denir; burada da bu ad kullanılır: "hub yap" = bölümleri kutucuklara böl.
-- Sol menü de hub'tır: yalnızca ana başlıklar (Ana Sayfa, Bildirimler, Projeler, Toplantılar, Satış ve Pazar, Yönetim); alt sayfalar `HUBS` içinde tanımlı `.hub-card` kutucuklarından açılır, menüde ayrı madde olarak yer almaz. Yeni sayfa eklenince `HUBS` ve `HUB_VIEW`'a yazılır; görünürlük `hubCan()` ile verilir.
+- Sol menü de hub'tır: yalnızca ana başlıklar (Ana Sayfa, Bildirimler, Projeler, Toplantılar, İş Geliştirme, Yönetim); alt sayfalar `HUBS` içinde tanımlı `.hub-card` kutucuklarından açılır, menüde ayrı madde olarak yer almaz. Yeni sayfa eklenince `HUBS` ve `HUB_VIEW`'a yazılır; görünürlük `hubCan()` ile verilir.
 - Uygulama: `.hub-tiles` ızgarası içinde `.comp-tile` kutuları (Rakip Analizi: Analiz Yap / Geçmiş Analizler; Dosyalar: klasörler). Seçili kutu `.on`; içerik sayısı varsa simgenin köşesinde `.ct-n` rozeti ve alt satırda "N dosya" gibi sayı gösterilir. Yeni renk/yazı tipi eklenmez.
 

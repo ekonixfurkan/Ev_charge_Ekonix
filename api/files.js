@@ -6,10 +6,12 @@
 //   POST {action:'folder', site, name}                        yeni klasör
 //   DELETE ?id=ID                    dosyayı sil (yalnızca sahip hesap)
 //   DELETE ?site=ID&folder=AD        boş özel klasörü sil
+// Sevkiyatlar (konteyner, ürün atamaları, belgeler) da burada: ?ships / ?ship / ?shipfiles / ?shipfile (bkz. lib/shipments.js)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
 import { logActivity } from '../lib/activity.js';
+import { handleShipQuery, registerShipFile, shipFileRow, shipExists } from '../lib/shipments.js';
 import { _deps, MAX_BYTES, ALLOWED_TYPES, DEFAULT_FOLDERS, TYPES, cleanName, cleanFolder, extOf, isAllowedName, signedGetUrl } from '../lib/files.js';
 
 let _ready = null;
@@ -60,10 +62,12 @@ export default async function handler(req, res) {
     const s = sql();
     const q = req.query || {};
 
+    if (await handleShipQuery(req, res, user, s, q)) return;
+
     if (req.method === 'GET' && q.download) {
       const id = String(q.download);
       if (!/^\d+$/.test(id)) return res.status(400).json({ error: 'id gerekli' });
-      const r = await s`SELECT name, mime, pathname FROM site_files WHERE id = ${id}::bigint`;
+      const r = q.ship === '1' ? [await shipFileRow(s, id)].filter(Boolean) : await s`SELECT name, mime, pathname FROM site_files WHERE id = ${id}::bigint`;
       if (!r.length) return res.status(404).json({ error: 'Dosya bulunamadı' });
       const inline = q.inline === '1';
       try {
@@ -108,10 +112,11 @@ export default async function handler(req, res) {
             body: b,
             request: req,
             onBeforeGenerateToken: async (pathname) => {
-              // yol biçimi: sites/{proje id}/{rastgele}-{dosya adı}
-              const m = /^sites\/([^/]+)\/([^/]+)$/.exec(pathname);
-              if (!m || !isAllowedName(m[2])) throw new Error('Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)');
-              if ((await siteName(s, m[1])) == null) throw new Error('Proje bulunamadı');
+              // yol biçimi: sites/{proje id}/{rastgele}-{dosya adı}  ya da  ships/{sevkiyat id}/{rastgele}-{dosya adı}
+              const m = /^(sites|ships)\/([^/]+)\/([^/]+)$/.exec(pathname);
+              if (!m || !isAllowedName(m[3])) throw new Error('Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)');
+              if (m[1] === 'ships') { if (!(await shipExists(s, m[2]))) throw new Error('Sevkiyat bulunamadı'); }
+              else if ((await siteName(s, m[2])) == null) throw new Error('Proje bulunamadı');
               return { allowedContentTypes: ALLOWED_TYPES, maximumSizeInBytes: MAX_BYTES, addRandomSuffix: false, allowOverwrite: false, tokenPayload: JSON.stringify({ by: user.email }) };
             },
           });
@@ -120,6 +125,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: String(e && e.message ? e.message : 'Yükleme başlatılamadı') });
         }
       }
+      if (b.action === 'shipfile') return await registerShipFile(res, user, s, b);
       const site = typeof b.site === 'string' ? b.site : '';
       const name = await siteName(s, site);
       if (name == null) return res.status(404).json({ error: 'Proje bulunamadı' });
