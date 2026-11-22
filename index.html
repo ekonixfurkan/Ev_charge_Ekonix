@@ -1192,6 +1192,11 @@ body.sk-open{overflow:hidden}
 .sh-cnt{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:var(--teal);color:#fff;font-size:10.5px;font-weight:700;text-align:center;line-height:18px}
 .sh-state{align-self:center;font-size:11.5px;color:var(--muted);min-width:90px}.sh-state.dirty{color:var(--risk);font-weight:600}.sh-state.err{color:var(--no);font-weight:600}
 .sh-item h3 small{font-weight:600}.sh-free{color:var(--risk)}.sh-over{color:var(--no)}.sh-done{color:var(--ok)}
+.sh-chip{display:inline-flex;align-items:center;gap:4px;margin:2px 4px 2px 0;padding:2px 9px;border:1px solid var(--hair-strong);border-radius:99px;background:var(--soft);font-size:11.5px;color:var(--ink);white-space:nowrap}
+.sh-chip b{font-weight:700;color:var(--navy)}.sh-chip.free{background:var(--risk-soft);border-color:var(--risk);color:var(--risk)}.sh-chip.free b{color:var(--risk)}.sh-chip.over{background:var(--no-soft);border-color:var(--no);color:var(--no)}.sh-chip.over b{color:var(--no)}
+.sh-bar{width:100%;min-width:90px;height:8px;border-radius:4px;background:var(--hair);overflow:hidden}.sh-bar i{display:block;height:100%;background:var(--ok)}.sh-bar i.over{background:var(--no)}
+table.yearly.sh-sum{width:100%;min-width:100%;display:table}.sh-sum th,.sh-sum td{text-align:left;vertical-align:middle;white-space:normal}.sh-sum th.num,.sh-sum td.num{text-align:right}.sh-sum th{white-space:nowrap}.sh-sum1 td:last-child{width:46%}.sh-sum2 th:last-child{width:14%}
+.sh-h2{margin:22px 0 10px;font-size:14px;font-weight:700;color:var(--ink)}
 .sh-head{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:14px;margin-bottom:12px}
 .sh-sub{margin:4px 0 8px;font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .sh-al{display:grid;grid-template-columns:minmax(0,1fr) 110px auto;gap:10px;align-items:center;margin-bottom:8px}
@@ -1201,6 +1206,9 @@ body.sk-open{overflow:hidden}
 .sh-drop{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 16px;margin-bottom:14px;border:1px dashed var(--hair-strong);border-radius:var(--radius);background:var(--soft)}
 .sh-drop.over{border-color:var(--teal);background:var(--teal-soft)}.sh-drop .note{flex:1 1 320px;margin:0}
 .sh-title{width:calc(100% - 46px);min-width:0;padding:5px 8px;min-height:30px;font-weight:600}
+.fl-tbl td .sub{display:block;margin-top:2px;font-size:11px;font-weight:400;color:var(--muted)}
+.fl-tbl .fl-act{white-space:nowrap}.fl-tbl .fl-act>*{display:inline-block;margin-left:8px;vertical-align:middle}
+.fl-tbl.sh-fl th:nth-child(1){width:38%}.fl-tbl.sh-fl th:nth-child(2){width:9%}.fl-tbl.sh-fl th:nth-child(3){width:16%}.fl-tbl.sh-fl th:nth-child(4){width:15%}.fl-tbl.sh-fl th:nth-child(5){width:22%}
 .sh-ftbl{table-layout:fixed}.sh-ftbl td{white-space:normal;overflow-wrap:anywhere;vertical-align:middle}.sh-ftbl .fl-act{white-space:nowrap;text-align:right}.sh-ftbl .fl-act>*{display:inline-block;margin-left:6px}.sh-ftbl select{min-width:0;font-size:12px;padding:5px 6px}
 @media (max-width:900px){.sh-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.sh-head{grid-template-columns:1fr}}
 html.ro .sh-w{display:none}
@@ -1288,6 +1296,11 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
   <label>Sorumlu<select id="shnOwner"></select></label>
   <p class="alert" id="shnErr" role="alert" hidden></p>
   <div class="row"><button type="button" id="shnCancel">Vazgeç</button><button type="button" class="primary" id="shnSave">Oluştur</button></div></dialog>
+<dialog id="shfDlg"><h3 style="margin:0 0 10px">Dosyayı Düzenle</h3>
+  <label>Başlık<input id="shfTitle" maxlength="160" autocomplete="off"></label>
+  <label>Klasör<select id="shfKind"></select></label>
+  <p class="alert" id="shfErr" role="alert" hidden></p>
+  <div class="row"><button type="button" id="shfCancel">Vazgeç</button><button type="button" class="primary" id="shfSave">Kaydet</button></div></dialog>
 <dialog id="ask"><form method="dialog"><p id="askMsg" style="margin:0 0 6px;font-size:14px"></p><div class="row"><button value="no" id="askNo">Vazgeç</button><button value="yes" class="primary" id="askYes">Tamam</button></div></form></dialog>
 <dialog id="dlg">
   <form id="dlgForm">
@@ -3131,7 +3144,9 @@ function renderHubStats(){document.querySelectorAll('[data-hubstat]').forEach(e=
 document.addEventListener('click',e=>{const c=e.target.closest('[data-hubgo]');if(c&&view==='hub')hubGo(c.dataset.hubgo);});
 /* ---------- Sevkiyatlar: Çin'den gelen konteynerler, içindeki ürünler, hangi projeye gidecekleri ve belgeler ---------- */
 const SH_STATUS=[['hazirlaniyor','Hazırlanıyor','var(--s-aday)'],['yolda','Yolda','var(--s-inceleme)'],['gumrukte','Gümrükte','var(--stg-09)'],['depoda','Depoda','var(--stg-08)'],['teslim','Teslim Edildi','var(--s-onay)']];
-const SH_KIND=[['beyanname','Gümrük Beyannamesi'],['sigorta','Nakliyat Sigortası'],['fatura','Fatura'],['liman','Liman ve Ardiye'],['denetim','Denetim (TSE vb.)'],['uygunluk','Uygunluk Belgesi (TPS / BTK)'],['nakliye','Nakliye ve Konşimento'],['diger','Diğer']];
+// Belge klasörleri tüm sevkiyatlarda birebir aynıdır (sabit); dosya türüne göre klasöre yerleşir.
+const SH_KIND=[['beyanname','Gümrük Beyannameleri'],['sigorta','Nakliyat Sigortası'],['fatura','Faturalar'],['liman','Liman ve Ardiye'],['denetim','Denetim (TSE vb.)'],['uygunluk','Uygunluk Belgeleri (TPS / BTK)'],['nakliye','Nakliye ve Konşimento'],['diger','Diğer']];
+const shKindName=k=>(SH_KIND.find(x=>x[0]===k)||SH_KIND[SH_KIND.length-1])[1];
 const shStat=k=>SH_STATUS.find(x=>x[0]===k)||SH_STATUS[1];
 const sh={list:[],loaded:false,busy:false,err:'',f:{q:'',status:'',owner:''},owner:false,id:'',sub:'urun',files:null,fileBusy:false,up:[],timer:null,state:''};
 async function shApi(method,qs,body){
@@ -3207,7 +3222,7 @@ document.addEventListener('change',e=>{
   if(e.target.id==='shFStatus'){sh.f.status=e.target.value;renderShips();}
   else if(e.target.id==='shFOwner'){sh.f.owner=e.target.value;renderShips();}
 });
-function shOpen(id){guard(()=>{sh.id=id;sh.sub=sh.sub||'urun';sh.files=null;view='ship';render();window.scrollTo(0,0);});}
+function shOpen(id){guard(()=>{sh.id=id;sh.sub=sh.sub||'urun';sh.files=null;sh.sel=undefined;view='ship';render();window.scrollTo(0,0);});}
 /* --- yeni sevkiyat --- */
 function shNewOpen(){
   $('shnNo').value='';$('shnStatus').value='yolda';$('shnEta').value='';
@@ -3225,7 +3240,7 @@ async function shNewSave(){
   catch(e){$('shnSave').disabled=false;$('shnErr').textContent=e.message;$('shnErr').hidden=false;}
 }
 /* --- detay --- */
-const SH_TABS=[['urun','Ürünler ve Atama'],['genel','Genel'],['belge','Belgeler']];
+const SH_TABS=[['urun','Ürünler ve Atama'],['genel','Genel'],['belge','Dosyalar']];
 function renderShip(){
   if(!sh.loaded){$('view').innerHTML='<section class="box"><h3>Sevkiyat<small>Yükleniyor…</small></h3></section>';shLoad();return;}
   const x=shGet(sh.id);
@@ -3263,6 +3278,23 @@ function shModelSelect(it,dis){
   return `<select data-shmodel ${dis} aria-label="Ürün"><option value="">Ürün seçin…</option>${[...groups].map(([g,l])=>`<optgroup label="${esc(g)}">${l.map(r=>`<option value="${esc(lab(r))}" ${lab(r)===cur?'selected':''}>${esc(lab(r))}</option>`).join('')}</optgroup>`).join('')}<option value="__other" ${cur&&!inCat?'selected':''}>Diğer (elle yaz)</option></select>
     <input data-shmodeltxt value="${esc(cur)}" placeholder="Ürün adı" aria-label="Ürün adı" ${cur&&!inCat?'':'hidden'} ${dis} style="margin-top:6px">`;
 }
+// Konteynerde ne var, nereye gidecek: iki özet tablo (ürüne göre, projeye göre) ve altında düzenlenecek kalemler.
+function shSummaryHtml(x){
+  const its=(x.items||[]).filter(i=>i.model||i.qty);
+  if(!its.length)return '';
+  const chip=(t,n,cls='')=>`<span class="sh-chip ${cls}">${esc(t)} <b>× ${nf.format(n)}</b></span>`;
+  const rows=its.map(it=>{const q=+it.qty||0,al=(it.alloc||[]).filter(l=>l.site&&+l.qty>0),a=al.reduce((m,l)=>m+(+l.qty||0),0),free=q-a,pct=q?Math.min(100,a/q*100):0;
+    return `<tr><td><b>${esc(it.model||'Ürün seçilmedi')}</b></td><td class="num">${nf.format(q)}</td><td class="num">${nf.format(a)}</td><td class="num"><b class="${free<0?'sh-over':free>0?'sh-free':'sh-done'}">${nf.format(free)}</b></td>
+      <td><div class="sh-bar" title="${nf.format(a)} / ${nf.format(q)}"><i class="${a>q?'over':''}" style="width:${pct.toFixed(0)}%"></i></div></td>
+      <td>${al.map(l=>chip(shSiteLabel(l.site),l.qty)).join(' ')}${free>0?' '+chip('Atanmamış',free,'free'):''}${free<0?' '+chip('Fazla atanmış',-free,'over'):''}${!al.length&&free<=0?'<span class="note">—</span>':''}</td></tr>`;}).join('');
+  const by=new Map();its.forEach(it=>(it.alloc||[]).forEach(l=>{if(!l.site||!(+l.qty>0))return;if(!by.has(l.site))by.set(l.site,[]);by.get(l.site).push([it.model||'Ürün seçilmedi',+l.qty]);}));
+  const prow=[...by].sort((a,b)=>shSiteLabel(a[0]).localeCompare(shSiteLabel(b[0]),'tr')).map(([id,l])=>`<tr><td><b>${esc(shSiteLabel(id))}</b></td><td>${l.map(([m,q])=>chip(m,q)).join(' ')}</td><td class="num">${nf.format(l.reduce((m,v)=>m+v[1],0))}</td></tr>`).join('');
+  return `<section class="box"><h3>Konteyner İçeriği ve Dağılım<small>Hangi ürün, kaç adet, nereye gidecek</small></h3>
+    <div class="scroll"><table class="yearly sh-sum sh-sum1 m-cards"><thead><tr><th>Ürün</th><th class="num">Adet</th><th class="num">Atanan</th><th class="num">Boşta</th><th>Atama Durumu</th><th>Hangi Projeye</th></tr></thead><tbody>${rows}</tbody></table></div></section>
+    <section class="box"><h3>Projelere Göre Dağılım<small>${by.size?nf.format(by.size)+' proje':''}</small></h3>
+    ${prow?`<div class="scroll"><table class="yearly sh-sum sh-sum2 m-cards"><thead><tr><th>Proje</th><th>Bu Konteynerden Gelecek Ürünler</th><th class="num">Toplam Adet</th></tr></thead><tbody>${prow}</tbody></table></div>`:'<p class="note">Henüz hiçbir ürün bir projeye atanmadı. Aşağıdaki kalemlerde "+ Projeye Ata" ile atama yapın.</p>'}</section>
+    <h2 class="sh-h2">Kalemleri Düzenle</h2>`;
+}
 function shUrunHtml(x){
   const ro=shRO(),dis=ro?'disabled':'';
   const cards=(x.items||[]).map((it,i)=>{
@@ -3270,32 +3302,61 @@ function shUrunHtml(x){
     const al=(it.alloc||[]).map((l,j)=>`<div class="sh-al" data-shal="${j}"><select data-shsite ${dis} aria-label="Proje"><option value="">Proje seçin…</option>${[...db.sites].sort((a,b)=>String(a.code).localeCompare(String(b.code))).map(s=>`<option value="${esc(s.id)}" ${s.id===l.site?'selected':''}>${esc([s.code,s.name].filter(Boolean).join(' · '))}</option>`).join('')}${l.site&&!db.sites.some(s=>s.id===l.site)?`<option value="${esc(l.site)}" selected>${esc(shSiteLabel(l.site))}</option>`:''}</select>
       <input data-shalqty type="number" min="1" step="1" value="${esc(l.qty)}" aria-label="Adet" ${dis}>${ro?'':'<button type="button" class="ghost" data-shaldel title="Atamayı kaldır">×</button>'}</div>`).join('');
     const nser=String(it.serials||'').split('\n').filter(v=>v.trim()).length;
-    return `<section class="box sh-item" data-shit="${i}"><h3><span>Kalem ${i+1}</span><small>${esc(`${nf.format(asg)} / ${nf.format(+it.qty||0)} atandı`)}${free>0?` · <b class="sh-free">${nf.format(free)} boşta</b>`:free<0?` · <b class="sh-over">${nf.format(-free)} fazla atanmış</b>`:` · <b class="sh-done">tamamı atandı</b>`}</small></h3>
+    return `<section class="box sh-item" data-shit="${i}"><h3><span>Kalem ${i+1}${it.model?' · '+esc(it.model):''}</span><small>${esc(`${nf.format(asg)} / ${nf.format(+it.qty||0)} atandı`)}${free>0?` · <b class="sh-free">${nf.format(free)} boşta</b>`:free<0?` · <b class="sh-over">${nf.format(-free)} fazla atanmış</b>`:` · <b class="sh-done">tamamı atandı</b>`}</small></h3>
       <div class="sh-head"><label>Ürün${shModelSelect(it,dis)}</label><label>Adet<input data-shqty type="number" min="1" step="1" value="${esc(it.qty||'')}" ${dis}></label></div>
       <div class="sh-sub">Hangi projeye gidecek</div>${al||'<p class="note">Henüz projeye atanmadı.</p>'}
       ${ro?'':`<p class="sh-addrow"><button type="button" class="ghost" data-shaladd>+ Projeye Ata</button>${i>=0?'<button type="button" class="ghost danger" data-shitdel>Kalemi Sil</button>':''}</p>`}
       <details class="sh-ser" ${nser?'open':''}><summary>Seri numaraları <small>(isteğe bağlı${nser?' · '+nf.format(nser)+' kayıt':''})</small></summary><textarea data-shser rows="4" placeholder="Her satıra bir seri numarası" ${dis}>${esc(it.serials||'')}</textarea></details></section>`;}).join('');
-  return (cards||'<section class="box"><p class="note">Bu konteynerde henüz ürün kalemi yok.</p></section>')+(ro?'':'<p class="sh-add"><button type="button" class="primary" id="shAddItem">+ Ürün Kalemi Ekle</button></p>');
+  return shSummaryHtml(x)+(cards||'<section class="box"><p class="note">Bu konteynerde henüz ürün kalemi yok. "+ Ürün Kalemi Ekle" ile konteynerin içindeki ürünleri girin.</p></section>')+(ro?'':'<p class="sh-add"><button type="button" class="primary" id="shAddItem">+ Ürün Kalemi Ekle</button></p>');
 }
 /* --- belgeler --- */
-const shKindOf=n=>{const t=String(n).toLocaleLowerCase('tr');return /beyanname/.test(t)?'beyanname':/poli[cç]e|sigorta/.test(t)?'sigorta':/\btps\b|uygunluk|\bbtk\b/.test(t)?'uygunluk':/\btse\b/.test(t)?'denetim':/konsimento|bill of lading|packing|\bbl\b/.test(t)?'nakliye':/invoice|fatura/.test(t)?'fatura':'diger';};
+// Dosya adından klasör tahmini. EAS… (liman e-arşiv serisi), GIB… (Ticaret Bakanlığı / Tareks), NASE… (belge alım faturası) bu şirketin kullandığı bilinen belge serileridir.
+const shKindOf=n=>{const t=String(n).toLocaleLowerCase('tr');return /beyanname/.test(t)?'beyanname':/poli[cç]e|sigorta/.test(t)?'sigorta':/\btps\b|uygunluk|\bbtk\b/.test(t)?'uygunluk':/\btse\b/.test(t)?'denetim':/konsimento|bill of lading|packing|\bbl\b/.test(t)?'nakliye':/^eas\d|marport|ardiye/.test(t)?'liman':/invoice|fatura|^gib\d|^nase\b/.test(t)?'fatura':'diger';};
 const shTitleOf=n=>String(n).replace(/\.[A-Za-z0-9]{1,8}$/,'').replace(/[_]+/g,' ').trim();
+const SH_FOLDER_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>';
+const shFileRow=f=>{const can=!!sh.fileOwner&&!shRO(),u='/api/files?download='+esc(f.id)+'&ship=1',view_=/^(pdf|jpg|jpeg|png)$/.test(flExt(f.name)),base=String(f.name).replace(/\.[A-Za-z0-9]{1,8}$/,''),tt=f.title&&f.title!==base;
+  return `<tr data-shfid="${esc(f.id)}"><td><span class="fl-ico">${flBadge(f.name)}</span>${view_?`<a href="${u}&inline=1" target="_blank" rel="noopener">${esc(f.title||f.name)}</a>`:`<a href="${u}">${esc(f.title||f.name)}</a>`}${tt?`<span class="sub" translate="no">${esc(f.name)}</span>`:''}</td>
+    <td class="num">${esc(flSize(f.size))}</td><td>${esc(f.uploadedByName||f.uploadedBy||'—')}</td><td class="num">${esc(fmtTs(f.uploadedAt))}</td>
+    <td class="fl-act"><a class="btn-link" href="${u}">İndir</a>${shRO()?'':`<button type="button" class="ghost" data-shfedit="${esc(f.id)}">Düzenle</button>`}<button type="button" class="ghost" data-shfdel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></td></tr>`;};
+const shPicCard=f=>{const can=!!sh.fileOwner&&!shRO(),u='/api/files?download='+esc(f.id)+'&ship=1';
+  return `<figure class="fl-pic" data-shfid="${esc(f.id)}"><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><img src="${u}&inline=1" alt="${esc(f.name)}" loading="lazy" decoding="async"></a>
+    <figcaption><b title="${esc(f.title||f.name)}">${esc(f.title||f.name)}</b><small>${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><span class="fl-pic-act"><a class="btn-link" href="${u}">İndir</a>${shRO()?'':`<button type="button" class="ghost" data-shfedit="${esc(f.id)}">Düzenle</button>`}<button type="button" class="ghost" data-shfdel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;};
 async function shBelge(x){
   const b=$('shBody');if(!b)return;
-  if(sh.files===null){b.innerHTML='<section class="box"><h3>Belgeler<small>Yükleniyor…</small></h3></section>';
+  if(sh.files===null){b.innerHTML='<section class="box"><h3>Dosyalar<small>Yükleniyor…</small></h3></section>';
     try{const d=await shApi('GET','shipfiles='+encodeURIComponent(x.id));sh.files=d.files||[];sh.fileOwner=!!d.owner;}catch(e){sh.files=[];toast(e.message);}
     if(view!=='ship'||sh.sub!=='belge'||sh.id!==x.id)return;
   }
-  const ro=shRO(),dis=ro?'disabled':'';
-  b.innerHTML=`<section class="box"><h3>Belgeler<small>${sh.files.length?nf.format(sh.files.length)+' belge':''}</small></h3>
-    ${ro?'':`<div class="sh-drop no-print" id="shDrop"><p class="note">Gümrük beyannamesi, sigorta poliçesi, fatura, uygunluk belgesi… Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Dosyayı buraya sürükleyebilir ya da düğmeyi kullanabilirsin.</p><button type="button" class="primary" id="shUp">Belge Yükle</button><input type="file" id="shPick" multiple hidden accept=".pdf,.xls,.xlsx,.csv,.doc,.docx,.jpg,.jpeg,.png"></div><div id="shUps"></div>`}
-    ${sh.files.length?`<div class="scroll"><table class="yearly fl-tbl sh-ftbl m-cards"><colgroup><col style="width:26%"><col style="width:15%"><col style="width:15%"><col style="width:8%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup><thead><tr><th>Başlık</th><th>Tür</th><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${sh.files.map(f=>`<tr data-shfid="${esc(f.id)}"><td><span class="fl-ico">${flBadge(f.name)}</span><input class="sh-title" data-shftitle value="${esc(f.title)}" ${dis} aria-label="Başlık"></td>
-      <td><select data-shfkind ${dis} aria-label="Tür">${SH_KIND.map(([k,t])=>`<option value="${k}" ${k===f.kind?'selected':''}>${esc(t)}</option>`).join('')}</select></td>
-      <td><a href="/api/files?download=${esc(f.id)}&ship=1&inline=1" target="_blank" rel="noopener" translate="no">${esc(f.name)}</a></td><td class="num">${esc(flSize(f.size))}</td><td>${esc(f.uploadedByName||f.uploadedBy||'—')}</td><td class="num">${esc(fmtTs(f.uploadedAt))}</td>
-      <td class="fl-act"><a class="btn-link" href="/api/files?download=${esc(f.id)}&ship=1">İndir</a><button type="button" class="ghost" data-shfdel="${esc(f.id)}" ${sh.fileOwner&&!ro?'':'disabled'} aria-label="Belgeyi sil">Sil</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="note" style="padding:14px 0">Bu sevkiyata henüz belge yüklenmedi.</p>'}</section>`;
+  const ro=shRO(),by={};sh.files.forEach(f=>{const k=SH_KIND.some(v=>v[0]===f.kind)?f.kind:'diger';(by[k]=by[k]||[]).push(f);});
+  if(sh.sel===undefined)sh.sel=(SH_KIND.find(v=>(by[v[0]]||[]).length)||[''])[0];
+  const tiles=SH_KIND.map(([k,t])=>{const n=(by[k]||[]).length,on=sh.sel===k;
+    return `<button type="button" class="comp-tile fl-tile${on?' on':''}" data-shsel="${k}" data-shfolder="${k}" aria-expanded="${on}"><span class="ct-ic">${SH_FOLDER_ICON}${n?`<i class="ct-n">${n>99?'99+':n}</i>`:''}</span><span class="ct-tx"><b>${esc(t)}</b><small>${n?n+' dosya':'Boş'}</small></span></button>`;}).join('');
+  const list=(by[sh.sel]||[]).slice().sort((a,c)=>String(a.title||a.name).localeCompare(String(c.title||c.name),'tr',{numeric:true,sensitivity:'base'}));
+  const pane=sh.sel?`<div class="fl-folder fl-pane" data-shfolder="${sh.sel}"><div class="fl-head"><strong>${esc(shKindName(sh.sel))}</strong><small>${list.length} dosya</small>${ro?'':`<button type="button" class="ghost pick-btn" data-shfup="${sh.sel}">Yükle</button>`}</div>
+    ${(()=>{const pics=list.filter(f=>/^(jpg|jpeg|png)$/.test(flExt(f.name))),others=list.filter(f=>!pics.includes(f));
+      return (pics.length?`<div class="fl-gallery">${pics.map(shPicCard).join('')}</div>`:'')+(others.length?`<div class="scroll"><table class="yearly fl-tbl sh-fl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${others.map(shFileRow).join('')}</tbody></table></div>`:'');})()}
+    ${list.length?'':'<p class="note" style="padding:14px 16px">Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.</p>'}</div>`:'';
+  b.innerHTML=`<section class="box files-box"><h3>Dosyalar<small>${sh.files.length?sh.files.length+' dosya':''}</small></h3>
+    <div class="fl-bar-top no-print"><p class="note">Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.</p></div>
+    <div id="shUps"></div><input type="file" id="shPick" multiple hidden accept=".pdf,.xls,.xlsx,.csv,.doc,.docx,.jpg,.jpeg,.png">
+    <div class="hub-tiles no-print">${tiles}</div>${pane}</section>`;
+  shPaintUps();
+}
+let shEditId='';
+function shEditOpen(id){
+  const f=(sh.files||[]).find(v=>v.id===id);if(!f)return;shEditId=id;
+  $('shfTitle').value=f.title||f.name;$('shfKind').innerHTML=SH_KIND.map(([k,t])=>`<option value="${k}" ${k===f.kind?'selected':''}>${esc(t)}</option>`).join('');
+  $('shfErr').hidden=true;$('shfSave').disabled=false;$('shfDlg').showModal();$('shfTitle').focus();$('shfTitle').select();
+}
+async function shEditSave(){
+  const f=(sh.files||[]).find(v=>v.id===shEditId);if(!f)return;
+  const title=$('shfTitle').value.trim();if(!title){$('shfErr').textContent='Başlık boş olamaz.';$('shfErr').hidden=false;return;}
+  $('shfSave').disabled=true;
+  try{await shApi('PATCH','shipfile='+encodeURIComponent(f.id),{title,kind:$('shfKind').value});f.title=title;f.kind=$('shfKind').value;$('shfDlg').close();toast('Dosya güncellendi.');if(view==='ship'&&sh.sub==='belge'){sh.sel=f.kind;shBelge(shGet(sh.id));}}
+  catch(e){$('shfSave').disabled=false;$('shfErr').textContent=e.message;$('shfErr').hidden=false;}
 }
 function shPaintUps(){const u=$('shUps');if(!u)return;u.innerHTML=sh.up.map(x=>`<div class="fl-up${x.err?' bad':''}"><span>${esc(x.name)}</span><span class="fl-bar"><i style="width:${Math.round(x.pct||0)}%"></i></span><small>${x.err?esc(x.err):Math.round(x.pct||0)+'%'}</small></div>`).join('');}
-async function shUpload(fileList){
+async function shUpload(fileList,kind){
   const x=shGet(sh.id);if(!x||!fileList.length)return;let ok=0;
   for(const file of [...fileList]){
     const ext=flExt(file.name),item={name:file.name,pct:0,err:''};sh.up.push(item);shPaintUps();
@@ -3306,12 +3367,13 @@ async function shUpload(fileList){
       const safe=file.name.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._() -]+/g,'_').slice(-120);
       const pathname=`ships/${x.id}/${uid()}-${safe}`;
       const blob=await VercelBlobClient.upload(pathname,file,{access:'private',handleUploadUrl:'/api/files',contentType:FL_TYPES[ext],multipart:file.size>8*1048576,onUploadProgress:p=>{item.pct=p.percentage;shPaintUps();}});
-      await shApi('POST','',{action:'shipfile',ship:x.id,name:file.name,title:shTitleOf(file.name),kind:shKindOf(file.name),pathname:blob.pathname});
+      await shApi('POST','',{action:'shipfile',ship:x.id,name:file.name,title:shTitleOf(file.name),kind:(kind&&kind!=='diger')?kind:shKindOf(file.name),pathname:blob.pathname});
       item.pct=100;ok++;
     }catch(e){item.err=e.message;shPaintUps();}
   }
   sh.up=sh.up.filter(v=>v.err);
   if(ok)toast(ok+' belge yüklendi.');
+  if(kind&&ok)sh.sel=kind;
   sh.files=null;await shLoad0(x.id);
 }
 async function shLoad0(id){try{const d=await shApi('GET','ships=1');sh.list=d.ships||sh.list;}catch(e){}if(view==='ship'&&sh.id===id){renderShip();}}
@@ -3337,7 +3399,11 @@ document.addEventListener('click',async e=>{
     if(t.closest('[data-shitdel]')){if(!await ask('Bu ürün kalemi ve atamaları silinsin mi?','Kalemi Sil'))return;x.items.splice(+card.dataset.shit,1);shTouch(x);renderShip();return;}
     if(t.closest('[data-shaladd]')){it.alloc=it.alloc||[];const used=it.alloc.reduce((m,l)=>m+(+l.qty||0),0);it.alloc.push({site:'',qty:Math.max(1,(+it.qty||0)-used)});shTouch(x);renderShip();return;}
     const dl=t.closest('[data-shaldel]');if(dl){const j=+dl.closest('[data-shal]').dataset.shal;it.alloc.splice(j,1);shTouch(x);renderShip();return;}}
-  if(t.closest('#shUp')){$('shPick').value='';$('shPick').click();return;}
+  const ss=t.closest('[data-shsel]');if(ss){sh.sel=sh.sel===ss.dataset.shsel?'':ss.dataset.shsel;shBelge(x);return;}
+  const su=t.closest('[data-shfup]');if(su){sh.upKind=su.dataset.shfup;$('shPick').value='';$('shPick').click();return;}
+  const se=t.closest('[data-shfedit]');if(se){shEditOpen(se.dataset.shfedit);return;}
+  if(t.closest('#shfCancel')){$('shfDlg').close();return;}
+  if(t.closest('#shfSave')){shEditSave();return;}
   const fd=t.closest('[data-shfdel]');
   if(fd&&!fd.disabled){const f=sh.files.find(v=>v.id===fd.dataset.shfdel);if(!await ask((f?f.title||f.name:'Bu belge')+' silinsin mi? Bu işlem herkes için geçerli olur ve geri alınamaz.','Belgeyi Sil'))return;
     try{await shApi('DELETE','shipfile='+encodeURIComponent(fd.dataset.shfdel));toast('Belge silindi.');sh.files=null;await shLoad0(x.id);}catch(err){toast(err.message);}}
@@ -3349,7 +3415,7 @@ document.addEventListener('input',e=>{
   if(el.matches('[data-shser]')){it.serials=el.value;shTouch(x);}else if(el.matches('[data-shmodeltxt]')){it.model=el.value.trim();shTouch(x);}
 });
 document.addEventListener('change',async e=>{
-  if(view==='ship'&&e.target.id==='shPick'&&e.target.files.length){shUpload(e.target.files);return;}
+  if(view==='ship'&&e.target.id==='shPick'&&e.target.files.length){shUpload(e.target.files,sh.upKind||sh.sel);return;}
   if(view!=='ship')return;
   const x=shGet(sh.id);if(!x)return;const el=e.target;
   if(el.dataset.shf){x[el.dataset.shf]=el.value;shTouch(x);if(['status','no'].includes(el.dataset.shf))renderShip();return;}
@@ -3361,14 +3427,10 @@ document.addEventListener('change',async e=>{
     if(el.matches('[data-shser]')){it.serials=el.value;shTouch(x);return;}
     const al=el.closest('[data-shal]');
     if(al){const l=it.alloc[+al.dataset.shal];if(!l)return;if(el.matches('[data-shsite]'))l.site=el.value;else if(el.matches('[data-shalqty]'))l.qty=Math.max(1,Math.floor(+el.value)||1);shTouch(x);renderShip();return;}}
-  const row=el.closest('[data-shfid]');
-  if(row){const f=sh.files.find(v=>v.id===row.dataset.shfid);if(!f)return;
-    const body={};if(el.matches('[data-shftitle]')){body.title=el.value.trim();if(!body.title){el.value=f.title;return;}}if(el.matches('[data-shfkind]'))body.kind=el.value;
-    try{await shApi('PATCH','shipfile='+encodeURIComponent(f.id),body);Object.assign(f,body);toast('Belge güncellendi.');}catch(err){toast(err.message);}}
 });
-['dragenter','dragover'].forEach(n=>document.addEventListener(n,e=>{const d=e.target.closest&&e.target.closest('#shDrop');if(!d)return;e.preventDefault();d.classList.add('over');}));
-document.addEventListener('dragleave',e=>{const d=e.target.closest&&e.target.closest('#shDrop');if(d&&!d.contains(e.relatedTarget))d.classList.remove('over');});
-document.addEventListener('drop',e=>{const d=e.target.closest&&e.target.closest('#shDrop');if(!d)return;e.preventDefault();d.classList.remove('over');if(e.dataTransfer&&e.dataTransfer.files.length)shUpload(e.dataTransfer.files);});
+['dragenter','dragover'].forEach(n=>document.addEventListener(n,e=>{const d=e.target.closest&&e.target.closest('[data-shfolder]');if(!d||view!=='ship')return;e.preventDefault();d.classList.add('over');}));
+document.addEventListener('dragleave',e=>{const d=e.target.closest&&e.target.closest('[data-shfolder]');if(d&&!d.contains(e.relatedTarget))d.classList.remove('over');});
+document.addEventListener('drop',e=>{const d=e.target.closest&&e.target.closest('[data-shfolder]');if(!d||view!=='ship')return;e.preventDefault();d.classList.remove('over');if(shRO())return;if(e.dataTransfer&&e.dataTransfer.files.length)shUpload(e.dataTransfer.files,d.dataset.shfolder);});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&view==='ships'){const r=e.target.closest&&e.target.closest('[data-shopen]');if(r)shOpen(r.dataset.shopen);}});
 /* ---------- ROI Hesaplayıcı: ayrı sayfa (roi.html) aynı kaynaklı çerçevede açılır; kendi stili ve betiği kimlik/CSS çakışması yaratmaz ---------- */
 function renderRoi(){

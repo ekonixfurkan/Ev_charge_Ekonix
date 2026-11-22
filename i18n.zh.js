@@ -1189,7 +1189,27 @@ window.I18N_ZH = {
    "Tahmini Depo Teslim": "预计入库时间",
    "Tahmini depo teslim": "预计入库时间",
    "Depo teslim tarihi": "入库日期",
-   "Sevkiyat no, konteyner no, ürün, proje…": "发运编号、集装箱号、产品、项目…"
+   "Sevkiyat no, konteyner no, ürün, proje…": "发运编号、集装箱号、产品、项目…",
+   "Gümrük Beyannameleri": "报关单",
+   "Faturalar": "发票",
+   "Uygunluk Belgeleri (TPS / BTK)": "符合性证明（TPS / BTK）",
+   "Konteyner İçeriği ve Dağılım": "集装箱内容与分配",
+   "Hangi ürün, kaç adet, nereye gidecek": "哪种产品、多少数量、发往何处",
+   "Atama Durumu": "分配状态",
+   "Hangi Projeye": "发往项目",
+   "Projelere Göre Dağılım": "按项目分配",
+   "Bu Konteynerden Gelecek Ürünler": "本集装箱将送达的产品",
+   "Toplam Adet": "总数量",
+   "Kalemleri Düzenle": "编辑条目",
+   "Fazla atanmış": "超额分配",
+   "Ürün seçilmedi": "未选择产品",
+   "Henüz hiçbir ürün bir projeye atanmadı. Aşağıdaki kalemlerde \"+ Projeye Ata\" ile atama yapın.": "尚无产品分配到项目。请在下方条目中使用“+ 分配到项目”。",
+   "Bu konteynerde henüz ürün kalemi yok. \"+ Ürün Kalemi Ekle\" ile konteynerin içindeki ürünleri girin.": "该集装箱内尚无产品条目。请通过“+ 添加产品条目”录入箱内产品。",
+   "Dosyayı Düzenle": "编辑文件",
+   "Klasör": "文件夹",
+   "Başlık boş olamaz.": "标题不能为空。",
+   "Dosya güncellendi.": "文件已更新。",
+   "Sevkiyat kaydedildi.": "发运记录已保存。"
   },
   rules: function (sub) {
     var PZ = [
