@@ -100,7 +100,7 @@ export default async function handler(req, res) {
       const folders = [...DEFAULT_FOLDERS];
       for (const c of custom) if (!folders.includes(c.name)) folders.push(c.name);
       for (const f of files) if (!folders.includes(f.folder)) folders.push(f.folder);
-      return res.status(200).json({ folders, defaults: DEFAULT_FOLDERS, files: files.map(shape), max: MAX_BYTES, maxVideo: MAX_VIDEO_BYTES, me: user.email, owner: Boolean(user.owner) });
+      return res.status(200).json({ folders, defaults: DEFAULT_FOLDERS, files: files.map(shape), max: MAX_BYTES, maxVideo: MAX_VIDEO_BYTES, me: user.email, owner: Boolean(user.owner || user.delFiles) });
     }
 
     if (req.method === 'POST') {
@@ -162,7 +162,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'DELETE') {
-      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
+      if (q.id ? !(user.owner || user.delFiles) : !user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
       if (q.id) {
         const id = String(q.id);
         if (!/^\d+$/.test(id)) return res.status(400).json({ error: 'id gerekli' });
