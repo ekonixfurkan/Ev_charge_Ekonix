@@ -3416,7 +3416,7 @@ async function shUpload(fileList,kind){
   for(const file of [...fileList]){
     const ext=flExt(file.name),item={name:file.name,pct:0,err:''};sh.up.push(item);shPaintUps();
     try{
-      if(!FL_TYPES[ext])throw new Error('Bu dosya türü desteklenmiyor');
+      if(!FL_TYPES[ext]||FL_VIDEO.test(ext))throw new Error(FL_VIDEO.test(ext)?'Sevkiyat dosyalarına video yüklenemez':'Bu dosya türü desteklenmiyor'+(ext?' (.'+ext+')':''));
       if(file.size>FL_MAX)throw new Error('25 MB sınırını aşıyor');
       if(!window.VercelBlobClient)throw new Error('Yükleme bileşeni yüklenemedi; sayfayı yenileyin');
       const safe=file.name.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._() -]+/g,'_').slice(-120);
@@ -3882,7 +3882,7 @@ async function flUploadFiles(folder,fileList){
   for(const file of [...fileList]){
     const ext=flExt(file.name),item={name:file.name,pct:0,err:''};fl.uploading.push(item);paintUploads();
     try{
-      if(!FL_TYPES[ext])throw new Error('Bu dosya türü desteklenmiyor');
+      if(!FL_TYPES[ext])throw new Error('Bu dosya türü desteklenmiyor'+(ext?' (.'+ext+')':'')+'. Desteklenenler: Excel, PDF, Word, JPG, PNG, MP4, MOV, WebM');
       if(file.size>(FL_VIDEO.test(ext)?FL_MAX_VIDEO:FL_MAX))throw new Error(FL_VIDEO.test(ext)?'Video 300 MB sınırını aşıyor':'25 MB sınırını aşıyor');
       if(!window.VercelBlobClient)throw new Error('Yükleme bileşeni yüklenemedi; sayfayı yenileyin');
       const safe=file.name.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._() -]+/g,'_').slice(-120);
