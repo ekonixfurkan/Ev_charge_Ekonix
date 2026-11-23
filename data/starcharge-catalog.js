@@ -1,6 +1,6 @@
 // StarCharge ürün kataloğu. Kaynak: https://www.starcharge.com/products/ev-charging (ürün sayfaları, Kasım 2026).
 // Yalnızca sitede yazan değerler alınmıştır. kw: null ise sitede güç yazmaz (dispenser'ın gücü bağlı olduğu güç kabinine göre belirlenir).
-// type: DC | AC | CAB (dağıtım kabini) · form: ürün türü · sockets: ünite başına soket/konnektör sayısı (0 = soket yok, güç kabini)
+// v2g: true = çift yönlü (V2G) ürün; katalogda ayrı "V2G" sekmesinde de listelenir. type: DC | AC | CAB (dağıtım kabini) · form: ürün türü · sockets: ünite başına soket/konnektör sayısı (0 = soket yok, güç kabini)
 window.SC_CATALOG=[
  {brand:'StarCharge',model:'Neptune',type:'DC',form:'Tek gövde',kws:[120],sockets:2,conn:'',volt:'',amp:'',ip:'',url:''},
  {brand:'StarCharge',model:'Venus V3',type:'DC',form:'Tek gövde (duvar/ayaklı)',kws:[20,30],sockets:1,conn:'1 × CCS2',volt:'150–1000 Vdc',amp:'20 kW: 80 A · 30 kW: 100 A',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/81'},
@@ -15,7 +15,7 @@ window.SC_CATALOG=[
  {brand:'StarCharge',model:'Hydrus Plus',type:'DC',form:'Dispenser (sıvı soğutmalı)',kws:[null],sockets:2,conn:'2 × CCS2 / CCS2 + GBT',volt:'150–1000 Vdc',amp:'600 A (800 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/86'},
  {brand:'StarCharge',model:'Aries V2',type:'DC',form:'Dispenser (ayrık tip)',kws:[null],sockets:2,conn:'2 × CCS2',volt:'150–1000 Vdc',amp:'380 A (600 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/85'},
  {brand:'StarCharge',model:'Triton V2',type:'DC',form:'Dispenser (otobüs depoları için)',kws:[null],sockets:1,conn:'1 × CCS2',volt:'150–1000 Vdc',amp:'380 A (500 A max)',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/dc-charger/84'},
- {brand:'StarCharge',model:'Halo (V2G çift yönlü)',type:'DC',form:'Çift yönlü DC wallbox (V2G)',kws:[7.4,11],sockets:1,conn:'',volt:'',amp:'',ip:'',url:'https://www.starcharge.com/products/ev-charging/v2g/93'},
+ {brand:'StarCharge',model:'Halo (V2G çift yönlü)',type:'AC',v2g:true,form:'Çift yönlü AC wallbox (V2G)',kws:[7.4,11],sockets:1,conn:'',volt:'',amp:'',ip:'',url:'https://www.starcharge.com/products/ev-charging/v2g/93'},
  {brand:'StarCharge',model:'Artemis V2',type:'AC',form:'AC wallbox',kws:[7.4,11,22],sockets:1,conn:'1 × Tip 2',volt:'230/400 Vac',amp:'',ip:'IP65',url:'https://www.starcharge.com/products/ev-charging/ac-charger/82'},
  {brand:'StarCharge',model:'Arc V1',type:'AC',form:'AC şarj ünitesi',kws:[7,11,22],sockets:1,conn:'1 × Tip 2',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/19'},
  {brand:'StarCharge',model:'Saturn',type:'AC',form:'AC çift soketli',kws:[44],sockets:2,conn:'2 × Tip 2 (2 × 22 kW)',volt:'',amp:'',ip:'IP55',url:'https://www.starcharge.com/products/ev-charging/ac-charger/18'},

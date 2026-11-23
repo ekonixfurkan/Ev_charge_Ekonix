@@ -1307,7 +1307,7 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
 </dialog>
 <dialog id="catDlg">
   <div class="cat-head"><div><h2>StarCharge Ürün Kataloğu</h2><p class="dsub">Satıra "Ekle" diyerek ünite listesine direkt ekleyin; marka/model, tip, güç ve soket sayısı otomatik dolar.</p></div><button type="button" id="catClose" class="ghost" aria-label="Kapat">✕</button></div>
-  <div class="cat-bar"><div class="viewbar" id="catType"><button type="button" data-ct="" aria-pressed="true">Tümü</button><button type="button" data-ct="DC" aria-pressed="false">DC</button><button type="button" data-ct="AC" aria-pressed="false">AC</button><button type="button" data-ct="CAB" aria-pressed="false">Dağıtım Kabini</button></div><input type="search" id="catQ" placeholder="Model ara…" autocomplete="off"></div>
+  <div class="cat-bar"><div class="viewbar" id="catType"><button type="button" data-ct="" aria-pressed="true">Tümü</button><button type="button" data-ct="DC" aria-pressed="false">DC</button><button type="button" data-ct="AC" aria-pressed="false">AC</button><button type="button" data-ct="V2G" aria-pressed="false">V2G</button><button type="button" data-ct="CAB" aria-pressed="false">Dağıtım Kabini</button></div><input type="search" id="catQ" placeholder="Model ara…" autocomplete="off"></div>
   <div class="scroll"><table class="cat-tbl m-cards"><thead><tr><th>Model</th><th>Tip</th><th class="num">Güç (kW)</th><th class="num">Soket</th><th>Konnektör</th><th>Voltaj / Akım</th><th>IP</th><th></th></tr></thead><tbody id="catRows"></tbody></table></div>
   <p class="note">Kaynak: starcharge.com ürün sayfaları. Güç yazmayan dispenser modellerinde (Hydrus, Aries, Triton) güç, bağlı güç kabinine göre belirlenir; kW elle girilir.</p>
 </dialog>
@@ -4530,9 +4530,9 @@ function catFlat(){
   const rows=[];(window.SC_CATALOG||[]).forEach(p=>p.kws.forEach(kw=>rows.push({p,kw})));return rows;
 }
 function paintCat(){
-  const q=norm($('catQ').value),rows=catFlat().filter(r=>(!catType||r.p.type===catType)&&(!q||norm(r.p.brand+' '+r.p.model+' '+r.p.form).includes(q)));
+  const q=norm($('catQ').value),rows=catFlat().filter(r=>(!catType||(catType==='V2G'?r.p.v2g:r.p.type===catType))&&(!q||norm(r.p.brand+' '+r.p.model+' '+r.p.form).includes(q)));
   catList=rows;
-  $('catRows').innerHTML=rows.length?rows.map((r,i)=>`<tr><td><b>${esc(r.p.brand+' '+r.p.model)}</b><span class="sub">${esc(r.p.form)}</span></td><td><span class="badge stg">${r.p.type}</span></td>
+  $('catRows').innerHTML=rows.length?rows.map((r,i)=>`<tr><td><b>${esc(r.p.brand+' '+r.p.model)}</b><span class="sub">${esc(r.p.form)}</span></td><td><span class="badge stg">${r.p.type}</span>${r.p.v2g?' <span class="badge stg">V2G</span>':''}</td>
     <td class="num">${r.kw==null?'<span title="Güç kabinine göre">—</span>':df.format(r.kw)}</td><td class="num">${r.p.sockets||'—'}</td><td>${esc(r.p.conn||'—')}</td><td>${esc([r.p.volt,r.p.amp].filter(Boolean).join(' · ')||'—')}</td><td>${esc(r.p.ip||'—')}</td>
     <td><button type="button" class="primary" data-catpick="${i}">Ekle</button></td></tr>`).join(''):'<tr><td colspan="8" class="note" style="padding:20px;text-align:center">Eşleşen ürün yok.</td></tr>';
 }
