@@ -3332,7 +3332,8 @@ const SH_PKG='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke
 const shChip=(t,n,cls='')=>`<span class="sh-chip ${cls}">${esc(t)} <b>× ${nf.format(n)}</b></span>`;
 function shModelSelect(it,dis){
   const rows=catFlat(),lab=r=>catLabel(r),cur=it.model||'',inCat=rows.some(r=>lab(r)===cur);
-  const groups=new Map();rows.forEach(r=>{const g=r.p.type+' · '+r.p.form;if(!groups.has(g))groups.set(g,[]);groups.get(g).push(r);});
+  const groups=new Map();rows.forEach(r=>{const g=r.p.v2g?'V2G · Çift yönlü':r.p.type+' · '+r.p.form;if(!groups.has(g))groups.set(g,[]);groups.get(g).push(r);});
+  if(groups.has('V2G · Çift yönlü')){const v=groups.get('V2G · Çift yönlü');groups.delete('V2G · Çift yönlü');groups.set('V2G · Çift yönlü',v);} // V2G grubu listenin sonunda, ayrı
   return `<select data-shmodel ${dis} aria-label="Ürün"><option value="">Ürün seçin…</option>${[...groups].map(([g,l])=>`<optgroup label="${esc(g)}">${l.map(r=>`<option value="${esc(lab(r))}" ${lab(r)===cur?'selected':''}>${esc(lab(r))}</option>`).join('')}</optgroup>`).join('')}<option value="__other" ${cur&&!inCat?'selected':''}>Diğer (elle yaz)</option></select>
     <input data-shmodeltxt value="${esc(cur)}" placeholder="Ürün adı" aria-label="Ürün adı" ${cur&&!inCat?'':'hidden'} ${dis} style="margin-top:6px">`;
 }
