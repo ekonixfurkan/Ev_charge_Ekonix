@@ -171,7 +171,7 @@ window.I18N_ZH = {
    "Yeni Proje Ekle": "添加新项目",
    "Proje ekle": "添加项目",
    "Projeyi ekle": "添加项目",
-   "Qualified Lead": "合格线索",
+   "Nitelikli Müşteri": "合格线索",
    "Aktif": "进行中",
    "Pasif": "非活跃",
    "Beklemede": "暂停",

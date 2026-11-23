@@ -48,7 +48,7 @@
     /* proje listesi / ana sayfa */
     'Projeler': 'Projects', 'Proje': 'Project', 'Proje adı': 'Project Name', 'Proje adı *': 'Project Name *',
     'Yeni Proje': 'New Project', 'Yeni Proje Ekle': 'Add New Project', 'Proje ekle': 'Add project', 'Projeyi ekle': 'Add Project',
-    'Qualified Lead': 'Qualified Lead', 'Aktif': 'Active', 'Pasif': 'Inactive', 'Beklemede': 'On Hold', 'Kuruldu': 'Live',
+    'Nitelikli Müşteri': 'Qualified Lead', 'Aktif': 'Active', 'Pasif': 'Inactive', 'Beklemede': 'On Hold', 'Kuruldu': 'Live',
     'Uygun Değil': 'DD Failed', 'Uygun değil': 'Not suitable', 'Kaybedildi': 'Lost', 'İptal Edildi': 'Cancelled',
     'Aşama': 'Stage', 'Durum': 'Status', 'Skor': 'Score', 'Toplam Güç': 'Total Power', 'Toplam kW': 'Total kW', 'Toplam': 'Total',
     'Sorumlu': 'Owner', 'Sorumlu / Ortak': 'Owner / Partner', 'Yerel Ortak': 'Local Partner', 'Yerel ortak': 'Local partner',

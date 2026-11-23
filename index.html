@@ -1828,7 +1828,7 @@ function legendHtml(){
   const mk=(l,v)=>`<div class="mk"><span>${l}</span><strong>${v}</strong></div>`;
   // Aktif / Pasif tek kutuda ortadan ikiye bölünmüş; tıklayınca altındaki değerler ve liste o gruba göre süzülür.
   const half=(k,l,n)=>`<button type="button" data-act="${k}" aria-pressed="${F.act===k}" title="${l} projeleri göster (tekrar tıklayınca tümü)"><span>${l}</span><strong>${n}</strong></button>`;
-  return mk('Qualified Lead',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
+  return mk('Nitelikli Müşteri',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 // Üst başlık: proje sayfasında proje adı (altında il/ilçe), diğer sayfalarda uygulama adı.
 const PAGE_TITLES={ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Daily Toplantı Notları',roi:'ROI Hesaplayıcı',ships:'Sevkiyatlar'};
