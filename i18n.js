@@ -427,6 +427,8 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Gemi No': 'Vessel No.', 'Gemi no': 'Vessel no.',
+    'ör. IMO 9811000 (sonradan da girilebilir)': 'e.g. IMO 9811000 (can be entered later)',
     'Bu projenin görev listesine git': 'Go to this project\'s task list',
     'Projeye Dön': 'Back to Project',
     'İşlemler': 'Actions',

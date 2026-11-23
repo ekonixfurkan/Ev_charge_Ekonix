@@ -1321,7 +1321,7 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
   <p class="alert" id="ntErr" role="alert" hidden></p>
   <div class="row"><button type="button" id="ntCancel">Vazgeç</button><button type="button" class="primary" id="ntSave">Görev Ekle</button></div></dialog>
 <dialog id="shnDlg"><h3 style="margin:0 0 10px">Yeni Sevkiyat</h3>
-  <label>Sevkiyat No<input id="shnCode" readonly data-locked tabindex="-1" value="—" title="Sunucu tarafından verilir; değiştirilemez"></label>
+  <label>Gemi No<input id="shnVessel" maxlength="60" autocomplete="off" placeholder="ör. IMO 9811000 (sonradan da girilebilir)"></label>
   <label>Konteyner No<input id="shnNo" maxlength="60" autocomplete="off" placeholder="ör. MSMU7898053 (sonradan da girilebilir)"></label>
   <label>Durum<select id="shnStatus"><option value="hazirlaniyor">Hazırlanıyor</option><option value="yolda" selected>Yolda</option><option value="gumrukte">Gümrükte</option><option value="depoda">Depoda</option><option value="teslim">Teslim Edildi</option></select></label>
   <label>Tahmini Depo Teslim<input id="shnEta" type="date"></label>
@@ -3251,7 +3251,7 @@ function renderShips(){
 }
 function shMatch(x){
   const f=sh.f;if(f.status&&x.status!==f.status)return false;if(f.owner&&x.owner!==f.owner)return false;
-  if(f.q){const hay=norm([x.code,x.no,x.invoiceNo,x.owner,...(x.items||[]).map(i=>i.model),...(x.items||[]).flatMap(i=>(i.alloc||[]).map(a=>shSiteLabel(a.site)))].join(' '));if(!hay.includes(norm(f.q)))return false;}
+  if(f.q){const hay=norm([x.code,x.no,x.vessel,x.invoiceNo,x.owner,...(x.items||[]).map(i=>i.model),...(x.items||[]).flatMap(i=>(i.alloc||[]).map(a=>shSiteLabel(a.site)))].join(' '));if(!hay.includes(norm(f.q)))return false;}
   return true;
 }
 function paintShips(){
@@ -3278,14 +3278,13 @@ function shOpen(id){guard(()=>{sh.edit=false;sh.snap=null;sh.dirty=null;sh.id=id
 function shNewOpen(){
   $('shnNo').value='';$('shnStatus').value='yolda';$('shnEta').value='';
   $('shnOwner').innerHTML='<option value="">Seçin</option>'+shOwners().map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
-  $('shnErr').hidden=true;$('shnSave').disabled=false;$('shnCode').value='—';
-  shApi('GET','shipnext=1').then(d=>{if($('shnDlg').open)$('shnCode').value=d.code||'—';}).catch(()=>{});
-  $('shnDlg').showModal();$('shnNo').focus();
+  $('shnErr').hidden=true;$('shnSave').disabled=false;$('shnVessel').value='';
+  $('shnDlg').showModal();$('shnVessel').focus();
 }
 async function shNewSave(){
   const no=$('shnNo').value.trim();
   if(no&&sh.list.some(x=>norm(x.no)===norm(no))){$('shnErr').textContent='Bu konteyner numarası zaten kayıtlı.';$('shnErr').hidden=false;return;}
-  const x={id:uid(),no,invoiceNo:'',origin:'',port:'',status:$('shnStatus').value,eta:$('shnEta').value,arrived:'',owner:$('shnOwner').value,note:'',items:[],files:0,createdAt:now(),updatedAt:now()};
+  const x={id:uid(),no,vessel:$('shnVessel').value.trim(),invoiceNo:'',origin:'',port:'',status:$('shnStatus').value,eta:$('shnEta').value,arrived:'',owner:$('shnOwner').value,note:'',items:[],files:0,createdAt:now(),updatedAt:now()};
   $('shnSave').disabled=true;
   try{const d=await shApi('PUT','ship=1',x);if(d&&d.ship)Object.assign(x,d.ship);sh.list.unshift(x);$('shnDlg').close();toast((x.code?x.code+' ':'')+'oluşturuldu.');sh.sub='genel';shOpen(x.id);}
   catch(e){$('shnSave').disabled=false;$('shnErr').textContent=e.message;$('shnErr').hidden=false;}
@@ -3320,7 +3319,7 @@ function paintShipBody(){
 function shGenelHtml(x){
   const ro=shLock(),dis=ro?'disabled':'',f=(k,l,type='text',extra='')=>`<label${extra}>${l}<input data-shf="${k}" type="${type}" value="${esc(x[k]||'')}" ${dis}></label>`;
   return `<section class="box"><h3>Sevkiyat Bilgileri</h3><div class="grid infogrid">
-    <label>Sevkiyat no<input value="${esc(x.code||'—')}" readonly data-locked tabindex="-1" title="Sunucu tarafından verilir; değiştirilemez"></label>${f('no','Konteyner no')}${f('invoiceNo','Fatura no')}
+    <label>Sevkiyat no<input value="${esc(x.code||'—')}" readonly data-locked tabindex="-1" title="Sunucu tarafından verilir; değiştirilemez"></label>${f('vessel','Gemi no')}${f('no','Konteyner no')}${f('invoiceNo','Fatura no')}
     <label>Durum<select data-shf="status" ${dis}>${SH_STATUS.map(([k,t])=>`<option value="${k}" ${k===x.status?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
     ${f('origin','Çıkış limanı')}${f('port','Varış limanı')}${f('eta','Tahmini depo teslim','date')}${f('arrived','Depo teslim tarihi','date')}
     <label>Sorumlu<select data-shf="owner" ${dis}><option value="">Seçin</option>${[...new Set([x.owner,...shOwners()].filter(Boolean))].map(o=>`<option value="${esc(o)}" ${o===x.owner?'selected':''}>${esc(o)}</option>`).join('')}</select></label>
