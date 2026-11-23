@@ -334,6 +334,10 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 #ctDlgRows tr{cursor:pointer}#ctDlgRows tr:hover td{background:var(--navy-soft)}
 .pick-btn{font-size:11px;padding:5px 10px}
 .pick-grp{display:inline-flex;gap:6px}
+.ovw-flt{font-size:11px;font-weight:600;padding:5px 12px;border:1px solid color-mix(in srgb,var(--risk) 30%,transparent);border-radius:999px;background:var(--risk-soft);color:var(--risk);cursor:pointer}
+.ovw-flt:hover{border-color:var(--risk)}
+.ovw-flt[aria-pressed="true"]{background:color-mix(in srgb,var(--risk) 22%,var(--risk-soft));border-color:var(--risk)}
+.ovw-flt[aria-pressed="true"]::before{content:"✓ "}
 .pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
 .pager .pg-info{font-size:11.5px;color:var(--muted)}
 .pager .pg-btns{display:flex;align-items:center;gap:4px}
@@ -2006,10 +2010,12 @@ function donutHtml(parts,center,label){
   return `<svg class="donut" viewBox="0 0 42 42" role="img" aria-label="${esc(label)}"><circle r="15.915" cx="21" cy="21" fill="none" stroke="var(--soft)" stroke-width="5.5"/><g transform="rotate(-90 21 21)">${segs}</g><text x="21" y="22.2" text-anchor="middle" class="dn-n">${center}</text></svg>`;
 }
 const barRow=(l,v,max,c,sub,go)=>`<div class="hb"${go?` data-dgo="${esc(go)}" role="button" tabindex="0"`:''}><span class="hb-l">${l}</span><span class="hb-t"><i style="width:${max?Math.max(v?2:0,v/max*100):0}%;background:${c}"></i></span><span class="hb-v">${v}${sub?`<small>${sub}</small>`:''}</span></div>`;
+// Ana Sayfa: "Pasif Projeleri Filtrele" açıkken yalnızca aktif (Aktif, Beklemede, Kuruldu) projeler hesaplanır.
+let ovwNoPassive=false;try{ovwNoPassive=localStorage.getItem('saha-ovw-nopassive')==='1';}catch(e){}
 function renderPortfolio(){
   if(!loaded){$('view').innerHTML='<div class="box emptystate"><h2>Projeler Yükleniyor</h2><p>Kayıtlı projeler buluttan getiriliyor.</p></div>';return;}
-  const all=db.sites;
-  if(!all.length){$('view').innerHTML=emptyHtml();return;}
+  if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
+  const all=ovwNoPassive?db.sites.filter(isOpen):db.sites;
   const T=sumOf(all),n=all.length,act=all.filter(isOpen).length,kw=T.dcKw+T.acKw;
   const tt=all.map(x=>[x,totals(x)]);
   // Aşama
@@ -2034,7 +2040,7 @@ function renderPortfolio(){
   const maxSt=Math.max(...byStat.map(x=>x.n),1);
   const c3=`<div class="vcols">${byStat.map(x=>{const q=tt.filter(([y])=>statusOf(y.status).k===x.k).reduce((a,[,t])=>a+t.kw,0);return `<div class="vc" data-dgo="status:${x.k}" role="button" tabindex="0" title="${esc(x.t)}: ${x.n} proje"><span class="vc-n">${x.n}</span><span class="vc-kw">${x.n?nf.format(q)+' kW':'—'}</span><span class="vc-bar"><i style="height:${x.n?Math.max(4,x.n/maxSt*100):0}%;background:${x.c}"></i></span><span class="vc-l">${esc(x.t)}</span></div>`;}).join('')}</div>`;
   const c5=`<div class="hbars">${cityBars}</div>`;
-  $('view').innerHTML=`<div class="dash" data-tab="ovw">${card('Genel Özet','',c1)}${card('Aşamalara Göre Projeler','Satıra tıklayınca liste açılır',c2)}${card('Durum Dağılımı','',c3)}${card('İllere Göre Projeler',`İlk ${cities.length} il`,c5)}</div>`;
+  $('view').innerHTML=`<div class="dash" data-tab="ovw">${card('Genel Özet','',c1).replace('</h3>',`<button type="button" class="ovw-flt no-print" id="ovwFlt" aria-pressed="${ovwNoPassive}" title="${ovwNoPassive?'Pasif projeler hesaba katılmıyor; tıklayınca hepsi gösterilir':'Pasif projeleri (Uygun Değil, Kaybedildi, İptal) hesaplardan çıkar'}">Pasif Projeleri Filtrele</button></h3>`)}${card('Aşamalara Göre Projeler','Satıra tıklayınca liste açılır',c2)}${card('Durum Dağılımı','',c3)}${card('İllere Göre Projeler',`İlk ${cities.length} il`,c5)}</div>`;
 }
 document.addEventListener('click',e=>{const g=e.target.closest('[data-dgo]');if(!g||view!=='portfolio')return;dashGo(g.dataset.dgo);});
 document.addEventListener('keydown',e=>{const g=e.target.closest('[data-dgo]');if(g&&view==='portfolio'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();dashGo(g.dataset.dgo);}});
@@ -3569,7 +3575,8 @@ async function renderDaily(){
     +sec('3. Güncellenmeyen Projeler',DY_QUIET+'+ gündür',quiet.length,dyRows(quiet,'İl','Güncelleme','Bütün açık projeler güncel.'))
     +sec('4. Son 24 Saatte Güncellenenler','Dünden beri',fresh.length,dyRows(fresh,'İl','Güncelleme','Son 24 saatte güncellenen proje yok.'))+'</div>';
 }
-document.addEventListener('click',e=>{if(e.target.closest('#goTasks')&&view==='site'){const id=activeId;pl.f.site=id;pl.f.status='open';pl.f.assignee='';pl.f.range='';pl.f.hideEmpty=false;guard(()=>{taskFrom=id;dyBack=false;view='planner';render();window.scrollTo(0,0);});return;}
+document.addEventListener('click',e=>{if(e.target.closest('#ovwFlt')){ovwNoPassive=!ovwNoPassive;try{localStorage.setItem('saha-ovw-nopassive',ovwNoPassive?'1':'0');}catch(x){}renderPortfolio();return;}
+  if(e.target.closest('#goTasks')&&view==='site'){const id=activeId;pl.f.site=id;pl.f.status='open';pl.f.assignee='';pl.f.range='';pl.f.hideEmpty=false;guard(()=>{taskFrom=id;dyBack=false;view='planner';render();window.scrollTo(0,0);});return;}
   if(e.target.closest('#dyBack')){const t=backTarget();if(t)guard(()=>{if(notesOpen)closeNotes();t.go();render();window.scrollTo(0,0);});return;}
   const r=e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const r=e.target.closest&&e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
