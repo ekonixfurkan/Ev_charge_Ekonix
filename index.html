@@ -1229,11 +1229,14 @@ table.yearly.sh-sum{width:100%;min-width:100%;display:table}.sh-sum th,.sh-sum t
 .fl-tbl.sh-fl th:last-child{text-align:right}
 .fl-tbl.sh-fl .fl-act{text-align:right}
 .fl-tbl.sh-fl .fl-act>*{margin-left:0;margin-right:0}
-.fl-tbl.sh-fl .fl-act>*+*{margin-left:14px}
-.fl-tbl.sh-fl .fl-act .btn-link,.fl-tbl.sh-fl .fl-act button{font-weight:700;font-size:12px;padding:0;border:0;background:none;box-shadow:none;color:var(--navy);text-decoration:none;cursor:pointer}
-.fl-tbl.sh-fl .fl-act button[data-shfdel]{color:var(--no)}
-.fl-tbl.sh-fl .fl-act .btn-link:hover,.fl-tbl.sh-fl .fl-act button:hover:not(:disabled){text-decoration:underline}
-.fl-tbl.sh-fl .fl-act button:disabled{opacity:.4;cursor:not-allowed}
+.fl-tbl.sh-fl .fl-act .ic{display:inline-grid;place-items:center;width:30px;height:30px;padding:0;border:1px solid transparent;border-radius:50%;background:color-mix(in srgb,currentColor 11%,transparent);box-shadow:none;cursor:pointer;text-decoration:none;vertical-align:middle}
+.fl-tbl.sh-fl .fl-act .ic:hover:not(:disabled){background:color-mix(in srgb,currentColor 20%,transparent);border-color:currentColor}
+.fl-tbl.sh-fl .fl-act .ic-view{color:var(--navy)}.fl-tbl.sh-fl .fl-act .ic-dl{color:var(--ok)}.fl-tbl.sh-fl .fl-act .ic-edit{color:var(--risk)}.fl-tbl.sh-fl .fl-act .ic-del{color:var(--no)}
+.fl-tbl.sh-fl .fl-act .ic:disabled{opacity:.35;cursor:not-allowed}
+.fl-tbl.sh-fl .fl-act>*+*{margin-left:8px}
+.fl-tbl.sh-fl .fl-headrow th{padding:0;text-align:left;background:var(--soft);text-transform:none;letter-spacing:0;font-size:inherit;font-weight:inherit}
+.fl-tbl.sh-fl .fl-headrow .fl-head strong{font-size:12.5px;font-weight:700;color:var(--ink)}.fl-tbl.sh-fl .fl-headrow .fl-head small{font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}.fl-tbl.sh-fl .fl-headrow .fl-head .pick-btn{margin-left:auto}
+.fl-tbl.sh-fl .fl-headrow .fl-head{border-radius:0}
 .fl-tbl.sh-fl th:nth-child(1){width:34%}.fl-tbl.sh-fl th:nth-child(2){width:9%}.fl-tbl.sh-fl th:nth-child(3){width:16%}.fl-tbl.sh-fl th:nth-child(4){width:15%}.fl-tbl.sh-fl th:nth-child(5){width:26%}
 .sh-ftbl{table-layout:fixed}.sh-ftbl td{white-space:normal;overflow-wrap:anywhere;vertical-align:middle}.sh-ftbl .fl-act{white-space:nowrap;text-align:right}.sh-ftbl .fl-act>*{display:inline-block;margin-left:6px}.sh-ftbl select{min-width:0;font-size:12px;padding:5px 6px}
 @media (max-width:900px){.sh-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.sh-head{grid-template-columns:1fr}}
@@ -3354,11 +3357,13 @@ function shUrunHtml(x){
 const shKindOf=n=>{const t=String(n).toLocaleLowerCase('tr');return /beyanname/.test(t)?'beyanname':/poli[cç]e|sigorta/.test(t)?'sigorta':/\btps\b|uygunluk|\bbtk\b/.test(t)?'uygunluk':/\btse\b/.test(t)?'denetim':/konsimento|bill of lading|packing|\bbl\b/.test(t)?'nakliye':/^eas\d|marport|ardiye/.test(t)?'liman':/invoice|fatura|^gib\d|^nase\b/.test(t)?'fatura':'diger';};
 const shTitleOf=n=>String(n).replace(/\.[A-Za-z0-9]{1,8}$/,'').replace(/[_]+/g,' ').trim();
 const SH_FOLDER_ICON='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>';
+const SH_IC=p=>`<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const SH_I={view:SH_IC('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'),dl:SH_IC('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>'),edit:SH_IC('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),del:SH_IC('<path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>')};
 const shFileRow=f=>{const can=!!sh.fileOwner&&!shRO(),u='/api/files?download='+esc(f.id)+'&ship=1',view_=/^(pdf|jpg|jpeg|png)$/.test(flExt(f.name)),base=String(f.name).replace(/\.[A-Za-z0-9]{1,8}$/,''),tt=f.title&&f.title!==base;
   const img=/^(jpg|jpeg|png)$/.test(flExt(f.name)),ico=img?`<a class="fl-thumb" href="${u}&inline=1" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img src="${u}&inline=1" alt="" loading="lazy" decoding="async" width="40" height="40"></a>`:`<span class="fl-ico">${flBadge(f.name)}</span>`;
   return `<tr data-shfid="${esc(f.id)}"><td>${ico}${view_?`<a href="${u}&inline=1" target="_blank" rel="noopener">${esc(f.title||f.name)}</a>`:`<a href="${u}">${esc(f.title||f.name)}</a>`}${tt?`<span class="sub" translate="no">${esc(f.name)}</span>`:''}</td>
     <td class="num">${esc(flSize(f.size))}</td><td>${esc(f.uploadedByName||f.uploadedBy||'—')}</td><td class="num">${esc(fmtTs(f.uploadedAt))}</td>
-    <td class="fl-act">${view_?`<a class="btn-link" href="${u}&inline=1" target="_blank" rel="noopener">Önizle</a>`:''}<a class="btn-link" href="${u}">İndir</a>${shRO()?'':`<button type="button" class="ghost" data-shfedit="${esc(f.id)}">Düzenle</button>`}<button type="button" class="ghost" data-shfdel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></td></tr>`;};
+    <td class="fl-act">${view_?`<a class="ic ic-view" href="${u}&inline=1" target="_blank" rel="noopener" title="Önizle" aria-label="Önizle">${SH_I.view}</a>`:''}<a class="ic ic-dl" href="${u}" title="İndir" aria-label="İndir">${SH_I.dl}</a>${shRO()?'':`<button type="button" class="ic ic-edit" data-shfedit="${esc(f.id)}" title="Düzenle" aria-label="Düzenle">${SH_I.edit}</button>`}<button type="button" class="ic ic-del" data-shfdel="${esc(f.id)}" ${can?'':'disabled'} title="Sil" aria-label="Dosyayı sil">${SH_I.del}</button></td></tr>`;};
 const shPicCard=f=>{const can=!!sh.fileOwner&&!shRO(),u='/api/files?download='+esc(f.id)+'&ship=1';
   return `<figure class="fl-pic" data-shfid="${esc(f.id)}"><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><img src="${u}&inline=1" alt="${esc(f.name)}" loading="lazy" decoding="async"></a>
     <figcaption><b title="${esc(f.title||f.name)}">${esc(f.title||f.name)}</b><small>${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><span class="fl-pic-act"><a class="btn-link" href="${u}">İndir</a>${shRO()?'':`<button type="button" class="ghost" data-shfedit="${esc(f.id)}">Düzenle</button>`}<button type="button" class="ghost" data-shfdel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;};
@@ -3373,9 +3378,11 @@ async function shBelge(x){
   const tiles=SH_KIND.map(([k,t])=>{const n=(by[k]||[]).length,on=sh.sel===k;
     return `<button type="button" class="comp-tile fl-tile${on?' on':''}" data-shsel="${k}" data-shfolder="${k}" aria-expanded="${on}"><span class="ct-ic">${SH_FOLDER_ICON}${n?`<i class="ct-n">${n>99?'99+':n}</i>`:''}</span><span class="ct-tx"><b>${esc(t)}</b><small>${n?n+' dosya':'Boş'}</small></span></button>`;}).join('');
   const list=(by[sh.sel]||[]).slice().sort((a,c)=>String(a.title||a.name).localeCompare(String(c.title||c.name),'tr',{numeric:true,sensitivity:'base'}));
-  const pane=sh.sel?`<div class="fl-folder fl-pane" data-shfolder="${sh.sel}"><div class="fl-head"><strong>${esc(shKindName(sh.sel))}</strong><small>${list.length} dosya</small>${ro?'':`<button type="button" class="ghost pick-btn" data-shfup="${sh.sel}">Yükle</button>`}</div>
+  const headInner=`<strong>${esc(shKindName(sh.sel))}</strong><small>${list.length} dosya</small>${ro?'':`<button type="button" class="ghost pick-btn" data-shfup="${sh.sel}">Yükle</button>`}`;
+  const hasOth=list.some(f=>!/^(jpg|jpeg|png)$/.test(flExt(f.name)));
+  const pane=sh.sel?`<div class="fl-folder fl-pane" data-shfolder="${sh.sel}">${hasOth?'':`<div class="fl-head">${headInner}</div>`}
     ${(()=>{const pics=list.filter(f=>/^(jpg|jpeg|png)$/.test(flExt(f.name))),others=list.filter(f=>!pics.includes(f));
-      return (pics.length?`<div class="fl-gallery">${pics.map(shPicCard).join('')}</div>`:'')+(others.length?`<div class="scroll"><table class="yearly fl-tbl sh-fl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${others.map(shFileRow).join('')}</tbody></table></div>`:'');})()}
+      return (others.length?`<div class="scroll"><table class="yearly fl-tbl sh-fl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th>İşlemler</th></tr><tr class="fl-headrow"><th colspan="5"><div class="fl-head">${headInner}</div></th></tr></thead><tbody>${others.map(shFileRow).join('')}</tbody></table></div>`:'')+(pics.length?`<div class="fl-gallery">${pics.map(shPicCard).join('')}</div>`:'');})()}
     ${list.length?'':'<p class="note" style="padding:14px 16px">Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.</p>'}</div>`:'';
   b.innerHTML=`<section class="box files-box"><h3>Dosyalar<small>${sh.files.length?sh.files.length+' dosya':''}</small></h3>
     <div class="fl-bar-top no-print"><p class="note">Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.</p></div>

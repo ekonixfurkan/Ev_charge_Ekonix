@@ -427,6 +427,7 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'İşlemler': 'Actions',
     /* günlük toplantı */
     '2. Şirket İçi Bilgilendirme': '2. Internal Announcements', 'Not': 'Note', 'Yazan': 'Author', 'Zaman': 'When',
     'Son günlerde eklenen şirket içi not yok.': 'No internal notes added in recent days.',
