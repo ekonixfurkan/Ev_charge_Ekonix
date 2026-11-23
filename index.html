@@ -333,6 +333,7 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 #ctDlg{width:min(900px,96vw);max-width:none;max-height:92vh;overflow:auto}
 #ctDlgRows tr{cursor:pointer}#ctDlgRows tr:hover td{background:var(--navy-soft)}
 .pick-btn{font-size:11px;padding:5px 10px}
+.pick-grp{display:inline-flex;gap:6px}
 .pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
 .pager .pg-info{font-size:11.5px;color:var(--muted)}
 .pager .pg-btns{display:flex;align-items:center;gap:4px}
@@ -1299,6 +1300,15 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
 </div>
 <div id="toast" role="status" hidden></div>
 <dialog id="actDlg"><div id="actBody"></div><div class="row"><button type="button" id="actClose" class="primary">Kapat</button></div></dialog>
+<dialog id="cnDlg"><h3 style="margin:0 0 6px">Yeni Kişi</h3><p class="dsub" style="margin:0 0 10px">Kişi Müşteri Bilgileri'ne kaydedilir ve projeye işlenir.</p>
+  <label>Şirket<input id="cnCompany" maxlength="120" autocomplete="off"></label>
+  <label>Ad *<input id="cnFirst" maxlength="80" autocomplete="off"></label>
+  <label>Soyad<input id="cnLast" maxlength="80" autocomplete="off"></label>
+  <label>Telefon *<input id="cnPhone" type="tel" inputmode="tel" maxlength="22" placeholder="+90 (5__) ___ __ __" autocomplete="off"></label>
+  <label>E-posta<input id="cnEmail" type="email" maxlength="254" autocomplete="off"></label>
+  <label>Unvan<input id="cnTitle" maxlength="100" autocomplete="off"></label>
+  <p class="alert" id="cnErr" role="alert" hidden></p>
+  <div class="row"><button type="button" id="cnCancel">Vazgeç</button><button type="button" class="primary" id="cnSave">Kaydet ve Seç</button></div></dialog>
 <dialog id="ctDlg">
   <div class="cat-head"><div><h2>Kişilerden Seç</h2><p class="dsub">Satıra tıklayın; ad, telefon ve şirket projeye işlenir.</p></div><button type="button" id="ctDlgClose" class="ghost" aria-label="Kapat">✕</button></div>
   <div class="cat-bar"><input type="search" id="ctDlgQ" placeholder="Şirket, kişi veya telefon…" autocomplete="off"></div>
@@ -1342,11 +1352,11 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
     <p class="dsub">Temel bilgileri girin. Üniteler, altyapı ve finansman detayı kayıttan sonra proje sayfasında doldurulur.</p>
     <div class="dgrid">
       <label class="span2">Proje adı *<input id="dlgName" required maxlength="120" autocomplete="off"></label>
-      <div class="span2" style="display:flex;justify-content:flex-end"><button type="button" class="ghost pick-btn" id="dlgPickContact">Kişilerden Seç</button></div>
-      <label>İletişim kişisi *<input id="dlgContact" maxlength="120" autocomplete="off"></label>
-      <label>Telefon *<input id="dlgPhone" data-phone type="tel" inputmode="tel" maxlength="22" placeholder="+90 (5__) ___ __ __" autocomplete="off"></label>
+      <div class="span2" style="display:flex;justify-content:flex-end;gap:8px"><button type="button" class="ghost pick-btn" id="dlgNewContact">Yeni Kişi</button><button type="button" class="ghost pick-btn" id="dlgPickContact">Kişilerden Seç</button></div>
+      <label>İletişim kişisi *<input id="dlgContact" maxlength="120" autocomplete="off" data-locked readonly placeholder="Kişilerden seçin ya da yeni kişi ekleyin"></label>
+      <label>Telefon *<input id="dlgPhone" data-phone type="tel" inputmode="tel" maxlength="22" placeholder="+90 (5__) ___ __ __" autocomplete="off" data-locked readonly></label>
       <label>Saha tipi<select id="dlgType"><option value="Hotel">Otel</option><option value="Hospital">Hastane</option><option value="Mall">AVM</option><option value="Office">Ofis</option><option value="Industry Zone">Sanayi Sitesi</option><option value="Residence">Konut</option><option value="Commercial Center">Ticari Merkez</option><option value="Car Inspection Center">Araç Muayene İstasyonu</option><option value="Carpark">Otopark</option><option value="High School">Lise</option><option value="University">Üniversite</option><option value="Gym & Restaurant">Spor Salonu ve Restoran</option><option value="Fuel Station">Akaryakıt İstasyonu</option><option value="Logistics Center">Lojistik Merkezi</option><option value="Other">Diğer</option></select></label>
-      <label>Şirket<input id="dlgCompany" maxlength="120" autocomplete="off"></label>
+      <label>Şirket<input id="dlgCompany" maxlength="120" autocomplete="off" data-locked readonly></label>
       <div class="trio">
         <label>İlk süre (yıl)<input id="dlgBase" type="number" min="0" step="any" inputmode="decimal"></label>
         <label>Uzatma (yıl)<input id="dlgExt" type="number" min="0" step="any" inputmode="decimal"></label>
@@ -2180,14 +2190,14 @@ function renderSite(){
   <div id="ddAlerts"></div>
 
   <div class="info-pair" data-tab="info">
-  <section class="box"><h3>Proje Bilgileri${siteEdit&&mode==='cloud'?'<button type="button" class="ghost pick-btn no-print" id="pickContact">Kişilerden Seç</button>':''}</h3>
+  <section class="box"><h3>Proje Bilgileri${siteEdit&&mode==='cloud'?'<span class="pick-grp no-print"><button type="button" class="ghost pick-btn" id="newContact">Yeni Kişi</button><button type="button" class="ghost pick-btn" id="pickContact">Kişilerden Seç</button></span>':''}</h3>
   <div class="grid infogrid">
     ${field('name','Proje adı')}
     <label>Proje kodu<input id="codeBox" data-locked readonly tabindex="-1" value="${esc(s.code||'—')}" title="Sunucu tarafından verilir; değiştirilemez"></label>
-    ${field('contact','İletişim kişisi')}
-    <label>Telefon<input data-f="phone" data-phone type="tel" inputmode="tel" placeholder="+90 (5__) ___ __ __" value="${esc(s.phone)}"></label>
+    <label>İletişim kişisi<input data-f="contact" type="text" value="${esc(s.contact)}" data-locked readonly title="Müşteri Bilgileri'nden gelir: \"Kişilerden Seç\" ya da \"Yeni Kişi\" kullanın"></label>
+    <label>Telefon<input data-f="phone" data-phone type="tel" inputmode="tel" placeholder="+90 (5__) ___ __ __" value="${esc(s.phone)}" data-locked readonly title="Müşteri Bilgileri'nden gelir: \"Kişilerden Seç\" ya da \"Yeni Kişi\" kullanın"></label>
     <label>Saha tipi<select data-f="type">${TYPES.map(([k,t])=>`<option value="${esc(k)}" ${k===s.type?'selected':''}>${esc(t)}</option>`).join('')}</select></label>
-    ${field('contactCompany','Şirket')}
+    <label>Şirket<input data-f="contactCompany" type="text" value="${esc(s.contactCompany)}" data-locked readonly title="Müşteri Bilgileri'nden gelir: \"Kişilerden Seç\" ya da \"Yeni Kişi\" kullanın"></label>
     <div class="trio">
       <label>İlk süre (yıl)<input data-f="contractBase" type="number" min="0" step="any" inputmode="decimal" value="${esc(s.contractBase)}"></label>
       <label>Uzatma (yıl)<input data-f="contractExt" type="number" min="0" step="any" inputmode="decimal" value="${esc(s.contractExt)}"></label>
@@ -3770,6 +3780,26 @@ async function openCtPicker(cb){
   try{if(!ct.loaded)await loadContacts();}catch(e){toast(e.message);return;}
   $('ctDlgQ').value='';paintCtPicker();$('ctDlg').showModal();$('ctDlgQ').focus();
 }
+// Projeden yeni kişi: Müşteri Bilgileri'ne kaydedilir, sonra projeye işlenir (projede serbest yazı yok).
+let cnCb=null;
+function openCtNew(cb){
+  cnCb=cb;for(const i of ['cnCompany','cnFirst','cnLast','cnPhone','cnEmail','cnTitle'])$(i).value='';
+  $('cnErr').hidden=true;$('cnSave').disabled=false;$('cnDlg').showModal();$('cnFirst').focus();
+}
+document.addEventListener('input',e=>{if(e.target.id==='cnPhone'){const el=e.target;el.value=fmtPhone(el.value,(el._dg??null),/^delete/.test(e.inputType||''));el._dg=el.value.replace(/\D/g,'').replace(/^90/,'').length;}});
+async function ctNewSave(){
+  const v=i=>$(i).value.replace(/\s+/g,' ').trim(),bad=m=>{$('cnErr').textContent=m;$('cnErr').hidden=false;};
+  if(!v('cnFirst')){bad('Ad zorunlu.');return;}
+  if(v('cnPhone').replace(/\D/g,'').replace(/^90/,'').length!==10){bad('Telefon numarasını +90 (5xx) xxx xx xx biçiminde eksiksiz girin.');return;}
+  $('cnSave').disabled=true;
+  try{
+    if(!ct.loaded)await loadContacts();
+    const full=ctLow([v('cnFirst'),v('cnLast')].filter(Boolean).join(' ')),dup=ct.rows.find(c=>ctLow(ctName(c))===full);
+    if(dup&&!(await ask(ctName(dup)+' Müşteri Bilgileri\'nde zaten kayıtlı. Yine de yeni kayıt açılsın mı? (Hayır: mevcut kişi seçilir.)','Yeni Kayıt Aç'))){$('cnDlg').close();const cb=cnCb;cnCb=null;if(cb)cb(dup);return;}
+    const d=await ctApi('POST','',{company:v('cnCompany'),firstName:v('cnFirst'),lastName:v('cnLast'),phone:v('cnPhone'),email:v('cnEmail'),title:v('cnTitle')});
+    ct.rows.push(d.contact);$('cnDlg').close();toast('Kişi Müşteri Bilgileri\'ne eklendi.');const cb=cnCb;cnCb=null;if(cb)cb(d.contact);
+  }catch(x){$('cnSave').disabled=false;bad(x.message);}
+}
 function ctPickSet(c){
   const cb=ctPickCb;ctPickCb=null;$('ctDlg').close();if(cb)cb(c);
 }
@@ -3780,8 +3810,16 @@ document.addEventListener('click',e=>{
     s.contact=ctName(c);s.phone=c.phone||'';s.contactCompany=c.company||'';
     for(const [k,v] of [['contact',s.contact],['phone',s.phone],['contactCompany',s.contactCompany]]){const i=document.querySelector(`[data-f="${k}"]`);if(i)i.value=v;}
     touched(s);updateDerived();});return;}
+  if(e.target.closest('#newContact')){openCtNew(c=>{const s=cur();if(!s)return;
+    s.contact=ctName(c);s.phone=c.phone||'';s.contactCompany=c.company||'';
+    for(const [k,v] of [['contact',s.contact],['phone',s.phone],['contactCompany',s.contactCompany]]){const i=document.querySelector(`[data-f="${k}"]`);if(i)i.value=v;}
+    touched(s);updateDerived();});return;}
+  if(e.target.closest('#dlgNewContact')){openCtNew(c=>{$('dlgContact').value=ctName(c);const p=$('dlgPhone');p.value=c.phone||'';p._dg=p.value.replace(/\D/g,'').replace(/^90/,'').length;$('dlgCompany').value=c.company||'';clearDlgErr();});return;}
+  if(e.target.closest('#cnCancel')){$('cnDlg').close();return;}
+  if(e.target.closest('#cnSave')){ctNewSave();return;}
   if(e.target.closest('#dlgPickContact')){openCtPicker(c=>{$('dlgContact').value=ctName(c);const p=$('dlgPhone');p.value=c.phone||'';p._dg=p.value.replace(/\D/g,'').replace(/^90/,'').length;$('dlgCompany').value=c.company||'';clearDlgErr();});return;}
 });
+setTimeout(()=>{if(typeof mode!=='undefined'&&mode==='cloud'&&!ct.loaded)loadContacts().catch(()=>{});},4000); // rehber açılınca sunucu, projelerdeki kişileri bir kez rehbere aktarır
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#ctDlgRows [data-ctpick]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const c=ct.rows.find(x=>x.id===r.dataset.ctpick);if(c)ctPickSet(c);}});
 
 /* ---------- Proje dosyaları (Excel, PDF, Word, JPG, PNG) ---------- */
