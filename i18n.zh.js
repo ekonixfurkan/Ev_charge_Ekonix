@@ -1214,6 +1214,7 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Açık-Kapalı": "露天+室内",
    "Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Video (MP4, MOV, WebM) en fazla 300 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki \"Yükle\" düğmesini kullanabilirsin.": "支持 Excel、PDF、Word、JPG 和 PNG；单个文件最大 25 MB。视频（MP4、MOV、WebM）最大 300 MB。可将文件拖到文件夹上，或使用文件夹中的“上传”按钮。",
    "Oynat": "播放",
    "Video 300 MB sınırını aşıyor": "视频超过 300 MB 限制",

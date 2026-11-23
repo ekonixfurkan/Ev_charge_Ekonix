@@ -427,6 +427,7 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Açık-Kapalı': 'Open-Covered',
     'Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Video (MP4, MOV, WebM) en fazla 300 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.': 'Excel, PDF, Word, JPG and PNG; up to 25 MB per file. Video (MP4, MOV, WebM) up to 300 MB. You can drag a file onto a folder or use the “Upload” button on the folder.',
     'Oynat': 'Play',
     'Video 300 MB sınırını aşıyor': 'Video exceeds the 300 MB limit',
