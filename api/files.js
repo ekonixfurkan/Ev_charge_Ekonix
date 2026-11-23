@@ -12,7 +12,7 @@ import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
 import { logActivity } from '../lib/activity.js';
 import { handleShipQuery, registerShipFile, shipFileRow, shipExists } from '../lib/shipments.js';
-import { _deps, MAX_BYTES, ALLOWED_TYPES, DEFAULT_FOLDERS, TYPES, cleanName, cleanFolder, extOf, isAllowedName, signedGetUrl } from '../lib/files.js';
+import { _deps, MAX_BYTES, MAX_VIDEO_BYTES, VIDEO_TYPES, isVideoName, maxBytesFor, ALLOWED_TYPES, DEFAULT_FOLDERS, TYPES, cleanName, cleanFolder, extOf, isAllowedName, signedGetUrl } from '../lib/files.js';
 
 let _ready = null;
 export function ensureFiles() {
@@ -100,7 +100,7 @@ export default async function handler(req, res) {
       const folders = [...DEFAULT_FOLDERS];
       for (const c of custom) if (!folders.includes(c.name)) folders.push(c.name);
       for (const f of files) if (!folders.includes(f.folder)) folders.push(f.folder);
-      return res.status(200).json({ folders, defaults: DEFAULT_FOLDERS, files: files.map(shape), max: MAX_BYTES, me: user.email, owner: Boolean(user.owner) });
+      return res.status(200).json({ folders, defaults: DEFAULT_FOLDERS, files: files.map(shape), max: MAX_BYTES, maxVideo: MAX_VIDEO_BYTES, me: user.email, owner: Boolean(user.owner) });
     }
 
     if (req.method === 'POST') {
@@ -114,10 +114,10 @@ export default async function handler(req, res) {
             onBeforeGenerateToken: async (pathname) => {
               // yol biçimi: sites/{proje id}/{rastgele}-{dosya adı}  ya da  ships/{sevkiyat id}/{rastgele}-{dosya adı}
               const m = /^(sites|ships)\/([^/]+)\/([^/]+)$/.exec(pathname);
-              if (!m || !isAllowedName(m[3])) throw new Error('Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)');
+              if (!m || !(isAllowedName(m[3]) || (m[1] === 'sites' && isVideoName(m[3])))) throw new Error('Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG, MP4, MOV)');
               if (m[1] === 'ships') { if (!(await shipExists(s, m[2]))) throw new Error('Sevkiyat bulunamadı'); }
               else if ((await siteName(s, m[2])) == null) throw new Error('Proje bulunamadı');
-              return { allowedContentTypes: ALLOWED_TYPES, maximumSizeInBytes: MAX_BYTES, addRandomSuffix: false, allowOverwrite: false, tokenPayload: JSON.stringify({ by: user.email }) };
+              return { allowedContentTypes: ALLOWED_TYPES, maximumSizeInBytes: maxBytesFor(m[3]), addRandomSuffix: false, allowOverwrite: false, tokenPayload: JSON.stringify({ by: user.email }) };
             },
           });
           return res.status(200).json(json);
@@ -142,15 +142,15 @@ export default async function handler(req, res) {
         const fname = cleanName(b.name);
         const pathname = typeof b.pathname === 'string' ? b.pathname : '';
         if (!folder || !fname) return res.status(400).json({ error: 'Klasör ve dosya adı gerekli' });
-        if (!isAllowedName(fname)) return res.status(400).json({ error: 'Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG)' });
+        if (!isAllowedName(fname) && !isVideoName(fname)) return res.status(400).json({ error: 'Bu dosya türü desteklenmiyor (Excel, PDF, Word, JPG, PNG, MP4, MOV)' });
         if (!pathname.startsWith(`sites/${site}/`)) return res.status(400).json({ error: 'Geçersiz dosya yolu' });
         let meta;
         try { meta = await _deps.head(pathname); } catch { return res.status(400).json({ error: 'Yüklenen dosya bulunamadı' }); }
-        if (meta.size > MAX_BYTES) {
+        if (meta.size > maxBytesFor(fname)) {
           try { await _deps.del(pathname); } catch { /* yok say */ }
-          return res.status(400).json({ error: 'Dosya 25 MB sınırını aşıyor' });
+          return res.status(400).json({ error: isVideoName(fname) ? 'Video 300 MB sınırını aşıyor' : 'Dosya 25 MB sınırını aşıyor' });
         }
-        const mime = TYPES[extOf(fname)] || meta.contentType || '';
+        const mime = TYPES[extOf(fname)] || VIDEO_TYPES[extOf(fname)] || meta.contentType || '';
         if (!DEFAULT_FOLDERS.includes(folder)) await s`INSERT INTO site_folders (site_id, name, created_by) VALUES (${site}, ${folder}, ${user.email}) ON CONFLICT DO NOTHING`;
         const r = await s`INSERT INTO site_files (site_id, folder, name, size, mime, pathname, uploaded_by)
           VALUES (${site}, ${folder}, ${fname}, ${meta.size}, ${mime}, ${pathname}, ${user.email}) ON CONFLICT (pathname) DO NOTHING RETURNING id`;

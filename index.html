@@ -372,7 +372,9 @@ table.portfolio.notif-tbl :is(th,td){min-width:0}
 .fl-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;padding:14px}
 .fl-pic{margin:0;border:1px solid var(--hair);border-radius:var(--radius);background:var(--card);overflow:hidden}
 .fl-pic>a{display:block;aspect-ratio:4/3;background:var(--soft)}
-.fl-pic img{display:block;width:100%;height:100%;object-fit:cover}
+.fl-pic img,.fl-pic video{display:block;width:100%;height:100%;object-fit:cover}
+.fl-vid>a{position:relative;background:var(--navy-d)}
+.fl-play{position:absolute;inset:0;display:grid;place-items:center;color:#fff;pointer-events:none}.fl-play svg{padding:11px;width:46px;height:46px;border-radius:50%;background:rgba(11,46,87,.72)}
 .fl-pic figcaption{display:grid;gap:2px;padding:8px 10px}
 .fl-pic figcaption b{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fl-pic figcaption small{color:var(--muted);font-size:11px}
@@ -2316,7 +2318,7 @@ function renderSite(){
 
   <section class="box files-box" data-tab="files"><h3>Dosyalar<small id="flSummary"></small></h3>
     <div id="flBody"><p class="note">Yükleniyor…</p></div>
-    <input type="file" id="flPick" multiple hidden accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.jpg,.jpeg,.png">
+    <input type="file" id="flPick" multiple hidden accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.jpg,.jpeg,.png,.mp4,.mov,.m4v,.webm">
   </section>
 
   <section class="box" data-tab="info"><h3>Genel Notlar</h3><textarea data-f="notes" rows="4" aria-label="Genel notlar" placeholder="Saha ziyareti, finansör geri bildirimi, açık sorular">${esc(s.notes)}</textarea>
@@ -3782,7 +3784,8 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{const r=e.target.closest&&e.target.closest('#ctDlgRows [data-ctpick]');if(r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const c=ct.rows.find(x=>x.id===r.dataset.ctpick);if(c)ctPickSet(c);}});
 
 /* ---------- Proje dosyaları (Excel, PDF, Word, JPG, PNG) ---------- */
-const FL_TYPES={pdf:'application/pdf',xls:'application/vnd.ms-excel',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',csv:'text/csv',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png'};
+const FL_TYPES={pdf:'application/pdf',xls:'application/vnd.ms-excel',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',csv:'text/csv',doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',mp4:'video/mp4',mov:'video/quicktime',m4v:'video/x-m4v',webm:'video/webm'};
+const FL_VIDEO=/^(mp4|mov|m4v|webm)$/,FL_MAX_VIDEO=300*1024*1024;
 const FL_MAX=25*1024*1024;
 let fl={site:null,folders:[],files:[],me:'',admin:false,loaded:false,collapsed:{},uploading:[],target:'',newOpen:false,err:''};
 async function flApi(method,qs,body){
@@ -3794,7 +3797,7 @@ async function flApi(method,qs,body){
 }
 const flSize=n=>n>=1048576?df.format(n/1048576)+' MB':Math.max(1,Math.round(n/1024))+' KB';
 const flExt=n=>(/\.([A-Za-z0-9]+)$/.exec(n)||[])[1]?.toLowerCase()||'';
-const flBadge=n=>{const e=flExt(n);return e==='pdf'?'PDF':/^xls|csv/.test(e)?'XLS':/^doc/.test(e)?'DOC':'IMG';};
+const flBadge=n=>{const e=flExt(n);return FL_VIDEO.test(e)?'VID':e==='pdf'?'PDF':/^xls|csv/.test(e)?'XLS':/^doc/.test(e)?'DOC':'IMG';};
 function initFiles(){
   if(view!=='site'||!$('flBody'))return;
   if(mode!=='cloud'){$('flBody').innerHTML='<p class="note">Dosyalar için sunucu bağlantısı gerekli.</p>';return;}
@@ -3831,6 +3834,11 @@ function flPicHtml(f){
   return `<figure class="fl-pic${on?' in-card':''}" data-flid="${esc(f.id)}"><button type="button" class="fl-skbtn${on?' on':''}" data-skshow="${esc(f.id)}" aria-pressed="${on}" title="${on?'Saha kartından çıkar':'Saha kartına ekle (son sayfada gösterilir, en fazla 4)'}" aria-label="${on?'Saha kartından çıkar':'Saha kartına ekle'}">${on?TICK:SKI}</button><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><img src="${u}&inline=1" alt="${esc(f.name)}" loading="lazy" decoding="async"></a>
     <figcaption><b title="${esc(f.name)}">${esc(f.name)}</b><small>${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><span class="fl-pic-act"><a class="btn-link" href="${u}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;
 }
+function flVidHtml(f){
+  const can=!!fl.owner,u='/api/files?download='+esc(f.id);
+  return `<figure class="fl-pic fl-vid" data-flid="${esc(f.id)}"><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><video src="${u}&inline=1#t=0.1" preload="metadata" muted playsinline></video><span class="fl-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></span></a>
+    <figcaption><b title="${esc(f.name)}">${esc(f.name)}</b><small>Video · ${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><span class="fl-pic-act"><a class="btn-link" href="${u}&inline=1" target="_blank" rel="noopener">Oynat</a><a class="btn-link" href="${u}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;
+}
 function flRowHtml(f){
   const can=!!fl.owner,view_=/^(pdf|jpg|jpeg|png)$/.test(flExt(f.name));
   const img=/^(jpg|jpeg|png)$/.test(flExt(f.name));
@@ -3848,7 +3856,7 @@ function paintFiles(){
   const n=fl.files.length;$('flSummary').textContent=n?n+' dosya':'';
   if(fl.err&&!fl.loaded){b.innerHTML='<p class="note">'+esc(fl.err)+'</p>';return;}
   const by={};fl.files.forEach(f=>{(by[f.folder]=by[f.folder]||[]).push(f);});
-  b.innerHTML=`<div class="fl-bar-top no-print"><p class="note">Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.</p>
+  b.innerHTML=`<div class="fl-bar-top no-print"><p class="note">Excel, PDF, Word, JPG ve PNG; dosya başına en fazla 25 MB. Video (MP4, MOV, WebM) en fazla 300 MB. Dosyayı klasörün üzerine sürükleyebilir ya da klasördeki "Yükle" düğmesini kullanabilirsin.</p>
     <div class="fl-new">${fl.newOpen?`<input id="flNewName" maxlength="60" placeholder="Klasör adı" aria-label="Klasör adı"><button type="button" class="primary" id="flNewOk">Ekle</button><button type="button" id="flNewCancel">Vazgeç</button>`:'<button type="button" id="flNewOpen">+ Yeni Klasör</button>'}</div></div>
     <div id="flUploads"></div>
     ${(()=>{
@@ -3863,8 +3871,8 @@ function paintFiles(){
         ${vers.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Kart</th><th>Dil</th><th>Oluşturan</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${vers.map(v=>`<tr><td><span class="fl-ico">PDF</span><a href="#" data-skver="${esc(v.id)}">${esc((v.snap&&v.snap.name)||'')} · ${esc(fmtTs(v.at))}</a></td><td translate="no">${esc(LANG_LBL[v.lang]||v.lang||'')}</td><td>${esc(v.by||'—')}</td><td class="num">${esc(fmtTs(v.at))}</td><td class="fl-act"><button type="button" class="ghost" data-skver="${esc(v.id)}">Aç</button><button type="button" class="ghost" data-skverdel="${esc(v.id)}" ${me.owner?'':'disabled'} aria-label="Kartı sil">Sil</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="note" style="padding:14px 16px">Henüz kayıtlı saha kartı yok. Sağ üstteki "Saha Kartı" düğmesiyle kartı açıp "Dosyalara Kaydet"e basın.</p>'}</div>`:'';
       const list=(by[fl.sel]||[]).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr',{numeric:true,sensitivity:'base'})); // ada göre (A–Z, sayılar doğal sırada)
       const pane=fl.sel&&fl.folders.includes(fl.sel)?`<div class="fl-folder fl-pane" data-flfolder="${esc(fl.sel)}"><div class="fl-head"><strong>${esc(fl.sel)}</strong><small>${list.length} dosya${(()=>{const n=(cur()&&cur().card&&Array.isArray(cur().card.photos)?cur().card.photos.length:0);return n?` · <span class="fl-skcount">${n}/${SK_MAX} saha kartında</span>`:'';})()}</small><button type="button" class="ghost pick-btn" data-flup="${esc(fl.sel)}">Yükle</button></div>
-        ${(()=>{const pics=list.filter(f=>/^(jpg|jpeg|png)$/.test(flExt(f.name))),others=list.filter(f=>!pics.includes(f));
-          return (pics.length?`<div class="fl-gallery">${pics.map(flPicHtml).join('')}</div>`:'')+(others.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${others.map(flRowHtml).join('')}</tbody></table></div>`:'');})()}
+        ${(()=>{const pics=list.filter(f=>/^(jpg|jpeg|png)$/.test(flExt(f.name))),vids=list.filter(f=>FL_VIDEO.test(flExt(f.name))),others=list.filter(f=>!pics.includes(f)&&!vids.includes(f));
+          return (pics.length||vids.length?`<div class="fl-gallery">${pics.map(flPicHtml).join('')}${vids.map(flVidHtml).join('')}</div>`:'')+(others.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${others.map(flRowHtml).join('')}</tbody></table></div>`:'');})()}
         ${list.length?'':'<p class="note" style="padding:14px 16px">Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.</p>'}</div>`:'';
       return `<div class="hub-tiles no-print">${tiles}${cardTile}</div>${pane}${cardPane}`;})()}`;
   paintUploads();
@@ -3875,7 +3883,7 @@ async function flUploadFiles(folder,fileList){
     const ext=flExt(file.name),item={name:file.name,pct:0,err:''};fl.uploading.push(item);paintUploads();
     try{
       if(!FL_TYPES[ext])throw new Error('Bu dosya türü desteklenmiyor');
-      if(file.size>FL_MAX)throw new Error('25 MB sınırını aşıyor');
+      if(file.size>(FL_VIDEO.test(ext)?FL_MAX_VIDEO:FL_MAX))throw new Error(FL_VIDEO.test(ext)?'Video 300 MB sınırını aşıyor':'25 MB sınırını aşıyor');
       if(!window.VercelBlobClient)throw new Error('Yükleme bileşeni yüklenemedi; sayfayı yenileyin');
       const safe=file.name.normalize('NFKD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9._() -]+/g,'_').slice(-120);
       const pathname=`sites/${site}/${uid()}-${safe}`;
