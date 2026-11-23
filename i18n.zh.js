@@ -1214,6 +1214,8 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Bu projenin görev listesine git": "前往该项目的任务列表",
+   "Projeye Dön": "返回项目",
    "İşlemler": "操作"
   },
   rules: function (sub) {

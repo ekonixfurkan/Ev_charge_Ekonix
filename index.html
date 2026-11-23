@@ -576,6 +576,9 @@ input[data-locked]{background:var(--soft);color:var(--ink2);border-style:dashed;
 .sitetabs .notes-tab .cnt{position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--teal);color:#fff;font:700 10px/19px var(--font);font-style:normal;text-align:center}
 .sitetabs button:hover{border-color:var(--navy);color:var(--navy);background:var(--navy-soft)}
 .sitetabs button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+.vc-stage{display:flex;align-items:center;gap:10px}
+.vc-go{display:grid;place-items:center;flex:none;width:32px;height:32px;padding:0;border:1px solid transparent;border-radius:50%;background:var(--navy-soft);color:var(--navy);cursor:pointer}
+.vc-go:hover{border-color:var(--navy)}
 .vcell{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:8px 14px;min-width:110px}
 .vcell span{display:block;font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .vcell strong{font-size:20px;font-variant-numeric:tabular-nums;line-height:1.25}
@@ -1965,6 +1968,7 @@ function applyRestricted(){
 }
 function render(){
   if(view!=='ship'&&typeof sh!=='undefined'&&sh.edit)shModeCancel(true);
+  if(view!=='planner')taskFrom=null;
   if(isRestricted()&&REC_VIEWS.includes(view)){view='portfolio';sub='ovw';}
   {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
@@ -2161,7 +2165,7 @@ function renderSite(){
   <div class="sitetabs subtabs no-print" role="tablist" aria-label="Proje bölümleri">${SITE_TABS.map(([k,t])=>`<button type="button" role="tab" data-sub="${k}" aria-pressed="${sub===k}" aria-selected="${sub===k}">${t}</button>`).join('')}${mode==='cloud'?`<button type="button" class="notes-tab" id="notesBtn" aria-pressed="${notesOpen}" title="Şirket içi notlar"><span>Şirket İçi</span><span>Bilgilendirme</span><i class="cnt" id="notesCount" hidden></i></button>`:''}</div>
   <div class="site-head">
     <div class="verdict">
-      <div class="vcell"><span>Aşama</span><strong id="vStage" style="font-size:14px"></strong></div>
+      <div class="vcell vc-stage">${mode==='cloud'?`<button type="button" class="vc-go no-print" id="goTasks" title="Bu projenin görev listesine git" aria-label="Bu projenin görev listesine git"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8M13 12h8M13 18h8"/></svg></button>`:''}<div><span>Aşama</span><strong id="vStage" style="font-size:14px"></strong></div></div>
       <div class="vcell"><span>Durum</span><strong id="vStatus" style="font-size:14px"></strong></div>
       <div class="vcell"><span>Skor</span><div class="vrow"><strong id="vScore"></strong><small id="vDec"></small></div></div>
       <div class="vcell"><span>Toplam Güç</span><strong id="vKw"></strong></div>
@@ -3499,9 +3503,10 @@ function dyRows(rows,h2,h3,empty){
   return `<table class="u-tbl dy-tbl"><colgroup><col style="width:36%"><col style="width:38%"><col style="width:26%"></colgroup><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>${more}`;
 }
 // Satıra tıklayınca ilgili yere gider: görev → Proje Görev Listesi (o proje), not → proje + Şirket İçi Notlar paneli, diğerleri → proje.
-let dyBack=false;
+let dyBack=false,taskFrom=null; // taskFrom: Proje sayfasındaki kısayoldan Görev Listesi'ne gidildiyse o projenin kimliği
 // Sağ üstteki geri düğmesi: Daily'den bir projeye/göreve gelindiyse Daily'ye; proje sayfasındaysa Proje Listesi'ne; alt sayfadaysa üst başlığın kutucuklarına döner.
 function backTarget(){
+  if(view==='planner'&&taskFrom&&!dyBack&&db.sites.some(x=>x.id===taskFrom))return {label:'Projeye Dön',go:()=>{const id=taskFrom;taskFrom=null;activeId=id;view='site';sub='info';}};
   if(dyBack&&view!=='daily')return {label:'Daily Toplantı Notları',go:()=>{dyBack=false;view='daily';}};
   if(view==='site')return {label:'Proje Listesi',go:()=>{view='locations';}};
   if(view==='ship')return {label:'Sevkiyatlar',go:()=>{view='ships';}};
@@ -3550,7 +3555,8 @@ async function renderDaily(){
     +sec('3. Güncellenmeyen Projeler',DY_QUIET+'+ gündür',quiet.length,dyRows(quiet,'İl','Güncelleme','Bütün açık projeler güncel.'))
     +sec('4. Son 24 Saatte Güncellenenler','Dünden beri',fresh.length,dyRows(fresh,'İl','Güncelleme','Son 24 saatte güncellenen proje yok.'))+'</div>';
 }
-document.addEventListener('click',e=>{if(e.target.closest('#dyBack')){const t=backTarget();if(t)guard(()=>{if(notesOpen)closeNotes();t.go();render();window.scrollTo(0,0);});return;}
+document.addEventListener('click',e=>{if(e.target.closest('#goTasks')&&view==='site'){const id=activeId;pl.f.site=id;pl.f.status='open';pl.f.assignee='';pl.f.range='';pl.f.hideEmpty=false;guard(()=>{taskFrom=id;dyBack=false;view='planner';render();window.scrollTo(0,0);});return;}
+  if(e.target.closest('#dyBack')){const t=backTarget();if(t)guard(()=>{if(notesOpen)closeNotes();t.go();render();window.scrollTo(0,0);});return;}
   const r=e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const r=e.target.closest&&e.target.closest('[data-dopen]');if(r&&view==='daily')dyGo(r.dataset.dopen,r.dataset.dgo);});
 async function renderPlanner(){
