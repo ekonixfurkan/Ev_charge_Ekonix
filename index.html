@@ -1801,7 +1801,8 @@ document.addEventListener('click',e=>{
   pg[b.dataset.pg]=+b.dataset.to;
   if(b.dataset.pg==='loc')paintLocRows();else if(b.dataset.pg==='pl')paintPlanner();else render();
 });
-function visibleSites(){return db.sites.filter(matchesF).sort(SORTS[sortKey][1]);}
+// Seçili sıralama korunur; durumu "Uygun Değil" (DD Failed) olan projeler listenin en sonuna iner (kendi aralarında aynı sıralama).
+function visibleSites(){const l=db.sites.filter(matchesF).sort(SORTS[sortKey][1]);return [...l.filter(x=>x.status!=='ddfailed'),...l.filter(x=>x.status==='ddfailed')];}
 function filterText(){
   const t=[];if(F.act)t.push(F.act==='active'?'Aktif':'Pasif');if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.q)t.push('“'+F.q+'”');
   return t.join(' · ');
