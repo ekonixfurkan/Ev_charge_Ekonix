@@ -427,6 +427,7 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Şirket içi bilgilendirmeyi aç': 'Open internal notes',
     'Grup notu yazın: grubun tüm projelerine eklenir… (Ctrl+Enter ile gönder)': 'Write a group note: it is added to all projects in the group… (Ctrl+Enter to send)',
     'Bu grup için henüz not yok.': 'There are no notes for this group yet.',
     'Yazdığınız not grubun tüm projelerine eklenir.': 'Notes you write are added to all projects in the group.',

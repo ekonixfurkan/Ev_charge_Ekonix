@@ -1214,6 +1214,7 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Şirket içi bilgilendirmeyi aç": "打开内部通知",
    "Grup notu yazın: grubun tüm projelerine eklenir… (Ctrl+Enter ile gönder)": "撰写分组备注：将添加到组内所有项目…（Ctrl+Enter 发送）",
    "Bu grup için henüz not yok.": "该分组暂无备注。",
    "Yazdığınız not grubun tüm projelerine eklenir.": "您撰写的备注将添加到组内所有项目。",
