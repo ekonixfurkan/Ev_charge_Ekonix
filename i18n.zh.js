@@ -567,7 +567,7 @@ window.I18N_ZH = {
    "Saha kartına en fazla 4 fotoğraf seçilebilir. Önce birinin işaretini kaldırın.": "站点卡片最多可选择 4 张照片。请先取消勾选其中一张。",
    "Bu hesap salt okunurdur; değişiklik yapamaz.": "此账号为只读，无法进行更改。",
    "Tarayıcınız yükleme penceresini şu an kendiliğinden açmadı. Aşağıdaki yoldan elle yükleyebilirsiniz:": "浏览器当前未自动弹出安装窗口。您可以按以下方式手动安装：",
-   "Uygulama zaten yüklüyse masaüstünde ya da başlat menüsünde \"Ekonix Saha\" adıyla bulunur.": "如果应用已安装，可在桌面或开始菜单中找到，名称为\"Ekonix Saha\"。",
+   "Uygulama zaten yüklüyse masaüstünde ya da başlat menüsünde \"Orbit\" adıyla bulunur.": "如果应用已安装，可在桌面或开始菜单中找到，名称为\"Orbit\"。",
    "2. Şirket İçi Bilgilendirme": "2. 公司内部通知",
    "Yazan": "作者",
    "Zaman": "时间",

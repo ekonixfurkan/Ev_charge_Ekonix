@@ -219,7 +219,7 @@
     'Saha kartına en fazla 4 fotoğraf seçilebilir. Önce birinin işaretini kaldırın.': 'Up to 4 photos can be selected for the site card. Uncheck one first.',
     'Bu hesap salt okunurdur; değişiklik yapamaz.': 'This account is read-only and cannot make changes.',
     'Tarayıcınız yükleme penceresini şu an kendiliğinden açmadı. Aşağıdaki yoldan elle yükleyebilirsiniz:': 'Your browser did not open the install prompt right now. You can install manually as follows:',
-    'Uygulama zaten yüklüyse masaüstünde ya da başlat menüsünde "Ekonix Saha" adıyla bulunur.': 'If the app is already installed, it is on the desktop or start menu as "Ekonix Saha".',
+    'Uygulama zaten yüklüyse masaüstünde ya da başlat menüsünde "Orbit" adıyla bulunur.': 'If the app is already installed, it is on the desktop or start menu as "Orbit".',
     /* saha bilgi kartı belgesi, yükleme penceresi ve tarama ile bulunan eksikler */
     'Tanımlı değil': 'Not set',
     'TomTom API anahtarı': 'TomTom API key',

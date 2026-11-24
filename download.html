@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/jpeg" href="/ekonix-logo.jpeg">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0a2440">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="preload" href="/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/plus-jakarta-sans-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<title>Orbit · Uygulamayı Yükle</title>
+<script>window.__installEv=null;window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__installEv=e;});</script>
+<style>
+/* Plus Jakarta Sans (SIL OFL, kendi sunucumuzdan) */
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:200 800;font-display:swap;src:url(/fonts/plus-jakarta-sans-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:200 800;font-display:swap;src:url(/fonts/plus-jakarta-sans-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* EKONIX design-v1 jetonları (login.html ile aynı) */
+:root{color-scheme:light;--font:"Plus Jakarta Sans","Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--navy:#0b2e57;--navy-d:#082244;--teal:#13a08a;--ink:#10202e;--muted:#5b6a7a;--hair:#dde4eb;--hair-strong:#c3ced9;--ok:#1f7a4d;--ok-soft:#e6f3ec;--side:#0a2440}
+*{box-sizing:border-box}
+html{min-height:100%;background:#f2f5f8}
+body{margin:0;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:32px 20px;font-family:var(--font);color:var(--ink);background:linear-gradient(135deg,#071b33,var(--side) 55%,#0d3a52)}
+.card{width:100%;max-width:520px;background:#fff;border:1px solid var(--hair);border-radius:16px;padding:36px 32px 28px;box-shadow:0 24px 60px rgba(0,0,0,.35);position:relative}
+.card::before{content:"";position:absolute;left:32px;top:-1px;width:56px;height:4px;border-radius:0 0 3px 3px;background:var(--teal)}
+.lg{display:inline-flex;background:var(--side);border-radius:12px;padding:8px 14px}.lg i{display:inline-flex;background:#fff;border-radius:8px;padding:5px 10px}.lg img{display:block;height:34px;width:auto}
+h1{margin:22px 0 6px;font-size:28px;line-height:1.2;font-weight:800;letter-spacing:-.01em}
+.sub{margin:0 0 22px;font-size:14px;font-weight:500;color:var(--muted);line-height:1.55}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px 18px;border:0;border-radius:10px;background:var(--navy);color:#fff;font:700 15px var(--font);cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--navy-d)}.btn:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.btn[hidden]{display:none}
+.btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--hair-strong);margin-top:10px;font-weight:600}.btn.ghost:hover{background:#f2f5f8}
+.ok{display:none;margin:0 0 14px;padding:10px 12px;border-radius:8px;background:var(--ok-soft);color:var(--ok);border:1px solid color-mix(in srgb,var(--ok) 35%,transparent);font-size:13px;font-weight:600}
+.ok.on{display:block}
+.steps{margin:22px 0 0;padding:16px 16px 14px;border:1px solid var(--hair);border-radius:12px;background:#f7f9fb}
+.steps h2{margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.steps ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.steps li{font-size:12.5px;line-height:1.5;color:var(--ink);padding:8px 10px;border-radius:8px;border:1px solid transparent}
+.steps li b{font-weight:700}
+.steps li.me{background:#fff;border-color:var(--teal)}
+.foot{margin:18px 0 0;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.5}
+@media (max-width:480px){.card{padding:30px 20px 22px}h1{font-size:24px}}
+</style>
+</head>
+<body>
+<main class="card">
+  <span class="lg"><i><img src="/ekonix-logo.jpeg" alt="Ekonix" width="289" height="93"></i></span>
+  <h1>Orbit'i Yükle</h1>
+  <p class="sub">Orbit'i bilgisayarınıza uygulama olarak yükleyin: masaüstünde ve başlat menüsünde kendi simgesiyle, ayrı bir pencerede açılır. Giriş bilgileriniz aynı kalır.</p>
+  <p class="ok" id="ok" role="status"></p>
+  <button type="button" class="btn" id="inst"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>Uygulamayı Yükle</button>
+  <a class="btn ghost" id="open" href="/">Siteyi Tarayıcıda Aç</a>
+  <section class="steps" id="steps" aria-label="Elle yükleme">
+    <h2>Düğme çalışmazsa</h2>
+    <ul>
+      <li data-b="chrome"><b>Chrome:</b> Adres çubuğunun sağındaki yükle simgesi; ya da üç nokta menüsü, "Yayınla, kaydet ve paylaş", "Sayfayı uygulama olarak yükle".</li>
+      <li data-b="edge"><b>Edge:</b> Üç nokta menüsü, "Uygulamalar", "Bu siteyi uygulama olarak yükle".</li>
+      <li data-b="safari"><b>Safari (Mac):</b> "Dosya" menüsü, "Dock'a Ekle".</li>
+      <li data-b="ios"><b>iPhone / iPad (Safari):</b> "Paylaş" düğmesi, "Ana Ekrana Ekle".</li>
+      <li data-b="android"><b>Android (Chrome):</b> Üç nokta menüsü, "Ana ekrana ekle" ya da "Uygulamayı yükle".</li>
+      <li data-b="firefox"><b>Firefox:</b> Bu özelliği desteklemez; Chrome ya da Edge ile açın.</li>
+    </ul>
+  </section>
+  <p class="foot">Yükledikten sonra masaüstünde ya da başlat menüsünde "Orbit" adıyla bulabilirsiniz.</p>
+</main>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i);};
+  var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var b=ios?'ios':/Android/.test(ua)?'android':/Edg\//.test(ua)?'edge':/Firefox\//.test(ua)?'firefox':/Chrome\//.test(ua)?'chrome':/Safari\//.test(ua)?'safari':'';
+  var me=document.querySelector('[data-b="'+b+'"]');if(me)me.className='me';
+  var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  function done(msg){$('inst').hidden=true;$('open').textContent='Orbit\'i Aç';$('ok').textContent=msg;$('ok').className='ok on';}
+  if(standalone)done('Orbit zaten uygulama olarak çalışıyor.');
+  window.addEventListener('appinstalled',function(){done('Orbit yüklendi. Masaüstünde ya da başlat menüsünde bulabilirsiniz.');});
+  $('inst').addEventListener('click',function(){
+    var ev=window.__installEv;
+    if(!ev){$('steps').scrollIntoView({behavior:'smooth',block:'center'});$('ok').textContent='Tarayıcınız yükleme penceresini şu an açmadı; aşağıdaki yolu izleyin. Orbit zaten yüklüyse başlat menüsünde bulunur.';$('ok').className='ok on';return;}
+    ev.prompt().then(function(){return ev.userChoice;}).then(function(c){window.__installEv=null;if(c&&c.outcome==='accepted')done('Orbit yükleniyor…');}).catch(function(){window.__installEv=null;});
+  });
+  if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+})();
+</script>
+</body>
+</html>
