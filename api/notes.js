@@ -1,4 +1,4 @@
-// /api/notes — proje başına şirket içi notlar. GET ?site=ID · GET ?recent=GÜN (tüm projelerde son notlar, Günlük Toplantı için) · POST { site, body } · DELETE ?id=
+// /api/notes — proje başına şirket içi notlar. Grup notu: POST { sites:[ID…], group, body } her projeye ortak bir 'batch' ile kopyalanır; GET ?sites=ID,ID… grubun tüm notları; DELETE ?batch=ID (sahip). GET ?site=ID · GET ?recent=GÜN (tüm projelerde son notlar, Günlük Toplantı için) · POST { site, body } · DELETE ?id=
 // Toplantı notları da burada (Hobby planda işlev sayısı sınırlı): ?meeting=list (GET) · ?meeting=new (POST) · ?meeting=ID (PATCH, DELETE)
 import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
@@ -18,6 +18,8 @@ function ensureNotes() {
       created_at timestamptz NOT NULL DEFAULT now()
     )`;
     await s`CREATE INDEX IF NOT EXISTS site_notes_site_idx ON site_notes (site_id, id)`;
+    await s`ALTER TABLE site_notes ADD COLUMN IF NOT EXISTS batch text NOT NULL DEFAULT ''`;
+    await s`ALTER TABLE site_notes ADD COLUMN IF NOT EXISTS grp text NOT NULL DEFAULT ''`;
     await s`CREATE TABLE IF NOT EXISTS meetings (
       id bigserial PRIMARY KEY,
       site_id text,
@@ -155,9 +157,17 @@ export default async function handler(req, res) {
           WHERE n.created_at > now() - make_interval(days => ${d}) ORDER BY n.id DESC LIMIT 100`;
         return res.status(200).json({ notes: rows });
       }
+      if (req.query?.sites !== undefined) {
+        const ids = [...new Set(String(req.query.sites).split(',').map((x) => x.trim()).filter(Boolean))].slice(0, 100);
+        if (!ids.length) return res.status(200).json({ notes: [] });
+        const rows = await s`SELECT n.id, n.site_id, n.body, n.created_at, n.author, n.batch, n.grp, NULLIF(u.name, '') AS author_name
+          FROM site_notes n LEFT JOIN users u ON u.email = n.author
+          WHERE n.site_id = ANY(${ids}::text[]) ORDER BY n.id`;
+        return res.status(200).json({ notes: rows });
+      }
       const site = String(req.query?.site || '');
       if (!site) return res.status(400).json({ error: 'site gerekli' });
-      const rows = await s`SELECT n.id, n.body, n.created_at, n.author, NULLIF(u.name, '') AS author_name
+      const rows = await s`SELECT n.id, n.body, n.created_at, n.author, n.batch, n.grp, NULLIF(u.name, '') AS author_name
         FROM site_notes n LEFT JOIN users u ON u.email = n.author
         WHERE n.site_id = ${site} ORDER BY n.id`;
       return res.status(200).json({ notes: rows });
@@ -167,6 +177,19 @@ export default async function handler(req, res) {
       const b = (await readJson(req)) || {};
       const site = typeof b.site === 'string' ? b.site : '';
       const body = typeof b.body === 'string' ? b.body.trim() : '';
+      // Grup notu: aynı not grubun her projesine eklenir (ortak batch ile; grup görünümünde tek kayıt görünür).
+      if (Array.isArray(b.sites)) {
+        const ids = [...new Set(b.sites.filter((x) => typeof x === 'string' && x).map((x) => x.trim()))].slice(0, 100);
+        const grp = typeof b.group === 'string' ? b.group.trim().slice(0, 120) : '';
+        if (!ids.length) return res.status(400).json({ error: 'Grupta proje yok' });
+        if (!body || body.length > 2000) return res.status(400).json({ error: 'Not 1–2000 karakter olmalı' });
+        const found = await s`SELECT id, data->>'name' AS name FROM sites WHERE id = ANY(${ids}::text[])`;
+        if (!found.length) return res.status(404).json({ error: 'Proje bulunamadı' });
+        const batch = 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        for (const f of found) await s`INSERT INTO site_notes (site_id, author, body, batch, grp) VALUES (${f.id}, ${user.email}, ${body}, ${batch}, ${grp})`;
+        for (const f of found) await logActivity({ actor: user.email, action: 'not-ekle', entity: 'lokasyon', entityId: f.id, entityName: f.name, summary: 'Şirket içi grup notu eklendi' + (grp ? ': ' + grp : '') });
+        return res.status(201).json({ ok: true, batch, count: found.length });
+      }
       if (!site) return res.status(400).json({ error: 'site gerekli' });
       if (!body || body.length > 2000) return res.status(400).json({ error: 'Not 1–2000 karakter olmalı' });
       const found = await s`SELECT data->>'name' AS name FROM sites WHERE id = ${site}`;
@@ -174,6 +197,14 @@ export default async function handler(req, res) {
       const r = await s`INSERT INTO site_notes (site_id, author, body) VALUES (${site}, ${user.email}, ${body}) RETURNING id`;
       await logActivity({ actor: user.email, action: 'not-ekle', entity: 'lokasyon', entityId: site, entityName: found[0].name, summary: 'Şirket içi not eklendi' });
       return res.status(201).json({ ok: true, id: r[0].id });
+    }
+
+    if (req.method === 'DELETE' && req.query?.batch) {
+      const batch = String(req.query.batch);
+      if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
+      const del = await s`DELETE FROM site_notes WHERE batch = ${batch} AND batch <> '' RETURNING site_id`;
+      for (const d of del) { const nm = await s`SELECT data->>'name' AS name FROM sites WHERE id = ${d.site_id}`; await logActivity({ actor: user.email, action: 'not-sil', entity: 'lokasyon', entityId: d.site_id, entityName: (nm[0] && nm[0].name) || d.site_id, summary: 'Şirket içi grup notu silindi' }); }
+      return res.status(200).json({ ok: true, count: del.length });
     }
 
     if (req.method === 'DELETE') {

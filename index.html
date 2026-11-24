@@ -738,6 +738,9 @@ table.portfolio.loclist td:nth-child(7){max-width:none}
 .np-note{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);padding:10px 12px}
 .np-note .np-meta{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:4px;font-size:11px;color:var(--muted)}
 .np-note .np-meta b{color:var(--ink);font-size:11.5px}
+.np-tag{display:inline-block;margin:0 0 4px;padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:600;color:var(--ink2);background:var(--soft);border:1px solid var(--hair)}
+.np-tag.grp{color:var(--navy);background:var(--navy-soft);border-color:color-mix(in srgb,var(--navy) 25%,transparent)}
+.grp-chev{cursor:pointer;padding:2px 6px;margin-left:-6px;border-radius:4px}.grp-chev:hover{background:var(--navy-soft)}
 .np-note p{margin:0;white-space:pre-wrap;word-break:break-word;font-size:12.5px}
 .np-note button{padding:0 6px;min-height:0;font-size:11px}
 .nav-item{position:relative}
@@ -1253,6 +1256,7 @@ table.yearly.sh-sum{width:100%;min-width:100%;display:table}.sh-sum th,.sh-sum t
 html.ro .sh-w{display:none}
 .roi-frame{display:block;width:100%;height:calc(100vh - 150px);min-height:620px;border:0;background:var(--paper)}
 .dy-back{position:fixed;top:2px;right:18px;z-index:60;display:inline-flex;align-items:center;gap:9px;white-space:nowrap;padding:6px 18px;font-size:13px;font-weight:700;background:var(--side);color:#fff;border:1px solid var(--side-d);border-left:3px solid var(--teal);border-radius:var(--radius);box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
+.notes-on .dy-back{right:calc(min(400px,92vw) + 18px)}   /* not paneli açıkken geri düğmesi panelin kapat (✕) düğmesini örtmesin */
 .dy-back:hover{background:var(--side-d);color:#fff}
 .dy-back:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .dy-back[hidden]{display:none}
@@ -1862,7 +1866,7 @@ function arrangeGroups(list){
 }
 function grpHeadHtml(g,all){
   const m=all.filter(x=>grpOf(x)===g),T=sumOf(m),open=!grp.closed.has(g);
-  return `<tr class="grp-head" data-grp="${esc(g)}" tabindex="0" aria-expanded="${open}"><td colspan="6"><span class="grp-chev" aria-hidden="true">${open?'▾':'▸'}</span><span class="grp-name">${esc(g)}</span><small>${m.length} proje</small></td>
+  return `<tr class="grp-head" data-grp="${esc(g)}" tabindex="0" aria-expanded="${open}" title="Grubun Şirket İçi Bilgilendirmesini aç (ok işareti: grubu aç/kapat)"><td colspan="6"><span class="grp-chev" role="button" aria-label="Grubu aç / kapat" title="Grubu aç / kapat">${open?'▾':'▸'}</span><span class="grp-name">${esc(g)}</span><small>${m.length} proje</small></td>
     <td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td>
     <td><button type="button" class="ghost grp-x" data-grpadd="${esc(g)}" title="Bu gruba yeni proje ekle">Proje Ekle</button> <button type="button" class="ghost grp-x" data-grpdel="${esc(g)}" title="Grubu dağıt (projeler silinmez)">Grubu Dağıt</button></td></tr>`;
 }
@@ -1915,7 +1919,9 @@ document.addEventListener('click',async e=>{
   const row=e.target.closest('#locRows [data-gsel]');
   if(row){const id=row.dataset.gsel;if(grp.sel.has(id))grp.sel.delete(id);else grp.sel.add(id);paintLocRows();paintGrpBar();return;}
   const hd=e.target.closest('#locRows .grp-head');
-  if(hd){const g=hd.dataset.grp;if(grp.closed.has(g))grp.closed.delete(g);else grp.closed.add(g);paintLocRows();pageFx();}
+  if(hd){const g=hd.dataset.grp;
+    if(e.target.closest('.grp-chev')||grp.on){if(grp.closed.has(g))grp.closed.delete(g);else grp.closed.add(g);paintLocRows();pageFx();return;}   // ok işareti: aç/kapa
+    openGroupNotes(g);}   // başlığın kendisi: grubun Şirket İçi Bilgilendirme paneli
 });
 document.addEventListener('keydown',e=>{
   if(view!=='locations')return;
@@ -2000,7 +2006,7 @@ function render(){
   dockBar();setPageTitle();
   {const b=$('dyBack');if(b){const t=backTarget();b.hidden=!t;if(t)b.querySelector('span').textContent=I18N.t(t.label);}}
   saveRoute();
-  if(view!=='site'&&notesOpen)closeNotes();
+  if(notesOpen&&!((view==='site'&&!notesGroup)||(view==='locations'&&notesGroup)))closeNotes();
 }
 
 // Ana Sayfa: rapor panosu (özet kutuları, aşama/durum/il grafikleri, DC-AC dağılımı, özet tablolar). Satıra/çubuğa tıklayınca Proje Listesi o filtreyle açılır.
@@ -2398,7 +2404,7 @@ const viewLogged={};
 // Proje sayfasının açılması işlem geçmişine yazılır (aynı proje 10 dk içinde bir kez).
 function logView(id){if(mode!=='cloud')return;const t=Date.now();if(viewLogged[id]&&t-viewLogged[id]<600000)return;viewLogged[id]=t;
   fetch('/api/activity',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({action:'goruntule',id})}).catch(()=>{});}
-function openSite(id){guard(()=>{if(notesOpen&&activeId!==id)closeNotes();activeId=id;view='site';sub='info';render();window.scrollTo({top:0});logView(id);});}
+function openSite(id){guard(()=>{if(notesOpen&&(notesGroup||activeId!==id))closeNotes();activeId=id;view='site';sub='info';render();window.scrollTo({top:0});logView(id);});}
 // Yeni Proje penceresi: telefon maskesi, il -> ilçe zinciri, süre toplamı
 document.addEventListener('input',e=>{
   const el=e.target;if(!el.closest||!el.closest('#dlg'))return;
@@ -3967,7 +3973,7 @@ window.addEventListener('dragover',e=>{if(!(e.target.closest&&e.target.closest('
 window.addEventListener('drop',e=>{if(!(e.target.closest&&e.target.closest('[data-flfolder]')))e.preventDefault();});
 
 /* ---------- Şirket içi bilgilendirme (proje notları) ---------- */
-const notesBy={};let notesOpen=false,notesFor=null;
+const notesBy={},notesGrp={};let notesOpen=false,notesFor=null,notesGroup=''; // notesGroup doluysa panel bir grubun (Proje Listesi'ndeki grup başlığı) notlarını gösterir
 async function notesApi(method,qs,body){
   const r=await fetch('/api/notes'+(qs||''),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
   if(r.status===401){location.replace('/login.html');throw new Error('401');}
@@ -3979,6 +3985,12 @@ async function loadNotes(id){
   if(!id)return;notesFor=id;
   try{const d=await notesApi('GET','?site='+encodeURIComponent(id));notesBy[id]=d.notes||[];}catch(e){return;}
   if(activeId===id){paintNotesBadge();if(notesOpen)paintNotes();}
+}
+const grpSites=g=>db.sites.filter(x=>grpOf(x)===g);
+async function loadGroupNotes(g){
+  const ids=grpSites(g).map(x=>x.id);if(!ids.length)return;
+  try{const d=await notesApi('GET','?sites='+encodeURIComponent(ids.join(',')));notesGrp[g]=d.notes||[];}catch(e){return;}
+  if(notesOpen&&notesGroup===g)paintNotes();
 }
 function paintNotesBadge(){const b=$('notesCount');if(!b)return;const n=(notesBy[activeId]||[]).length;b.textContent=n>99?'99+':n;b.hidden=!n;}
 // Notu tek tıkla görev listesine çevir: açılır pencerede kime atanacağı ve son tarih sorulur.
@@ -4005,19 +4017,40 @@ async function ntSave(){
   catch(e){$('ntSave').disabled=false;return err(e.message);}
   ntDone.add(String(ntNote.id));$('ntDlg').close();pl.loaded=false;toast('Görev listesine eklendi.');paintNotes();
 }
+const NT_ICON='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>';
+// Grup görünümü: grup notları (her projeye kopyalanmış, tek kayıt görünür) + üyelerin kendi notları, zaman sırasıyla.
+function groupNoteList(g){
+  const seen=new Set(),out=[];
+  for(const n of notesGrp[g]||[]){
+    if(n.batch){if(seen.has(n.batch))continue;seen.add(n.batch);out.push({...n,_cnt:(notesGrp[g]||[]).filter(y=>y.batch===n.batch).length});}
+    else out.push(n);
+  }
+  return out;
+}
 function paintNotes(){
-  const x=cur(),list=notesBy[activeId]||[];
-  $('npSite').textContent=x?x.name:'';
-  $('npList').innerHTML=list.length?list.map(n=>{const can=!!me.owner;
-    return `<div class="np-note"><div class="np-meta"><b>${esc(n.author_name||n.author)}</b><span>${esc(fmtTs(n.created_at))} <button type="button" class="nt-task${ntDone.has(String(n.id))?' done':''}" data-note2task="${n.id}" title="${ntDone.has(String(n.id))?'Göreve eklendi (tekrar ekle)':'Görev listesine ekle'}" aria-label="Görev listesine ekle"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></button>${can?` <button type="button" class="ghost" data-delnote="${n.id}" title="Notu sil">Sil</button>`:''}</span></div><p>${esc(n.body)}</p></div>`;}).join(''):'<div class="np-empty">Bu proje için henüz not yok.<br>İlk notu aşağıdan yazın.</div>';
+  const grpMode=!!notesGroup,x=cur();
+  const list=grpMode?groupNoteList(notesGroup):(notesBy[activeId]||[]);
+  const sName=id=>{const q=db.sites.find(y=>y.id===id);return q?[q.code,q.name].filter(Boolean).join(' · '):id;};
+  $('npSite').textContent=grpMode?'Grup: '+notesGroup+' · '+grpSites(notesGroup).length+' proje':(x?x.name:'');
+  $('npText').placeholder=grpMode?'Grup notu yazın: grubun tüm projelerine eklenir… (Ctrl+Enter ile gönder)':'Not yazın… (Ctrl+Enter ile gönder)';
+  $('npList').innerHTML=list.length?list.map(n=>{
+    const can=!!me.owner,isG=!!n.batch;
+    const tag=grpMode?(isG?`<span class="np-tag grp">Grup notu · ${n._cnt} projeye eklendi</span>`:`<span class="np-tag">${esc(sName(n.site_id))}</span>`):(isG?`<span class="np-tag grp">Grup notu${n.grp?' · '+esc(n.grp):''}</span>`:'');
+    const task=grpMode?'':` <button type="button" class="nt-task${ntDone.has(String(n.id))?' done':''}" data-note2task="${n.id}" title="${ntDone.has(String(n.id))?'Göreve eklendi (tekrar ekle)':'Görev listesine ekle'}" aria-label="Görev listesine ekle">${NT_ICON}</button>`;
+    const del=can?` <button type="button" class="ghost" ${grpMode&&isG?`data-delbatch="${esc(n.batch)}" title="Notu tüm projelerden sil"`:`data-delnote="${n.id}" title="Notu sil"`}>Sil</button>`:'';
+    return `<div class="np-note"><div class="np-meta"><b>${esc(n.author_name||n.author)}</b><span>${esc(fmtTs(n.created_at))}${task}${del}</span></div>${tag}<p>${esc(n.body)}</p></div>`;}).join(''):`<div class="np-empty">${grpMode?'Bu grup için henüz not yok.<br>Yazdığınız not grubun tüm projelerine eklenir.':'Bu proje için henüz not yok.<br>İlk notu aşağıdan yazın.'}</div>`;
   const l=$('npList');l.scrollTop=l.scrollHeight;
 }
-function openNotes(){notesOpen=true;const p=$('notesPanel');p.hidden=false;requestAnimationFrame(()=>p.classList.add('open'));paintNotes();loadNotes(activeId);$('npText').focus();const b=$('notesBtn');if(b)b.setAttribute('aria-pressed','true');}
-function closeNotes(){notesOpen=false;const p=$('notesPanel');p.classList.remove('open');const b=$('notesBtn');if(b)b.setAttribute('aria-pressed','false');setTimeout(()=>{if(!notesOpen)p.hidden=true;},200);}
+function openNotes(){notesGroup='';notesOpen=true;document.body.classList.add('notes-on');const p=$('notesPanel');p.hidden=false;requestAnimationFrame(()=>p.classList.add('open'));paintNotes();loadNotes(activeId);$('npText').focus();const b=$('notesBtn');if(b)b.setAttribute('aria-pressed','true');}
+function openGroupNotes(g){notesGroup=g;notesOpen=true;document.body.classList.add('notes-on');const p=$('notesPanel');p.hidden=false;requestAnimationFrame(()=>p.classList.add('open'));paintNotes();loadGroupNotes(g);$('npText').focus();}
+function closeNotes(){notesOpen=false;notesGroup='';document.body.classList.remove('notes-on');const p=$('notesPanel');p.classList.remove('open');const b=$('notesBtn');if(b)b.setAttribute('aria-pressed','false');setTimeout(()=>{if(!notesOpen)p.hidden=true;},200);}
 async function sendNote(){
-  const body=$('npText').value.trim();if(!body||!activeId)return;
+  const body=$('npText').value.trim();if(!body||(!activeId&&!notesGroup))return;
   $('npSend').disabled=true;
-  try{await notesApi('POST','',{site:activeId,body});$('npText').value='';await loadNotes(activeId);}
+  try{
+    if(notesGroup){const g=notesGroup;await notesApi('POST','',{sites:grpSites(g).map(x=>x.id),group:g,body});$('npText').value='';await loadGroupNotes(g);toast('Not grubun tüm projelerine eklendi.');}
+    else{await notesApi('POST','',{site:activeId,body});$('npText').value='';await loadNotes(activeId);}
+  }
   catch(e){toast(e.message);}
   $('npSend').disabled=false;$('npText').focus();
 }
@@ -4028,8 +4061,10 @@ document.addEventListener('click',async e=>{
   const nt=e.target.closest('[data-note2task]');if(nt){ntOpen(nt.dataset.note2task);return;}
   if(e.target.closest('#ntCancel')){$('ntDlg').close();return;}
   if(e.target.closest('#ntSave')){ntSave();return;}
+  const db_=e.target.closest('[data-delbatch]');
+  if(db_){if(!await ask('Bu grup notu grubun tüm projelerinden silinsin mi? Bu işlem geri alınamaz.','Sil'))return;try{await notesApi('DELETE','?batch='+encodeURIComponent(db_.dataset.delbatch));await loadGroupNotes(notesGroup);}catch(x){toast(x.message);}return;}
   const d=e.target.closest('[data-delnote]');
-  if(d){if(!await ask('Bu not silinsin mi?','Sil'))return;try{await notesApi('DELETE','?id='+encodeURIComponent(d.dataset.delnote));await loadNotes(activeId);}catch(x){toast(x.message);}}
+  if(d){if(!await ask('Bu not silinsin mi?','Sil'))return;try{await notesApi('DELETE','?id='+encodeURIComponent(d.dataset.delnote));if(notesGroup)await loadGroupNotes(notesGroup);else await loadNotes(activeId);}catch(x){toast(x.message);}}
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&notesOpen&&!$('ask').open)closeNotes();
