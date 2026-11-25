@@ -427,6 +427,14 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Excel / CSV İçe Aktar': 'Import Excel / CSV',
+    'İçe Aktar': 'Import',
+    'Dosyadaki kayıtların tümü zaten Aday Müşteriler\'de.': 'All records in the file are already in Prospects.',
+    'Dosyada aktarılacak satır yok': 'The file has no rows to import',
+    'İlk satırda "Proje Adı" ya da "Firma" başlığı bulunamadı': 'No "Project Name" or "Company" header found in the first row',
+    'Excel dosyası okunamadı': 'Could not read the Excel file',
+    'Excel dosyasında sayfa bulunamadı': 'No sheet found in the Excel file',
+    'Dosya 5 MB sınırını aşıyor': 'The file exceeds the 5 MB limit',
     'Aday Müşteriler': 'Prospects',
     'Aday Müşteri': 'Prospect',
     'Henüz temas etmediğiniz, kendi seçtiğiniz firma ve kişiler.': 'Hand-picked companies and people you have not contacted yet.',
@@ -711,6 +719,8 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^([\d.,]+) aday içe aktarıldı\.$/, function (m) { return m[1] + ' prospects imported.'; }],
+    [/^Dosyada ([\d.,]+) kayıt var; ([\d.,]+) tanesi eklenecek, ([\d.,]+) tanesi atlanacak \(zaten kayıtlı ya da tekrar\)\.(?:\s+Adı mevcut projelere benzeyen ([\d.,]+) kayıt: ([\s\S]*?))?\s+Aktarılsın mı\?$/, function (m) { return 'The file has ' + m[1] + ' records; ' + m[2] + ' will be added, ' + m[3] + ' skipped (already listed or repeated).' + (m[4] ? '\n' + m[4] + ' records resemble existing project names: ' + m[5] : '') + '\nImport?'; }],
     [/^([\d.,]+) aday(?: · ([\d.,]+) temas edilmedi)?$/, function (m) { return m[1] + ' prospects' + (m[2] ? ' · ' + m[2] + ' not contacted' : ''); }],
     [/^([\d.,]+) \/ ([\d.,]+) aday$/, function (m) { return m[1] + ' / ' + m[2] + ' prospects'; }],
     [/^Benzer bir kayıt var: (.+)\. Yine de eklemek ister misiniz\?$/, function (m) { return 'A similar record exists: ' + m[1] + '. Add anyway?'; }],

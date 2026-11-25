@@ -15,3 +15,6 @@ leads_out/
 
 # Müşteri belgeleri (gizli): depoya girmez
 *.pdf
+
+# Aday müşteri listesi (müşteri verisi): depoya girmez
+Aday*.csv
