@@ -2878,7 +2878,9 @@ const prName=x=>[x.company,x.person].filter(Boolean).join(' · ');
 const prOwners=()=>[...new Set([...pr.rows.map(x=>x.owner),...people.map(p=>p.name||p.email)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));
 function prVisible(){
   const f=pr.f,q=refFold(f.q),t=q.replace(/ /g,'');
-  return pr.rows.filter(x=>(!f.status||x.status===f.status)&&(!f.stage||x.stage===f.stage)&&(!f.sector||fKey(x.sector)===fKey(f.sector))&&(!f.owner||fKey(x.owner)===fKey(f.owner))&&(!q||[x.company,x.person,x.title,x.phone,x.email,x.il,x.ilce,x.sector,x.source,x.owner,x.note].some(v=>{const h=refFold(v);return h&&(h.includes(q)||h.replace(/ /g,'').includes(t));})));
+  // Sıra Proje Listesi'ndeki gibi aşamaya göre (ileri aşama üstte, aşamasız altta); "İlgilenmiyor" olanlar en sonda. Aynı aşamada ekleme sırası korunur.
+  const rank=x=>x.status==='İlgilenmiyor'?1:0;
+  return pr.rows.filter(x=>(!f.status||x.status===f.status)&&(!f.stage||x.stage===f.stage)&&(!f.sector||fKey(x.sector)===fKey(f.sector))&&(!f.owner||fKey(x.owner)===fKey(f.owner))&&(!q||[x.company,x.person,x.title,x.phone,x.email,x.il,x.ilce,x.sector,x.source,x.owner,x.note].some(v=>{const h=refFold(v);return h&&(h.includes(q)||h.replace(/ /g,'').includes(t));}))).sort((a,b)=>rank(a)-rank(b)||String(b.stage||'').localeCompare(String(a.stage||'')));
 }
 function renderProspects(){
   if(isRestricted()){view='portfolio';sub='ovw';render();return;}
