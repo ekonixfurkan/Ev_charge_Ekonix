@@ -1862,8 +1862,9 @@ document.addEventListener('click',e=>{
   pg[b.dataset.pg]=+b.dataset.to;
   if(b.dataset.pg==='loc')paintLocRows();else if(b.dataset.pg==='pl')paintPlanner();else render();
 });
-// Seçili sıralama korunur; durumu "Uygun Değil" (DD Failed) olan projeler listenin en sonuna iner (kendi aralarında aynı sıralama).
-function visibleSites(){const l=db.sites.filter(matchesF).sort(SORTS[sortKey][1]);return [...l.filter(x=>x.status!=='ddfailed'),...l.filter(x=>x.status==='ddfailed')];}
+// Seçili sıralama korunur; "Beklemede" projeler listenin altına, "Uygun Değil" (DD Failed) olanlar en sona iner (her bölüm kendi içinde aynı sıralama).
+const listRank=x=>x.status==='ddfailed'?2:x.status==='hold'?1:0;
+function visibleSites(){return db.sites.filter(matchesF).sort(SORTS[sortKey][1]).sort((a,b)=>listRank(a)-listRank(b));}
 function filterText(){
   const t=[];if(F.act)t.push(F.act==='active'?'Aktif':'Pasif');if(F.stage)t.push(stageLabel(F.stage));if(F.status)t.push(statusOf(F.status).t);if(F.city)t.push(F.city);if(F.type)t.push(typeLabel(F.type));if(F.owner)t.push(F.owner);if(F.partner)t.push(F.partner);if(F.q)t.push('“'+F.q+'”');
   return t.join(' · ');
