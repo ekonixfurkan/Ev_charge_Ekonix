@@ -1326,6 +1326,7 @@ window.I18N_ZH = {
   },
   rules: function (sub) {
     var PZ = [
+      [/^İçe aktarılamadı: (.+)$/, function (m) { return '导入失败：' + m[1]; }],
       [/^([\d.,]+) aday içe aktarıldı\.$/, function (m) { return '已导入 ' + m[1] + ' 位潜在客户。'; }],
       [/^Dosyada ([\d.,]+) kayıt var; ([\d.,]+) tanesi eklenecek, ([\d.,]+) tanesi atlanacak \(zaten kayıtlı ya da tekrar\)\.(?:\s+Adı mevcut projelere benzeyen ([\d.,]+) kayıt: ([\s\S]*?))?\s+Aktarılsın mı\?$/, function (m) { return '文件包含 ' + m[1] + ' 条记录；将添加 ' + m[2] + ' 条，跳过 ' + m[3] + ' 条（已存在或重复）。' + (m[4] ? '\n名称与现有项目相似的记录 ' + m[4] + ' 条：' + m[5] : '') + '\n要导入吗？'; }],
       [/^([\d.,]+) aday(?: · ([\d.,]+) temas edilmedi)?$/, function (m) { return m[1] + ' 位潜在客户' + (m[2] ? ' · ' + m[2] + ' 位未联系' : ''); }],

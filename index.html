@@ -2990,13 +2990,12 @@ async function xlsxRows(buf){
     out[col]=ty==='s'&&v?shared[+v.textContent]:ty==='inlineStr'?all(c,'t').map(t=>t.textContent).join(''):v?v.textContent:'';}
     return Array.from(out,x=>x??'');});
 }
-function csvRows(text){
-  text=text.replace(/^\ufeff/,'');const head=text.split('\n')[0],d=(head.match(/;/g)||[]).length>=(head.match(/,/g)||[]).length?';':',';
-  const rows=[[]];let cell='',q=false;
-  for(let i=0;i<text.length;i++){const c=text[i];
-    if(q){if(c==='"'){if(text[i+1]==='"'){cell+='"';i++;}else q=false;}else cell+=c;}
-    else if(c==='"'&&!cell)q=true;else if(c===d){rows[rows.length-1].push(cell);cell='';}else if(c==='\n'){rows[rows.length-1].push(cell.replace(/\r$/,''));cell='';rows.push([]);}else cell+=c;}
-  rows[rows.length-1].push(cell.replace(/\r$/,''));return rows;
+// CSV kodlaması: UTF-8 değilse (Excel'in Türkçe Windows kaydı) windows-1254 ile okunur; UTF-16 dosyaları da tanınır. Satırlara ayırma: csvRows (Lead Havuzu ile ortak).
+function csvText(buf){
+  const u=new Uint8Array(buf);
+  if(u[0]===0xff&&u[1]===0xfe)return new TextDecoder('utf-16le').decode(u);
+  if(u[0]===0xfe&&u[1]===0xff)return new TextDecoder('utf-16be').decode(u);
+  try{return new TextDecoder('utf-8',{fatal:true}).decode(u);}catch(e){return new TextDecoder('windows-1254').decode(u);}
 }
 const PR_HEADS={company:['proje adi','firma','firma adi','proje'],person:['kisi','yetkili','ad soyad'],title:['unvan'],phone:['telefon'],email:['e posta','eposta','email','e mail'],il:['sehir','il'],ilce:['ilce'],sector:['mulk turu','sektor','saha tipi'],source:['referans','kaynak'],stage:['asama'],owner:['sorumlu'],note:['not','notlar'],status:['durum']};
 function prMapRows(rows){
@@ -3013,17 +3012,19 @@ function prMapRows(rows){
 async function prImportFile(file){
   try{
     if(file.size>5*1048576)throw new Error('Dosya 5 MB sınırını aşıyor');
-    const rows=prMapRows(/\.xlsx$/i.test(file.name)?await xlsxRows(await file.arrayBuffer()):csvRows(await file.text()));
+    const buf=await file.arrayBuffer(),sig=new Uint8Array(buf,0,Math.min(2,buf.byteLength));
+    // Uzantıya değil içeriğe bakılır: "PK" ile başlayan dosya Excel'dir.
+    const rows=prMapRows(sig[0]===0x50&&sig[1]===0x4b?await xlsxRows(buf):csvRows(csvText(buf)));
     if(!rows.length)throw new Error('Dosyada aktarılacak satır yok');
     await loadProspects();
     const key=o=>fKey(o.company||o.person)+'|'+fKey(o.il),have=new Set(pr.rows.map(key)),seen=new Set(),fresh=rows.filter(o=>{const k=key(o);if(have.has(k)||seen.has(k))return false;seen.add(k);return true;});
-    if(!fresh.length){toast('Dosyadaki kayıtların tümü zaten Aday Müşteriler\'de.');return;}
+    if(!fresh.length){await ask('Dosyadaki kayıtların tümü zaten Aday Müşteriler\'de.','Tamam');return;}
     const projects=db.sites.map(x=>[x.name,refFold(x.name)]).filter(v=>v[1]),like=[];
     fresh.forEach(o=>{const a=refFold(o.company||o.person),hit=projects.find(([,b])=>a===b||(Math.min(a.length,b.length)>=8&&(a.includes(b)||b.includes(a))));if(hit)like.push((o.company||o.person)+' ↔ '+hit[0]);});
     const msg=`Dosyada ${rows.length} kayıt var; ${fresh.length} tanesi eklenecek, ${rows.length-fresh.length} tanesi atlanacak (zaten kayıtlı ya da tekrar).`+(like.length?`\nAdı mevcut projelere benzeyen ${like.length} kayıt: ${like.slice(0,6).join('; ')}${like.length>6?'…':''}`:'')+'\nAktarılsın mı?';
     if(!await ask(msg,'İçe Aktar'))return;
-    const d=await prApi('POST','import',{rows:fresh});toast(`${d.added} aday içe aktarıldı.`);await loadProspects();
-  }catch(e){toast(e.message);}
+    const d=await prApi('POST','import',{rows:fresh});pr.f={q:'',status:'',owner:'',stage:'',sector:''};toast(`${d.added} aday içe aktarıldı.`);await loadProspects();
+  }catch(e){await ask('İçe aktarılamadı: '+e.message,'Tamam');}   // hata ekranda kalır (kısa bildirim gözden kaçıyordu)
 }
 document.addEventListener('change',async e=>{
   const el=e.target;
@@ -4953,7 +4954,7 @@ async function ldImport(file){
   if(!file||ld.busy)return;const note=$('ldNote');
   ld.busy=true;const btn=$('ldImport');if(btn)btn.disabled=true;
   try{
-    const rows=csvRows(await file.text());
+    const rows=csvRows(csvText(await file.arrayBuffer()));
     if(rows.length<2)throw new Error('Dosyada veri satırı yok.');
     const cols=rows[0].map(h=>LD_MAP[ldKey(h)]||'');
     if(!cols.includes('company')||!cols.includes('phone'))throw new Error('Başlık satırında “Firma” ve “Telefon” sütunları olmalı.');

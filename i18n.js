@@ -719,6 +719,7 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^İçe aktarılamadı: (.+)$/, function (m) { return 'Import failed: ' + m[1]; }],
     [/^([\d.,]+) aday içe aktarıldı\.$/, function (m) { return m[1] + ' prospects imported.'; }],
     [/^Dosyada ([\d.,]+) kayıt var; ([\d.,]+) tanesi eklenecek, ([\d.,]+) tanesi atlanacak \(zaten kayıtlı ya da tekrar\)\.(?:\s+Adı mevcut projelere benzeyen ([\d.,]+) kayıt: ([\s\S]*?))?\s+Aktarılsın mı\?$/, function (m) { return 'The file has ' + m[1] + ' records; ' + m[2] + ' will be added, ' + m[3] + ' skipped (already listed or repeated).' + (m[4] ? '\n' + m[4] + ' records resemble existing project names: ' + m[5] : '') + '\nImport?'; }],
     [/^([\d.,]+) aday(?: · ([\d.,]+) temas edilmedi)?$/, function (m) { return m[1] + ' prospects' + (m[2] ? ' · ' + m[2] + ' not contacted' : ''); }],
