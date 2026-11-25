@@ -2,6 +2,7 @@
 import { requireAuth } from '../lib/auth.js';
 import { listActivity, activityActors, logActivity, ensureActivity } from '../lib/activity.js';
 import { sql, readJson } from '../lib/db.js';
+import { trashList, trashRestore, TRASH_DAYS } from '../lib/trash.js';
 
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'no-store');
@@ -9,6 +10,24 @@ export default async function handler(req, res) {
     const user = await requireAuth(req, res);
     if (!user) return;
     if (!process.env.DATABASE_URL) return res.status(503).json({ error: 'İşlem geçmişi için veritabanı gerekli' });
+    // Çöp Kutusu (Hobby planda işlev sayısı sınırlı olduğu için burada): GET ?trash=1 liste · POST ?trash=1 { action:'restore', id }. Yalnızca sahip hesap.
+    if (req.query?.trash !== undefined) {
+      if (!user.owner) return res.status(403).json({ error: 'Çöp Kutusu yalnızca sahip hesaba açık' });
+      const s = sql();
+      if (req.method === 'GET') return res.status(200).json({ items: await trashList(s), days: TRASH_DAYS });
+      if (req.method !== 'POST') return res.status(405).json({ error: 'Yöntem desteklenmiyor' });
+      const b = (await readJson(req)) || {};
+      if (b.action !== 'restore' || !/^\d+$/.test(String(b.id || ''))) return res.status(400).json({ error: 'Geçersiz istek' });
+      try {
+        const r = await trashRestore(s, String(b.id));
+        const siteId = r.tables.sites?.[0]?.id || r.tables.site_files?.[0]?.site_id || r.tables.site_notes?.[0]?.site_id || '';
+        const shipId = r.tables.shipments?.[0]?.id || r.tables.shipment_files?.[0]?.ship_id || '';
+        await logActivity({ actor: user.email, action: 'geri-al', entity: shipId ? 'sevkiyat' : 'lokasyon', entityId: shipId || siteId, entityName: r.title, summary: 'Çöp Kutusu\'ndan geri alındı' });
+        return res.status(200).json({ ok: true, kind: r.kind });
+      } catch (e) {
+        return res.status(e.status || 500).json({ error: e.status ? e.message : 'Geri alınamadı' });
+      }
+    }
     if (req.method === 'POST') {
       // Bir proje sayfasının açılması işlem geçmişine yazılır (bildirim üretmez). Aynı kişi aynı projeyi 10 dakika içinde tekrar açarsa yeniden yazılmaz.
       const b = (await readJson(req)) || {};

@@ -9,7 +9,7 @@ import { seedOnce } from '../lib/seed.js';
 import { nextCode, backfillCodes } from '../lib/codes.js';
 import { undoSubcodesOnce } from '../lib/undo-subcodes.js';
 import { reorderOnce, swapCodesOnce } from '../lib/reorder.js';
-import { _deps as _filesDeps } from '../lib/files.js';
+import { trashPut, rowsOf } from '../lib/trash.js';
 import { analyze, validArea, maxRequests, sealKey, openKey, keyLooksValid, testKey } from '../lib/tomtom.js';
 import { saveAnalysis, handleHistory } from '../lib/evhistory.js';
 import { resolveMapsLink } from '../lib/geo.js';
@@ -164,15 +164,21 @@ export default async function handler(req, res) {
       const id = req.query?.id;
       if (!id) return res.status(400).json({ error: 'id gerekli' });
       const prev = await s`SELECT data FROM sites WHERE id = ${id}`;
+      // Proje; notları, dosya kayıtları ve klasörleriyle birlikte Çöp Kutusu'na taşınır (dosyalar depoda 30 gün kalır).
+      if (prev.length) {
+        const tables = { sites: rowsOf(await s`SELECT to_jsonb(t) AS r FROM sites t WHERE id = ${id}`) };
+        // Yan tablolar henüz oluşmamış olabilir (hiç not/dosya eklenmemiş kurulum).
+        const have = new Set((await s`SELECT table_name FROM information_schema.tables WHERE table_name IN ('site_notes', 'site_files', 'site_folders')`).map((r) => r.table_name));
+        if (have.has('site_notes')) tables.site_notes = rowsOf(await s`SELECT to_jsonb(t) AS r FROM site_notes t WHERE site_id = ${id}`);
+        if (have.has('site_files')) tables.site_files = rowsOf(await s`SELECT to_jsonb(t) AS r FROM site_files t WHERE site_id = ${id}`);
+        if (have.has('site_folders')) tables.site_folders = rowsOf(await s`SELECT to_jsonb(t) AS r FROM site_folders t WHERE site_id = ${id}`);
+        const nf = (tables.site_files || []).length, nn = (tables.site_notes || []).length;
+        await trashPut(s, { kind: 'site', title: [prev[0].data?.code, prev[0].data?.name].filter(Boolean).join(' · ') || id, context: `${nf} dosya, ${nn} not`, tables, by: user.email });
+        if (have.has('site_notes')) await s`DELETE FROM site_notes WHERE site_id = ${id}`;
+        if (have.has('site_files')) await s`DELETE FROM site_files WHERE site_id = ${id}`;
+        if (have.has('site_folders')) await s`DELETE FROM site_folders WHERE site_id = ${id}`;
+      }
       await s`DELETE FROM sites WHERE id = ${id}`;
-      try { await s`DELETE FROM site_notes WHERE site_id = ${id}`; } catch { /* not tablosu henüz yoksa */ }
-      try {
-        // Projenin dosyaları da silinir (Blob + kayıtlar).
-        const files = await s`SELECT pathname FROM site_files WHERE site_id = ${id}`;
-        if (files.length) await _filesDeps.del(files.map((f) => f.pathname));
-        await s`DELETE FROM site_files WHERE site_id = ${id}`;
-        await s`DELETE FROM site_folders WHERE site_id = ${id}`;
-      } catch { /* dosya tabloları henüz yoksa */ }
       await logActivity({ actor: user.email, action: 'sil', entity: 'lokasyon', entityId: id, entityName: prev[0]?.data?.name || id, summary: 'Proje silindi' });
       return res.status(204).end();
     }

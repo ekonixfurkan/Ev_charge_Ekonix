@@ -11,6 +11,7 @@ import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
 import { logActivity } from '../lib/activity.js';
+import { trashPut, rowsOf } from '../lib/trash.js';
 import { handleShipQuery, registerShipFile, shipFileRow, shipExists } from '../lib/shipments.js';
 import { _deps, MAX_BYTES, MAX_VIDEO_BYTES, VIDEO_TYPES, isVideoName, maxBytesFor, ALLOWED_TYPES, DEFAULT_FOLDERS, TYPES, cleanName, cleanFolder, extOf, isAllowedName, signedGetUrl } from '../lib/files.js';
 
@@ -169,9 +170,9 @@ export default async function handler(req, res) {
         const r = await s`SELECT * FROM site_files WHERE id = ${id}::bigint`;
         if (!r.length) return res.status(404).json({ error: 'Dosya bulunamadı' });
         const f = r[0];
-        try { await _deps.del(f.pathname); } catch { /* Blob'da yoksa kayıt yine de silinir */ }
-        await s`DELETE FROM site_files WHERE id = ${id}::bigint`;
         const name = (await siteName(s, f.site_id)) || f.site_id;
+        await trashPut(s, { kind: 'sitefile', title: f.name, context: `${name} · ${f.folder}`, tables: { site_files: rowsOf(await s`SELECT to_jsonb(t) AS r FROM site_files t WHERE id = ${id}::bigint`) }, by: user.email });
+        await s`DELETE FROM site_files WHERE id = ${id}::bigint`;
         await logActivity({ actor: user.email, action: 'dosya-sil', entity: 'lokasyon', entityId: f.site_id, entityName: name, summary: `${f.name} (${f.folder})` });
         return res.status(200).json({ ok: true });
       }

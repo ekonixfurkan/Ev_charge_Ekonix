@@ -4,6 +4,7 @@ import { sql, readJson } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
 import { logActivity } from '../lib/activity.js';
+import { trashPut, rowsOf } from '../lib/trash.js';
 
 let _ready = null;
 function ensureNotes() {
@@ -202,6 +203,8 @@ export default async function handler(req, res) {
     if (req.method === 'DELETE' && req.query?.batch) {
       const batch = String(req.query.batch);
       if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
+      const keep = rowsOf(await s`SELECT to_jsonb(t) AS r FROM site_notes t WHERE batch = ${batch} AND batch <> ''`);
+      if (keep.length) await trashPut(s, { kind: 'note', title: keep[0].body.slice(0, 160), context: `Grup notu${keep[0].grp ? ': ' + keep[0].grp : ''} · ${keep.length} proje`, tables: { site_notes: keep }, by: user.email });
       const del = await s`DELETE FROM site_notes WHERE batch = ${batch} AND batch <> '' RETURNING site_id`;
       for (const d of del) { const nm = await s`SELECT data->>'name' AS name FROM sites WHERE id = ${d.site_id}`; await logActivity({ actor: user.email, action: 'not-sil', entity: 'lokasyon', entityId: d.site_id, entityName: (nm[0] && nm[0].name) || d.site_id, summary: 'Şirket içi grup notu silindi' }); }
       return res.status(200).json({ ok: true, count: del.length });
@@ -213,6 +216,8 @@ export default async function handler(req, res) {
       const r = await s`SELECT n.author, n.site_id, (SELECT data->>'name' FROM sites WHERE id = n.site_id) AS name FROM site_notes n WHERE n.id = ${id}::bigint`;
       if (!r.length) return res.status(404).json({ error: 'Not bulunamadı' });
       if (!user.owner) return res.status(403).json({ error: 'Silme yetkisi yalnızca sahip hesaptadır' });
+      const keep = rowsOf(await s`SELECT to_jsonb(t) AS r FROM site_notes t WHERE id = ${id}::bigint`);
+      await trashPut(s, { kind: 'note', title: (keep[0]?.body || 'Not').slice(0, 160), context: r[0].name || r[0].site_id, tables: { site_notes: keep }, by: user.email });
       await s`DELETE FROM site_notes WHERE id = ${id}::bigint`;
       await logActivity({ actor: user.email, action: 'not-sil', entity: 'lokasyon', entityId: r[0].site_id, entityName: r[0].name || r[0].site_id, summary: 'Şirket içi not silindi' });
       return res.status(200).json({ ok: true });
