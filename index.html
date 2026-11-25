@@ -297,13 +297,22 @@ aside{background:var(--side);color:var(--side-muted);border-right:1px solid var(
 .nav-item.active:hover{background:rgba(255,255,255,.14);color:#fff;border-left-color:var(--teal)}
 .nav-item:focus-visible,.nav-head:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
 .nav-item .nv-tx{display:flex;flex-direction:column;min-width:0;line-height:1.3;text-align:left}
-.nav-item .nv-tx small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:500;color:var(--side-muted);opacity:.8}
+aside .nav-item .nv-tx>span{font-size:14.5px;font-weight:700;letter-spacing:.005em}
+.nav-item .nv-tx small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:500;color:var(--side-muted);opacity:.9}
+aside .nav-item .ni{width:19px;height:19px}
 .nav-item .nv-tx small.warn{color:#ffb0a6;opacity:1}
 /* Aktif başlık kutu gibi belirgin */
 aside .nav-item.active{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.28);border-left:3px solid var(--teal);box-shadow:0 6px 16px rgba(0,0,0,.28)}
 aside .nav-item.active .nv-tx small{color:#fff;opacity:.85}
 aside .nav-item.active .nv-tx small.warn{color:#ffb0a6;opacity:1}
 .sb-collapsed .nav-item .nv-tx{display:none}
+/* Sol menünün alt bölümü de büyütüldü (küçük yazı kalmasın) */
+aside .zoom-note{font-size:12px;line-height:1.45}
+aside #saveStatus{font-size:12px}
+aside .whoami{font-size:13px;font-weight:600}
+aside .sb-user .install,aside .sb-user .logout{font-size:13.5px;font-weight:700}
+aside .sb-user .lang-sw button{font-size:12.5px}
+.sb-collapsed aside #saveStatus,.sb-collapsed #saveStatus{font-size:0}
 .sb-user{margin-top:auto;padding:12px 8px 16px;border-top:1px solid rgba(255,255,255,.1);position:sticky;bottom:0;background:var(--side)}
 .sb-user .lang-sw{display:flex;margin:0 4px 10px;border:1px solid rgba(255,255,255,.18);border-radius:var(--radius);overflow:hidden}
 .sb-user .lang-sw button{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 0;white-space:nowrap;border:0;border-radius:0;background:transparent;color:var(--side-muted);font-size:11px;font-weight:700;letter-spacing:.04em;cursor:pointer}
@@ -1693,7 +1702,7 @@ async function load(){
     if(Array.isArray(data.sites))db.sites=data.sites.map(migrateSite);
     if(Array.isArray(data.team)&&data.team.length)team=data.team;
     db.sites.sort(byCreated);mode='cloud';loaded=true;
-    status('Sunucuda kayıtlı · '+clock());restoreRoute();render();startPoll();return;
+    status('Sunucuda Kayıtlı · '+clock());restoreRoute();render();startPoll();return;
   }catch(e){/* API/DB yok → bu tarayıcıya kaydet */}
   try{const v=localStorage.getItem(KEY);if(v){const d=JSON.parse(v);if(Array.isArray(d.sites))db.sites=d.sites.map(migrateSite);if(Array.isArray(d.team)&&d.team.length)team=d.team;}db.sites.sort(byCreated);mode='local';
     status('Sunucuya bağlanılamadı · bu tarayıcıya kaydediliyor',true);}
@@ -1714,7 +1723,7 @@ async function poll(){
   db.sites=db.sites.filter(x=>ids.has(x.id)||pending.has(x.id));
   if(activeId&&!db.sites.some(x=>x.id===activeId)){exitEdit();activeId=null;if(view==='site')view='portfolio';activeChanged=true;}
   db.sites.sort(byCreated);
-  if(!pending.size)status('Sunucuda kayıtlı · '+clock());
+  if(!pending.size)status('Sunucuda Kayıtlı · '+clock());
   if(view==='site'){if(activeChanged&&!editingNow())renderSite();else renderPipe();}else if(view!=='users'&&view!=='activity'&&view!=='contacts'&&view!=='notifs'&&view!=='planner'&&view!=='meetings'&&view!=='rakip'&&view!=='leads'&&view!=='daily'&&view!=='roi'&&view!=='hub'&&view!=='ships'&&view!=='ship')render();
 }
 function queue(id,op){pending.set(id,{op,v:++ver});status('Kaydediliyor…');clearTimeout(flushTimer);flushTimer=setTimeout(flush,600);}
@@ -1736,7 +1745,7 @@ async function flush(){
     if(failed.status===401||failed.status===403){canWrite=false;status('Bu sayfada değişiklik kaydetme yetkiniz yok',true);return;}
     status('Kayıt bekliyor · tekrar deneniyor',true);flushTimer=setTimeout(flush,4000);return;
   }
-  if(pending.size)flushTimer=setTimeout(flush,200);else status('Sunucuda kayıtlı · '+clock());
+  if(pending.size)flushTimer=setTimeout(flush,200);else status('Sunucuda Kayıtlı · '+clock());
 }
 function touched(s){
   s.updatedAt=now();
@@ -2168,14 +2177,14 @@ function saveEdit(){
   const s=cur();if(!s||!siteEdit)return;
   if($('view').querySelector('[aria-invalid="true"]')){toast('Hatalı alanlar var; düzeltip tekrar kaydedin.');return;}
   const dirty=editDirty;exitEdit();
-  if(dirty){touched(s);flush();}else status('Sunucuda kayıtlı · '+clock());
+  if(dirty){touched(s);flush();}else status('Sunucuda Kayıtlı · '+clock());
   renderSite();toast('Proje bilgileri güncellendi.');
 }
 function cancelEdit(quiet){
   const s=cur();if(!siteEdit)return;
   const snap=editSnap,dirty=editDirty;exitEdit();
   if(s&&snap&&dirty){const k=db.sites.findIndex(x=>x.id===s.id);if(k>=0)db.sites[k]=snap;}
-  status(pending.size?'Kaydediliyor…':'Sunucuda kayıtlı · '+clock());
+  status(pending.size?'Kaydediliyor…':'Sunucuda Kayıtlı · '+clock());
   if(!quiet){renderSite();toast(dirty?'Değişiklikler geri alındı.':'Düzenleme iptal edildi.');}
 }
 // Kaydedilmemiş değişiklik varken başka sayfaya geçişi onaya bağlar.
@@ -2540,12 +2549,12 @@ const SITE_SUBS=['info','units','infra','comp','credit','check','files'],PORT_SU
 const SITE_TABS=[['info','Genel'],['units','Şarj Üniteleri'],['infra','Altyapı & Güç'],['comp','Rakip Analizi'],['credit','Finansman'],['check','Skor Hesaplama'],['files','Dosyalar']];
 // Menü başlıklarının altındaki küçük alt satır (canlı sayılar; veri henüz gelmediyse sabit kısa açıklama).
 function navSubText(k){
-  if(k==='ovw')return 'Genel özet';
-  if(k==='notifs')return bell.unread?nf.format(bell.unread)+' okunmamış':'Yeni bildirim yok';
-  if(k==='hub:proj'){if(!loaded)return 'Liste, görev, sevkiyat';const open=sh.loaded?sh.list.filter(x=>x.status!=='teslim').length:0;return nf.format(db.sites.length)+' proje'+(open?' · '+nf.format(open)+' sevkiyat':'');}
-  if(k==='hub:meet'){if(!pl.loaded)return 'Daily ve toplantı notları';const t=todayStr(),op=pl.tasks.filter(x=>!x.done),late=op.filter(x=>x.due&&x.due<t).length;return late?nf.format(late)+' gecikmiş görev':nf.format(op.length)+' açık görev';}
-  if(k==='hub:market')return 'Lead, müşteri ve analiz';
-  if(k==='hub:admin')return 'Hesaplar ve kayıtlar';
+  if(k==='ovw')return 'Genel Özet';
+  if(k==='notifs')return bell.unread?nf.format(bell.unread)+' Okunmamış':'Yeni Bildirim Yok';
+  if(k==='hub:proj'){if(!loaded)return 'Liste, Görev, Sevkiyat';const open=sh.loaded?sh.list.filter(x=>x.status!=='teslim').length:0;return nf.format(db.sites.length)+' Proje'+(open?' · '+nf.format(open)+' Sevkiyat':'');}
+  if(k==='hub:meet'){if(!pl.loaded)return 'Daily ve Toplantı Notları';const t=todayStr(),op=pl.tasks.filter(x=>!x.done),late=op.filter(x=>x.due&&x.due<t).length;return late?nf.format(late)+' Gecikmiş Görev':nf.format(op.length)+' Açık Görev';}
+  if(k==='hub:market')return 'Lead, Müşteri ve Analiz';
+  if(k==='hub:admin')return 'Hesaplar ve Kayıtlar';
   return '';
 }
 function paintNavSubs(){
@@ -2554,7 +2563,7 @@ function paintNavSubs(){
     let tx=b.querySelector(':scope>.nv-tx');
     if(!tx){tx=document.createElement('span');tx.className='nv-tx';span.replaceWith(tx);tx.appendChild(span);tx.appendChild(document.createElement('small'));}
     const sm=tx.querySelector('small');if(sm.dataset.src!==text){sm.dataset.src=text;sm.textContent=I18N.t(text);}
-    sm.classList.toggle('warn',/gecikmiş/.test(text));
+    sm.classList.toggle('warn',/Gecikmiş/.test(text));
   });
 }
 function paintNav(){
