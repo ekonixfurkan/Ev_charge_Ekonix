@@ -2109,6 +2109,15 @@ async function loadPeople(){
   try{const r=await fetch('/api/people',{credentials:'same-origin'});if(!r.ok)return;const d=await r.json();people=d.people||[];}catch(e){return;}
   if(view==='site'&&!editingNow())renderSite();
 }
+// Referans: diğer projelerde yazılmış adlar açılır listede çıkar; listede yoksa "Yeni Referans Yaz" ile eklenir (sonra tüm projelerde seçilebilir).
+function refNames(){
+  const m=new Map();db.sites.forEach(x=>{const v=String((x.survey&&x.survey.partner)||'').replace(/\s+/g,' ').trim();if(v&&!m.has(v.toLocaleLowerCase('tr-TR')))m.set(v.toLocaleLowerCase('tr-TR'),v);});
+  return [...m.values()].sort((a,b)=>a.localeCompare(b,'tr'));
+}
+function refField(){
+  const v=cur().survey.partner||'',names=refNames(),key=v.replace(/\s+/g,' ').trim().toLocaleLowerCase('tr-TR'),sel=names.find(n=>n.toLocaleLowerCase('tr-TR')===key)||'';
+  return `<label>Referans<select data-ref aria-label="Referans"><option value="">Seçiniz</option>${names.map(n=>`<option value="${esc(n)}" translate="no" ${n===sel?'selected':''}>${esc(n)}</option>`).join('')}<option value="__new">+ Yeni Referans Yaz</option></select><input data-sv="partner" type="text" maxlength="120" value="${esc(v)}" placeholder="Referans adı" aria-label="Yeni referans adı" hidden style="margin-top:6px"></label>`;
+}
 function leadField(){
   const v=cur().survey.lead||'',names=people.map(x=>x.name||x.email);
   const list=[...(v&&!names.includes(v)?[v]:[]),...names];
@@ -2260,7 +2269,7 @@ function renderSite(){
     ${leadField()}
     <label class="span4">Sıradaki iş<input id="nextActionBox" data-locked readonly tabindex="-1" value="${esc(nextStageOf(s))}" title="Bir sonraki aşama; aşama değişince kendiliğinden güncellenir"></label>
     ${field('nextActionDate','Sıradaki iş tarihi','date')}
-    ${sv('partner','Referans')}
+    ${refField()}
     ${field('statusTr','Son durum','text',' class="span4"')}
     <label class="span4">Engel<input data-f="blockerTr" value="${esc(s.blockerTr||s.blocker)}"></label>
   </div></section>
@@ -2524,6 +2533,10 @@ $('view').addEventListener('input',e=>{
     t[k]=v;touched(s);updateDerived();return;}
   if(el.dataset.finText){s.fin[el.dataset.finText]=el.value;touched(s);updateDerived();return;}
   if('lead' in el.dataset){s.survey.lead=el.value;touched(s);updateDerived();return;}
+  if('ref' in el.dataset){const box=el.parentElement.querySelector('[data-sv="partner"]');
+    if(el.value==='__new'){box.hidden=false;box.value='';if(s.survey.partner){s.survey.partner='';touched(s);}box.focus();}
+    else{box.hidden=true;box.value=el.value;if((s.survey.partner||'')!==el.value){s.survey.partner=el.value;touched(s);}}
+    updateDerived();return;}
   if(el.dataset.sv){const k=el.dataset.sv;s.survey[k]=el.type==='number'?(el.value===''?'':Math.max(0,+el.value||0)):el.value;if(k==='tariffTl'||k==='usdTry')syncTariff(s);touched(s);updateDerived();return;}
   if(el.dataset.svc){const k=el.dataset.svc;s.survey[k]=[...document.querySelectorAll(`[data-svc="${k}"]:checked`)].map(x=>x.value);const sm=document.querySelector(`[data-msel="${k}"] summary`);if(sm){sm.textContent=msLabel(k,s.survey[k]);sm.classList.toggle('ph',!s.survey[k].length);}touched(s);return;}
   if(el.dataset.amg){const c=AMG.find(x=>x.k===el.dataset.amg),raw=el.value.trim();

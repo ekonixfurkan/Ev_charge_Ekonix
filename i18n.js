@@ -427,6 +427,7 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    '+ Yeni Referans Yaz': '+ Enter New Referral', 'Referans adı': 'Referral name', 'Yeni referans adı': 'New referral name',
     'Referans': 'Referral',
     'Çöp Kutusu': 'Trash',
     'Silinen proje, dosya ve notlar 30 gün burada bekler.': 'Deleted projects, files and notes wait here for 30 days.',
