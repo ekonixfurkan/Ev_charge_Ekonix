@@ -1214,6 +1214,12 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Genel özet": "总览",
+   "Yeni bildirim yok": "暂无新通知",
+   "Liste, görev, sevkiyat": "列表、任务、发运",
+   "Daily ve toplantı notları": "每日与会议记录",
+   "Lead, müşteri ve analiz": "线索、客户与分析",
+   "Hesaplar ve kayıtlar": "账户与日志",
    "Şirket içi bilgilendirmeyi aç": "打开内部通知",
    "Grup notu yazın: grubun tüm projelerine eklenir… (Ctrl+Enter ile gönder)": "撰写分组备注：将添加到组内所有项目…（Ctrl+Enter 发送）",
    "Bu grup için henüz not yok.": "该分组暂无备注。",
@@ -1250,6 +1256,10 @@ window.I18N_ZH = {
   },
   rules: function (sub) {
     var PZ = [
+      [/^([\d.,]+) okunmamış$/, function (m) { return m[1] + ' 条未读'; }],
+      [/^([\d.,]+) proje(?: · ([\d.,]+) sevkiyat)?$/, function (m) { return m[1] + ' 个项目' + (m[2] ? ' · ' + m[2] + ' 批发运' : ''); }],
+      [/^([\d.,]+) gecikmiş görev$/, function (m) { return m[1] + ' 个逾期任务'; }],
+      [/^([\d.,]+) açık görev$/, function (m) { return m[1] + ' 个待办任务'; }],
       [/^([\d.,]+) \/ ([\d.,]+) atandı$/, function (m) { return '已分配 ' + m[1] + ' / ' + m[2]; }],
       [/^([\d.,]+) fazla atanmış$/, function (m) { return '超额分配 ' + m[1]; }],
       [/^([\d.,]+) boşta$/, function (m) { return m[1] + ' 未分配'; }],

@@ -427,6 +427,12 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Genel özet': 'Overview',
+    'Yeni bildirim yok': 'No new notifications',
+    'Liste, görev, sevkiyat': 'List, tasks, shipments',
+    'Daily ve toplantı notları': 'Daily and meeting notes',
+    'Lead, müşteri ve analiz': 'Leads, contacts and analysis',
+    'Hesaplar ve kayıtlar': 'Accounts and logs',
     'Şirket içi bilgilendirmeyi aç': 'Open internal notes',
     'Grup notu yazın: grubun tüm projelerine eklenir… (Ctrl+Enter ile gönder)': 'Write a group note: it is added to all projects in the group… (Ctrl+Enter to send)',
     'Bu grup için henüz not yok.': 'There are no notes for this group yet.',
@@ -646,6 +652,10 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^([\d.,]+) okunmamış$/, function (m) { return m[1] + ' unread'; }],
+    [/^([\d.,]+) proje(?: · ([\d.,]+) sevkiyat)?$/, function (m) { return m[1] + ' projects' + (m[2] ? ' · ' + m[2] + ' shipments' : ''); }],
+    [/^([\d.,]+) gecikmiş görev$/, function (m) { return m[1] + ' overdue tasks'; }],
+    [/^([\d.,]+) açık görev$/, function (m) { return m[1] + ' open tasks'; }],
     [/^([\d.,]+) \/ ([\d.,]+) atandı$/, function (m) { return m[1] + ' / ' + m[2] + ' allocated'; }],
     [/^([\d.,]+) fazla atanmış$/, function (m) { return m[1] + ' over-allocated'; }],
     [/^([\d.,]+) boşta$/, function (m) { return m[1] + ' unallocated'; }],
