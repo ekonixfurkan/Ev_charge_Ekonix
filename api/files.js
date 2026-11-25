@@ -71,12 +71,14 @@ export default async function handler(req, res) {
       const r = q.ship === '1' ? [await shipFileRow(s, id)].filter(Boolean) : await s`SELECT name, mime, pathname FROM site_files WHERE id = ${id}::bigint`;
       if (!r.length) return res.status(404).json({ error: 'Dosya bulunamadı' });
       const inline = q.inline === '1';
+      // proxy=1: tarayıcı depodaki adrese doğrudan erişemezse (toplu ZIP indirme) dosya sunucu üzerinden akıtılır.
       try {
+        if (q.proxy === '1') throw new Error('proxy');
         const url = await signedGetUrl(r[0].pathname, { download: !inline });
         res.setHeader('location', url);
         return res.status(302).end();
       } catch (e) {
-        // İmzalı adres alınamazsa dosya sunucudan akıtılır (küçük dosyalar için yeterli).
+        // İmzalı adres alınamazsa (ya da proxy istendiyse) dosya sunucudan akıtılır.
         const got = await _deps.get(r[0].pathname, { access: 'private' });
         if (!got || !got.stream) return res.status(404).json({ error: 'Dosya bulunamadı' });
         res.setHeader('content-type', r[0].mime || 'application/octet-stream');

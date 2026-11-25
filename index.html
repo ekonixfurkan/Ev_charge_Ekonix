@@ -351,6 +351,8 @@ aside .sb-user .lang-sw button{font-size:12.5px}
 #ctDlgRows tr{cursor:pointer}#ctDlgRows tr:hover td{background:var(--navy-soft)}
 .pick-btn{font-size:11px;padding:5px 10px}
 .pick-grp{display:inline-flex;gap:6px}
+.fl-zip{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:5px 12px;border:1px solid color-mix(in srgb,var(--ok) 35%,transparent);border-radius:999px;background:var(--ok-soft);color:var(--ok);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.fl-zip:hover:not(:disabled){border-color:var(--ok)}.fl-zip.busy{cursor:progress;opacity:.85}.fl-zip+.pick-btn{margin-left:4px}
 dialog.pr-dlg{width:min(780px,94vw);max-width:94vw}.pr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px}.pr-grid .pr-wide{grid-column:span 2}.pr-grid textarea{min-height:0;height:62px}
 @media (max-width:760px){.pr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-grid .pr-wide{grid-column:1/-1}}@media (max-width:520px){.pr-grid{grid-template-columns:1fr}}
 .fl-tbl.pr-tbl{table-layout:fixed;width:100%;min-width:1180px}.fl-tbl.pr-tbl th,.fl-tbl.pr-tbl td{text-align:left;vertical-align:middle;white-space:normal;overflow-wrap:anywhere}.fl-tbl.pr-tbl th{white-space:nowrap}
@@ -4257,6 +4259,61 @@ function flPicHtml(f){
   return `<figure class="fl-pic${on?' in-card':''}" data-flid="${esc(f.id)}"><button type="button" class="fl-skbtn${on?' on':''}" data-skshow="${esc(f.id)}" aria-pressed="${on}" title="${on?'Saha kartından çıkar':'Saha kartına ekle (son sayfada gösterilir, en fazla 4)'}" aria-label="${on?'Saha kartından çıkar':'Saha kartına ekle'}">${on?TICK:SKI}</button><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><img src="${u}&inline=1" alt="${esc(f.name)}" loading="lazy" decoding="async"></a>
     <figcaption><b title="${esc(f.name)}">${esc(f.name)}</b><small>${esc(flSize(f.size))} · ${esc(fmtTs(f.uploadedAt))}</small><span class="fl-pic-act"><a class="btn-link" href="${u}">İndir</a><button type="button" class="ghost" data-fldel="${esc(f.id)}" ${can?'':'disabled'} aria-label="Dosyayı sil">Sil</button></span></figcaption></figure>`;
 }
+/* --- Saha Fotoğrafları: klasördeki her şeyi (fotoğraf, video, diğer) tek ZIP olarak indirir. ZIP tarayıcıda hazırlanır (sıkıştırmasız: foto/video zaten sıkıştırılmıştır). --- */
+const ZIP_MAX=1500*1048576;
+let zipJob=null; // {done,total} sürerken düğmede ilerleme yazar
+const zipLabel=()=>zipJob?`${zipJob.done} / ${zipJob.total}`:'';
+const zipBtn=n=>`<button type="button" class="fl-zip no-print${zipJob?' busy':''}" id="flZip" ${zipJob?'disabled':''} title="Klasördeki tüm fotoğraf ve videoları ZIP olarak indir" aria-label="Klasördeki tümünü ZIP olarak indir (${n} dosya)"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg><span>${zipJob?zipLabel():'ZIP İndir'}</span></button>`;
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[i]=c>>>0;}return t;})();
+const crc32=u=>{let c=0xffffffff;for(let i=0;i<u.length;i++)c=CRC_T[(c^u[i])&255]^(c>>>8);return (c^0xffffffff)>>>0;};
+// entries: [{name, data:Uint8Array, date}] -> ZIP Blob (yöntem: saklama; dosya adları UTF-8)
+function zipBlob(entries){
+  const enc=new TextEncoder(),parts=[],central=[];let off=0;
+  const hdr=(len,fill)=>{const b=new Uint8Array(len),v=new DataView(b.buffer);fill(v);return b;};
+  for(const e of entries){
+    const name=enc.encode(e.name),crc=crc32(e.data),size=e.data.length,d=e.date&&!isNaN(e.date)?e.date:new Date();
+    const time=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1),date=((Math.max(1980,d.getFullYear())-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
+    parts.push(hdr(30,v=>{v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x0800,true);v.setUint16(10,time,true);v.setUint16(12,date,true);v.setUint32(14,crc,true);v.setUint32(18,size,true);v.setUint32(22,size,true);v.setUint16(26,name.length,true);}),name,e.data);
+    central.push(hdr(46,v=>{v.setUint32(0,0x02014b50,true);v.setUint16(4,20,true);v.setUint16(6,20,true);v.setUint16(8,0x0800,true);v.setUint16(12,time,true);v.setUint16(14,date,true);v.setUint32(16,crc,true);v.setUint32(20,size,true);v.setUint32(24,size,true);v.setUint16(28,name.length,true);v.setUint32(42,off,true);}),name);
+    off+=30+name.length+size;
+  }
+  const cdSize=central.reduce((a,x)=>a+x.length,0);
+  return new Blob([...parts,...central,hdr(22,v=>{v.setUint32(0,0x06054b50,true);v.setUint16(8,entries.length,true);v.setUint16(10,entries.length,true);v.setUint32(12,cdSize,true);v.setUint32(16,off,true);})],{type:'application/zip'});
+}
+const zipSafe=v=>String(v||'').replace(/[\\/:*?"<>|\u0000-\u001f]+/g,'-').trim();
+// Önce depodan doğrudan indirilir; tarayıcı buna izin vermezse dosya sunucu üzerinden akıtılır.
+async function zipFetch(id){
+  const u='/api/files?download='+encodeURIComponent(id)+'&inline=1';
+  for(const url of [u,u+'&proxy=1']){
+    try{const res=await fetch(url,{credentials:'same-origin'});if(res.ok)return new Uint8Array(await res.arrayBuffer());}catch(e){}
+  }
+  return null;
+}
+async function flZipDownload(){
+  const s=cur();if(!s||zipJob)return;
+  const list=fl.files.filter(f=>f.folder==='Saha Fotoğrafları').sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr',{numeric:true}));
+  if(!list.length)return;
+  const total=list.reduce((a,f)=>a+(+f.size||0),0);
+  if(total>ZIP_MAX){await ask(`Klasör ${flSize(total)}: tek ZIP için sınır 1,5 GB. Büyük videoları tek tek indirin.`,'Tamam');return;}
+  const title=zipSafe([s.code,s.name].filter(Boolean).join(' ')+' - Saha Fotoğrafları');
+  zipJob={done:0,total:list.length};paintFiles();
+  const paint=()=>{const e=document.querySelector('#flZip span');if(e)e.textContent=zipLabel();};
+  const entries=[],failed=[],used=new Set();
+  try{
+    for(const f of list){
+      const data=await zipFetch(f.id);
+      if(!data)failed.push(f.name);
+      else{let name=zipSafe(f.name)||'dosya',i=2;const m=/^(.*?)(\.[^.]*)?$/.exec(name);while(used.has(name.toLocaleLowerCase('tr-TR')))name=m[1]+' ('+(i++)+')'+(m[2]||'');used.add(name.toLocaleLowerCase('tr-TR'));entries.push({name,data,date:new Date(f.uploadedAt)});}
+      zipJob.done++;paint();
+    }
+    if(!entries.length){await ask('Dosyalar indirilemedi. Bağlantınızı kontrol edip yeniden deneyin.','Tamam');return;}
+    const a=document.createElement('a');a.href=URL.createObjectURL(zipBlob(entries));a.download=title+'.zip';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+    if(failed.length)await ask(`${entries.length} dosya ZIP'e eklendi. Şu ${failed.length} dosya indirilemedi: ${failed.slice(0,6).join(', ')}${failed.length>6?'…':''}`,'Tamam');
+    else toast(`${entries.length} dosya ZIP olarak indirildi.`);
+  }catch(e){await ask('ZIP hazırlanamadı: '+e.message,'Tamam');}
+  finally{zipJob=null;if(view==='site')paintFiles();}
+}
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#flZip'))flZipDownload();});
 function flVidHtml(f){
   const can=!!fl.owner,u='/api/files?download='+esc(f.id);
   return `<figure class="fl-pic fl-vid" data-flid="${esc(f.id)}"><a href="${u}&inline=1" target="_blank" rel="noopener" title="${esc(f.name)}"><video src="${u}&inline=1#t=0.1" preload="metadata" muted playsinline></video><span class="fl-play" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7Z"/></svg></span></a>
@@ -4293,7 +4350,7 @@ function paintFiles(){
       const cardPane=fl.sel==='__cards'?`<div class="fl-folder fl-pane"><div class="fl-head"><strong>Saha Kartları</strong><small>${vers.length} kart</small></div>
         ${vers.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Kart</th><th>Dil</th><th>Oluşturan</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${vers.map(v=>`<tr><td><span class="fl-ico">PDF</span><a href="#" data-skver="${esc(v.id)}">${esc((v.snap&&v.snap.name)||'')} · ${esc(fmtTs(v.at))}</a></td><td translate="no">${esc(LANG_LBL[v.lang]||v.lang||'')}</td><td>${esc(v.by||'—')}</td><td class="num">${esc(fmtTs(v.at))}</td><td class="fl-act"><button type="button" class="ghost" data-skver="${esc(v.id)}">Aç</button><button type="button" class="ghost" data-skverdel="${esc(v.id)}" ${me.owner?'':'disabled'} aria-label="Kartı sil">Sil</button></td></tr>`).join('')}</tbody></table></div>`:'<p class="note" style="padding:14px 16px">Henüz kayıtlı saha kartı yok. Sağ üstteki "Saha Kartı" düğmesiyle kartı açıp "Dosyalara Kaydet"e basın.</p>'}</div>`:'';
       const list=(by[fl.sel]||[]).slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'tr',{numeric:true,sensitivity:'base'})); // ada göre (A–Z, sayılar doğal sırada)
-      const pane=fl.sel&&fl.folders.includes(fl.sel)?`<div class="fl-folder fl-pane" data-flfolder="${esc(fl.sel)}"><div class="fl-head"><strong>${esc(fl.sel)}</strong><small>${list.length} dosya${(()=>{const n=(cur()&&cur().card&&Array.isArray(cur().card.photos)?cur().card.photos.length:0);return n?` · <span class="fl-skcount">${n}/${SK_MAX} saha kartında</span>`:'';})()}</small><button type="button" class="ghost pick-btn" data-flup="${esc(fl.sel)}">Yükle</button></div>
+      const pane=fl.sel&&fl.folders.includes(fl.sel)?`<div class="fl-folder fl-pane" data-flfolder="${esc(fl.sel)}"><div class="fl-head"><strong>${esc(fl.sel)}</strong><small>${list.length} dosya${(()=>{const n=(cur()&&cur().card&&Array.isArray(cur().card.photos)?cur().card.photos.length:0);return n?` · <span class="fl-skcount">${n}/${SK_MAX} saha kartında</span>`:'';})()}</small>${fl.sel==='Saha Fotoğrafları'&&list.length?zipBtn(list.length):''}<button type="button" class="ghost pick-btn" data-flup="${esc(fl.sel)}">Yükle</button></div>
         ${(()=>{const pics=list.filter(f=>/^(jpg|jpeg|png)$/.test(flExt(f.name))),vids=list.filter(f=>FL_VIDEO.test(flExt(f.name))),others=list.filter(f=>!pics.includes(f)&&!vids.includes(f));
           return (pics.length||vids.length?`<div class="fl-gallery">${pics.map(flPicHtml).join('')}${vids.map(flVidHtml).join('')}</div>`:'')+(others.length?`<div class="scroll"><table class="yearly fl-tbl m-cards"><thead><tr><th>Dosya</th><th class="num">Boyut</th><th>Yükleyen</th><th class="num">Tarih</th><th></th></tr></thead><tbody>${others.map(flRowHtml).join('')}</tbody></table></div>`:'');})()}
         ${list.length?'':'<p class="note" style="padding:14px 16px">Bu klasörde dosya yok. "Yükle" düğmesini kullanın ya da dosyayı buraya sürükleyin.</p>'}</div>`:'';

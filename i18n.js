@@ -427,6 +427,9 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'ZIP İndir': 'Download ZIP',
+    'Klasördeki tüm fotoğraf ve videoları ZIP olarak indir': 'Download all photos and videos in this folder as a ZIP',
+    'Dosyalar indirilemedi. Bağlantınızı kontrol edip yeniden deneyin.': 'The files could not be downloaded. Check your connection and try again.',
     'Excel / CSV İçe Aktar': 'Import Excel / CSV',
     'İçe Aktar': 'Import',
     'Dosyadaki kayıtların tümü zaten Aday Müşteriler\'de.': 'All records in the file are already in Prospects.',
@@ -719,6 +722,10 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^([\d.,]+) dosya ZIP olarak indirildi\.$/, function (m) { return m[1] + ' files downloaded as ZIP.'; }],
+    [/^([\d.,]+) dosya ZIP'e eklendi\. Şu ([\d.,]+) dosya indirilemedi: (.+)$/, function (m) { return m[1] + ' files added to the ZIP. These ' + m[2] + ' could not be downloaded: ' + m[3]; }],
+    [/^Klasör (.+): tek ZIP için sınır 1,5 GB\. Büyük videoları tek tek indirin\.$/, function (m) { return 'The folder is ' + m[1] + '; the limit for one ZIP is 1.5 GB. Download large videos one by one.'; }],
+    [/^ZIP hazırlanamadı: (.+)$/, function (m) { return 'Could not build the ZIP: ' + m[1]; }],
     [/^İçe aktarılamadı: (.+)$/, function (m) { return 'Import failed: ' + m[1]; }],
     [/^([\d.,]+) aday içe aktarıldı\.$/, function (m) { return m[1] + ' prospects imported.'; }],
     [/^Dosyada ([\d.,]+) kayıt var; ([\d.,]+) tanesi eklenecek, ([\d.,]+) tanesi atlanacak \(zaten kayıtlı ya da tekrar\)\.(?:\s+Adı mevcut projelere benzeyen ([\d.,]+) kayıt: ([\s\S]*?))?\s+Aktarılsın mı\?$/, function (m) { return 'The file has ' + m[1] + ' records; ' + m[2] + ' will be added, ' + m[3] + ' skipped (already listed or repeated).' + (m[4] ? '\n' + m[4] + ' records resemble existing project names: ' + m[5] : '') + '\nImport?'; }],

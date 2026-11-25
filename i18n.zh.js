@@ -1214,6 +1214,9 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "ZIP İndir": "下载 ZIP",
+   "Klasördeki tüm fotoğraf ve videoları ZIP olarak indir": "将此文件夹中的所有照片和视频打包为 ZIP 下载",
+   "Dosyalar indirilemedi. Bağlantınızı kontrol edip yeniden deneyin.": "无法下载文件。请检查网络后重试。",
    "Excel / CSV İçe Aktar": "导入 Excel / CSV",
    "İçe Aktar": "导入",
    "Dosyadaki kayıtların tümü zaten Aday Müşteriler'de.": "文件中的所有记录已在潜在客户中。",
@@ -1326,6 +1329,10 @@ window.I18N_ZH = {
   },
   rules: function (sub) {
     var PZ = [
+      [/^([\d.,]+) dosya ZIP olarak indirildi\.$/, function (m) { return '已将 ' + m[1] + ' 个文件打包下载。'; }],
+      [/^([\d.,]+) dosya ZIP'e eklendi\. Şu ([\d.,]+) dosya indirilemedi: (.+)$/, function (m) { return '已将 ' + m[1] + ' 个文件加入 ZIP。以下 ' + m[2] + ' 个无法下载：' + m[3]; }],
+      [/^Klasör (.+): tek ZIP için sınır 1,5 GB\. Büyük videoları tek tek indirin\.$/, function (m) { return '文件夹大小为 ' + m[1] + '；单个 ZIP 上限为 1.5 GB。请逐个下载大视频。'; }],
+      [/^ZIP hazırlanamadı: (.+)$/, function (m) { return '无法生成 ZIP：' + m[1]; }],
       [/^İçe aktarılamadı: (.+)$/, function (m) { return '导入失败：' + m[1]; }],
       [/^([\d.,]+) aday içe aktarıldı\.$/, function (m) { return '已导入 ' + m[1] + ' 位潜在客户。'; }],
       [/^Dosyada ([\d.,]+) kayıt var; ([\d.,]+) tanesi eklenecek, ([\d.,]+) tanesi atlanacak \(zaten kayıtlı ya da tekrar\)\.(?:\s+Adı mevcut projelere benzeyen ([\d.,]+) kayıt: ([\s\S]*?))?\s+Aktarılsın mı\?$/, function (m) { return '文件包含 ' + m[1] + ' 条记录；将添加 ' + m[2] + ' 条，跳过 ' + m[3] + ' 条（已存在或重复）。' + (m[4] ? '\n名称与现有项目相似的记录 ' + m[4] + ' 条：' + m[5] : '') + '\n要导入吗？'; }],
