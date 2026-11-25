@@ -2114,6 +2114,37 @@ function refNames(){
   const m=new Map();db.sites.forEach(x=>{const v=String((x.survey&&x.survey.partner)||'').replace(/\s+/g,' ').trim();if(v&&!m.has(v.toLocaleLowerCase('tr-TR')))m.set(v.toLocaleLowerCase('tr-TR'),v);});
   return [...m.values()].sort((a,b)=>a.localeCompare(b,'tr'));
 }
+// Benzer ad denetimi: Türkçe harf, nokta, boşluk farkı; küçük yazım hatası; baş harfle kısaltma ("A. Yılmaz"); birinin diğerini kelime kelime kapsaması ("X Gayrimenkul" / "X Gayrimenkul Ltd").
+const refFold=v=>String(v||'').toLocaleLowerCase('tr-TR').replace(/[çğıöşü]/g,c=>({'ç':'c','ğ':'g','ı':'i','ö':'o','ş':'s','ü':'u'}[c])).replace(/[^a-z0-9\u00c0-\u024f\u4e00-\u9fff]+/g,' ').trim();
+function editDist(a,b){let prev=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const cur_=[i];for(let j=1;j<=b.length;j++)cur_[j]=Math.min(prev[j]+1,cur_[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur_;}return prev[b.length];}
+function refSimilar(name,list){
+  const a=refFold(name);if(a.length<3)return '';
+  const wa=a.split(' ');
+  return list.find(n=>{
+    const b=refFold(n);if(!b)return false;
+    if(a===b||a.replace(/ /g,'')===b.replace(/ /g,''))return true;
+    const wb=b.split(' '),min=Math.min(a.length,b.length);
+    if(min>=5&&editDist(a,b)<=(min>=18?2:1)&&a.replace(/\d+/g,'')!==b.replace(/\d+/g,''))return true;
+    const [s1,s2]=wa.length<=wb.length?[wa,wb]:[wb,wa];
+    if(s1.length>=2&&s1.every((w,i)=>w===s2[i]))return true;
+    return wa.length>=2&&wa.length===wb.length&&wa[wa.length-1]===wb[wb.length-1]&&wa.slice(0,-1).every((w,i)=>w===wb[i]||((w.length===1||wb[i].length===1)&&w[0]===wb[i][0]));
+  })||'';
+}
+// Yeni yazılan referans kutudan çıkılınca denetlenir (diğer projelerdeki adlarla).
+async function refCheck(box){
+  const s=cur();if(!s||!siteEdit)return;
+  const val=box.value.replace(/\s+/g,' ').trim();if(!val)return;
+  const low=v=>v.toLocaleLowerCase('tr-TR');
+  const others=[...new Set(db.sites.filter(x=>x.id!==s.id).map(x=>String((x.survey&&x.survey.partner)||'').replace(/\s+/g,' ').trim()).filter(Boolean))];
+  const use=name=>{s.survey.partner=name;touched(s);const w=box.parentElement,sel=w.querySelector('[data-ref]');if(![...sel.options].some(o=>o.value===name)){const o=new Option(name,name);sel.insertBefore(o,sel.options[sel.options.length-1]);}sel.value=name;box.value=name;box.hidden=true;updateDerived();};
+  const same=others.find(n=>low(n)===low(val));
+  if(same){use(same);toast('Bu referans zaten kayıtlı; listedeki ad seçildi.');return;}
+  const near=refSimilar(val,others);
+  if(!near||box.dataset.okName===val)return;
+  if(await ask(`Böyle bir isim var: "${near}". "${val}" adını yine de eklemek ister misiniz? ("Vazgeç" derseniz kayıtlı isim seçilir.)`,'Yine de Ekle'))box.dataset.okName=val;
+  else use(near);
+}
+document.addEventListener('change',e=>{const el=e.target;if(el.matches&&el.matches('#view input[data-sv="partner"]')&&!el.hidden)refCheck(el);});
 function refField(){
   const v=cur().survey.partner||'',names=refNames(),key=v.replace(/\s+/g,' ').trim().toLocaleLowerCase('tr-TR'),sel=names.find(n=>n.toLocaleLowerCase('tr-TR')===key)||'';
   return `<label>Referans<select data-ref aria-label="Referans"><option value="">Seçiniz</option>${names.map(n=>`<option value="${esc(n)}" translate="no" ${n===sel?'selected':''}>${esc(n)}</option>`).join('')}<option value="__new">+ Yeni Referans Yaz</option></select><input data-sv="partner" type="text" maxlength="120" value="${esc(v)}" placeholder="Referans adı" aria-label="Yeni referans adı" hidden style="margin-top:6px"></label>`;

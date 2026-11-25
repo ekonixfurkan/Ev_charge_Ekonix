@@ -1214,6 +1214,8 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Yine de Ekle": "仍然添加",
+   "Bu referans zaten kayıtlı; listedeki ad seçildi.": "该推荐人已存在；已选择列表中的名称。",
    "+ Yeni Referans Yaz": "+ 输入新推荐人",
    "Referans adı": "推荐人姓名",
    "Yeni referans adı": "新推荐人姓名",
@@ -1283,6 +1285,7 @@ window.I18N_ZH = {
   },
   rules: function (sub) {
     var PZ = [
+      [/^Böyle bir isim var: "(.+)"\. "(.+)" adını yine de eklemek ister misiniz\? \("Vazgeç" derseniz kayıtlı isim seçilir\.\)$/, function (m) { return '已有相似名称："' + m[1] + '"。仍要添加"' + m[2] + '"吗？（选择"取消"将选中已有名称。）'; }],
       [/^(.+) sevkiyatı ve belgeleri silinsin mi\? Çöp Kutusu'na taşınır; sahip hesap 30 gün içinde geri alabilir\.$/, function (m) { return '要删除发运记录 ' + m[1] + ' 及其文件吗？将移至回收站；所有者账户可在 30 天内恢复。'; }],
       [/^(.+) silinsin mi\? Çöp Kutusu'na taşınır; sahip hesap 30 gün içinde geri alabilir\.$/, function (m) { return '要删除 ' + m[1] + ' 吗？将移至回收站；所有者账户可在 30 天内恢复。'; }],
       [/^([\d.,]+) gün$/, function (m) { return m[1] + ' 天'; }],

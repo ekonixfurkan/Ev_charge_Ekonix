@@ -427,6 +427,7 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Yine de Ekle': 'Add Anyway', 'Bu referans zaten kayıtlı; listedeki ad seçildi.': 'This referral already exists; the listed name was selected.',
     '+ Yeni Referans Yaz': '+ Enter New Referral', 'Referans adı': 'Referral name', 'Yeni referans adı': 'New referral name',
     'Referans': 'Referral',
     'Çöp Kutusu': 'Trash',
@@ -677,6 +678,7 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^Böyle bir isim var: "(.+)"\. "(.+)" adını yine de eklemek ister misiniz\? \("Vazgeç" derseniz kayıtlı isim seçilir\.\)$/, function (m) { return 'A similar name exists: "' + m[1] + '". Add "' + m[2] + '" anyway? (Choosing "Cancel" selects the existing name.)'; }],
     [/^(.+) sevkiyatı ve belgeleri silinsin mi\? Çöp Kutusu'na taşınır; sahip hesap 30 gün içinde geri alabilir\.$/, function (m) { return 'Delete shipment ' + m[1] + ' and its documents? It moves to the Trash; the owner account can restore it within 30 days.'; }],
     [/^(.+) silinsin mi\? Çöp Kutusu'na taşınır; sahip hesap 30 gün içinde geri alabilir\.$/, function (m) { return 'Delete ' + m[1] + '? It moves to the Trash; the owner account can restore it within 30 days.'; }],
     [/^([\d.,]+) gün$/, function (m) { return m[1] + ' days'; }],
