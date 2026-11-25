@@ -1819,10 +1819,23 @@ function matchesF(s){
   if(F.status&&s.status!==F.status)return false;
   if(F.city&&s.city!==F.city)return false;
   if(F.type&&s.type!==F.type)return false;
-  if(F.owner&&(s.survey.lead||'')!==F.owner)return false;
-  if(F.partner&&(s.survey.partner||'')!==F.partner)return false;
-  if(F.q){const hay=norm([s.code,s.name,s.city,s.district,s.survey.partner,s.survey.lead,nextStageOf(s),s.blockerTr,s.blocker].join(' '));if(!hay.includes(norm(F.q)))return false;}
+  if(F.owner&&fKey(s.survey.lead)!==fKey(F.owner))return false;
+  if(F.partner&&fKey(s.survey.partner)!==fKey(F.partner))return false;
+  if(F.q&&!searchHit(s,F.q))return false;
   return true;
+}
+// Süzgeçlerde aynı adın harf / boşluk farkı tek değer sayılır.
+const fKey=v=>String(v??'').replace(/\s+/g,' ').trim().toLocaleLowerCase('tr-TR');
+// Arama: projede yazılı tüm metin alanlarına bakar. Türkçe harf (ş=s, ı=i…), noktalama ve boşluk farkı önemsizdir ("fix charge" = "FixCharge").
+function searchFields(s){
+  const txt=o=>Object.values(o||{}).filter(v=>typeof v==='string');
+  return [s.code,s.name,s.group,s.city,s.district,s.address,typeLabel(s.type),stageLabel(s.stage),statusOf(s.status).t,s.contact,s.contactCompany,s.phone,s.host,s.cpoPartner,nextStageOf(s),s.blockerTr,s.blocker,s.statusTr,s.needs,s.notes,
+    ...txt(s.survey),...txt(s.fx),...(s.units||[]).map(u=>u.model),...(Array.isArray(s.oldCodes)?s.oldCodes:[])];
+}
+function searchHit(s,q){
+  const needle=refFold(q);if(!needle)return true;
+  const tight=needle.replace(/ /g,'');
+  return searchFields(s).some(v=>{const h=refFold(v);return h&&(h.includes(needle)||h.replace(/ /g,'').includes(tight));});
 }
 const SORTS={order:['Liste Sırası',byCreated],updated:['Son Güncelleme',(a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt))],name:['Ada Göre (A–Z)',(a,b)=>String(a.name).localeCompare(String(b.name),'tr')],score:['Skora Göre (Yüksek–Düşük)',(a,b)=>(scoreOf(b).v??-1)-(scoreOf(a).v??-1)],stage:['Aşamaya Göre',(a,b)=>String(b.stage).localeCompare(String(a.stage))||byCreated(a,b)],date:['Sıradaki İş Tarihi',(a,b)=>String(a.nextActionDate||'9999').localeCompare(String(b.nextActionDate||'9999'))]};
 /* ---------- Sayfalama: bir sayfada 15 proje ---------- */
@@ -1893,7 +1906,7 @@ function arrangeGroups(list){
   return out;
 }
 function grpHeadHtml(g,all){
-  const m=all.filter(x=>grpOf(x)===g),T=sumOf(m),open=!grp.closed.has(g);
+  const m=all.filter(x=>grpOf(x)===g),T=sumOf(m),open=!grp.closed.has(g)||hasFilter();
   return `<tr class="grp-head" data-grp="${esc(g)}" tabindex="0" aria-expanded="${open}" title="Grubun Şirket İçi Bilgilendirmesini aç (ok işareti: grubu aç/kapat)"><td><span class="grp-chev" role="button" aria-label="Grubu aç / kapat" title="Grubu aç / kapat">${open?'▾':'▸'}</span></td><td class="c-msg">${msgBtn('data-gmsg="'+esc(g)+'"',g)}</td><td colspan="6"><span class="grp-name">${esc(g)}</span><small>${m.length} proje</small></td>
     <td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td>
     <td><button type="button" class="ghost grp-x" data-grpadd="${esc(g)}" title="Bu gruba yeni proje ekle">Proje Ekle</button> <button type="button" class="ghost grp-x" data-grpdel="${esc(g)}" title="Grubu dağıt (projeler silinmez)">Grubu Dağıt</button></td></tr>`;
@@ -1906,7 +1919,7 @@ function locRowsHtml(rows,all=rows){
     const g=grpOf(s);
     if(g&&g!==prev)h+=grpHeadHtml(g,all);
     prev=g;
-    if(g&&grp.closed.has(g))continue;
+    if(g&&grp.closed.has(g)&&!hasFilter())continue;   // süzgeç/arama açıkken kapalı grup eşleşen projeyi gizlemez
     const t=totals(s),d=scoreOf(s),st=statusOf(s.status),on=grp.sel.has(s.id);
     h+=`<tr ${grp.on?`data-gsel="${s.id}" aria-selected="${on}"`:`data-open="${s.id}"`} tabindex="0" class="${isOpen(s)?'':'closed'}${g?' grp-row':''}${on?' sel':''}"><td class="c-code">${grp.on?`<input type="checkbox" class="grp-cb" tabindex="-1" ${on?'checked':''} aria-label="Seç"> `:''}${esc(s.code||'—')}</td><td class="c-msg">${msgBtn('data-msg="'+esc(s.id)+'"',s.name)}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc([s.city,s.district].filter(Boolean).join(' / '))||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td><td class="c-ref" translate="no" title="${esc(s.survey.partner||'')}"><span>${esc(s.survey.partner||'—')}</span></td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td><td class="num">${t.sockets}</td>
@@ -1967,7 +1980,7 @@ function agoText(v){const t=new Date(v);if(!v||isNaN(t))return '—';const a=new
 const fmtDate=v=>{if(!v)return '';const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)),d=m?new Date(+m[1],+m[2]-1,+m[3]):new Date(v);return isNaN(d)?String(v):d.toLocaleDateString(LOC);};
 function paintLocRows(){
   const list=arrangeGroups(visibleSites()),pi=pageOf(list,'loc');
-  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows,list):'<tr><td colspan="15" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
+  $('locRows').innerHTML=list.length?locRowsHtml(pi.rows,list):'<tr><td colspan="17" class="note" style="padding:24px;text-align:center">Bu filtrelere uyan proje yok.</td></tr>';
   const T=sumOf(list);$('locFoot').innerHTML=locFootHtml(T);$('locKpi').innerHTML=legendHtml()+kpiTilesHtml(T);
   $('locPager').innerHTML=pagerHtml('loc',pi);
   $('locClear').hidden=!hasFilter();{const tg=$('lfToggle');if(tg)tg.classList.toggle('on',hasFilter());}paintGrpBar();
@@ -1975,12 +1988,12 @@ function paintLocRows(){
 let lfOpen=false;  // telefonda süzgeç paneli açık mı (liste her 4 sn yenilendiği için burada tutulur)
 function renderLocations(){
   if(!db.sites.length){$('view').innerHTML=emptyHtml();return;}
-  const uniq=f=>[...new Set(db.sites.map(f).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'tr'));
+  const uniq=f=>{const m=new Map();db.sites.forEach(x=>{const v=String(f(x)??'').replace(/\s+/g,' ').trim();if(v&&!m.has(fKey(v)))m.set(fKey(v),v);});return [...m.values()].sort((a,b)=>a.localeCompare(b,'tr'));};
   const opt=(v,cur,t)=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(t??v)}</option>`;
-  const selF=(id,label,key,items)=>`<label class="lf">${label}<select data-lf="${key}" id="${id}"><option value="">Tümü</option>${items.map(([v,t])=>opt(v,F[key],t)).join('')}</select></label>`;
+  const selF=(id,label,key,items)=>`<label class="lf">${label}<select data-lf="${key}" id="${id}"><option value="">Tümü</option>${items.map(([v,t])=>opt(v,F[key]&&(key==='owner'||key==='partner')&&fKey(v)===fKey(F[key])?v:F[key],t)).join('')}</select></label>`;
   $('view').innerHTML=`<section class="box">
     <div class="locbar no-print${lfOpen?' lf-open':''}">
-      <label class="lf lq">Ara<input type="search" id="locQ" data-lf="q" value="${esc(F.q)}" placeholder="Ad, şehir, mal sahibi, referans, sıradaki iş…" autocomplete="off"></label>
+      <label class="lf lq">Ara<input type="search" id="locQ" data-lf="q" value="${esc(F.q)}" placeholder="Ad, kod, şehir, şirket, kişi, referans…" autocomplete="off"></label>
       <button type="button" id="lfToggle" class="lf-toggle${hasFilter()?' on':''}" aria-expanded="${lfOpen}">Filtreler</button>
       ${selF('lfStage','Aşama','stage',STAGES.map(([k,t])=>[k,k+' '+t]))}
       ${selF('lfStatus','Durum','status',STATUSES.map(x=>[x.k,x.t]))}
@@ -2002,6 +2015,8 @@ function dockBar(){
   const b=v.querySelector('.locbar');
   if(b)t.replaceChildren(b);
 }
+// Bir sayfa kendini yeniden çizdiğinde (Filtreleri Temizle, veri yenilemesi…) yeni çubuk #view içinde oluşur; üst başlıkta eskisi kalmasın diye hemen taşınır.
+new MutationObserver(()=>{const v=$('view');if(v&&v.querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
 new MutationObserver(()=>{if($('view').querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
 // Kısıtlı Kullanıcı: menüdeki "Kayıtlar" grubu gizlenir; sunucu da bu uçlara 403 verir.
 const REC_VIEWS=['contacts','meetings','leads'],REC_NAV=REC_VIEWS;
@@ -2536,11 +2551,12 @@ $('view').addEventListener('click',e=>{
   if(e.target.id==='delSite'){ask(s.name+' silinsin mi? Çöp Kutusu\'na taşınır; sahip hesap 30 gün içinde geri alabilir.','Projeyi sil').then(ok=>{if(!ok)return;
     exitEdit();removeSite(s);activeId=null;view='portfolio';render();toast('Proje silindi.');});return;}
 });
-$('view').addEventListener('input',e=>{const el=e.target;if(view!=='locations'||!el.dataset.lf)return;F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();});
-$('view').addEventListener('change',e=>{const el=e.target;if(view!=='locations')return;
+// Dikkat: süzgeç çubuğu (.locbar) dockBar() ile üst başlığa (#hdrTools, #view'ın dışında) taşınır; bu yüzden olaylar document'ta dinlenir.
+document.addEventListener('input',e=>{const el=e.target;if(view!=='locations'||!el.dataset||!el.dataset.lf)return;F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();});
+document.addEventListener('change',e=>{const el=e.target;if(view!=='locations'||!el.dataset)return;
   if(el.dataset.lf){F[el.dataset.lf]=el.type==='checkbox'?el.checked:el.value;paintLocRows();}
   else if(el.id==='lfSort'){sortKey=el.value;paintLocRows();}});
-$('view').addEventListener('click',e=>{if(e.target.id==='locClear'){F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:''};renderLocations();}});
+document.addEventListener('click',e=>{if(view==='locations'&&e.target.closest&&e.target.closest('#locClear')){F={q:'',act:'',stage:'',status:'',city:'',type:'',owner:'',partner:''};renderLocations();}});
 $('view').addEventListener('keydown',e=>{if(e.target.closest('[data-msg],[data-gmsg]'))return;const row=e.target.closest('[data-open]');if(row&&(e.key==='Enter'||e.key===' ')){e.preventDefault();openSite(row.dataset.open);}});
 $('view').addEventListener('input',e=>{
   const s=cur();if(!s||view!=='site')return;const el=e.target;

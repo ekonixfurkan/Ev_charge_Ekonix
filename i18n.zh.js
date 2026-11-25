@@ -1214,6 +1214,7 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Ad, kod, şehir, şirket, kişi, referans…": "名称、编号、城市、公司、联系人、推荐人…",
    "Yine de Ekle": "仍然添加",
    "Bu referans zaten kayıtlı; listedeki ad seçildi.": "该推荐人已存在；已选择列表中的名称。",
    "+ Yeni Referans Yaz": "+ 输入新推荐人",

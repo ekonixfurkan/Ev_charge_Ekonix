@@ -427,6 +427,7 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Ad, kod, şehir, şirket, kişi, referans…': 'Name, code, city, company, contact, referral…',
     'Yine de Ekle': 'Add Anyway', 'Bu referans zaten kayıtlı; listedeki ad seçildi.': 'This referral already exists; the listed name was selected.',
     '+ Yeni Referans Yaz': '+ Enter New Referral', 'Referans adı': 'Referral name', 'Yeni referans adı': 'New referral name',
     'Referans': 'Referral',
