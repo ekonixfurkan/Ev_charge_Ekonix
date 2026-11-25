@@ -21,7 +21,7 @@ Bu depoda değişiklik yaparken (insan ya da yapay zekâ) şunlara uy.
 - Hesaplar Neon `users` tablosunda; şifreler yalnızca hash. Şifreyi düz metin saklama/gösterme.
 - Sahip hesabı (`furkan.kece@ekonix.com.tr`) korumalıdır; kodda kaldırma/zayıflatma.
 - Proje dosyaları Vercel Blob'da (private mağaza `ekonix-files`, `BLOB_READ_WRITE_TOKEN`); yükleme tarayıcıdan doğrudan Blob'a gider (`/api/files` jeton verir ve kaydı yazar; Hobby planda en fazla 12 Vercel işlevi olduğu için ayrı dosya açma). `vendor/vercel-blob-client.js`, `@vercel/blob/client`ın esbuild ile paketlenmiş halidir (CDN kullanılmaz).
-- Çöp Kutusu (`lib/trash.js`, Yönetim > Çöp Kutusu, yalnızca sahip): proje, proje dosyası, şirket içi not, sevkiyat ve sevkiyat belgesi silinirken önce `trashPut` ile kopyalanır, Blob dosyası hemen silinmez (30 gün). Bu kayıtlara yeni bir silme yolu eklenirse o da `trashPut`'tan geçer; bu tablolara bağlı yeni yan tablo eklenirse silme ve geri alma listesine yazılır.
+- Çöp Kutusu (`lib/trash.js`, Yönetim > Çöp Kutusu, yalnızca sahip): proje, proje dosyası, şirket içi not, sevkiyat, sevkiyat belgesi ve aday müşteri silinirken önce `trashPut` ile kopyalanır, Blob dosyası hemen silinmez (30 gün). Bu kayıtlara yeni bir silme yolu eklenirse o da `trashPut`'tan geçer; bu tablolara bağlı yeni yan tablo eklenirse silme ve geri alma listesine yazılır.
 - Her değişiklik `main`'e commit + push edilir, Vercel otomatik yayınlar.
 
 ## Hub (kutucuklu bölüm seçimi)

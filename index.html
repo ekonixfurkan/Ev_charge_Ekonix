@@ -351,6 +351,16 @@ aside .sb-user .lang-sw button{font-size:12.5px}
 #ctDlgRows tr{cursor:pointer}#ctDlgRows tr:hover td{background:var(--navy-soft)}
 .pick-btn{font-size:11px;padding:5px 10px}
 .pick-grp{display:inline-flex;gap:6px}
+dialog.pr-dlg{width:min(780px,94vw);max-width:94vw}.pr-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px}.pr-grid .pr-wide{grid-column:span 2}.pr-grid textarea{min-height:0;height:62px}
+@media (max-width:760px){.pr-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pr-grid .pr-wide{grid-column:1/-1}}@media (max-width:520px){.pr-grid{grid-template-columns:1fr}}
+.fl-tbl.pr-tbl{table-layout:fixed;width:100%;min-width:1080px}.fl-tbl.pr-tbl th,.fl-tbl.pr-tbl td{text-align:left;vertical-align:middle;white-space:normal;overflow-wrap:anywhere}.fl-tbl.pr-tbl th{white-space:nowrap}
+.fl-tbl.pr-tbl th:nth-child(1){width:22%}.fl-tbl.pr-tbl th:nth-child(2){width:15%}.fl-tbl.pr-tbl th:nth-child(3){width:11%}.fl-tbl.pr-tbl th:nth-child(4){width:13%}.fl-tbl.pr-tbl th:nth-child(5){width:10%}.fl-tbl.pr-tbl th:nth-child(6){width:12%}.fl-tbl.pr-tbl th:nth-child(7){width:8%}.fl-tbl.pr-tbl th:nth-child(8){width:164px}
+.fl-tbl.pr-tbl td:nth-child(7),.fl-tbl.pr-tbl td.pr-act{white-space:nowrap}
+.fl-tbl.pr-tbl th:last-child,.fl-tbl.pr-tbl td.pr-act{text-align:right}
+.fl-tbl.pr-tbl td .sub{display:block;font-size:11px;color:var(--muted)}.fl-tbl.pr-tbl .pr-note{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pr-tbl select.pr-st{width:100%;min-width:0;font-size:11.5px;font-weight:700;padding:4px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c) 60%,transparent);background:color-mix(in srgb,var(--c) 12%,var(--card));color:var(--ink)}
+.pr-tbl .pr-act .ic{display:inline-grid;place-items:center;width:30px;height:30px;margin-left:6px;padding:0;border:1px solid transparent;border-radius:50%;background:color-mix(in srgb,currentColor 11%,transparent);box-shadow:none;cursor:pointer;vertical-align:middle}
+.pr-tbl .pr-act .ic:hover{border-color:currentColor}.pr-tbl .pr-act .ic-edit{color:var(--risk)}.pr-tbl .pr-act .ic-view{color:var(--navy)}.pr-tbl .pr-act .ic-dl{color:var(--ok)}.pr-tbl .pr-act .ic-del{color:var(--no)}
 .fl-tbl.trash-tbl{table-layout:fixed;width:100%}.fl-tbl.trash-tbl th,.fl-tbl.trash-tbl td{text-align:left;vertical-align:middle}.fl-tbl.trash-tbl .num{text-align:right}
 .fl-tbl.trash-tbl td{white-space:normal;overflow-wrap:anywhere}.fl-tbl.trash-tbl td .sub{display:block;font-size:11px;color:var(--muted)}
 .fl-tbl.trash-tbl th:nth-child(1){width:14%}.fl-tbl.trash-tbl th:nth-child(2){width:36%}.fl-tbl.trash-tbl th:nth-child(3),.fl-tbl.trash-tbl th:nth-child(4){width:15%}.fl-tbl.trash-tbl th:nth-child(5),.fl-tbl.trash-tbl th:nth-child(6){width:10%}
@@ -1336,6 +1346,18 @@ html.ro #saveStatus::after{content:' · Salt okunur';font-weight:600}
 </div>
 <div id="toast" role="status" hidden></div>
 <dialog id="actDlg"><div id="actBody"></div><div class="row"><button type="button" id="actClose" class="primary">Kapat</button></div></dialog>
+<dialog id="prDlg" class="pr-dlg"><h3 style="margin:0 0 10px" id="prdTitle">Yeni Aday</h3>
+  <p class="note" style="margin:0 0 10px">Yalnızca firma ya da kişi adı zorunlu.</p>
+  <div class="pr-grid">
+  <label>Firma<input id="prCompany" maxlength="160" autocomplete="off"></label><label>Kişi<input id="prPerson" maxlength="120" autocomplete="off"></label>
+  <label>Unvan<input id="prTitle" maxlength="100" autocomplete="off"></label><label>Telefon<input id="prPhone" type="tel" inputmode="tel" maxlength="22" placeholder="+90 (5__) ___ __ __" autocomplete="off"></label>
+  <label>E-posta<input id="prEmail" type="email" maxlength="254" autocomplete="off"></label><label>Sektör<input id="prSector" maxlength="80" list="prSectors" autocomplete="off"></label>
+  <label>İl<select id="prIl"></select></label><label>İlçe<select id="prIlce"></select></label>
+  <label>Kaynak<input id="prSource" maxlength="120" list="prSources" autocomplete="off" placeholder="Nereden duyduk?"></label><label>Sorumlu<select id="prOwner"></select></label>
+  <label>Durum<select id="prStatus"></select></label><label class="pr-wide">Not<textarea id="prNote" rows="3" maxlength="2000"></textarea></label>
+  </div><datalist id="prSources"></datalist><datalist id="prSectors"></datalist>
+  <p class="alert" id="prErr" role="alert" hidden></p>
+  <div class="row"><button type="button" id="prCancel">Vazgeç</button><button type="button" class="primary" id="prSave">Kaydet</button></div></dialog>
 <dialog id="cnDlg"><h3 style="margin:0 0 6px">Yeni Kişi</h3><p class="dsub" style="margin:0 0 10px">Kişi Müşteri Bilgileri'ne kaydedilir ve projeye işlenir.</p>
   <label>Şirket<input id="cnCompany" maxlength="120" autocomplete="off"></label>
   <label>Ad *<input id="cnFirst" maxlength="80" autocomplete="off"></label>
@@ -1653,8 +1675,8 @@ async function api(path,opts){
 }
 /* ---------- Sayfa adresi: yenileyince aynı sayfada kalmak için #/… ---------- */
 let routeOn=false;
-const ROUTE_VIEWS=['trash','locations','users','activity','contacts','notifs','planner','daily','roi','ships'];
-const ROUTE_NAMES={trash:'trash',locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip',leads:'leads',daily:'daily',roi:'roi',ships:'ships'};
+const ROUTE_VIEWS=['prospects','trash','locations','users','activity','contacts','notifs','planner','daily','roi','ships'];
+const ROUTE_NAMES={prospects:'prospects',trash:'trash',locations:'list',users:'users',activity:'activity',contacts:'contacts',notifs:'notifs',planner:'planner',meetings:'meetings',rakip:'rakip',leads:'leads',daily:'daily',roi:'roi',ships:'ships'};
 function routeHash(){
   if(view==='portfolio')return '#/'+sub;
   if(view==='site')return '#/site/'+encodeURIComponent(activeId||'')+'/'+sub;
@@ -1877,7 +1899,7 @@ function legendHtml(){
   return mk('Nitelikli Müşteri',total)+`<div class="mk split">${half('active','Aktif',active)}${half('passive','Pasif',passive)}</div>`;
 }
 // Üst başlık: proje sayfasında proje adı (altında il/ilçe), diğer sayfalarda uygulama adı.
-const PAGE_TITLES={trash:'Çöp Kutusu',ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Daily Toplantı Notları',roi:'ROI Hesaplayıcı',ships:'Sevkiyatlar'};
+const PAGE_TITLES={prospects:'Aday Müşteriler',trash:'Çöp Kutusu',ovw:'Ana Sayfa',port:'Portföy Özeti',locations:'Proje Listesi',users:'Kullanıcı Yönetimi',activity:'İşlem Geçmişi',contacts:'Müşteri Bilgileri',notifs:'Bildirimler',planner:'Proje Görev Listesi',meetings:'Toplantı Notları',rakip:'Rakip Analizi',leads:'Lead Havuzu',daily:'Daily Toplantı Notları',roi:'ROI Hesaplayıcı',ships:'Sevkiyatlar'};
 // Üst başlık: proje sayfasında proje adı (altında kod ve il/ilçe), diğer sayfalarda seçilen menü başlığı.
 function setPageTitle(){
   const x=view==='site'?cur():null,sub2=x?[x.code,[x.district,x.city].filter(Boolean).join(', ')].filter(Boolean).join(' · '):'';
@@ -2020,7 +2042,7 @@ function dockBar(){
 new MutationObserver(()=>{const v=$('view');if(v&&v.querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
 new MutationObserver(()=>{if($('view').querySelector('.locbar'))dockBar();}).observe($('view'),{childList:true,subtree:true});
 // Kısıtlı Kullanıcı: menüdeki "Kayıtlar" grubu gizlenir; sunucu da bu uçlara 403 verir.
-const REC_VIEWS=['contacts','meetings','leads'],REC_NAV=REC_VIEWS;
+const REC_VIEWS=['contacts','meetings','leads','prospects'],REC_NAV=REC_VIEWS;
 const RESTRICT_RECORDS=true; // Kısıtlı Kullanıcı Kayıtlar grubunu göremez; kapatmak için false
 
 const isRestricted=()=>RESTRICT_RECORDS&&!!(me&&me.role==='restricted');
@@ -2043,12 +2065,12 @@ function render(){
   {const t=$('hdrTools');if(t)t.replaceChildren();}
   if(view==='portfolio'&&!PORT_SUBS.includes(sub))sub='ovw';
   if(view==='site'&&!SITE_SUBS.includes(sub))sub='info';
-  $('view').dataset.sub=(view==='trash'||view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='hub'||view==='ships'||view==='ship')?'':sub;
+  $('view').dataset.sub=(view==='prospects'||view==='trash'||view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='hub'||view==='ships'||view==='ship')?'':sub;
   document.body.dataset.page=view==='portfolio'?sub:view;
   $('view').dataset.fsub=fsub;$('view').dataset.psub=psub;
   renderPipe();paintNav();
-  document.querySelector('.pipeline').hidden=view==='trash'||view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='hub'||view==='ships'||view==='ship'||view==='site'||(view==='portfolio'&&sub==='ovw');
-  if(view==='users')renderUsers();else if(view==='trash')renderTrash();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();else if(view==='roi')renderRoi();else if(view==='hub')renderHub();else if(view==='ships')renderShips();else if(view==='ship')renderShip();
+  document.querySelector('.pipeline').hidden=view==='prospects'||view==='trash'||view==='locations'||view==='users'||view==='activity'||view==='contacts'||view==='notifs'||view==='planner'||view==='meetings'||view==='rakip'||view==='leads'||view==='daily'||view==='roi'||view==='hub'||view==='ships'||view==='ship'||view==='site'||(view==='portfolio'&&sub==='ovw');
+  if(view==='users')renderUsers();else if(view==='trash')renderTrash();else if(view==='prospects')renderProspects();else if(view==='activity')renderActivity();else if(view==='contacts')renderContacts();else if(view==='notifs')renderNotifs();else if(view==='planner')renderPlanner();else if(view==='meetings')renderMeetings();else if(view==='rakip')renderRakip();else if(view==='leads')renderLeads();else if(view==='daily')renderDaily();else if(view==='roi')renderRoi();else if(view==='hub')renderHub();else if(view==='ships')renderShips();else if(view==='ship')renderShip();
   else if(view==='locations')renderLocations();else if(view==='site'&&db.sites.find(s=>s.id===activeId))renderSite();else{view='portfolio';renderPortfolio();}
   dockBar();setPageTitle();
   {const b=$('dyBack');if(b){const t=backTarget();b.hidden=!t;if(t)b.querySelector('span').textContent=I18N.t(t.label);}}
@@ -2805,7 +2827,7 @@ document.addEventListener('click',async e=>{
 /* ---------- İşlem geçmişi (yalnızca yönetici) ---------- */
 let actOwn=false,actF={q:'',actor:'',entity:'',site:''},actRows=[],actMore=false,actActors=[];
 const ACT_LABEL={'geri-al':['Geri Alındı','hi'],olustur:['Oluşturuldu','hi'],guncelle:['Güncellendi','stg'],sil:['Silindi','lo'],giris:['Giriş','none'],cikis:['Çıkış','none'],'giris-basarisiz':['Başarısız Giriş','lo'],'not-ekle':['Not Eklendi','stg'],'not-sil':['Not Silindi','lo'],goruntule:['Görüntülendi','none'],'dosya-ekle':['Dosya Eklendi','stg'],'dosya-sil':['Dosya Silindi','lo'],'gorev-ekle':['Görev Eklendi','stg'],'gorev-tamam':['Görev Tamamlandı','hi'],'gorev-ata':['Görev Atandı','stg'],'gorev-sil':['Görev Silindi','lo'],'toplanti-ekle':['Toplantı Notu Eklendi','stg'],'toplanti-sil':['Toplantı Notu Silindi','lo']};
-const ENT_LABEL={lokasyon:'Proje',sevkiyat:'Sevkiyat',toplanti:'Toplantı',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
+const ENT_LABEL={aday:'Aday Müşteri',lokasyon:'Proje',sevkiyat:'Sevkiyat',toplanti:'Toplantı',kisi:'Kişi',kullanici:'Kullanıcı',oturum:'Oturum'};
 // Proje filtresi: proje kodu · ad (kod sırasıyla)
 const siteOptions=sel=>[...db.sites].sort((a,b)=>String(a.code||'~').localeCompare(String(b.code||'~'),'tr',{numeric:true})).map(x=>`<option value="${esc(x.id)}" ${x.id===sel?'selected':''}>${esc((x.code||'—')+' · '+(x.name||'Adsız Proje'))}</option>`).join('');
 const fmtTs=v=>{const d=new Date(v);return isNaN(d)?'':d.toLocaleString(LOC,{dateStyle:'short',timeStyle:'short'});};
@@ -2833,8 +2855,134 @@ function paintActivity(){
   $('actMore').hidden=!actMore;
   $('actClear').hidden=!(actF.q||actF.actor||actF.entity||actF.site);
 }
+/* ---------- Aday Müşteriler: henüz temas edilmemiş, tek tek seçilen firma ve kişiler (Lead Havuzu'ndan ayrı) ---------- */
+const PR_ST=[['Temas Edilmedi','var(--s-aday)'],['Temas Edildi','var(--s-inceleme)'],['Görüşülüyor','var(--s-onay)'],['İlgilenmiyor','var(--s-red)']];
+const pr={rows:[],loaded:false,busy:false,err:'',owner:false,edit:'',f:{q:'',status:'',owner:''}};
+async function prApi(method,qs,body){
+  const r=await fetch('/api/contacts?prospects='+(qs||'1'),{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  if(r.status===401){location.replace('/login.html');throw new Error('401');}
+  const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.error||('HTTP '+r.status));e.status=r.status;e.data=d;throw e;}return d;
+}
+async function loadProspects(){
+  if(pr.busy)return;pr.busy=true;
+  try{const d=await prApi('GET');pr.rows=d.prospects||[];pr.owner=!!d.owner;pr.err='';}catch(e){pr.err=e.message;}
+  pr.busy=false;pr.loaded=true;if(view==='prospects')paintProspects();else if(view==='hub')renderHubStats();
+}
+const prName=x=>[x.company,x.person].filter(Boolean).join(' · ');
+const prOwners=()=>[...new Set([...pr.rows.map(x=>x.owner),...people.map(p=>p.name||p.email)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'tr'));
+function prVisible(){
+  const f=pr.f,q=refFold(f.q),t=q.replace(/ /g,'');
+  return pr.rows.filter(x=>(!f.status||x.status===f.status)&&(!f.owner||fKey(x.owner)===fKey(f.owner))&&(!q||[x.company,x.person,x.title,x.phone,x.email,x.il,x.ilce,x.sector,x.source,x.owner,x.note].some(v=>{const h=refFold(v);return h&&(h.includes(q)||h.replace(/ /g,'').includes(t));})));
+}
+function renderProspects(){
+  if(isRestricted()){view='portfolio';sub='ovw';render();return;}
+  setPageTitle();if(!people.length)loadPeople();
+  const o=(v,c,t)=>`<option value="${esc(v)}" ${v===c?'selected':''}>${esc(t??v)}</option>`;
+  $('view').innerHTML=`<section class="box">
+    <div class="locbar no-print"><label class="lf lq">Ara<input type="search" id="prQ" data-prf="q" value="${esc(pr.f.q)}" placeholder="Firma, kişi, telefon, sektör…" autocomplete="off"></label>
+      <label class="lf">Durum<select id="prFStatus" data-prf="status"><option value="">Tümü</option>${PR_ST.map(([k])=>o(k,pr.f.status)).join('')}</select></label>
+      <label class="lf">Sorumlu<select id="prFOwner" data-prf="owner"><option value="">Tümü</option>${prOwners().map(v=>o(v,pr.f.owner)).join('')}</select></label>
+      <button type="button" id="prClear" class="ghost" hidden>Filtreleri Temizle</button>
+      ${isRO()?'':'<button type="button" id="prNew" class="primary">+ Yeni Aday</button>'}</div>
+    <h3>Aday Müşteriler<small id="prCount"></small></h3><div id="prBody"></div></section>`;
+  paintProspects();loadProspects();
+}
+function paintProspects(){
+  const b=$('prBody');if(!b)return;
+  const list=prVisible(),ro=isRO();
+  const c=$('prCount');if(c)c.textContent=pr.loaded&&pr.rows.length?(list.length===pr.rows.length?nf.format(pr.rows.length)+' aday':nf.format(list.length)+' / '+nf.format(pr.rows.length)+' aday'):'';
+  const cl=$('prClear');if(cl)cl.hidden=!(pr.f.q||pr.f.status||pr.f.owner);
+  if(!pr.loaded){b.innerHTML='<p class="note">Yükleniyor…</p>';return;}
+  if(pr.err){b.innerHTML=`<p class="alert">${esc(pr.err)}</p>`;return;}
+  if(!list.length){b.innerHTML=`<p class="note" style="padding:18px 0">${pr.rows.length?'Bu filtrelere uyan aday yok.':'Henüz aday müşteri yok. "+ Yeni Aday" ile ekleyin.'}</p>`;return;}
+  const two=(a,c2)=>`<b translate="no">${esc(a||'—')}</b>${c2?`<span class="sub" translate="no">${esc(c2)}</span>`:''}`;
+  b.innerHTML=`<div class="scroll"><table class="yearly fl-tbl pr-tbl m-cards"><thead><tr><th>Firma / Kişi</th><th>İletişim</th><th>İl / İlçe</th><th>Sektör / Kaynak</th><th>Sorumlu</th><th>Durum</th><th>Eklenme</th><th>İşlemler</th></tr></thead><tbody>${list.map(x=>`<tr data-prid="${esc(x.id)}">
+    <td>${two(x.company||x.person,x.company?[x.person,x.title].filter(Boolean).join(' · '):x.title)}${x.note?`<span class="sub pr-note" translate="no" title="${esc(x.note)}">${esc(x.note)}</span>`:''}</td>
+    <td>${two(x.phone,x.email)}</td><td translate="no">${esc([x.il,x.ilce].filter(Boolean).join(' / ')||'—')}</td><td>${two(x.sector,x.source)}</td><td translate="no">${esc(x.owner||'—')}</td>
+    <td><select data-prstatus aria-label="Durum" class="pr-st" style="--c:${(PR_ST.find(v=>v[0]===x.status)||PR_ST[0])[1]}" ${ro?'disabled':''}>${PR_ST.map(([k])=>`<option ${k===x.status?'selected':''}>${k}</option>`).join('')}</select></td>
+    <td>${esc(fmtDate(x.createdAt))}</td>
+    <td class="pr-act">${ro?'':`<button type="button" class="ic ic-edit" data-predit title="Düzenle" aria-label="Düzenle">${SH_I.edit}</button><button type="button" class="ic ic-view" data-prcontact title="${x.contactId?'Müşteri Bilgileri\'ne aktarıldı':'Müşteri Bilgileri\'ne aktar'}" aria-label="Müşteri Bilgileri'ne aktar">${x.contactId?SH_IC('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/>'):SH_IC('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>')}</button><button type="button" class="ic ic-dl" data-prproject title="Proje aç" aria-label="Proje aç">${SH_IC('<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M12 10v6M9 13h6"/>')}</button>${pr.owner?`<button type="button" class="ic ic-del" data-prdel title="Sil" aria-label="Sil">${SH_I.del}</button>`:''}`}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function prOpen(x){
+  pr.edit=x?x.id:'';x=x||{status:PR_ST[0][0],owner:''};
+  $('prdTitle').textContent=pr.edit?'Adayı Düzenle':'Yeni Aday';
+  for(const [id,k] of [['prCompany','company'],['prPerson','person'],['prTitle','title'],['prPhone','phone'],['prEmail','email'],['prSector','sector'],['prSource','source'],['prNote','note']])$(id).value=x[k]||'';
+  $('prPhone')._dg=undefined;
+  $('prIl').innerHTML=ilOptions(x.il||'');$('prIlce').innerHTML=ilceOptions(x.il||'',x.ilce||'');$('prIlce').disabled=!x.il;
+  const uniq=a=>[...new Set(a.filter(Boolean))].sort((m,n)=>m.localeCompare(n,'tr'));
+  $('prSources').innerHTML=uniq([...pr.rows.map(v=>v.source),...refNames()]).map(v=>`<option value="${esc(v)}">`).join('');
+  $('prSectors').innerHTML=uniq(pr.rows.map(v=>v.sector)).map(v=>`<option value="${esc(v)}">`).join('');
+  $('prOwner').innerHTML='<option value="">Seçiniz</option>'+[...new Set([x.owner,...prOwners()].filter(Boolean))].map(v=>`<option value="${esc(v)}" ${v===x.owner?'selected':''}>${esc(v)}</option>`).join('');
+  $('prStatus').innerHTML=PR_ST.map(([k])=>`<option ${k===x.status?'selected':''}>${k}</option>`).join('');
+  $('prErr').hidden=true;$('prSave').disabled=false;$('prDlg').showModal();$('prCompany').focus();
+}
+async function prSave(){
+  const v=i=>$(i).value.trim(),bad=m=>{$('prErr').textContent=m;$('prErr').hidden=false;$('prSave').disabled=false;};
+  const body={company:v('prCompany'),person:v('prPerson'),title:v('prTitle'),phone:v('prPhone'),email:v('prEmail'),il:v('prIl'),ilce:v('prIlce'),sector:v('prSector'),source:v('prSource'),owner:v('prOwner'),status:v('prStatus'),note:v('prNote')};
+  if(!body.company&&!body.person)return bad('Firma ya da kişi adı girin.');
+  $('prSave').disabled=true;
+  try{
+    if(pr.edit){await prApi('PATCH',pr.edit,body);}
+    else{
+      try{await prApi('POST','new',body);}
+      catch(e){
+        if(e.status!==409||!e.data.dups)throw e;
+        $('prDlg').close();
+        const why={telefon:'aynı telefon',firma:'aynı firma adı','kişi':'aynı ad'};
+        const ok=await ask('Benzer bir kayıt var: '+e.data.dups.map(d=>d.where+': '+d.name+' ('+(why[d.why]||d.why)+')').join('; ')+'. Yine de eklemek ister misiniz?','Yine de Ekle');
+        if(!ok){$('prDlg').showModal();$('prSave').disabled=false;return;}
+        await prApi('POST','new',{...body,force:true});
+      }
+    }
+    if($('prDlg').open)$('prDlg').close();toast(pr.edit?'Aday güncellendi.':'Aday eklendi.');await loadProspects();
+  }catch(e){if(!$('prDlg').open)$('prDlg').showModal();bad(e.message);}
+}
+// Müşteri Bilgileri'ne aktarır (zaten kayıtlıysa ona bağlanır) ve kişi kaydını döndürür.
+async function prToContact(x){
+  const d=await prApi('POST',x.id+'&to=contact');ct.loaded=false;
+  const i=pr.rows.findIndex(v=>v.id===x.id);if(i>=0)pr.rows[i]=d.prospect;paintProspects();
+  return d;
+}
+// Adaydan proje: kişi önce Müşteri Bilgileri'ne aktarılır (projede iletişim kişisi yalnızca oradan gelir), Yeni Proje penceresi dolu açılır.
+async function prToProject(x){
+  if(!x.phone){toast('Proje açmak için adayın telefonu gerekli.');prOpen(x);return;}
+  if(!await ask(prName(x)+' için yeni proje açılsın mı? Kişi Müşteri Bilgileri\'ne aktarılır, proje penceresi bilgilerle açılır.','Proje Aç'))return;
+  const d=await prToContact(x),c=d.contact;
+  openAdd();
+  $('dlgName').value=x.company||x.person;$('dlgContact').value=ctName(c)||c.company;const p=$('dlgPhone');p.value=fmtPhone(c.phone||x.phone,null,false);p._dg=p.value.replace(/\D/g,'').replace(/^90/,'').length;
+  $('dlgCompany').value=c.company||x.company;
+  if(x.il){$('dlgCity').value=x.il;$('dlgDistrict').innerHTML=ilceOptions(x.il,x.ilce);$('dlgDistrict').disabled=false;}
+}
+document.addEventListener('input',e=>{
+  const el=e.target;
+  if(el.id==='prPhone'){el.value=fmtPhone(el.value,(el._dg??null),/^delete/.test(e.inputType||''));el._dg=el.value.replace(/\D/g,'').replace(/^90/,'').length;return;}
+  if(view==='prospects'&&el.dataset&&el.dataset.prf){pr.f[el.dataset.prf]=el.value;paintProspects();}
+});
+document.addEventListener('change',async e=>{
+  const el=e.target;
+  if(el.id==='prIl'){$('prIlce').innerHTML=ilceOptions(el.value,'');$('prIlce').disabled=!el.value;return;}
+  if(view!=='prospects')return;
+  if(el.dataset&&el.dataset.prf){pr.f[el.dataset.prf]=el.value;paintProspects();return;}
+  if(el.matches&&el.matches('[data-prstatus]')){const id=el.closest('[data-prid]').dataset.prid;
+    try{const d=await prApi('PATCH',id,{status:el.value});const i=pr.rows.findIndex(v=>v.id===id);if(i>=0)pr.rows[i]=d.prospect;paintProspects();}catch(x){toast(x.message);loadProspects();}}
+});
+document.addEventListener('click',async e=>{
+  const t=e.target;if(!t.closest)return;
+  if(t.closest('#prCancel')){$('prDlg').close();return;}
+  if(t.closest('#prSave')){prSave();return;}
+  if(view!=='prospects')return;
+  if(t.closest('#prNew')){prOpen(null);return;}
+  if(t.closest('#prClear')){pr.f={q:'',status:'',owner:''};renderProspects();return;}
+  const tr=t.closest('[data-prid]');if(!tr)return;const x=pr.rows.find(v=>v.id===tr.dataset.prid);if(!x)return;
+  try{
+    if(t.closest('[data-predit]'))prOpen(x);
+    else if(t.closest('[data-prcontact]')){const d=await prToContact(x);toast(d.created?'Kişi Müşteri Bilgileri\'ne eklendi.':'Bu kişi Müşteri Bilgileri\'nde zaten kayıtlı; bağlandı.');}
+    else if(t.closest('[data-prproject]'))await prToProject(x);
+    else if(t.closest('[data-prdel]')){if(!await ask(prName(x)+' silinsin mi? Çöp Kutusu\'na taşınır; sahip hesap 30 gün içinde geri alabilir.','Adayı Sil'))return;await prApi('DELETE',x.id);toast('Aday silindi.');await loadProspects();}
+  }catch(err){toast(err.message);}
+});
 /* ---------- Çöp Kutusu (yalnızca sahip hesap): silinen proje, dosya, not ve sevkiyatlar 30 gün bekler ---------- */
-const TR_KIND={site:'Proje',sitefile:'Proje Dosyası',note:'Şirket İçi Not',ship:'Sevkiyat',shipfile:'Sevkiyat Belgesi'};
+const TR_KIND={prospect:'Aday Müşteri',site:'Proje',sitefile:'Proje Dosyası',note:'Şirket İçi Not',ship:'Sevkiyat',shipfile:'Sevkiyat Belgesi'};
 const trs={items:[],loaded:false,busy:false,err:'',days:30};
 async function trashApi(method,body){
   const r=await fetch('/api/activity?trash=1',{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
@@ -2853,7 +3001,7 @@ function renderTrash(){
 function paintTrash(){
   const body=!trs.loaded?'<p class="note">Yükleniyor…</p>':trs.err?`<p class="alert">${esc(trs.err)}</p>`:!trs.items.length?'<p class="note" style="padding:18px 0">Çöp kutusu boş.</p>'
     :`<div class="scroll"><table class="yearly fl-tbl trash-tbl m-cards"><colgroup><col style="width:14%"><col style="width:36%"><col style="width:15%"><col style="width:15%"><col style="width:10%"><col style="width:10%"></colgroup><thead><tr><th>Tür</th><th>Silinen Kayıt</th><th>Silen</th><th>Silinme Tarihi</th><th class="num">Kalan Süre</th><th>İşlem</th></tr></thead><tbody>${trs.items.map(x=>`<tr><td><span class="badge stg">${esc(TR_KIND[x.kind]||x.kind)}</span></td><td><b translate="no">${esc(x.title)}</b>${x.context?`<span class="sub">${esc(x.context)}</span>`:''}</td><td translate="no">${esc(x.deletedBy||'—')}</td><td>${esc(fmtTs(x.deletedAt))}</td><td class="num">${nf.format(x.daysLeft)} gün</td><td><button type="button" class="primary" data-trres="${esc(x.id)}">Geri Al</button></td></tr>`).join('')}</tbody></table></div>`;
-  $('view').innerHTML=`<section class="box"><h3>Çöp Kutusu<small>${trs.items.length?nf.format(trs.items.length)+' kayıt':''}</small></h3><p class="note" style="margin:0 0 12px">Silinen proje, proje dosyası, şirket içi not, sevkiyat ve sevkiyat belgesi 30 gün burada bekler, sonra kalıcı olarak silinir. Görev, kişi, toplantı notu, lead ve kayıtlı saha kartı silmeleri buraya gelmez.</p>${body}</section>`;
+  $('view').innerHTML=`<section class="box"><h3>Çöp Kutusu<small>${trs.items.length?nf.format(trs.items.length)+' kayıt':''}</small></h3><p class="note" style="margin:0 0 12px">Silinen proje, proje dosyası, şirket içi not, sevkiyat, sevkiyat belgesi ve aday müşteri 30 gün burada bekler, sonra kalıcı olarak silinir. Görev, kişi, toplantı notu, lead ve kayıtlı saha kartı silmeleri buraya gelmez.</p>${body}</section>`;
 }
 document.addEventListener('click',async e=>{
   const b=e.target.closest&&e.target.closest('[data-trres]');if(!b||view!=='trash')return;
@@ -3313,13 +3461,14 @@ const NAV_ICON={"ovw": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"curren
 /* ---------- Hub: menüde az sayıda ana başlık; başlığa basınca alt sayfaların kutucukları açılır (MKT Motors'taki hub ile aynı mantık) ---------- */
 NAV_ICON.ships='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.4 17.5 21 12H3l1.6 5.5"/><path d="M12 12V6M7 12V8h10v4"/></svg>';
 NAV_ICON.trash='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+NAV_ICON.prospects='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
 const HUBS={
   proj:{t:'Projeler',items:[['add','Yeni Proje Ekle','Yeni bir saha projesi kaydı açın.'],['list','Proje Listesi','Tüm projeler: aşama, durum, güç ve skor.'],['planner','Proje Görev Listesi','Projelere bağlı görevler, sorumlular ve terminler.'],['ships','Sevkiyatlar','Çin\'den gelen konteynerler, içindeki ürünler ve hangi projeye gidecekleri.']]},
   meet:{t:'Toplantılar',items:[['daily','Daily Toplantı Notları','Bugün konuşulacaklar: gecikmiş görevler, yeni notlar, güncellenmeyen projeler.'],['meetings','Toplantı Notları','Yapılan toplantıların kayıtları.']]},
-  market:{t:'İş Geliştirme',items:[['leads','Lead Havuzu','Aranacak firma listesi ve arama notları.'],['contacts','Müşteri Bilgileri','Şirketler ve iletişim kişileri.'],['rakip','Rakip Analizi','Çevredeki şarj istasyonları ve anlık doluluk.'],['roi','ROI Hesaplayıcı','Gelir paylaşımı ve geri dönüş senaryoları.']]},
+  market:{t:'İş Geliştirme',items:[['leads','Lead Havuzu','Aranacak firma listesi ve arama notları.'],['prospects','Aday Müşteriler','Henüz temas etmediğiniz, kendi seçtiğiniz firma ve kişiler.'],['contacts','Müşteri Bilgileri','Şirketler ve iletişim kişileri.'],['rakip','Rakip Analizi','Çevredeki şarj istasyonları ve anlık doluluk.'],['roi','ROI Hesaplayıcı','Gelir paylaşımı ve geri dönüş senaryoları.']]},
   admin:{t:'Yönetim',items:[['users','Kullanıcı Yönetimi','Hesaplar, roller ve şifreler.'],['trash','Çöp Kutusu','Silinen proje, dosya ve notlar 30 gün burada bekler.'],['activity','İşlem Geçmişi','Sistemde yapılan işlemlerin kaydı.']]}
 };
-const HUB_VIEW={list:'locations',planner:'planner',ships:'ships',daily:'daily',meetings:'meetings',leads:'leads',contacts:'contacts',rakip:'rakip',roi:'roi',users:'users',activity:'activity',trash:'trash'};
+const HUB_VIEW={prospects:'prospects',list:'locations',planner:'planner',ships:'ships',daily:'daily',meetings:'meetings',leads:'leads',contacts:'contacts',rakip:'rakip',roi:'roi',users:'users',activity:'activity',trash:'trash'};
 let hubKey='proj';
 // Hesabın görebildiği kutucuklar (Kısıtlı Kullanıcı Kayıtlar sayfalarını ve yazma işlemlerini görmez).
 const hubCan=k=>k==='users'?me.role==='admin':k==='activity'||k==='trash'?!!me.owner:k==='add'?!isRO():REC_NAV.includes(k)?!isRestricted():true;
@@ -3335,6 +3484,7 @@ function openHub(h){
   guard(()=>{view='hub';hubKey=h;render();window.scrollTo(0,0);});
 }
 function hubStat(k){
+  if(k==='prospects'&&pr.loaded){const n=pr.rows.length,w=pr.rows.filter(x=>x.status==='Temas Edilmedi').length;return n?nf.format(n)+' aday'+(w?' · '+nf.format(w)+' temas edilmedi':''):'';}
   if(k==='ships'&&sh.loaded){const n=sh.list.filter(x=>x.status!=='teslim').length,free=sh.list.reduce((a,x)=>a+Math.max(0,shTot(x).free),0);return sh.list.length?nf.format(n)+' açık sevkiyat'+(free?' · '+nf.format(free)+' ürün atanmamış':''):'';}
   if(k==='list'&&loaded){const n=db.sites.length;return n?nf.format(n)+' proje · '+nf.format(db.sites.filter(isOpen).length)+' aktif':'';}
   if((k==='planner'||k==='daily')&&pl.loaded){const t=todayStr(),op=pl.tasks.filter(x=>!x.done),late=op.filter(x=>x.due&&x.due<t).length;
@@ -3348,6 +3498,7 @@ function renderHub(){
     :'<section class="box"><p class="note">Bu bölümde görebileceğiniz sayfa yok.</p></section>';
   if(it.some(x=>x[0]==='ships')&&!sh.loaded)shLoad();
   // Görev sayıları sunucudan gelince kutucuklara yazılır.
+  if(mode==='cloud'&&!pr.loaded&&it.some(x=>x[0]==='prospects'))loadProspects();
   if(mode==='cloud'&&!pl.loaded&&it.some(x=>x[0]==='planner'||x[0]==='daily'))loadTasks().then(()=>{if(view==='hub')document.querySelectorAll('[data-hubstat]').forEach(e=>{e.textContent=hubStat(e.dataset.hubstat);});}).catch(()=>{});
 }
 function renderHubStats(){document.querySelectorAll('[data-hubstat]').forEach(e=>{e.textContent=hubStat(e.dataset.hubstat);});}

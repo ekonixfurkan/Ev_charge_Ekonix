@@ -5,6 +5,7 @@ import { requireAuth } from '../lib/auth.js';
 import { ensureUsers } from '../lib/users.js';
 import { logActivity } from '../lib/activity.js';
 import { handleLeads } from '../lib/leads.js';
+import { handleProspects } from '../lib/prospects.js';
 import { backfillSiteContacts } from '../lib/contacts-backfill.js';
 
 let _ready = null;
@@ -65,6 +66,7 @@ export default async function handler(req, res) {
     if (req.query?.leads) return await handleLeads(req, res, user, sql());
     await ensureContacts();
     const s = sql();
+    if (req.query?.prospects !== undefined) return await handleProspects(req, res, user, s); // Aday Müşteriler (bkz. lib/prospects.js)
     try { await backfillSiteContacts(s); } catch (e) { console.error('contacts backfill', e && e.message); } // projelerdeki kişileri rehbere bir kez aktarır; hata isteği düşürmez
 
     if (req.method === 'GET') {
