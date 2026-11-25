@@ -722,7 +722,8 @@ table.yearly{width:auto;min-width:min(100%,640px)}
 /* Proje Listesi tam genişliğe yayılır: kod, aşama, durum ve skor sütunları içerik kadar; artan alanı metin sütunları alır. */
 table.portfolio.loclist{width:100%}
 table.portfolio.loclist :is(th,td):is(:nth-child(1),:nth-child(2),:nth-child(4),:nth-child(5),:nth-child(6)){width:1%;white-space:nowrap}
-table.portfolio.loclist td:nth-child(8){max-width:none}
+table.portfolio.loclist td:nth-child(9){max-width:none}
+table.portfolio.loclist td.c-ref span{display:inline-block;max-width:130px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 /* Şirket içi bilgilendirme simgesi: dar sütun, ek boşluk yok */
 table.portfolio.ovwtbl.loclist :is(th,td).c-msg{width:1%;padding-left:0;padding-right:4px;text-align:center}
 .msg-btn{display:inline-grid;place-items:center;width:24px;height:24px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--navy);cursor:pointer;vertical-align:middle}
@@ -1025,22 +1026,23 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
   table.loclist.m-cards.m-cards td{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:1px;text-align:left;padding:0!important}
   table.loclist.m-cards.m-cards td::before{flex:none;white-space:nowrap}
   table.loclist.m-cards.m-cards tfoot td:empty,table.loclist.m-cards.m-cards td.sp{display:none}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:is(:nth-child(1),:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(13),:nth-child(14))::before{display:none}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:is(:nth-child(6),:nth-child(9),:nth-child(11)){display:none}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:is(:nth-child(1),:nth-child(3),:nth-child(4),:nth-child(5),:nth-child(14),:nth-child(15))::before{display:none}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:is(:nth-child(6),:nth-child(10),:nth-child(12)){display:none}
   table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(3){grid-column:1/4;grid-row:1;font-size:14px;font-weight:700;line-height:1.3;border:0;margin:0;padding:0!important}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(13){grid-column:4;grid-row:1;align-items:flex-end;font-size:18.5px;font-weight:700}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(14){grid-column:4;grid-row:1;align-items:flex-end;font-size:18.5px;font-weight:700}
   table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(1){grid-column:1/3;grid-row:2;flex-direction:row;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-top:2px}
   table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(5){grid-column:3/5;grid-row:2;align-items:flex-end;font-size:11px;color:var(--muted);margin-top:2px;text-align:right}
   table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(4){grid-column:1/3;grid-row:3;margin-top:8px}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(14){grid-column:3/5;grid-row:3;align-items:flex-end;margin-top:8px}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(15){grid-column:3/5;grid-row:3;align-items:flex-end;margin-top:8px}
   table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(7){grid-column:1/3;grid-row:4;margin-top:10px}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(16){grid-column:3/5;grid-row:4;align-items:flex-end;margin-top:10px;text-align:right}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:is(:nth-child(8),:nth-child(10),:nth-child(12),:nth-child(15)){grid-row:5;margin-top:10px;padding-top:8px!important;border-top:1px solid var(--hair)}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(8){grid-column:1}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(10){grid-column:2}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(12){grid-column:3}
-  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(15){grid-column:4}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(17){grid-column:3/5;grid-row:4;align-items:flex-end;margin-top:10px;text-align:right}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:is(:nth-child(9),:nth-child(11),:nth-child(13),:nth-child(16)){grid-row:5;margin-top:10px;padding-top:8px!important;border-top:1px solid var(--hair)}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(9){grid-column:1}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(11){grid-column:2}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(13){grid-column:3}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td:nth-child(16){grid-column:4}
   table.loclist.m-cards.m-cards :is(th,td).c-msg,table.loclist.m-cards.m-cards .grp-head td.c-msg{display:none!important}
+  table.loclist.m-cards.m-cards tbody tr:not(.grp-head) td.c-ref{display:none!important}
   table.loclist.m-cards.m-cards td[colspan]{grid-column:1/-1!important;grid-row:auto!important}
   /* Filtreler: arama her zaman açık, diğer süzgeçler "Filtreler" düğmesiyle açılır */
   .locbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
@@ -1892,7 +1894,7 @@ function arrangeGroups(list){
 }
 function grpHeadHtml(g,all){
   const m=all.filter(x=>grpOf(x)===g),T=sumOf(m),open=!grp.closed.has(g);
-  return `<tr class="grp-head" data-grp="${esc(g)}" tabindex="0" aria-expanded="${open}" title="Grubun Şirket İçi Bilgilendirmesini aç (ok işareti: grubu aç/kapat)"><td><span class="grp-chev" role="button" aria-label="Grubu aç / kapat" title="Grubu aç / kapat">${open?'▾':'▸'}</span></td><td class="c-msg">${msgBtn('data-gmsg="'+esc(g)+'"',g)}</td><td colspan="5"><span class="grp-name">${esc(g)}</span><small>${m.length} proje</small></td>
+  return `<tr class="grp-head" data-grp="${esc(g)}" tabindex="0" aria-expanded="${open}" title="Grubun Şirket İçi Bilgilendirmesini aç (ok işareti: grubu aç/kapat)"><td><span class="grp-chev" role="button" aria-label="Grubu aç / kapat" title="Grubu aç / kapat">${open?'▾':'▸'}</span></td><td class="c-msg">${msgBtn('data-gmsg="'+esc(g)+'"',g)}</td><td colspan="6"><span class="grp-name">${esc(g)}</span><small>${m.length} proje</small></td>
     <td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td>
     <td><button type="button" class="ghost grp-x" data-grpadd="${esc(g)}" title="Bu gruba yeni proje ekle">Proje Ekle</button> <button type="button" class="ghost grp-x" data-grpdel="${esc(g)}" title="Grubu dağıt (projeler silinmez)">Grubu Dağıt</button></td></tr>`;
 }
@@ -1906,7 +1908,7 @@ function locRowsHtml(rows,all=rows){
     prev=g;
     if(g&&grp.closed.has(g))continue;
     const t=totals(s),d=scoreOf(s),st=statusOf(s.status),on=grp.sel.has(s.id);
-    h+=`<tr ${grp.on?`data-gsel="${s.id}" aria-selected="${on}"`:`data-open="${s.id}"`} tabindex="0" class="${isOpen(s)?'':'closed'}${g?' grp-row':''}${on?' sel':''}"><td class="c-code">${grp.on?`<input type="checkbox" class="grp-cb" tabindex="-1" ${on?'checked':''} aria-label="Seç"> `:''}${esc(s.code||'—')}</td><td class="c-msg">${msgBtn('data-msg="'+esc(s.id)+'"',s.name)}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc([s.city,s.district].filter(Boolean).join(' / '))||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td>
+    h+=`<tr ${grp.on?`data-gsel="${s.id}" aria-selected="${on}"`:`data-open="${s.id}"`} tabindex="0" class="${isOpen(s)?'':'closed'}${g?' grp-row':''}${on?' sel':''}"><td class="c-code">${grp.on?`<input type="checkbox" class="grp-cb" tabindex="-1" ${on?'checked':''} aria-label="Seç"> `:''}${esc(s.code||'—')}</td><td class="c-msg">${msgBtn('data-msg="'+esc(s.id)+'"',s.name)}</td><td class="c-name"><span class="p1">${esc(s.name)}</span></td><td><span class="badge stg">${esc(stageLabel(s.stage))}</span></td><td>${esc([s.city,s.district].filter(Boolean).join(' / '))||'—'}</td><td class="sp"></td><td>${esc(s.survey.lead)||'—'}</td><td class="c-ref" translate="no" title="${esc(s.survey.partner||'')}"><span>${esc(s.survey.partner||'—')}</span></td>
       <td class="num"><span class="p1">${t.dcUnits}</span></td><td class="num">${df.format(t.dcKw)}</td><td class="num"><span class="p1">${t.acUnits}</span></td><td class="num">${df.format(t.acKw)}</td><td class="num">${t.sockets}</td>
       <td class="num"><span class="amgscore ${d.cls}">${d.label}</span></td>
       <td><span class="badge" style="--c:${st.c}">${esc(st.t)}</span></td><td class="num"><span class="p1">${df.format(t.dcKw+t.acKw)}</span></td><td title="${esc(fmtTs(s.updatedAt))}">${esc(agoText(s.updatedAt))}</td></tr>`;
@@ -1958,7 +1960,7 @@ document.addEventListener('keydown',e=>{
   const r=e.target.closest&&e.target.closest('#locRows [data-gsel],#locRows .grp-head');
   if(r&&e.target===r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();r.click();}
 });
-function locFootHtml(T){return `<tr><td colspan="3">Toplam</td><td></td><td></td><td class="sp"></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td><td></td></tr>`;}
+function locFootHtml(T){return `<tr><td colspan="3">Toplam</td><td></td><td></td><td class="sp"></td><td></td><td></td><td class="num">${T.dcU}</td><td class="num">${df.format(T.dcKw)}</td><td class="num">${T.acU}</td><td class="num">${df.format(T.acKw)}</td><td class="num">${T.sock}</td><td></td><td></td><td class="num">${df.format(T.dcKw+T.acKw)}</td><td></td></tr>`;}
 // "Bugün", "Dün", "3 gün önce"; 30 günden eskiyse tarih.
 function agoText(v){const t=new Date(v);if(!v||isNaN(t))return '—';const a=new Date(),d0=new Date(a.getFullYear(),a.getMonth(),a.getDate()),d1=new Date(t.getFullYear(),t.getMonth(),t.getDate()),n=Math.round((d0-d1)/864e5);
   return n<=0?'Bugün':n===1?'Dün':n<=30?n+' gün önce':t.toLocaleDateString(LOC);}
@@ -1978,20 +1980,20 @@ function renderLocations(){
   const selF=(id,label,key,items)=>`<label class="lf">${label}<select data-lf="${key}" id="${id}"><option value="">Tümü</option>${items.map(([v,t])=>opt(v,F[key],t)).join('')}</select></label>`;
   $('view').innerHTML=`<section class="box">
     <div class="locbar no-print${lfOpen?' lf-open':''}">
-      <label class="lf lq">Ara<input type="search" id="locQ" data-lf="q" value="${esc(F.q)}" placeholder="Ad, şehir, mal sahibi, ortak, sıradaki iş…" autocomplete="off"></label>
+      <label class="lf lq">Ara<input type="search" id="locQ" data-lf="q" value="${esc(F.q)}" placeholder="Ad, şehir, mal sahibi, referans, sıradaki iş…" autocomplete="off"></label>
       <button type="button" id="lfToggle" class="lf-toggle${hasFilter()?' on':''}" aria-expanded="${lfOpen}">Filtreler</button>
       ${selF('lfStage','Aşama','stage',STAGES.map(([k,t])=>[k,k+' '+t]))}
       ${selF('lfStatus','Durum','status',STATUSES.map(x=>[x.k,x.t]))}
       ${selF('lfCity','Şehir','city',uniq(s=>s.city).map(x=>[x,x]))}
       ${selF('lfType','Saha Tipi','type',TYPES.filter(t=>db.sites.some(s=>s.type===t[0])))}
       ${selF('lfOwner','Sorumlu','owner',uniq(s=>s.survey.lead).map(x=>[x,x]))}
-      ${selF('lfPartner','Yerel Ortak','partner',uniq(s=>s.survey.partner).map(x=>[x,x]))}
+      ${selF('lfPartner','Referans','partner',uniq(s=>s.survey.partner).map(x=>[x,x]))}
       <label class="lf">Sırala<select id="lfSort">${Object.entries(SORTS).map(([k,[t]])=>opt(k,sortKey,t)).join('')}</select></label>
       <button type="button" id="grpToggle" aria-pressed="false">Gruplandır</button>
       <button type="button" id="grpGo" class="save grp-go" hidden>Seçilenleri Gruplandır</button>
       <button type="button" id="locClear" class="ghost" hidden>Filtreleri Temizle</button>
     </div>
-    <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl loclist m-cards"><thead><tr><th>Proje Kodu</th><th class="c-msg" aria-label="Şirket içi bilgilendirme"></th><th>Proje</th><th>Aşama</th><th>İl / İlçe</th><th class="sp"></th><th>Sorumlu</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th><th>Güncelleme</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
+    <div class="ovw-grid"><div><div class="scroll"><table class="portfolio ovwtbl loclist m-cards"><thead><tr><th>Proje Kodu</th><th class="c-msg" aria-label="Şirket içi bilgilendirme"></th><th>Proje</th><th>Aşama</th><th>İl / İlçe</th><th class="sp"></th><th>Sorumlu</th><th>Referans</th><th class="num">DC Ünite</th><th class="num">DC kW</th><th class="num">AC Ünite</th><th class="num">AC kW</th><th class="num">Soket</th><th class="num">Skor</th><th>Durum</th><th class="num">Toplam kW</th><th>Güncelleme</th></tr></thead><tbody id="locRows"></tbody><tfoot id="locFoot"></tfoot></table></div><div id="locPager"></div></div><div class="kpi-col" id="locKpi"></div></div></section>`;
   paintLocRows();
 }
 // Süzgeç çubuğu (.locbar) sayfa başlığıyla aynı satıra, üst çubuğa taşınır (tüm sayfalarda).
@@ -2258,7 +2260,7 @@ function renderSite(){
     ${leadField()}
     <label class="span4">Sıradaki iş<input id="nextActionBox" data-locked readonly tabindex="-1" value="${esc(nextStageOf(s))}" title="Bir sonraki aşama; aşama değişince kendiliğinden güncellenir"></label>
     ${field('nextActionDate','Sıradaki iş tarihi','date')}
-    ${sv('partner','Yerel ortak')}
+    ${sv('partner','Referans')}
     ${field('statusTr','Son durum','text',' class="span4"')}
     <label class="span4">Engel<input data-f="blockerTr" value="${esc(s.blockerTr||s.blocker)}"></label>
   </div></section>
