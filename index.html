@@ -3892,7 +3892,7 @@ function renderRoi(){
   $('view').innerHTML='<iframe id="roiFrame" class="roi-frame" src="/roi.html" title="ROI Hesaplayıcı"></iframe>';
 }
 /* ---------- Daily Toplantı Notları: bugün konuşulacak projeler (veriden otomatik) ---------- */
-const DY_QUIET=7,DY_CAP=10,DY_NOTE_DAYS=3;
+const DY_QUIET=2,DY_CAP=10,DY_NOTE_DAYS=3;
 // Dört kutu (Ana Sayfa gibi 2×2); her kutuda aynı 3 sütun, aynı genişlik: Proje · Ayrıntı · Zaman. Tıklama: go = nereye gidilir.
 function dyRows(rows,h2,h3,empty){
   if(!rows.length)return `<p class="note">${esc(empty)}</p>`;
