@@ -2781,6 +2781,7 @@ function uAct(u){
   return `<span class="u-what" title="${esc(full)}"><b translate="no">${esc(what||ENT_LABEL[a.entity]||'—')}</b><span>${esc(a.summary)}</span></span><small class="u-sub">${fmtDt(a.at)} · ${agoShort(a.at)}</small>`;
 }
 async function renderUsers(){
+  if(me.email&&!me.owner){view='portfolio';sub='ovw';render();return;}   // yalnızca sahip hesap
   $('view').innerHTML='<section class="box"><h3>Kullanıcı Yönetimi<small>Yükleniyor…</small></h3></section>';
   let d;
   try{d=await userApi('GET');}catch(e){if(view!=='users')return;$('view').innerHTML='<section class="box"><h3>Kullanıcı Yönetimi</h3><p class="note">'+esc(e.message)+'</p></section>';return;}
@@ -3563,7 +3564,7 @@ const HUBS={
 const HUB_VIEW={prospects:'prospects',list:'locations',planner:'planner',ships:'ships',daily:'daily',meetings:'meetings',leads:'leads',contacts:'contacts',rakip:'rakip',roi:'roi',users:'users',activity:'activity',trash:'trash'};
 let hubKey='proj';
 // Hesabın görebildiği kutucuklar (Kısıtlı Kullanıcı Kayıtlar sayfalarını ve yazma işlemlerini görmez).
-const hubCan=k=>k==='users'?me.role==='admin':k==='activity'||k==='trash'?!!me.owner:k==='add'?!isRO():REC_NAV.includes(k)?!isRestricted():true;
+const hubCan=k=>k==='users'||k==='activity'||k==='trash'?!!me.owner:k==='add'?!isRO():REC_NAV.includes(k)?!isRestricted():true;
 const hubItems=h=>(HUBS[h]?HUBS[h].items:[]).filter(x=>hubCan(x[0]));
 const hubOf=v=>{const k=Object.keys(HUB_VIEW).find(x=>HUB_VIEW[x]===v);return k?Object.keys(HUBS).find(h=>HUBS[h].items.some(x=>x[0]===k)):'';};
 function hubGo(k){
@@ -5096,7 +5097,7 @@ const meReady=(async()=>{
     const r=await fetch('/api/auth/me?seen=1',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
-      me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};$('adminHubNav').hidden=!(d.role==='admin'||d.owner);
+      me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};$('adminHubNav').hidden=!d.owner;   // Yönetim yalnızca sahip hesapta
       document.documentElement.classList.toggle('ro',isRO());if(isRestricted())applyRestricted();
       // İşlem Geçmişi yalnızca sahip hesaba açık (sunucu da 403 verir).
       if(!me.owner&&view==='activity'){view='portfolio';sub='ovw';render();}

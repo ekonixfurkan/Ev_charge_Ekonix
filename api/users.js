@@ -1,4 +1,4 @@
-// /api/users — yalnızca yönetici. GET liste · POST yeni hesap · PATCH güncelle/şifre · DELETE ?email=
+// /api/users — yalnızca sahip hesap (requireAdmin). GET liste · POST yeni hesap · PATCH güncelle/şifre · DELETE ?email=
 import { readJson } from '../lib/db.js';
 import { requireAdmin } from '../lib/auth.js';
 import { logActivity, lastActions } from '../lib/activity.js';

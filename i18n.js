@@ -427,6 +427,7 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Yönetim bölümü yalnızca sahip hesaba açık': 'The Management section is available to the owner account only',
     'Son Görülme': 'Last Seen',
     'Son İşlem': 'Last Action',
     'Az önce': 'Just now',

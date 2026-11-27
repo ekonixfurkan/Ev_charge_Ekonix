@@ -1214,6 +1214,7 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Yönetim bölümü yalnızca sahip hesaba açık": "管理部分仅所有者账户可用",
    "Son Görülme": "最后在线",
    "Son İşlem": "最近操作",
    "Az önce": "刚刚",
