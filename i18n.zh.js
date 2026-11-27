@@ -1214,6 +1214,9 @@ window.I18N_ZH = {
    "Ürün eklemek için sağ üstteki \"Düzenle\"ye basın.": "如需添加产品，请点击右上角“编辑”。",
    "Henüz hiçbir ürün bir projeye atanmadı.": "尚无产品分配到项目。",
    "Önizle": "预览",
+   "Son Görülme": "最后在线",
+   "Son İşlem": "最近操作",
+   "Az önce": "刚刚",
    "ZIP İndir": "下载 ZIP",
    "Klasördeki tüm fotoğraf ve videoları ZIP olarak indir": "将此文件夹中的所有照片和视频打包为 ZIP 下载",
    "Dosyalar indirilemedi. Bağlantınızı kontrol edip yeniden deneyin.": "无法下载文件。请检查网络后重试。",
@@ -1329,6 +1332,9 @@ window.I18N_ZH = {
   },
   rules: function (sub) {
     var PZ = [
+      [/^([\d.,]+) dk önce$/, function (m) { return m[1] + ' 分钟前'; }],
+      [/^([\d.,]+) saat önce$/, function (m) { return m[1] + ' 小时前'; }],
+      [/^(.+ .+) · (?:Az önce|([\d.,]+) (dk|saat|gün) önce)$/, function (m) { return m[1] + ' · ' + (m[2] ? m[2] + (m[3] === 'dk' ? ' 分钟前' : m[3] === 'saat' ? ' 小时前' : ' 天前') : '刚刚'); }],
       [/^([\d.,]+) dosya ZIP olarak indirildi\.$/, function (m) { return '已将 ' + m[1] + ' 个文件打包下载。'; }],
       [/^([\d.,]+) dosya ZIP'e eklendi\. Şu ([\d.,]+) dosya indirilemedi: (.+)$/, function (m) { return '已将 ' + m[1] + ' 个文件加入 ZIP。以下 ' + m[2] + ' 个无法下载：' + m[3]; }],
       [/^Klasör (.+): tek ZIP için sınır 1,5 GB\. Büyük videoları tek tek indirin\.$/, function (m) { return '文件夹大小为 ' + m[1] + '；单个 ZIP 上限为 1.5 GB。请逐个下载大视频。'; }],

@@ -907,6 +907,10 @@ dialog .row button:not(.primary):hover{background:var(--soft);color:var(--ink)}
 .u-tbl .role-sel{width:auto;min-height:0;padding:5px 8px;font-size:11.5px}
 .u-tbl .acts button{padding:5px 9px;font-size:11.5px;min-height:0}
 .u-tbl tr.off td{opacity:.55}
+/* Kullanıcı tablosu: son görülme / son işlem sütunlarıyla sayfaya sığsın diye işlem düğmeleri iki satıra iner */
+@media (min-width:901px){.u-tbl.u-users td:first-child{min-width:150px}.u-tbl.u-users td:nth-child(2){white-space:normal;overflow-wrap:anywhere;max-width:190px}.u-tbl.u-users .acts{flex-wrap:wrap;width:232px;margin-left:auto;row-gap:5px}.u-tbl.u-users .acts .role-sel{flex:1 1 110px}}
+.u-tbl .u-sub{display:block;font-size:10.5px;color:var(--muted)}.u-tbl .u-sub.u-on{color:var(--ok);font-weight:700}
+.u-tbl td.u-last{white-space:normal;min-width:190px;max-width:270px}.u-tbl .u-what{display:block;line-height:1.35}.u-tbl .u-what b{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.u-tbl .u-what span{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;font-size:11px;color:var(--ink2)}
 .u-h3r{display:flex;align-items:center;gap:14px}
 .u-btns{display:flex;gap:8px;align-items:center}
 .u-tbl .name-in{font-weight:600;min-height:30px;padding:4px 8px;margin:0 0 2px -8px;width:calc(100% + 8px);border-color:transparent;background:transparent}
@@ -2764,6 +2768,18 @@ async function userApi(method,body,qs=''){
   return d;
 }
 function userMsg(t,err){const m=$('uMsg');if(!m)return;m.textContent=t||'';m.className='u-msg'+(err?' err':'');}
+const agoShort=v=>{const m=Math.floor((Date.now()-new Date(v))/60000);return m<1?'Az önce':m<60?m+' dk önce':m<1440?Math.floor(m/60)+' saat önce':Math.floor(m/1440)+' gün önce';};
+// Son Görülme: siteyi en son açtığı / kullandığı an (şifreyle giriş gerekmez). Eski kayıtlarda son giriş daha yeniyse o gösterilir.
+function uSeen(u){
+  const v=[u.lastSeen,u.lastLogin].filter(Boolean).sort((a,b)=>new Date(b)-new Date(a))[0];if(!v)return '—';
+  const on=Date.now()-new Date(v)<5*60000;
+  return `${fmtDt(v)}<small class="u-sub${on?' u-on':''}">${agoShort(v)}</small>`;
+}
+function uAct(u){
+  const a=u.lastAction;if(!a)return '—';
+  const what=[a.code,a.name].filter(Boolean).join(' · '),full=[what,a.summary].filter(Boolean).join(' — ');
+  return `<span class="u-what" title="${esc(full)}"><b translate="no">${esc(what||ENT_LABEL[a.entity]||'—')}</b><span>${esc(a.summary)}</span></span><small class="u-sub">${fmtDt(a.at)} · ${agoShort(a.at)}</small>`;
+}
 async function renderUsers(){
   $('view').innerHTML='<section class="box"><h3>Kullanıcı Yönetimi<small>Yükleniyor…</small></h3></section>';
   let d;
@@ -2775,6 +2791,8 @@ async function renderUsers(){
       <td style="white-space:nowrap">${esc(u.email)}</td>
       <td><span class="pill" style="--c:${u.active?'var(--ok)':'var(--muted)'}">${u.active?'Aktif':'Pasif'}</span></td>
       <td>${fmtDt(u.lastLogin)}</td>
+      <td>${uSeen(u)}</td>
+      ${d.owner?`<td class="u-last">${uAct(u)}</td>`:''}
       ${d.owner?`<td>${fmtDt(u.passChangedAt||u.createdAt)}</td>`:''}
       <td><div class="acts" data-email="${esc(u.email)}">
         <button type="button" data-act="pw" ${u.owner&&!d.owner?'disabled':''}>Şifre belirle</button>
@@ -2791,7 +2809,7 @@ async function renderUsers(){
       <span class="u-btns"><button type="submit" class="primary">Kullanıcıyı Ekle</button><button type="button" id="uCancel" class="ghost">Vazgeç</button></span>
     </form><p class="u-msg" id="uMsg" role="status"></p>
     <p class="note">Yönetici: kullanıcıları yönetebilir. Kullanıcı: sadece saha verisiyle çalışır. Kısıtlı Kullanıcı: Kullanıcı gibidir ama menüdeki Kayıtlar bölümünü (Müşteri Bilgileri, Toplantı Notları, Lead Havuzu) göremez. Şifre yalnızca burada görünür, kaydedilmiş hâli geri okunamaz; kullanıcıya ilettikten sonra değiştirmesini isteyin.</p></section>
-    <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl m-cards"><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Son Giriş</th>${d.owner?'<th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+    <section class="box"><h3>Kayıtlı Kullanıcılar<span class="u-h3r"><small>${d.users.length} hesap</small><button type="button" class="primary" id="uNew">+ Yeni Kullanıcı Ekle</button></span></h3><div class="u-wrap"><table class="u-tbl u-users m-cards"><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Durum</th><th>Son Giriş</th><th>Son Görülme</th>${d.owner?'<th>Son İşlem</th><th>Şifre Değişti</th>':''}<th style="text-align:right">Rol ve İşlemler</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
   $('uGen').onclick=()=>{$('uPass').value=genPass();};
   $('uForm').onsubmit=async e=>{e.preventDefault();userMsg('');
     const body={name:$('uName').value,email:$('uEmail').value,password:$('uPass').value,role:$('uRole').value};
@@ -5068,9 +5086,14 @@ document.addEventListener('click',e=>{
 document.addEventListener('input',e=>{if(e.target.id==='catQ')paintCat();});
 
 /* ---------- oturum ---------- */
+// Son görülme: yalnızca gerçek kullanımda (tıklama, tuş, sekmeye dönüş) ve en çok 2 dakikada bir bildirilir; arka plan yoklamaları sayılmaz.
+let seenAt=Date.now();
+function seenPing(){if(document.hidden||Date.now()-seenAt<120000||!/^https?:/.test(location.protocol))return;seenAt=Date.now();fetch('/api/auth/me?seen=1',{credentials:'same-origin'}).catch(()=>{});}
+for(const ev of ['pointerdown','keydown'])document.addEventListener(ev,seenPing,{passive:true,capture:true});
+document.addEventListener('visibilitychange',seenPing);
 const meReady=(async()=>{
   try{
-    const r=await fetch('/api/auth/me',{credentials:'same-origin'});
+    const r=await fetch('/api/auth/me?seen=1',{credentials:'same-origin'});
     if(r.status===401||r.status===503){location.replace('/login.html');return;}
     if(r.ok){const d=await r.json();if(d.email){const w=d.name||d.email;$('whoami').textContent=w;$('whoami').title=d.email;$('whoami').hidden=false;}
       me={email:d.email,name:d.name||'',role:d.role,owner:!!d.owner};$('adminHubNav').hidden=!(d.role==='admin'||d.owner);

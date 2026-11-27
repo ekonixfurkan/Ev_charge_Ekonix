@@ -1,7 +1,7 @@
 // /api/users — yalnızca yönetici. GET liste · POST yeni hesap · PATCH güncelle/şifre · DELETE ?email=
 import { readJson } from '../lib/db.js';
 import { requireAdmin } from '../lib/auth.js';
-import { logActivity } from '../lib/activity.js';
+import { logActivity, lastActions } from '../lib/activity.js';
 import { ROLES, isOwner, dbOn, listUsers, createUser, updateUser, deleteUser, findUser, activeAdminCount } from '../lib/users.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,7 +23,10 @@ export default async function handler(req, res) {
 
     if (req.method === 'GET') {
       // Şifre değişim bilgisi yalnızca sahibe gösterilir.
-      const users = (await listUsers()).map((u) => (me.owner ? u : { ...u, passChangedAt: undefined }));
+      // Son işlem (ne yaptığı) İşlem Geçmişi gibi yalnızca sahibe gösterilir.
+      let acts = null;
+      if (me.owner) { try { acts = await lastActions(); } catch { acts = null; } }
+      const users = (await listUsers()).map((u) => (me.owner ? { ...u, lastAction: (acts && acts.get(u.email)) || null } : { ...u, passChangedAt: undefined }));
       return res.status(200).json({ users, me: me.email, owner: Boolean(me.owner) });
     }
 

@@ -427,6 +427,9 @@
     'Ürün eklemek için sağ üstteki "Düzenle"ye basın.': 'To add products, press "Edit" at the top right.',
     'Henüz hiçbir ürün bir projeye atanmadı.': 'No product has been allocated to a project yet.',
     'Önizle': 'Preview',
+    'Son Görülme': 'Last Seen',
+    'Son İşlem': 'Last Action',
+    'Az önce': 'Just now',
     'ZIP İndir': 'Download ZIP',
     'Klasördeki tüm fotoğraf ve videoları ZIP olarak indir': 'Download all photos and videos in this folder as a ZIP',
     'Dosyalar indirilemedi. Bağlantınızı kontrol edip yeniden deneyin.': 'The files could not be downloaded. Check your connection and try again.',
@@ -722,6 +725,9 @@
   var tr; // aşağıda tanımlı
   function sub(s) { return tr(String(s).trim()); }
   var P = [
+    [/^([\d.,]+) dk önce$/, function (m) { return m[1] + ' min ago'; }],
+    [/^([\d.,]+) saat önce$/, function (m) { return m[1] + ' hours ago'; }],
+    [/^(.+ .+) · (?:Az önce|([\d.,]+) (dk|saat|gün) önce)$/, function (m) { return m[1] + ' · ' + (m[2] ? m[2] + (m[3] === 'dk' ? ' min ago' : m[3] === 'saat' ? ' hours ago' : ' days ago') : 'just now'); }],
     [/^([\d.,]+) dosya ZIP olarak indirildi\.$/, function (m) { return m[1] + ' files downloaded as ZIP.'; }],
     [/^([\d.,]+) dosya ZIP'e eklendi\. Şu ([\d.,]+) dosya indirilemedi: (.+)$/, function (m) { return m[1] + ' files added to the ZIP. These ' + m[2] + ' could not be downloaded: ' + m[3]; }],
     [/^Klasör (.+): tek ZIP için sınır 1,5 GB\. Büyük videoları tek tek indirin\.$/, function (m) { return 'The folder is ' + m[1] + '; the limit for one ZIP is 1.5 GB. Download large videos one by one.'; }],
